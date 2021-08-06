@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Generate tests" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="GenerateTestsKt" />
+    <module name="lsl_new.test" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
