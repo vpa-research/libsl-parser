@@ -1,54 +1,24 @@
 {
-  "metadata": {
-    "name": "simple",
-    "lslVersion": {
-      "first": {
-        "data": 1
-      },
-      "second": {
-        "data": 0
-      },
-      "third": {
-        "data": 0
-      }
-    }
-  },
-  "imports": [],
-  "includes": [],
-  "semanticTypes": [
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "types": [
     {
-      "semanticType": "Int",
-      "realType": {
-        "name": [
-          "int"
-        ]
-      }
+      "name": "Int",
+      "realName": "int"
     }
   ],
   "automata": [
     {
       "name": "A",
-      "kind": "REAL",
-      "states": [],
-      "shifts": [],
-      "internalVariables": [
+      "constructorVariables": [],
+      "variables": [
         {
           "name": "i",
-          "type": {
-            "semanticType": "Int",
-            "realType": {
-              "name": [
-                "int"
-              ]
-            }
-          }
+          "type": "Int"
         }
       ],
-      "constructorVariables": [],
-      "localFunctions": [
-        {}
-      ]
+      "states": [],
+      "shifts": []
     }
-  ],
-  "extensionFunctions": {}
+  ]
 }

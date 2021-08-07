@@ -1,326 +1,142 @@
 {
-  "metadata": {
-    "name": "simple",
-    "libraryVersion": "1.0.0f",
-    "language": "java",
-    "url": "https://github.com/vldf/",
-    "lslVersion": {
-      "first": {
-        "data": 1
-      },
-      "second": {
-        "data": 0
-      },
-      "third": {
-        "data": 0
-      }
-    }
-  },
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "lang": "java",
+  "library-version": "1.0.0f",
+  "url": "https://github.com/vldf/",
   "imports": [
     "another/one/file"
   ],
   "includes": [
     "file.to.include"
   ],
-  "semanticTypes": [
+  "types": [
     {
-      "semanticType": "SimpleType",
-      "realType": {
-        "name": [
-          "ru",
-          "vldf",
-          "Type"
-        ]
-      }
+      "name": "SimpleType",
+      "realName": "ru.vldf.Type"
     },
     {
-      "semanticType": "SimpleTypeWithGeneric",
-      "realType": {
-        "name": [
-          "ru",
-          "vldf",
-          "Type"
-        ],
-        "generic": [
-          "ru",
-          "vldf",
-          "Generic"
-        ]
-      }
+      "name": "SimpleTypeWithGeneric",
+      "realName": "ru.vldf.Type",
+      "realNameGeneric": "ru.vldf.Generic"
     },
     {
-      "semanticType": "EnumLikeType",
-      "realType": {
-        "name": [
-          "ru",
-          "vldf",
-          "Type"
-        ]
-      },
+      "name": "EnumLikeType",
+      "realName": "ru.vldf.Type",
       "entities": [
         {
-          "first": "VARIANT1",
-          "second": "-1"
+          "name": "VARIANT1",
+          "value": "-1"
         },
         {
-          "first": "VARIANT2",
-          "second": "true"
+          "name": "VARIANT2",
+          "value": "true"
         },
         {
-          "first": "VARIANT2",
-          "second": "1.0"
+          "name": "VARIANT2",
+          "value": "1.0"
         },
         {
-          "first": "VARIANT3",
-          "second": "\"String\""
+          "name": "VARIANT3",
+          "value": "\"String\""
         }
       ]
+    },
+    {
+      "name": "String",
+      "realName": "java.lang.String"
+    },
+    {
+      "name": "Int",
+      "realName": "int"
     }
   ],
   "automata": [
     {
       "name": "A",
-      "kind": "REAL",
+      "constructorVariables": [],
+      "variables": [
+        {
+          "name": "strVar",
+          "type": "String"
+        },
+        {
+          "name": "intVar",
+          "type": "Int"
+        }
+      ],
       "states": [
         {
           "name": "S1",
-          "kind": "SIMPLE",
-          "isSelf": false,
-          "isAny": false
+          "kind": "SIMPLE"
         },
         {
           "name": "S2",
-          "kind": "SIMPLE",
-          "isSelf": false,
-          "isAny": false
+          "kind": "SIMPLE"
         }
       ],
       "shifts": [
         {
-          "from": {
-            "name": "S1",
-            "kind": "SIMPLE",
-            "isSelf": false,
-            "isAny": false
-          },
-          "to": {
-            "name": "S2",
-            "kind": "SIMPLE",
-            "isSelf": false,
-            "isAny": false
-          },
-          "functions": [
-            {
-              "name": "func",
-              "automatonName": "A",
-              "args": [
-                {
-                  "name": "arg1",
-                  "type": {
-                    "semanticType": "SimpleType",
-                    "realType": {
-                      "name": [
-                        "ru",
-                        "vldf",
-                        "Type"
-                      ]
-                    }
-                  }
-                }
-              ],
-              "returnType": {
-                "semanticType": "SimpleTypeWithGeneric",
-                "realType": {
-                  "name": [
-                    "ru",
-                    "vldf",
-                    "Type"
-                  ],
-                  "generic": [
-                    "ru",
-                    "vldf",
-                    "Generic"
-                  ]
-                }
-              },
-              "contracts": [],
-              "statements": []
-            }
-          ]
+          "from": "S1",
+          "to": "S2",
+          "functions": {
+            "name": "func",
+            "args": [
+              "SimpleType"
+            ]
+          }
         }
-      ],
-      "variables": [],
-      "localFunctions": [
-        {}
       ]
     },
     {
       "name": "B",
-      "kind": "REAL",
+      "constructorVariables": [],
+      "variables": [
+        {
+          "name": "v",
+          "type": "Int"
+        }
+      ],
       "states": [
         {
           "name": "S1",
-          "kind": "SIMPLE",
-          "isSelf": false,
-          "isAny": false
+          "kind": "SIMPLE"
         },
         {
           "name": "S3",
-          "kind": "SIMPLE",
-          "isSelf": false,
-          "isAny": false
+          "kind": "SIMPLE"
         },
         {
           "name": "S7",
-          "kind": "SIMPLE",
-          "isSelf": false,
-          "isAny": false
+          "kind": "SIMPLE"
         },
         {
           "name": "S2",
-          "kind": "SIMPLE",
-          "isSelf": false,
-          "isAny": false
+          "kind": "SIMPLE"
         }
       ],
       "shifts": [
         {
-          "from": {
-            "name": "S1",
-            "kind": "SIMPLE",
-            "isSelf": false,
-            "isAny": false
-          },
-          "to": {
-            "name": "S2",
-            "kind": "SIMPLE",
-            "isSelf": false,
-            "isAny": false
-          },
-          "functions": [
-            {
-              "name": "func",
-              "automatonName": "B",
-              "args": [
-                {
-                  "name": "arg1",
-                  "type": {
-                    "semanticType": "SimpleTypeWithGeneric",
-                    "realType": {
-                      "name": [
-                        "ru",
-                        "vldf",
-                        "Type"
-                      ],
-                      "generic": [
-                        "ru",
-                        "vldf",
-                        "Generic"
-                      ]
-                    }
-                  }
-                }
-              ],
-              "returnType": {
-                "semanticType": "SimpleTypeWithGeneric",
-                "realType": {
-                  "name": [
-                    "ru",
-                    "vldf",
-                    "Type"
-                  ],
-                  "generic": [
-                    "ru",
-                    "vldf",
-                    "Generic"
-                  ]
-                }
-              },
-              "contracts": [],
-              "statements": []
-            }
-          ]
+          "from": "S1",
+          "to": "S2",
+          "functions": {
+            "name": "func",
+            "args": [
+              "SimpleTypeWithGeneric"
+            ]
+          }
         },
         {
-          "from": {
-            "name": "S2",
-            "kind": "SIMPLE",
-            "isSelf": false,
-            "isAny": false
-          },
-          "to": {
-            "name": "S1",
-            "kind": "SIMPLE",
-            "isSelf": false,
-            "isAny": false
-          },
-          "functions": [
-            {
-              "name": "func",
-              "automatonName": "B",
-              "args": [
-                {
-                  "name": "arg1",
-                  "type": {
-                    "semanticType": "SimpleType",
-                    "realType": {
-                      "name": [
-                        "ru",
-                        "vldf",
-                        "Type"
-                      ]
-                    }
-                  }
-                }
-              ],
-              "returnType": {
-                "semanticType": "SimpleTypeWithGeneric",
-                "realType": {
-                  "name": [
-                    "ru",
-                    "vldf",
-                    "Type"
-                  ],
-                  "generic": [
-                    "ru",
-                    "vldf",
-                    "Generic"
-                  ]
-                }
-              },
-              "contracts": [],
-              "statements": []
-            }
-          ]
+          "from": "S2",
+          "to": "S1",
+          "functions": {
+            "name": "func",
+            "args": [
+              "SimpleType"
+            ]
+          }
         }
-      ],
-      "variables": [],
-      "localFunctions": [
-        {},
-        {}
       ]
-    },
-    {
-      "name": "Main",
-      "kind": "SYNTHETIC",
-      "states": [],
-      "shifts": [],
-      "variables": [],
-      "localFunctions": []
     }
-  ],
-  "extensionFunctions": {
-    "A": [
-      {
-        "name": "extendedFunction",
-        "automatonName": "A",
-        "args": [],
-        "contracts": [],
-        "statements": [
-          {},
-          {}
-        ]
-      }
-    ]
-  }
+  ]
 }

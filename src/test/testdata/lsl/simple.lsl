@@ -14,6 +14,8 @@ types {
       VARIANT2: 1.0;
       VARIANT3: "String";
    }
+   String(java.lang.String);
+   Int(int);
 }
 
 automaton A {

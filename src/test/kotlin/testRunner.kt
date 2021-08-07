@@ -5,7 +5,8 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.asg.LslContext
+import org.jetbrains.research.libsl.asg.*
+import org.jetbrains.research.libsl.asg.Function
 import org.jetbrains.research.libsl.visitors.ASGBuilder
 import org.jetbrains.research.libsl.visitors.Resolver
 import org.junit.jupiter.api.Assertions
@@ -28,21 +29,12 @@ fun testRunner(name: String) {
 
     val gson = GsonBuilder()
         .setPrettyPrinting()
-        .setExclusionStrategies(object : ExclusionStrategy {
-            override fun shouldSkipField(f: FieldAttributes?): Boolean {
-                if (f?.name == "parent") {
-                    return true
-                }
-                return false
-            }
-
-            override fun shouldSkipClass(clazz: Class<*>): Boolean {
-                if (clazz == LslContext::class.java) {
-                    return true
-                }
-                return false
-            }
-        })
+        .registerTypeAdapter(Library::class.java, librarySerializer)
+        .registerTypeAdapter(Automaton::class.java, automatonSerializer)
+        .registerTypeAdapter(Type::class.java, typeSerializer)
+        .registerTypeAdapter(Function::class.java, functionSerializer)
+        .registerTypeAdapter(Expression::class.java, expressionSerializer)
+        .registerTypeAdapter(Statement::class.java, statementSerializer)
         .create()
     val prettyContent = gson.toJson(library)
 

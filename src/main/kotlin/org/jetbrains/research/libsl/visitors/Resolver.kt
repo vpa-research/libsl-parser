@@ -82,7 +82,7 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
             Argument(arg.name.text, argType)
         }?.toList().orEmpty()
 
-        val func = SimpleFunction(name, automatonName, args, returnType, listOf(), listOf(), context)
+        val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)
         context.storeResolvedFunction(func)
     }
 }

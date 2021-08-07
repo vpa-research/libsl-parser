@@ -29,9 +29,6 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val nonlocalFunctions = ctx.declarations().declaration()
             .mapNotNull { it.functionDecl() }
             .map { visitFunctionDecl(it) }
-        if (nonlocalFunctions.isNotEmpty()) {
-            automata.add(getMainAutomaton(nonlocalFunctions.filter { it.automatonName == null }))
-        }
 
         val types = ctx.typesSection().typesSectionBody().semanticType().map { typeCtx ->
             context.resolveType(typeCtx.semanticTypeName) ?: error("unresolved type: ${typeCtx.text}")
@@ -53,20 +50,6 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         nonlocalFunctions.forEach { it.parent.node = library }
 
         return library
-    }
-
-    private fun getMainAutomaton(
-        nonlocalFunctions: List<Function>
-    ): Automaton {
-        return Automaton(
-            "Main",
-            AutomatonKind.SYNTHETIC,
-            listOf(), // todo
-            listOf(),
-            listOf(),
-            listOf(),
-            nonlocalFunctions
-        )
     }
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext): Automaton {
