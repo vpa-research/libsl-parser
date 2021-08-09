@@ -18,7 +18,53 @@
         }
       ],
       "states": [],
-      "shifts": []
+      "shifts": [],
+      "functions": [
+        {
+          "name": "f",
+          "automaton": "A",
+          "args": [],
+          "contracts": [
+            {
+              "name": "test1",
+              "kind": "REQUIRES",
+              "expression": {
+                "kind": "binary",
+                "left": {
+                  "kind": "variableAccess",
+                  "name": "param",
+                  "automatonOwnerName": "A"
+                },
+                "right": {
+                  "kind": "variableAccess",
+                  "name": "i",
+                  "automatonOwnerName": "A"
+                }
+              }
+            },
+            {
+              "kind": "ENSURES",
+              "expression": {
+                "kind": "binary",
+                "left": {
+                  "kind": "oldValue",
+                  "value": {
+                    "kind": "variableAccess",
+                    "name": "param",
+                    "automatonOwnerName": "A"
+                  }
+                },
+                "right": {
+                  "kind": "variableAccess",
+                  "name": "param",
+                  "automatonOwnerName": "A"
+                }
+              }
+            }
+          ],
+          "statements": []
+        }
+      ]
     }
   ]
 }

@@ -97,6 +97,12 @@ val automatonSerializer = JsonSerializer<Automaton> { src, _, context ->
                 add(stateObject)
             }
         })
+
+        add("functions", JsonArray().apply{
+            src.functions.forEach { func ->
+                add(context.serialize(func))
+            }
+        })
     }
 }
 
@@ -138,11 +144,11 @@ val functionSerializer = JsonSerializer<Function> { src, _, context ->
 
         add("contracts", JsonArray().apply {
             src.contracts.forEach { contract ->
-                JsonObject().apply {
+                add(JsonObject().apply {
                     addProperty("name", contract.name)
                     add("kind", context.serialize(contract.kind))
                     add("expression", context.serialize(contract.expression, Expression::class.java))
-                }
+                })
             }
         })
 
@@ -201,6 +207,13 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
                 if (src.arrayIndex != null) {
                     addProperty("arrayIndex", src.arrayIndex)
                 }
+            }
+            is OldValue -> {
+                addProperty("kind", "oldValue")
+                add("value", context.serialize(src.value, Expression::class.java))
+            }
+            else -> {
+                error("unknown type of expression")
             }
         }
     }

@@ -52,6 +52,15 @@
             ]
           }
         }
+      ],
+      "functions": [
+        {
+          "name": "f",
+          "automaton": "A",
+          "args": [],
+          "contracts": [],
+          "statements": []
+        }
       ]
     }
   ]

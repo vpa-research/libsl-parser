@@ -86,6 +86,42 @@
             ]
           }
         }
+      ],
+      "functions": [
+        {
+          "name": "func",
+          "automaton": "A",
+          "returnType": "SimpleTypeWithGeneric",
+          "args": [],
+          "contracts": [],
+          "statements": []
+        },
+        {
+          "name": "extendedFunction",
+          "automaton": "A",
+          "args": [],
+          "contracts": [],
+          "statements": [
+            {
+              "kind": "assignment",
+              "variableName": "strVar",
+              "variableAutomaton": "A",
+              "value": {
+                "kind": "string",
+                "value": ""
+              }
+            },
+            {
+              "kind": "assignment",
+              "variableName": "b.v",
+              "variableAutomaton": "A",
+              "value": {
+                "kind": "integer",
+                "value": 1
+              }
+            }
+          ]
+        }
       ]
     },
     {
@@ -135,6 +171,24 @@
               "SimpleType"
             ]
           }
+        }
+      ],
+      "functions": [
+        {
+          "name": "func",
+          "automaton": "B",
+          "returnType": "SimpleTypeWithGeneric",
+          "args": [],
+          "contracts": [],
+          "statements": []
+        },
+        {
+          "name": "func",
+          "automaton": "B",
+          "returnType": "SimpleTypeWithGeneric",
+          "args": [],
+          "contracts": [],
+          "statements": []
         }
       ]
     }

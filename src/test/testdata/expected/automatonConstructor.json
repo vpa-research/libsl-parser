@@ -31,7 +31,8 @@
         }
       ],
       "states": [],
-      "shifts": []
+      "shifts": [],
+      "functions": []
     }
   ]
 }

@@ -212,6 +212,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
     override fun visitContractExpression(ctx: LibSLParser.ContractExpressionContext): Expression {
         return when {
+            ctx.apostrophe != null -> OldValue(visitQualifiedAccess(ctx.qualifiedAccess()))
             ctx.UNARY_MINUS() != null -> {
                 val content = visitContractExpression(ctx.contractExpression(0))
 
@@ -224,7 +225,6 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             }
             ctx.expressionAtomic() != null -> visitExpressionAtomic(ctx.expressionAtomic())
             ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
-            ctx.apostrophe != null -> OldValue(visitQualifiedAccess(ctx.qualifiedAccess()))
             else -> {
                 val left = visitContractExpression(ctx.contractExpression(0))
                 val right = visitContractExpression(ctx.contractExpression(1))
