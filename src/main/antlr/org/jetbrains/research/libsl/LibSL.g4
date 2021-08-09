@@ -89,7 +89,7 @@ declaration
  * syntax: automaton Name { statement1; statement2; ... }
  */
 automatonDecl
-   :   'automaton' name=Identifier ('('colonSeparatedIdentifiers (',' colonSeparatedIdentifiers)* ')')? '{' automatonStatement* '}'
+   :   'automaton' name=Identifier ('('varWithType (',' varWithType)* ')')? '{' automatonStatement* '}'
    ;
 
 automatonStatement
@@ -129,12 +129,12 @@ functionsListPart // todo: check, is it ok?
  */
 
 variableDeclaration
-   :   'var' colonSeparatedIdentifiers ';'
-   |   'var' colonSeparatedIdentifiers '=' assignmentRight ';'
+   :   varWithType ';'
+   |   varWithType '=' assignmentRight ';'
    ;
 
-colonSeparatedIdentifiers
-   :   name=Identifier ':' type=Identifier
+varWithType
+   :   'var' name=Identifier ':' type=Identifier
    ;
 
 automatonAssignment

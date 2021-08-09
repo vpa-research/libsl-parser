@@ -84,7 +84,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             .mapNotNull { it.variableDeclaration() }
             .map { visitVariableDeclaration(it) }
 
-        val constructorVariables = ctx.colonSeparatedIdentifiers().map { getVariable(it.name.text, it.type.text) }
+        val constructorVariables = ctx.varWithType().map { getVariable(it.name.text, it.type.text) }
 
         val automaton = Automaton(
             name = name,
@@ -140,8 +140,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitVariableDeclaration(ctx: LibSLParser.VariableDeclarationContext): Variable {
-        val variableName = ctx.colonSeparatedIdentifiers().name.text
-        val typeName = ctx.colonSeparatedIdentifiers().type.text
+        val variableName = ctx.varWithType().name.text
+        val typeName = ctx.varWithType().type.text
 
         return getVariable(variableName, typeName)
     }

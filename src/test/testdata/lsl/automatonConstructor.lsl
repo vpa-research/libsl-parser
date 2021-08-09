@@ -7,8 +7,8 @@ types {
 }
 
 automaton A(
-   i: Int,
-   s: String
+   var i: Int,
+   var s: String
 ) {
    var i: Int;
 }
