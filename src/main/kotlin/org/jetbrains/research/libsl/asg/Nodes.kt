@@ -194,3 +194,7 @@ data class FloatNumber(
 data class StringValue(
     val value: String
 ) : Expression()
+
+data class OldValue(
+    val value: VariableAccess
+) : Expression()

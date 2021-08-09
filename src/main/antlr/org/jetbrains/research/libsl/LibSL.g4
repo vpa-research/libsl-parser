@@ -207,6 +207,7 @@ contractExpression
    |   '!' contractExpression
    |   contractExpression op=('==' | '!=' | '<=' | '<' | '>=' | '>') contractExpression
    |   contractExpression op=('&' | '|' | '^') contractExpression
+   |   qualifiedAccess apostrophe='\''
    |   expressionAtomic
    |   qualifiedAccess
    ;

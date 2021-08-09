@@ -10,6 +10,7 @@ automaton A {
 
    fun f(param: Int)
    requires test1: param >= i;
+   ensures: param' < param;
    {
 
    }

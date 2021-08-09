@@ -224,6 +224,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             }
             ctx.expressionAtomic() != null -> visitExpressionAtomic(ctx.expressionAtomic())
             ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
+            ctx.apostrophe != null -> OldValue(visitQualifiedAccess(ctx.qualifiedAccess()))
             else -> {
                 val left = visitContractExpression(ctx.contractExpression(0))
                 val right = visitContractExpression(ctx.contractExpression(1))
