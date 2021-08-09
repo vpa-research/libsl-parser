@@ -1,0 +1,58 @@
+{
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "types": [
+    {
+      "name": "Int",
+      "realName": "int"
+    }
+  ],
+  "automata": [
+    {
+      "name": "A",
+      "constructorVariables": [],
+      "variables": [
+        {
+          "name": "i",
+          "type": "Int"
+        }
+      ],
+      "states": [
+        {
+          "name": "s1",
+          "kind": "SIMPLE"
+        },
+        {
+          "name": "s2",
+          "kind": "SIMPLE"
+        },
+        {
+          "name": "s3",
+          "kind": "SIMPLE"
+        }
+      ],
+      "shifts": [
+        {
+          "from": "s1",
+          "to": "s3",
+          "functions": {
+            "name": "f",
+            "args": [
+              "Int"
+            ]
+          }
+        },
+        {
+          "from": "s2",
+          "to": "s3",
+          "functions": {
+            "name": "f",
+            "args": [
+              "Int"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

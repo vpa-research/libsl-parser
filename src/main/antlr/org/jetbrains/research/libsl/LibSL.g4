@@ -101,25 +101,26 @@ automatonStatement
    |   variableAssignment // are we need it?
    ;
 
-/* todo: add supportion of multipy states declataion at one time
+/*
  * syntax: on of {initstate; state; finishstate} name;
  */
 automatonStateDecl
-   :   keyword=('initstate' | 'state' | 'finishstate') Identifier (',' Identifier)* ';'
+   :   keyword=('initstate' | 'state' | 'finishstate') identifierList ';'
    ;
 
 /*
  * syntax: shift from->to(function1; function2(optional arg types); ...)
  */
 automatonShiftDecl
-   :   'shift' from=Identifier '->' to=Identifier '(' functionsList? ')' ';' // todo: are we need specify names of args here?
+   :   'shift' from=Identifier '->' to=Identifier '(' functionsList? ')' ';'
+   |   'shift' from='(' identifierList ')' '->' to=Identifier '(' functionsList? ')' ';'
    ;
 
 functionsList
    :   functionsListPart (',' functionsListPart)*
    ;
 
-functionsListPart
+functionsListPart // todo: check, is it ok?
    :   name=Identifier ('(' (Identifier)* ')')?
    ;
 
@@ -231,6 +232,10 @@ realTypeName
 
 Identifier
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
+   ;
+
+identifierList
+   :   Identifier (',' Identifier)*
    ;
 
 QuotedString

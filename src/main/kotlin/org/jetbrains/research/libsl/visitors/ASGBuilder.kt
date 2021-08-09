@@ -55,45 +55,26 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext): Automaton {
         val name = ctx.name.text
         val states = ctx.automatonStatement()?.filter { it.automatonStateDecl() != null }?.flatMap { statesCtx ->
-            statesCtx.automatonStateDecl().Identifier().map { stateCtx ->
+            statesCtx.automatonStateDecl().identifierList().Identifier().map { stateCtx ->
                 val keyword = statesCtx.start.text
                 val stateName = stateCtx.text
                 val stateKind = StateKind.fromString(keyword)
                 State(stateName, stateKind)
             }
         }.orEmpty()
-        val shifts = ctx.automatonStatement()?.filter { it.automatonShiftDecl() != null }?.map { shiftCtx ->
+        val shifts = ctx.automatonStatement()?.filter { it.automatonShiftDecl() != null }?.flatMap { shiftCtx ->
             val parsedShift = shiftCtx.automatonShiftDecl()
-            val fromName = parsedShift.from?.text
-            val toName = parsedShift.to?.text
-            val fromState = if (fromName == "any") {
-                State("any", StateKind.SIMPLE, isAny = true)
-            } else {
-                states.firstOrNull { it.name == fromName } ?: error("unknown state")
-            }
+            val toName = parsedShift.to?.text!!
+            if (parsedShift.identifierList() != null) {
+                parsedShift.identifierList().Identifier().map { fromIdentifier ->
+                    val fromName = fromIdentifier.text!!
 
-            val toState = if (toName == "self") {
-                State("self", StateKind.SIMPLE, isSelf = true)
-            } else {
-                states.firstOrNull { it.name == toName } ?: error("unknown state")
-            }
-
-            val functions = parsedShift.functionsList()?.functionsListPart()?.map { part ->
-                val functionName = part.name.text
-                val functionArgs = part.Identifier().drop(1).map { type ->
-                    context.resolveType(type.text) ?: error("unresolved type: ${type.text}")
+                    processShift(fromName, toName, shiftCtx, states, automatonName = name)
                 }
-
-                context.resolveFunction(functionName, automatonName = name, argsType=functionArgs)
-                    ?: context.resolveFunction(functionName, automatonName = name)
-                    ?: error("unresolved function: $functionName")
-            } ?: error("empty functions list in shift $fromName -> $toName")
-
-            Shift(
-                fromState,
-                toState,
-                functions
-            )
+            } else {
+                val fromName = parsedShift.from.text!!
+                listOf(processShift(fromName, toName, shiftCtx, states, automatonName = name))
+            }
         }.orEmpty()
 
         val functions = ctx.automatonStatement()
@@ -118,6 +99,44 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         functions.forEach { it.parent.node = automaton }
 
         return automaton
+    }
+
+    private fun processShift(
+        fromName: String,
+        toName: String,
+        shiftCtx: LibSLParser.AutomatonStatementContext,
+        states: List<State>,
+        automatonName: String
+    ): Shift {
+        val parsedShift = shiftCtx.automatonShiftDecl()
+        val fromState = if (fromName == "any") {
+            State("any", StateKind.SIMPLE, isAny = true)
+        } else {
+            states.firstOrNull { it.name == fromName } ?: error("unknown state")
+        }
+
+        val toState = if (toName == "self") {
+            State("self", StateKind.SIMPLE, isSelf = true)
+        } else {
+            states.firstOrNull { it.name == toName } ?: error("unknown state")
+        }
+
+        val functions = parsedShift.functionsList()?.functionsListPart()?.map { part ->
+            val functionName = part.name.text
+            val functionArgs = part.Identifier().drop(1).map { type ->
+                context.resolveType(type.text) ?: error("unresolved type: ${type.text}")
+            }
+
+            context.resolveFunction(functionName, automatonName = automatonName, argsType=functionArgs)
+                ?: context.resolveFunction(functionName, automatonName = automatonName)
+                ?: error("unresolved function: $functionName")
+        } ?: error("empty functions list in shift $fromName -> $toName")
+
+        return Shift(
+            fromState,
+            toState,
+            functions
+        )
     }
 
     override fun visitVariableDeclaration(ctx: LibSLParser.VariableDeclarationContext): Variable {

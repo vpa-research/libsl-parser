@@ -18,6 +18,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testMultipleFromInShift() {
+        testRunner("multipleFromInShift")
+    }
+
+
+    @Test
     fun testSimple() {
         testRunner("simple")
     }
