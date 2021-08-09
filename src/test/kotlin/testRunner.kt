@@ -1,8 +1,7 @@
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.*
 import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
@@ -23,6 +22,19 @@ fun testRunner(name: String) {
     val tokenStream = CommonTokenStream(lexer)
     val context = LslContext()
     val parser = LibSLParser(tokenStream)
+    parser.addErrorListener(object : BaseErrorListener() {
+        override fun syntaxError(
+            recognizer: Recognizer<*, *>?,
+            offendingSymbol: Any?,
+            line: Int,
+            charPositionInLine: Int,
+            msg: String?,
+            e: RecognitionException?
+        ) {
+            Assertions.fail<RecognitionException>("$line:$charPositionInLine: $msg", e)
+        }
+    })
+
     val file = parser.file()
     Resolver(context).visitFile(file)
     val library = ASGBuilder(context).visitFile(file)
