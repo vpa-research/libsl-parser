@@ -230,5 +230,13 @@ val statementSerializer = JsonSerializer<Statement> { src, _, context ->
             }
             add("value", context.serialize(src.value, Expression::class.java))
         }
+
+        is Action -> JsonObject().apply {
+            addProperty("kind", "action")
+            addProperty("actionName", src.name)
+            add("args", JsonArray().apply {
+                src.arguments.forEach { arg -> add(context.serialize(arg, Expression::class.java)) }
+            })
+        }
     }
 }

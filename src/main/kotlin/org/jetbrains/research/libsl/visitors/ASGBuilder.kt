@@ -178,11 +178,34 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             }
         }.orEmpty()
 
-        val statementList = ctx.functionBody()?.variableAssignment()?.map { variableAssignment ->
-            val value = visitExpressionAtomic(variableAssignment.assignmentRight().expressionAtomic())
-            val variable = visitQualifiedAccess(variableAssignment.qualifiedAccess())
+        val statementList = ctx.functionBody()?.functionBodyStatements()?.map { variableStatement ->
+            when {
+                variableStatement.variableAssignment() != null -> {
+                    val variableAssignment = variableStatement.variableAssignment()
+                    val value = visitExpressionAtomic(variableAssignment.assignmentRight().expressionAtomic())
+                    val variable = visitQualifiedAccess(variableAssignment.qualifiedAccess())
 
-            Assignment(variable, value)
+                    Assignment(variable, value)
+                }
+
+                variableStatement.action() != null -> {
+                    val action = variableStatement.action()
+                    val actionName = action.Identifier().text
+                    val actionArgs = action
+                        .valuesAndIdentifiersList()
+                        ?.expressionAtomic()
+                        ?.map { visitExpressionAtomic(it) }
+                        .orEmpty()
+
+                    Action(
+                        actionName,
+                        actionArgs
+                    )
+                }
+
+                else -> error("unknown statement type")
+            }
+
         }.orEmpty()
 
         val resolvedFunction = context.resolveFunction(functionName, automatonName=ownerAutomatonName, args = args, returnType = type)

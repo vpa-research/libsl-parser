@@ -117,6 +117,11 @@ data class Assignment(
     val value: Expression
 ) : Statement()
 
+data class Action(
+    val name: String,
+    val arguments: List<Expression>
+) : Statement()
+
 data class Contract(
     val name: String?,
     val expression: Expression,

@@ -187,7 +187,20 @@ preamblePart
    ;
 
 functionBody
-   :   variableAssignment*
+   :   functionBodyStatements*
+   ;
+
+functionBodyStatements
+   :   variableAssignment
+   |   action
+   ;
+
+action
+   :  'action' Identifier '(' valuesAndIdentifiersList? ')' ';'
+   ;
+
+valuesAndIdentifiersList
+   :   expressionAtomic (',' expressionAtomic)*
    ;
 
 requiresContract

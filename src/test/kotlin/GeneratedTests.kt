@@ -6,6 +6,12 @@ import org.junit.jupiter.api.Test
 
 class GeneratedTests {
     @Test
+    fun testActions() {
+        testRunner("actions")
+    }
+
+
+    @Test
     fun testAutomatonConstructor() {
         testRunner("automatonConstructor")
     }
