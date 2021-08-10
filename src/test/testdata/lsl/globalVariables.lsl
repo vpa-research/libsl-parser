@@ -5,7 +5,7 @@ types {
    Int(int);
 }
 
-automaton A {
+automaton A : Int {
    state S;
 
    fun f(param: Int) {

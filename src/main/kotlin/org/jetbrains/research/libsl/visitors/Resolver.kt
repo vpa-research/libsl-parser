@@ -12,8 +12,11 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
 
         val automata = ctx.declarations().declaration().mapNotNull { it.automatonDecl() }
         for (automatonCtx in automata) {
+            val typeName = automatonCtx.type.text
+            val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
             val automaton = Automaton(
                 automatonCtx.name.text,
+                type,
                 listOf(),
                 listOf(),
                 listOf(),

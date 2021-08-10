@@ -61,6 +61,7 @@ data class SyntheticType(
 
 data class Automaton(
     val name: String,
+    val type: Type,
     var states: List<State>,
     var shifts: List<Shift>,
     var internalVariables: List<Variable>,

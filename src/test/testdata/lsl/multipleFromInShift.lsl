@@ -5,7 +5,7 @@ types {
    Int(int);
 }
 
-automaton A {
+automaton A : Int {
    var i: Int;
 
    state s1, s2, s3;

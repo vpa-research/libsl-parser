@@ -6,10 +6,10 @@ types {
    String(string);
 }
 
-automaton A(
+automaton A (
    var i: Int,
    var s: String
-) {
+) : Int {
    var i: Int;
 
    fun func() {
@@ -17,8 +17,8 @@ automaton A(
    }
 }
 
-automaton B(
+automaton B (
    var v: Int
-) {
+) : Int {
    state s1;
 }

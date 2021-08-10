@@ -88,10 +88,10 @@ declaration
    ;
 
 /*
- * syntax: automaton Name { statement1; statement2; ... }
+ * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   'automaton' name=Identifier ('(' 'var' nameWithType (',' 'var' nameWithType)* ')')? '{' automatonStatement* '}'
+   :   'automaton' name=Identifier ('(' 'var' nameWithType (',' 'var' nameWithType)* ')')? ':' type=Identifier '{' automatonStatement* '}'
    ;
 
 automatonStatement
@@ -109,7 +109,8 @@ automatonStateDecl
    ;
 
 /*
- * syntax: shift from->to(function1; function2(optional arg types); ...)
+ * syntax: shift from -> to(function1; function2(optional arg types); ...)
+ * syntax: shift (from1, from2, ...) -> to(function1; function2(optional arg types); ...)
  */
 automatonShiftDecl
    :   'shift' from=Identifier '->' to=Identifier '(' functionsList? ')' ';'
@@ -125,7 +126,7 @@ functionsListPart // todo: check, is it ok?
    ;
 
 /*
- * syntax: var NAME [: type] = { new AutomatonName(args); primitive_type; nothing }
+ * syntax: var NAME [: type] = { new AutomatonName(args); atomic; nothing }
  */
 
 variableDeclaration

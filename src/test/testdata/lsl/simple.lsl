@@ -18,7 +18,7 @@ types {
    Int(int);
 }
 
-automaton A {
+automaton A : Int {
    state S1;
    state S2;
 
@@ -31,7 +31,7 @@ automaton A {
    fun func(arg1: SimpleType): SimpleTypeWithGeneric;
 }
 
-automaton B {
+automaton B : Int {
    state S1, S3, S7;
    state S2;
 

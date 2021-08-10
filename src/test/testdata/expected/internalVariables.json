@@ -13,10 +13,6 @@
       "constructorVariables": [],
       "variables": [
         {
-          "name": "i",
-          "type": "Int"
-        },
-        {
           "name": "b",
           "type": "Int"
         }

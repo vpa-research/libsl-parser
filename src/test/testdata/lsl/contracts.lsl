@@ -5,7 +5,7 @@ types {
    Int(int);
 }
 
-automaton A {
+automaton A : Int {
    var i: Int;
 
    fun f(param: Int)
