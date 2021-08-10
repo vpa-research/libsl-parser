@@ -24,6 +24,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testInternalVariables() {
+        testRunner("internalVariables")
+    }
+
+
+    @Test
     fun testMultipleFromInShift() {
         testRunner("multipleFromInShift")
     }
