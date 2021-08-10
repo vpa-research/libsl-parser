@@ -11,24 +11,24 @@
     {
       "name": "A",
       "constructorVariables": [],
-      "variables": [
+      "variables": [],
+      "states": [
         {
-          "name": "b",
-          "type": "Int"
+          "name": "S",
+          "kind": "SIMPLE"
         }
       ],
-      "states": [],
       "shifts": [],
       "functions": [
         {
-          "name": "foo",
+          "name": "f",
           "automaton": "A",
           "args": [],
           "contracts": [],
           "statements": [
             {
               "kind": "assignment",
-              "variableName": "b.i",
+              "variableName": "globalInt",
               "variableAutomaton": "A",
               "value": {
                 "kind": "integer",
@@ -38,24 +38,29 @@
           ]
         }
       ]
-    },
+    }
+  ],
+  "variables": [
     {
-      "name": "B",
-      "constructorVariables": [],
-      "variables": [
-        {
-          "name": "i",
-          "type": "Int"
-        }
-      ],
-      "states": [
-        {
-          "name": "s",
-          "kind": "SIMPLE"
-        }
-      ],
-      "shifts": [],
-      "functions": []
+      "name": "globalInt",
+      "type": {
+        "name": "Int",
+        "realName": "int"
+      },
+      "initValue": {
+        "kind": "callAutomatonConstructor",
+        "automatonName": "A",
+        "args": [
+          {
+            "name": "state",
+            "value": {
+              "kind": "variableAccess",
+              "name": "S"
+            }
+          }
+        ]
+      },
+      "parent": {}
     }
   ]
 }

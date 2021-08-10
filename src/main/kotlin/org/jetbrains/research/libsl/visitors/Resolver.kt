@@ -30,6 +30,23 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
         for (extensionFunction in ctx.declarations().declaration().mapNotNull { it.functionDecl() }) {
             visitFunctionDecl(extensionFunction)
         }
+
+        ctx.declarations().declaration().mapNotNull { it.variableDeclaration() }.map { variableDecl ->
+            val nameWithType = variableDecl.nameWithType()
+            val type = context.resolveType(nameWithType.type.text) ?: error("unresolved type: ${nameWithType.type.text}")
+            val init = if (variableDecl.assignmentRight() != null){
+                asgBuilderVisitor.processAssignmentRight(variableDecl.assignmentRight())
+            } else {
+                null
+            }
+
+            val variable = Variable(
+                nameWithType.name.text,
+                type,
+                init
+            )
+            context.storeGlobalVariable(variable)
+        }
     }
 
     override fun visitTypesSectionBody(ctx: LibSLParser.TypesSectionBodyContext) {

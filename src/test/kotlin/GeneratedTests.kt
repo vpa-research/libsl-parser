@@ -24,6 +24,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testGlobalVariables() {
+        testRunner("globalVariables")
+    }
+
+
+    @Test
     fun testInternalVariables() {
         testRunner("internalVariables")
     }

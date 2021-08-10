@@ -42,7 +42,7 @@ include
  * Semantic types section
  */
 typesSection
-   :   'types' '{' typesSectionBody '}'
+   :   ('types' '{' typesSectionBody '}')?
    ;
 
 typesSectionBody
@@ -83,6 +83,8 @@ declarations
 declaration
    :   automatonDecl
    |   functionDecl
+   |   variableDeclaration
+   |   variableAssignment
    ;
 
 /*

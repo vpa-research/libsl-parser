@@ -36,17 +36,29 @@ val librarySerializer = JsonSerializer<Library> { src, _, context ->
             })
         }
 
-        add("types", JsonArray().apply {
-            src.semanticTypes.forEach { type ->
-                add(context.serialize(type, Type::class.java))
-            }
-        })
+        if (src.semanticTypes.isNotEmpty()) {
+            add("types", JsonArray().apply {
+                src.semanticTypes.forEach { type ->
+                    add(context.serialize(type, Type::class.java))
+                }
+            })
+        }
 
-        add("automata", JsonArray().apply {
-            src.automata.forEach { automaton ->
-                add(context.serialize(automaton, Automaton::class.java))
-            }
-        })
+        if (src.automata.isNotEmpty()) {
+            add("automata", JsonArray().apply {
+                src.automata.forEach { automaton ->
+                    add(context.serialize(automaton, Automaton::class.java))
+                }
+            })
+        }
+
+        if (src.globalVariables.isNotEmpty()) {
+            add("variables", JsonArray().apply {
+                src.globalVariables.forEach { (_, variable) ->
+                    add(context.serialize(variable, Variable::class.java))
+                }
+            })
+        }
     }
 }
 
@@ -203,7 +215,7 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
             is VariableAccess -> {
                 addProperty("kind", "variableAccess")
                 addProperty("name", src.name)
-                addProperty("automatonOwnerName", src.automaton.name)
+                addProperty("automatonOwnerName", src.automaton?.name)
                 if (src.arrayIndex != null) {
                     addProperty("arrayIndex", src.arrayIndex)
                 }
@@ -233,7 +245,7 @@ val statementSerializer = JsonSerializer<Statement> { src, _, context ->
         is Assignment -> JsonObject().apply {
             addProperty("kind", "assignment")
             addProperty("variableName", src.variable.name)
-            addProperty("variableAutomaton", src.variable.automaton.name)
+            addProperty("variableAutomaton", src.variable.automaton?.name)
             if (src.variable.arrayIndex != null) {
                 addProperty("variableIndex", src.variable.arrayIndex)
             }

@@ -4,6 +4,7 @@ class LslContext {
     private val typeStorage = mutableMapOf<String, Type>()
     private val functionStorage = mutableMapOf<String, MutableList<Function>>()
     private val automatonStorage = mutableMapOf<String, Automaton>()
+    val globalVariables = mutableMapOf<String, Variable>()
 
     fun storeResolvedType(type: Type) {
         typeStorage[type.semanticType] = type
@@ -35,5 +36,13 @@ class LslContext {
 
     fun resolveAutomaton(name: String): Automaton? {
         return automatonStorage[name]
+    }
+
+    fun storeGlobalVariable(variable: Variable) {
+        globalVariables[variable.name] = variable
+    }
+
+    fun resolveVariable(name: String): Variable? {
+        return globalVariables[name]
     }
 }

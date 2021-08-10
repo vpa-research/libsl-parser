@@ -47,7 +47,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             nonlocalFunctions.filter { it.automatonName != null }
                 .fold(mutableMapOf<String, MutableList<Function>>()) { old, curr ->
                     old.getOrPut(curr.automatonName!!) { mutableListOf()}.add(curr); old
-                }
+                },
+            context.globalVariables
         )
 
         automata.forEach { it.parent.node = library }
@@ -289,7 +290,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
     override fun visitQualifiedAccess(ctx: LibSLParser.QualifiedAccessContext): VariableAccess {
         val name = ctx.periodSeparatedFullName().text
-        val automaton = getParentAutomaton(ctx) ?: error("unresolved automaton for $name")
+        val automaton = getParentAutomatonOrNull(ctx)
 
         return if (ctx.integerNumber() != null) {
             val index = ctx.integerNumber().text.toInt()
@@ -299,7 +300,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         }
     }
 
-    private fun getParentAutomaton(ctx: RuleContext): Automaton? {
+    private fun getParentAutomatonOrNull(ctx: RuleContext): Automaton? {
         return when {
             ctx.parent == null -> {
                 null
@@ -313,7 +314,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 context.resolveAutomaton(name) ?: error("can't resolve automaton: $name")
             }
             else -> {
-                getParentAutomaton(ctx.parent)
+                getParentAutomatonOrNull(ctx.parent)
             }
         }
     }

@@ -10,7 +10,8 @@ data class Library(
     val includes: List<String> ,
     val semanticTypes: List<Type>,
     val automata: List<Automaton>,
-    val extensionFunctions: Map<String, List<Function>>
+    val extensionFunctions: Map<String, List<Function>>,
+    val globalVariables: Map<String, Variable>
 ) : Node()
 
 data class MetaNode(
@@ -181,7 +182,7 @@ data class Variable(
 
 data class VariableAccess(
     val name: String,
-    val automaton: Automaton,
+    val automaton: Automaton?,
     val arrayIndex: Int? = null
 ) : Atomic()
 
