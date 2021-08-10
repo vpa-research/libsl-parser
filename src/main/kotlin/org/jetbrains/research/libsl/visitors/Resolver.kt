@@ -14,7 +14,6 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
         for (automatonCtx in automata) {
             val automaton = Automaton(
                 automatonCtx.name.text,
-                AutomatonKind.REAL,
                 listOf(),
                 listOf(),
                 listOf(),

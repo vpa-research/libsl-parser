@@ -60,7 +60,6 @@ data class SyntheticType(
 
 data class Automaton(
     val name: String,
-    val kind: AutomatonKind,
     var states: List<State>,
     var shifts: List<Shift>,
     var internalVariables: List<Variable>,
@@ -132,10 +131,6 @@ data class Contract(
 
 enum class ContractKind {
     REQUIRES, ENSURES
-}
-
-enum class AutomatonKind {
-    REAL, SYNTHETIC
 }
 
 sealed class Expression: Node()
