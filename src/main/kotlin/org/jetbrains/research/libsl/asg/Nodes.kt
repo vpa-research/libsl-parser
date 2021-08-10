@@ -51,6 +51,13 @@ data class EnumLikeType(
     override val context: LslContext
 ) : Type()
 
+data class SyntheticType(
+    override val semanticType: String,
+    override val realType: RealType,
+    override val context: LslContext
+
+) : Type()
+
 data class Automaton(
     val name: String,
     val kind: AutomatonKind,
@@ -63,10 +70,6 @@ data class Automaton(
     val functions: List<Function>
         get() = localFunctions + (parent.node as Library).extensionFunctions[name].orEmpty()
 }
-
-data class VariablesBlock(
-    val variables: List<Variable>
-) : Node()
 
 data class State(
     val name: String,
@@ -93,7 +96,6 @@ enum class StateKind {
         }
     }
 }
-
 
 data class Argument(
     val name: String,
@@ -186,20 +188,32 @@ data class VariableAccess(
     val name: String,
     val automaton: Automaton,
     val arrayIndex: Int? = null
-) : Expression()
+) : Atomic()
+
+sealed class Atomic : Expression()
 
 data class IntegerNumber(
     val value: Int
-) : Expression()
+) : Atomic()
 
 data class FloatNumber(
     val value: Float
-) : Expression()
+) : Atomic()
 
 data class StringValue(
     val value: String
-) : Expression()
+) : Atomic()
 
 data class OldValue(
     val value: VariableAccess
 ) : Expression()
+
+data class CallAutomatonConstructor(
+    val automaton: Automaton,
+    val args: List<ArgumentWithValue>
+) : Atomic()
+
+data class ArgumentWithValue(
+    val variable: Variable,
+    val init: Atomic
+)

@@ -212,8 +212,17 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
                 addProperty("kind", "oldValue")
                 add("value", context.serialize(src.value, Expression::class.java))
             }
-            else -> {
-                error("unknown type of expression")
+            is CallAutomatonConstructor -> {
+                addProperty("kind", "callAutomatonConstructor")
+                addProperty("automatonName", src.automaton.name)
+                add("args", JsonArray().apply {
+                    src.args.forEach { arg ->
+                        add(JsonObject().apply {
+                            addProperty("name", arg.variable.name)
+                            add("value", context.serialize(arg.init, Expression::class.java))
+                        })
+                    }
+                })
             }
         }
     }

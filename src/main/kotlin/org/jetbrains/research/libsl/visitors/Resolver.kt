@@ -5,10 +5,26 @@ import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
 
 class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
+    private val asgBuilderVisitor = ASGBuilder(context)
+
     override fun visitFile(ctx: LibSLParser.FileContext) {
         visitTypesSectionBody(ctx.typesSection().typesSectionBody())
 
-        for (automaton in ctx.declarations().declaration().mapNotNull { it.automatonDecl() }) {
+        val automata = ctx.declarations().declaration().mapNotNull { it.automatonDecl() }
+        for (automatonCtx in automata) {
+            val automaton = Automaton(
+                automatonCtx.name.text,
+                AutomatonKind.REAL,
+                listOf(),
+                listOf(),
+                listOf(),
+                listOf(),
+                listOf(),
+            )
+            context.storeResolvedAutomaton(automaton)
+        }
+
+        for (automaton in automata) {
             visitAutomatonDecl(automaton)
         }
 
@@ -54,15 +70,25 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.text
 
-        val automaton = Automaton(
-            name,
-            AutomatonKind.REAL,
-            listOf(),
-            listOf(),
-            listOf(),
-            listOf(),
-            listOf()
-        )
+        val variables = ctx.automatonStatement()
+            .mapNotNull { it.variableDeclaration() }
+            .map { decl ->
+                val variableName = decl.nameWithType().name.text
+                val typeName = decl.nameWithType().type.text
+                if (decl.assignmentRight() != null) {
+                    val init: Atomic = asgBuilderVisitor.processAssignmentRight(decl.assignmentRight())
+                    getVariable(variableName, typeName, init, context)
+                } else {
+                    getVariable(variableName, typeName, null, context)
+                }
+            }
+
+        val constructorVariables = ctx.nameWithType().map { getVariable(it.name.text, it.type.text, null, context) }
+
+        val automaton = context.resolveAutomaton(name)?.apply {
+            this.internalVariables = variables
+            this.constructorVariables = constructorVariables
+        } ?: error("")
         context.storeResolvedAutomaton(automaton)
 
         for (functionDecl in ctx.automatonStatement().mapNotNull { it.functionDecl() }) {

@@ -26,7 +26,7 @@ automaton A {
 
    var strVar: String;
    var intVar: Int = 1;
-   automaton b = new A(state = S1, strVar = "", intVar = 1);
+   var b: Int = new B(state = S1);
 
    fun func(arg1: SimpleType): SimpleTypeWithGeneric;
 }

@@ -7,6 +7,10 @@ import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Function
 
 class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
+    private val syntheticVariable = Variable("state",
+        SyntheticType("state", RealType(listOf(), listOf()), context),
+        null
+    )
     override fun visitFile(ctx: LibSLParser.FileContext): Library {
         val header = ctx.header()
         val libraryName = header.libraryName?.text ?: error("no library name specified")
@@ -80,21 +84,11 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val functions = ctx.automatonStatement()
             .mapNotNull { it.functionDecl() }.map { visitFunctionDecl(it) }
 
-        val variables = ctx.automatonStatement()
-            .mapNotNull { it.variableDeclaration() }
-            .map { visitVariableDeclaration(it) }
-
-        val constructorVariables = ctx.varWithType().map { getVariable(it.name.text, it.type.text) }
-
-        val automaton = Automaton(
-            name = name,
-            kind = AutomatonKind.REAL,
-            states = states,
-            shifts = shifts,
-            variables,
-            constructorVariables,
-            functions
-        )
+        val automaton = context.resolveAutomaton(name)?.apply {
+            this.states = states
+            this.shifts = shifts
+            this.localFunctions = functions
+        } ?: error("")
 
         functions.forEach { it.parent.node = automaton }
 
@@ -139,16 +133,33 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         )
     }
 
-    override fun visitVariableDeclaration(ctx: LibSLParser.VariableDeclarationContext): Variable {
-        val variableName = ctx.varWithType().name.text
-        val typeName = ctx.varWithType().type.text
-
-        return getVariable(variableName, typeName)
+    override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Atomic = when {
+        ctx.expressionAtomic() != null -> {
+            visitExpressionAtomic(ctx.expressionAtomic())
+        }
+        ctx.callAutomatonWithNamedArgs() != null -> {
+            visitCallAutomatonWithNamedArgs(ctx.callAutomatonWithNamedArgs())
+        }
+        else -> error("can't parse init value in variable")
     }
 
-    private fun getVariable(name: String, typeName: String): Variable {
-        val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
-        return Variable(name, type, null)
+    override fun visitCallAutomatonWithNamedArgs(ctx: LibSLParser.CallAutomatonWithNamedArgsContext): Atomic {
+        val calleeName = ctx.name.text
+        val calleeAutomaton = context.resolveAutomaton(calleeName) ?: error("can't resolve automaton $calleeName")
+
+        val args = ctx.namedArgs()?.argPair()?.map { pair ->
+            val name = pair.name.text
+            val targetVariable = if (name == "state") {
+                syntheticVariable
+            } else {
+                calleeAutomaton.constructorVariables.first { it.name == name }
+            }
+            val value = visitExpressionAtomic(pair.value)
+
+            ArgumentWithValue(targetVariable, value)
+        }.orEmpty()
+
+        return CallAutomatonConstructor(calleeAutomaton, args)
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext): Function {
@@ -182,7 +193,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             when {
                 variableStatement.variableAssignment() != null -> {
                     val variableAssignment = variableStatement.variableAssignment()
-                    val value = visitExpressionAtomic(variableAssignment.assignmentRight().expressionAtomic())
+                    val value = visitAssignmentRight(variableAssignment.assignmentRight())
                     val variable = visitQualifiedAccess(variableAssignment.qualifiedAccess())
 
                     Assignment(variable, value)
@@ -258,7 +269,17 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         }
     }
 
-    override fun visitExpressionAtomic(ctx: LibSLParser.ExpressionAtomicContext): Expression = when {
+    internal fun processAssignmentRight(ctx: LibSLParser.AssignmentRightContext) = when {
+        ctx.expressionAtomic() != null -> {
+            visitExpressionAtomic(ctx.expressionAtomic())
+        }
+        ctx.callAutomatonWithNamedArgs() != null -> {
+            visitCallAutomatonWithNamedArgs(ctx.callAutomatonWithNamedArgs())
+        }
+        else -> error("can't parse init value in variable")
+    }
+
+    override fun visitExpressionAtomic(ctx: LibSLParser.ExpressionAtomicContext): Atomic = when {
         ctx.integerNumber() != null -> IntegerNumber(ctx.integerNumber().text.toInt())
         ctx.floatNumber() != null -> FloatNumber(ctx.floatNumber().text.toFloat())
         ctx.QuotedString() != null -> StringValue(removeQuotes(ctx.QuotedString().text))
@@ -267,10 +288,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitQualifiedAccess(ctx: LibSLParser.QualifiedAccessContext): VariableAccess {
-        val functionCtx = getParentAsFunction(ctx) ?: error("qualified access not in function!")
-        val automatonName = resolveFunctionByCtx(functionCtx)?.automatonName ?: error("can't resolve function: ${functionCtx.name.text}")
-        val automaton = context.resolveAutomaton(automatonName) ?: error("can't resolve automaton: $automatonName")
         val name = ctx.periodSeparatedFullName().text
+        val automaton = getParentAutomaton(ctx) ?: error("unresolved automaton for $name")
 
         return if (ctx.integerNumber() != null) {
             val index = ctx.integerNumber().text.toInt()
@@ -280,16 +299,21 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         }
     }
 
-    private fun getParentAsFunction(ctx: RuleContext): LibSLParser.FunctionDeclContext? {
+    private fun getParentAutomaton(ctx: RuleContext): Automaton? {
         return when {
             ctx.parent == null -> {
                 null
             }
             ctx is LibSLParser.FunctionDeclContext -> {
-                ctx
+                val automatonName = resolveFunctionByCtx(ctx)?.automatonName ?: error("can't resolve function: ${ctx.name.text}")
+                context.resolveAutomaton(automatonName) ?: error("can't resolve automaton: $automatonName")
+            }
+            ctx is LibSLParser.AutomatonDeclContext -> {
+                val name = ctx.name.text
+                context.resolveAutomaton(name) ?: error("can't resolve automaton: $name")
             }
             else -> {
-                getParentAsFunction(ctx.parent)
+                getParentAutomaton(ctx.parent)
             }
         }
     }

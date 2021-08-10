@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.asg.*
 
 fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, String> {
     val parent = (ctx.parent as? LibSLParser.AutomatonStatementContext)?.parent as? LibSLParser.AutomatonDeclContext
@@ -30,3 +31,8 @@ val LibSLParser.SemanticTypeContext.semanticTypeName
     get() = this.enumLikeSemanticType()?.semanticTypeName?.text
         ?: this.simpleSemanticType()?.semanticTypeName?.text
         ?: error("unknown type kind")
+
+fun getVariable(name: String, typeName: String, initValue: Atomic?, context: LslContext): Variable {
+    val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
+    return Variable(name, type, initValue)
+}

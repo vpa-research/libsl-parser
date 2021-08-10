@@ -32,6 +32,59 @@
       ],
       "states": [],
       "shifts": [],
+      "functions": [
+        {
+          "name": "func",
+          "automaton": "A",
+          "args": [],
+          "contracts": [],
+          "statements": [
+            {
+              "kind": "assignment",
+              "variableName": "i",
+              "variableAutomaton": "A",
+              "value": {
+                "kind": "callAutomatonConstructor",
+                "automatonName": "B",
+                "args": [
+                  {
+                    "name": "state",
+                    "value": {
+                      "kind": "variableAccess",
+                      "name": "s1",
+                      "automatonOwnerName": "A"
+                    }
+                  },
+                  {
+                    "name": "v",
+                    "value": {
+                      "kind": "integer",
+                      "value": 0
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "constructorVariables": [
+        {
+          "name": "v",
+          "type": "Int"
+        }
+      ],
+      "variables": [],
+      "states": [
+        {
+          "name": "s1",
+          "kind": "SIMPLE"
+        }
+      ],
+      "shifts": [],
       "functions": []
     }
   ]

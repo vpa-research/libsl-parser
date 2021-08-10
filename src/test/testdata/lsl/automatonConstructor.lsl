@@ -11,4 +11,14 @@ automaton A(
    var s: String
 ) {
    var i: Int;
+
+   fun func() {
+      i = new B(state = s1, v = 0);
+   }
+}
+
+automaton B(
+   var v: Int
+) {
+   state s1;
 }

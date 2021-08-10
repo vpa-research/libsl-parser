@@ -89,7 +89,7 @@ declaration
  * syntax: automaton Name { statement1; statement2; ... }
  */
 automatonDecl
-   :   'automaton' name=Identifier ('('varWithType (',' varWithType)* ')')? '{' automatonStatement* '}'
+   :   'automaton' name=Identifier ('(' 'var' nameWithType (',' 'var' nameWithType)* ')')? '{' automatonStatement* '}'
    ;
 
 automatonStatement
@@ -97,8 +97,6 @@ automatonStatement
    |   automatonShiftDecl
    |   functionDecl
    |   variableDeclaration
-   |   automatonAssignment
-   |   variableAssignment // are we need it?
    ;
 
 /*
@@ -129,16 +127,12 @@ functionsListPart // todo: check, is it ok?
  */
 
 variableDeclaration
-   :   varWithType ';'
-   |   varWithType '=' assignmentRight ';'
+   :   'var' nameWithType ';'
+   |   'var' nameWithType '=' assignmentRight ';'
    ;
 
-varWithType
-   :   'var' name=Identifier ':' type=Identifier
-   ;
-
-automatonAssignment
-   :   'automaton' Identifier '=' 'new' callAutomatonWithNamedArgs ';'
+nameWithType
+   :   name=Identifier ':' type=Identifier
    ;
 
 variableAssignment
@@ -147,10 +141,11 @@ variableAssignment
 
 assignmentRight
    :   expressionAtomic
+   |   'new' callAutomatonWithNamedArgs
    ;
 
 callAutomatonWithNamedArgs
-   :   Identifier '(' 'state' '=' Identifier (',' namedArgs)? ')'
+   :   name=Identifier '(' (namedArgs)? ')'
    ;
 
 namedArgs
@@ -158,7 +153,8 @@ namedArgs
    ;
 
 argPair
-   :   Identifier '=' (Identifier | expressionAtomic)
+   :   name='state' '=' value=expressionAtomic
+   |   name=Identifier '=' value=expressionAtomic
    ;
 
 /*
