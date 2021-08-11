@@ -32,13 +32,11 @@
                 "kind": "binary",
                 "left": {
                   "kind": "variableAccess",
-                  "name": "param",
-                  "automatonOwnerName": "A"
+                  "variable": "f.param"
                 },
                 "right": {
                   "kind": "variableAccess",
-                  "name": "i",
-                  "automatonOwnerName": "A"
+                  "variable": "A.i"
                 }
               }
             },
@@ -50,14 +48,12 @@
                   "kind": "oldValue",
                   "value": {
                     "kind": "variableAccess",
-                    "name": "param",
-                    "automatonOwnerName": "A"
+                    "variable": "f.param"
                   }
                 },
                 "right": {
                   "kind": "variableAccess",
-                  "name": "param",
-                  "automatonOwnerName": "A"
+                  "variable": "f.param"
                 }
               }
             }

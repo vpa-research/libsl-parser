@@ -28,8 +28,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variableName": "globalInt",
-              "variableAutomaton": "A",
+              "variable": "globalInt",
               "value": {
                 "kind": "integer",
                 "value": 1
@@ -43,6 +42,7 @@
   "variables": [
     {
       "name": "globalInt",
+      "fullName": "globalInt",
       "type": {
         "name": "Int",
         "realName": "int"
@@ -50,17 +50,9 @@
       "initValue": {
         "kind": "callAutomatonConstructor",
         "automatonName": "A",
-        "args": [
-          {
-            "name": "state",
-            "value": {
-              "kind": "variableAccess",
-              "name": "S"
-            }
-          }
-        ]
-      },
-      "parent": {}
+        "state": "S",
+        "args": []
+      }
     }
   ]
 }

@@ -1,0 +1,89 @@
+{
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "types": [
+    {
+      "name": "Int",
+      "realName": "int"
+    }
+  ],
+  "automata": [
+    {
+      "name": "A",
+      "constructorVariables": [],
+      "variables": [
+        {
+          "name": "i",
+          "type": "Int"
+        }
+      ],
+      "states": [],
+      "shifts": [],
+      "functions": [
+        {
+          "name": "f",
+          "automaton": "A",
+          "args": [],
+          "contracts": [
+            {
+              "kind": "REQUIRES",
+              "expression": {
+                "kind": "binary",
+                "left": {
+                  "kind": "variableAccess",
+                  "variable": "A.i"
+                },
+                "right": {
+                  "kind": "integer",
+                  "value": 0
+                }
+              }
+            }
+          ],
+          "statements": [
+            {
+              "kind": "assignment",
+              "variable": "A.i",
+              "value": {
+                "kind": "integer",
+                "value": 1
+              }
+            }
+          ]
+        },
+        {
+          "name": "g",
+          "automaton": "A",
+          "args": [],
+          "contracts": [],
+          "statements": [
+            {
+              "kind": "assignment",
+              "variable": "A.i",
+              "value": {
+                "kind": "variableAccess",
+                "variable": "g.a"
+              }
+            }
+          ]
+        },
+        {
+          "name": "a",
+          "automaton": "A",
+          "args": [],
+          "contracts": [],
+          "statements": [
+            {
+              "kind": "assignment",
+              "variable": "a.i",
+              "value": {
+                "kind": "integer",
+                "value": 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

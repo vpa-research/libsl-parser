@@ -108,8 +108,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variableName": "strVar",
-              "variableAutomaton": "A",
+              "variable": "A.strVar",
               "value": {
                 "kind": "string",
                 "value": ""
@@ -117,8 +116,7 @@
             },
             {
               "kind": "assignment",
-              "variableName": "b.v",
-              "variableAutomaton": "A",
+              "variable": "A.b",
               "value": {
                 "kind": "integer",
                 "value": 1

@@ -41,20 +41,12 @@
           "statements": [
             {
               "kind": "assignment",
-              "variableName": "i",
-              "variableAutomaton": "A",
+              "variable": "A.i",
               "value": {
                 "kind": "callAutomatonConstructor",
                 "automatonName": "B",
+                "state": "s1",
                 "args": [
-                  {
-                    "name": "state",
-                    "value": {
-                      "kind": "variableAccess",
-                      "name": "s1",
-                      "automatonOwnerName": "A"
-                    }
-                  },
                   {
                     "name": "v",
                     "value": {

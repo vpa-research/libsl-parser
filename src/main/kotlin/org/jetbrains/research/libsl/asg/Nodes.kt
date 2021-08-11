@@ -11,7 +11,7 @@ data class Library(
     val semanticTypes: List<Type>,
     val automata: List<Automaton>,
     val extensionFunctions: Map<String, List<Function>>,
-    val globalVariables: Map<String, Variable>
+    val globalVariables: Map<String, GlobalVariableDeclaration>
 ) : Node()
 
 data class MetaNode(
@@ -64,12 +64,14 @@ data class Automaton(
     val type: Type,
     var states: List<State>,
     var shifts: List<Shift>,
-    var internalVariables: List<Variable>,
+    var internalVariables: List<AutomatonVariableDeclaration>,
     var constructorVariables: List<Variable>,
     var localFunctions: List<Function>
 ) : Node() {
     val functions: List<Function>
         get() = localFunctions + (parent.node as Library).extensionFunctions[name].orEmpty()
+    val variables: List<Variable>
+        get() = internalVariables + constructorVariables
 }
 
 data class State(
@@ -98,20 +100,17 @@ enum class StateKind {
     }
 }
 
-data class Argument(
-    val name: String,
-    val type: Type
-)
-
 data class Function(
     val name: String,
-    val automatonName: String?,
-    val args: List<Argument>,
+    val automatonName: String,
+    val args: List<FunctionArgument>,
     val returnType: Type?,
     var contracts: List<Contract>,
     var statements: List<Statement>,
     val context: LslContext
-) : Node()
+) : Node() {
+    val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
+}
 
 sealed class Statement: Node()
 
@@ -175,15 +174,54 @@ enum class ArithmeticUnaryOp {
     MINUS, INVERSION
 }
 
-data class Variable(
-    val name: String,
-    val type: Type,
-    val initValue: Expression?
-) : Expression()
+sealed class Variable : Expression() {
+    abstract val name: String
+    abstract val type: Type
+    open val initValue: Atomic? = null
+
+    open val fullName: String
+        get() = name
+}
+
+data class GlobalVariableDeclaration(
+    override val name: String,
+    override val type: Type,
+    override val initValue: Atomic?
+) : Variable()
+
+data class AutomatonVariableDeclaration(
+    override val name: String,
+    override val type: Type,
+    override var initValue: Atomic?
+) : Variable() {
+    lateinit var automaton: Automaton
+
+    override val fullName: String
+        get() = "${automaton.name}.${name}"
+}
+
+data class FunctionArgument(
+    override val name: String,
+    override val type: Type
+) : Variable() {
+    lateinit var function: Function
+
+    override val fullName: String
+        get() = "${function.name}.$name"
+}
+
+data class ConstructorArgument(
+    override val name: String,
+    override val type: Type,
+) : Variable() {
+    lateinit var automaton: Automaton
+
+    override val fullName: String
+        get() = "${automaton.name}.$name"
+}
 
 data class VariableAccess(
-    val name: String,
-    val automaton: Automaton?,
+    val variable: Variable,
     val arrayIndex: Int? = null
 ) : Atomic()
 
@@ -207,7 +245,8 @@ data class OldValue(
 
 data class CallAutomatonConstructor(
     val automaton: Automaton,
-    val args: List<ArgumentWithValue>
+    val args: List<ArgumentWithValue>,
+    val state: State
 ) : Atomic()
 
 data class ArgumentWithValue(

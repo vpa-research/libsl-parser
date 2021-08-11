@@ -46,5 +46,11 @@ class GeneratedTests {
         testRunner("simple")
     }
 
+
+    @Test
+    fun testVariableResolution() {
+        testRunner("variableResolution")
+    }
+
 }
 

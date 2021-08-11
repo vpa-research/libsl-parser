@@ -28,8 +28,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variableName": "b.i",
-              "variableAutomaton": "A",
+              "variable": "A.b",
               "value": {
                 "kind": "integer",
                 "value": 1

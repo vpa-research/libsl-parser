@@ -40,8 +40,7 @@
                 },
                 {
                   "kind": "variableAccess",
-                  "name": "param",
-                  "automatonOwnerName": "A"
+                  "variable": "f.param"
                 }
               ]
             },

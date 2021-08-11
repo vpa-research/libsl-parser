@@ -118,6 +118,17 @@ val automatonSerializer = JsonSerializer<Automaton> { src, _, context ->
     }
 }
 
+val variableSerializer = JsonSerializer<Variable> { src, _, context ->
+    JsonObject().apply {
+        addProperty("name", src.name)
+        addProperty("fullName", src.fullName)
+        add("type", context.serialize(src.type, Type::class.java))
+        if (src.initValue != null) {
+            add("initValue", context.serialize(src.initValue, Expression::class.java))
+        }
+    }
+}
+
 val typeSerializer = JsonSerializer<Type> { src, _, _ ->
     JsonObject().apply {
         addProperty("name", src.semanticType)
@@ -206,7 +217,7 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
             }
             is Variable -> {
                 addProperty("kind", "variable")
-                addProperty("name", src.name)
+                addProperty("name", src.fullName)
                 addProperty("type", src.type.semanticType)
                 if (src.initValue != null) {
                     add("initValue", context.serialize(src.initValue, Expression::class.java))
@@ -214,8 +225,7 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
             }
             is VariableAccess -> {
                 addProperty("kind", "variableAccess")
-                addProperty("name", src.name)
-                addProperty("automatonOwnerName", src.automaton?.name)
+                addProperty("variable", src.variable.fullName)
                 if (src.arrayIndex != null) {
                     addProperty("arrayIndex", src.arrayIndex)
                 }
@@ -227,6 +237,7 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
             is CallAutomatonConstructor -> {
                 addProperty("kind", "callAutomatonConstructor")
                 addProperty("automatonName", src.automaton.name)
+                addProperty("state", src.state.name)
                 add("args", JsonArray().apply {
                     src.args.forEach { arg ->
                         add(JsonObject().apply {
@@ -244,8 +255,7 @@ val statementSerializer = JsonSerializer<Statement> { src, _, context ->
     when (src) {
         is Assignment -> JsonObject().apply {
             addProperty("kind", "assignment")
-            addProperty("variableName", src.variable.name)
-            addProperty("variableAutomaton", src.variable.automaton?.name)
+            addProperty("variable", src.variable.variable.fullName)
             if (src.variable.arrayIndex != null) {
                 addProperty("variableIndex", src.variable.arrayIndex)
             }

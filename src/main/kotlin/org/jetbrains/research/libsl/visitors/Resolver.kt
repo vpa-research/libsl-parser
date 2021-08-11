@@ -14,16 +14,52 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
         for (automatonCtx in automata) {
             val typeName = automatonCtx.type.text
             val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
+
+            val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDeclaration() }.map { variable ->
+                val variableName = variable.nameWithType().name.text
+                val variableTypeName = variable.nameWithType().type.text
+                val variableType = context.resolveType(variableTypeName) ?: error("unresolved type")
+
+                AutomatonVariableDeclaration(
+                    variableName,
+                    variableType,
+                    null
+                )
+            }
+
+            val constructorVariables = automatonCtx.nameWithType().map { cVar ->
+                val argName = cVar.name.text
+                val argTypeName = cVar.type.text
+                val argType = context.resolveType(argTypeName) ?: error("unresolved type $argTypeName")
+
+                ConstructorArgument(
+                    argName,
+                    argType
+                )
+            }
+
+            val states = automatonCtx.automatonStatement()?.filter { it.automatonStateDecl() != null }?.flatMap { statesCtx ->
+                statesCtx.automatonStateDecl().identifierList().Identifier().map { stateCtx ->
+                    val keyword = statesCtx.start.text
+                    val stateName = stateCtx.text
+                    val stateKind = StateKind.fromString(keyword)
+                    State(stateName, stateKind)
+                }
+            }.orEmpty()
+
             val automaton = Automaton(
                 automatonCtx.name.text,
                 type,
+                states,
                 listOf(),
-                listOf(),
-                listOf(),
-                listOf(),
+                variables,
+                constructorVariables,
                 listOf(),
             )
+
             context.storeResolvedAutomaton(automaton)
+            variables.forEach { it.automaton = automaton }
+            constructorVariables.forEach { it.automaton = automaton }
         }
 
         for (automaton in automata) {
@@ -43,7 +79,7 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
                 null
             }
 
-            val variable = Variable(
+            val variable = GlobalVariableDeclaration(
                 nameWithType.name.text,
                 type,
                 init
@@ -88,26 +124,19 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.text
+        val automaton = context.resolveAutomaton(name) ?: error("")
 
-        val variables = ctx.automatonStatement()
+        ctx.automatonStatement()
             .mapNotNull { it.variableDeclaration() }
-            .map { decl ->
+            .forEach { decl ->
                 val variableName = decl.nameWithType().name.text
-                val typeName = decl.nameWithType().type.text
+                val automatonVariable = automaton.internalVariables.first { it.name == variableName }
+
                 if (decl.assignmentRight() != null) {
-                    val init: Atomic = asgBuilderVisitor.processAssignmentRight(decl.assignmentRight())
-                    getVariable(variableName, typeName, init, context)
-                } else {
-                    getVariable(variableName, typeName, null, context)
+                    automatonVariable.initValue = asgBuilderVisitor.processAssignmentRight(decl.assignmentRight())
                 }
             }
 
-        val constructorVariables = ctx.nameWithType().map { getVariable(it.name.text, it.type.text, null, context) }
-
-        val automaton = context.resolveAutomaton(name)?.apply {
-            this.internalVariables = variables
-            this.constructorVariables = constructorVariables
-        } ?: error("")
         context.storeResolvedAutomaton(automaton)
 
         for (functionDecl in ctx.automatonStatement().mapNotNull { it.functionDecl() }) {
@@ -117,6 +146,7 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
         val (automatonName, name) = parseFunctionName(ctx)
+        automatonName ?: error("automaton name not specified for function: $name")
 
         val typeName = ctx.functionType?.text
         val returnType = if (typeName != null) context.resolveType(typeName)
@@ -124,10 +154,12 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
 
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
-            Argument(arg.name.text, argType)
+            FunctionArgument(arg.name.text, argType)
         }?.toList().orEmpty()
 
         val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)
         context.storeResolvedFunction(func)
+
+        args.forEach { it.function = func }
     }
 }
