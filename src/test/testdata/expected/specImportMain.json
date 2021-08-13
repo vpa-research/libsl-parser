@@ -1,0 +1,80 @@
+{
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "automata": [
+    {
+      "name": "A",
+      "type": "Int",
+      "constructorVariables": [],
+      "variables": [
+        {
+          "name": "i",
+          "type": "Int"
+        }
+      ],
+      "states": [],
+      "shifts": [],
+      "functions": [
+        {
+          "name": "f",
+          "automaton": "A",
+          "args": [
+            {
+              "name": "param",
+              "type": "Int"
+            }
+          ],
+          "contracts": [],
+          "statements": [
+            {
+              "kind": "action",
+              "actionName": "TEST_ACTION",
+              "args": [
+                {
+                  "kind": "integer",
+                  "value": 1
+                },
+                {
+                  "kind": "string",
+                  "value": "123"
+                },
+                {
+                  "kind": "qualifiedAccess",
+                  "access": {
+                    "kind": "variableAccess",
+                    "name": "param",
+                    "variableInfo": {
+                      "name": "param",
+                      "fullName": "f.param",
+                      "type": {
+                        "name": "Int",
+                        "isPointer": false,
+                        "kind": "simple",
+                        "realType": {
+                          "name": "foo.bar.int",
+                          "isPointer": false,
+                          "kind": "real"
+                        }
+                      },
+                      "kind": "functionArgument",
+                      "function": "A.f",
+                      "functionArgTypes": [
+                        "Int"
+                      ]
+                    },
+                    "type": "Int"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "action",
+              "actionName": "TEST_ACTION_TWO",
+              "args": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

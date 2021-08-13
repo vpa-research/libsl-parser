@@ -48,6 +48,18 @@ class GeneratedTests {
 
 
     @Test
+    fun testSpecImportMain() {
+        testRunner("specImportMain")
+    }
+
+
+    @Test
+    fun testSpecImportSecondary() {
+        testRunner("specImportSecondary")
+    }
+
+
+    @Test
     fun testTypes() {
         testRunner("types")
     }

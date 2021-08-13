@@ -1,14 +1,23 @@
 package org.jetbrains.research.libsl.visitors
 
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import org.jetbrains.research.libsl.LibSLBaseVisitor
+import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Bool
+import java.io.File
 
-class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
+class Resolver(
+    private val context: LslContext,
+    private val basePath: String
+    ) : LibSLBaseVisitor<Unit>() {
     private val asgBuilderVisitor = ASGBuilder(context)
 
     override fun visitFile(ctx: LibSLParser.FileContext) {
+        ctx.globalStatement().mapNotNull { it.importStatement() }.forEach { visitImportStatement(it) }
+
         val typeSections = ctx.globalStatement().mapNotNull { it.typesSection() }
         if (typeSections.size > 1) {
             error("only one types section could be provided")
@@ -255,5 +264,29 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
                 body,
                 context
             ))
+    }
+
+    override fun visitImportStatement(ctx: LibSLParser.ImportStatementContext) {
+        // todo: forbid for recursive imports
+        val importString = ctx.importString.text.removeQuotes()
+        val filePath = "$basePath/$importString.lsl"
+        val file = File(filePath)
+
+        if (!file.exists()) {
+            error("unresolved import path $importString. Full path: $filePath")
+        }
+
+        val stream = CharStreams.fromString(file.readText())
+        val lexer = LibSLLexer(stream)
+        val tokenStream = CommonTokenStream(lexer)
+        val parser = LibSLParser(tokenStream)
+
+        val newContext = LslContext()
+        context.import(newContext)
+        val resolver = Resolver(newContext, basePath)
+        val fileCtx = parser.file()
+        resolver.visitFile(fileCtx)
+        val asgBuilder = ASGBuilder(context)
+        asgBuilder.visitFile(fileCtx)
     }
 }

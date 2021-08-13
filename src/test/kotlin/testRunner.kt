@@ -1,5 +1,3 @@
-import com.google.gson.ExclusionStrategy
-import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
 import org.antlr.v4.runtime.*
 import org.jetbrains.research.libsl.LibSLLexer
@@ -36,7 +34,7 @@ fun testRunner(name: String) {
     })
 
     val file = parser.file()
-    Resolver(context).visitFile(file)
+    Resolver(context,"$testdataPath/lsl/").visitFile(file)
     val library = ASGBuilder(context).visitFile(file)
 
     val gson = GsonBuilder()
