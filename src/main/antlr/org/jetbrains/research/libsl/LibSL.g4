@@ -162,7 +162,7 @@ variableAssignment
    ;
 
 assignmentRight
-   :   expressionAtomic
+   :   expression
    |   'new' callAutomatonConstructorWithNamedArgs
    ;
 

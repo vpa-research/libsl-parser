@@ -222,7 +222,7 @@ enum class ArithmeticUnaryOp {
 sealed class Variable : Expression() {
     abstract val name: String
     abstract val type: Type
-    open val initValue: Atomic? = null
+    open val initValue: Expression? = null
 
     open val fullName: String
         get() = name
@@ -231,13 +231,13 @@ sealed class Variable : Expression() {
 data class GlobalVariableDeclaration(
     override val name: String,
     override val type: Type,
-    override val initValue: Atomic?
+    override val initValue: Expression?
 ) : Variable()
 
 data class AutomatonVariableDeclaration(
     override val name: String,
     override val type: Type,
-    override var initValue: Atomic?
+    override var initValue: Expression?
 ) : Variable() {
     lateinit var automaton: Automaton
 

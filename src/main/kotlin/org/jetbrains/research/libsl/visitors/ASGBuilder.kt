@@ -120,9 +120,9 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         )
     }
 
-    override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Atomic = when {
-        ctx.expressionAtomic() != null -> {
-            visitExpressionAtomic(ctx.expressionAtomic())
+    override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Expression = when {
+        ctx.expression() != null -> {
+            visitExpression(ctx.expression())
         }
         ctx.callAutomatonConstructorWithNamedArgs() != null -> {
             visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
@@ -260,8 +260,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     internal fun processAssignmentRight(ctx: LibSLParser.AssignmentRightContext) = when {
-        ctx.expressionAtomic() != null -> {
-            visitExpressionAtomic(ctx.expressionAtomic())
+        ctx.expression() != null -> {
+            visitExpression(ctx.expression())
         }
         ctx.callAutomatonConstructorWithNamedArgs() != null -> {
             visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())

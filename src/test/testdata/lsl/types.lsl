@@ -27,6 +27,6 @@ automaton Image : BlackAndWhiteImage {
    requires size: (x > 0) & (y > 0);
    ensures img[y][x] != img[y][x]';
    {
-       img.content[y][x] = img.content[y][x];
+       img.content[y][x] = !img.content[y][x];
    }
 }
