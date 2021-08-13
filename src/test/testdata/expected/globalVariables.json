@@ -4,12 +4,19 @@
   "types": [
     {
       "name": "Int",
-      "realName": "int"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "int",
+        "isPointer": false,
+        "kind": "real"
+      }
     }
   ],
   "automata": [
     {
       "name": "A",
+      "type": "Int",
       "constructorVariables": [],
       "variables": [],
       "states": [
@@ -23,7 +30,12 @@
         {
           "name": "f",
           "automaton": "A",
-          "args": [],
+          "args": [
+            {
+              "name": "param",
+              "type": "Int"
+            }
+          ],
           "contracts": [],
           "statements": [
             {
@@ -45,14 +57,21 @@
       "fullName": "globalInt",
       "type": {
         "name": "Int",
-        "realName": "int"
+        "isPointer": false,
+        "kind": "simple",
+        "realType": {
+          "name": "int",
+          "isPointer": false,
+          "kind": "real"
+        }
       },
       "initValue": {
         "kind": "callAutomatonConstructor",
         "automatonName": "A",
         "state": "S",
         "args": []
-      }
+      },
+      "kind": "global"
     }
   ]
 }

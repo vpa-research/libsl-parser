@@ -28,36 +28,80 @@ data class MetaNode(
         }
 }
 
-sealed class Type: Node() {
-    abstract val semanticType: String
-    abstract val realType: RealType
+sealed class Type {
+    abstract val name: String
+    abstract val isPointer: Boolean
     abstract val context: LslContext
+    abstract val generic: Type?
+    open val fullName: String
+        get() = "${if (isPointer) "*" else ""}$name"
+}
+
+sealed class LibslType : Type()
+
+data class RealType (
+    val nameParts: List<String>,
+    override val isPointer: Boolean,
+    override val generic: Type?,
+    override val context: LslContext
+) : Type() {
+    override val name: String
+        get() = nameParts.joinToString(".")
 }
 
 data class SimpleType(
-    override val semanticType: String,
-    override val realType: RealType,
+    override val name: String,
+    val realType: Type,
+    override val isPointer: Boolean,
     override val context: LslContext
-) : Type()
+) : LibslType() {
+    override val generic: Type? = null
+}
 
-data class RealType(
-    val name: List<String>,
-    val generic: List<String>?
-) : Node()
-
-data class EnumLikeType(
-    override val semanticType: String,
-    override val realType: RealType,
-    val entities: List<Pair<String, String>>,
+data class TypeAlias (
+    override val name: String,
+    val originalType: Type,
     override val context: LslContext
-) : Type()
+) : LibslType() {
+    override val isPointer: Boolean = false
+    override val generic: Type? = null
+}
 
-data class SyntheticType(
-    override val semanticType: String,
-    override val realType: RealType,
+data class EnumLikeSemanticType(
+    override val name: String,
+    val type: Type,
+    val entries: List<Pair<String, Atomic>>,
     override val context: LslContext
+) : LibslType() {
+    override val isPointer: Boolean = false
+    override val generic: Type? = null
+}
 
-) : Type()
+data class StructuredType(
+    override val name: String,
+    val type: Type,
+    override val generic: Type?,
+    val entries: List<Pair<String, Type>>,
+    override val context: LslContext
+) : LibslType() {
+    override val isPointer: Boolean = false
+}
+
+data class EnumType(
+    override val name: String,
+    val entries: List<Pair<String, Atomic>>,
+    override val context: LslContext
+) : LibslType() {
+    override val isPointer: Boolean = false
+    override val generic: Type? = null
+}
+
+data class ArrayType(
+    override val name: String,
+    override val isPointer: Boolean,
+    override val generic: Type,
+    override val context: LslContext
+) :  LibslType()
 
 data class Automaton(
     val name: String,
@@ -110,12 +154,13 @@ data class Function(
     val context: LslContext
 ) : Node() {
     val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
+    val qualifiedName: String by lazy { "${automaton.name}.$name" }
 }
 
 sealed class Statement: Node()
 
 data class Assignment(
-    val variable: VariableAccess,
+    val left: QualifiedAccess,
     val value: Expression
 ) : Statement()
 
@@ -220,10 +265,48 @@ data class ConstructorArgument(
         get() = "${automaton.name}.$name"
 }
 
+sealed class QualifiedAccess : Atomic() {
+    abstract var childAccess: QualifiedAccess?
+    abstract val type: Type
+
+    open fun text(): String = (childAccess?.text() ?: "") + ":${type.fullName}"
+
+    val lastChild: QualifiedAccess
+        get() = childAccess?.lastChild ?: childAccess ?: this
+}
+
 data class VariableAccess(
-    val variable: Variable,
-    val arrayIndex: Int? = null
-) : Atomic()
+    val fieldName: String,
+    override var childAccess: QualifiedAccess?,
+    override val type: Type,
+    val variable: Variable?
+) : QualifiedAccess() {
+    override fun text(): String = "$fieldName${childAccess?.text()?.let { ".$it" } ?: ""}"
+}
+
+data class AccessAlias(
+    override var childAccess: QualifiedAccess?,
+    override val type: Type
+) : QualifiedAccess() {
+    override fun text(): String = "alias[${type.fullName}].${childAccess!!.text()}"
+}
+
+data class RealTypeAccess(
+    override val type: RealType
+) : QualifiedAccess() {
+    override var childAccess: QualifiedAccess? = null
+
+    override fun text(): String = type.name
+}
+
+data class ArrayAccess(
+    var index: Atomic?,
+    override val type: Type
+) : QualifiedAccess() {
+    override var childAccess: QualifiedAccess? = null
+
+    override fun text(): String = "${type.fullName}[$index]"
+}
 
 sealed class Atomic : Expression()
 
@@ -239,8 +322,12 @@ data class StringValue(
     val value: String
 ) : Atomic()
 
+data class Bool(
+    val value: Boolean
+) : Atomic()
+
 data class OldValue(
-    val value: VariableAccess
+    val value: QualifiedAccess
 ) : Expression()
 
 data class CallAutomatonConstructor(

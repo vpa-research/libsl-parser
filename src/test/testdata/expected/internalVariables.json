@@ -4,12 +4,19 @@
   "types": [
     {
       "name": "Int",
-      "realName": "int"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "int",
+        "isPointer": false,
+        "kind": "real"
+      }
     }
   ],
   "automata": [
     {
       "name": "A",
+      "type": "Int",
       "constructorVariables": [],
       "variables": [
         {
@@ -28,7 +35,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "A.b",
+              "variable": "b.i",
               "value": {
                 "kind": "integer",
                 "value": 1
@@ -40,6 +47,7 @@
     },
     {
       "name": "B",
+      "type": "Int",
       "constructorVariables": [],
       "variables": [
         {

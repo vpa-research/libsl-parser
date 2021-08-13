@@ -7,10 +7,6 @@ import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Function
 
 class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
-    private val syntheticVariable = GlobalVariableDeclaration("state",
-        SyntheticType("state", RealType(listOf(), listOf()), context),
-        null
-    )
     override fun visitFile(ctx: LibSLParser.FileContext): Library {
         val header = ctx.header()
         val libraryName = header.libraryName?.text ?: error("no library name specified")
@@ -23,20 +19,18 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val url = header?.link?.text?.removeSurrounding("\"", "\"")
 
         val meta = MetaNode(libraryName, libraryVersion, language, url, lslVersion)
-        val imports = ctx.imports().oneImport().map { it.importString.text.removeSurrounding("\"", "\"") }.toList()
-        val includes = ctx.includes().include().map { it.includeString.text.removeSurrounding("\"", "\"") }.toList()
+        val imports = ctx.getChildren<LibSLParser.ImportStatementContext>().map { it.importString.text.removeSurrounding("\"", "\"") }.toList()
+        val includes = ctx.getChildren<LibSLParser.IncludeStatementContext>().map { it.includeString.text.removeSurrounding("\"", "\"") }.toList()
 
-        val automata = ctx.declarations().declaration()
-            .mapNotNull { it.automatonDecl() }
+        val automata = ctx.globalStatement()
+            .mapNotNull { it.declaration()?.automatonDecl() }
             .map { visitAutomatonDecl(it) }
             .toMutableList()
-        val nonlocalFunctions = ctx.declarations().declaration()
-            .mapNotNull { it.functionDecl() }
+        val nonlocalFunctions = ctx.globalStatement()
+            .mapNotNull { it.declaration()?.functionDecl() }
             .map { visitFunctionDecl(it) }
 
-        val types = ctx.typesSection().typesSectionBody().semanticType().map { typeCtx ->
-            context.resolveType(typeCtx.semanticTypeName) ?: error("unresolved type: ${typeCtx.text}")
-        }
+        val types = context.typeStorage.map { it.value }
 
         val library = Library(
             meta,
@@ -189,7 +183,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 variableStatement.variableAssignment() != null -> {
                     val variableAssignment = variableStatement.variableAssignment()
                     val value = visitAssignmentRight(variableAssignment.assignmentRight())
-                    val variable = visitQualifiedAccess(variableAssignment.qualifiedAccess())
+                    val variable = visitQualifiedAccess(variableAssignment.qualifiedAccess()) as? VariableAccess ?: error("")
 
                     Assignment(variable, value)
                 }
@@ -254,6 +248,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             }
             ctx.expressionAtomic() != null -> visitExpressionAtomic(ctx.expressionAtomic())
             ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
+            ctx.lbracket != null -> visitContractExpression(ctx.contractExpression().first())
             else -> {
                 val left = visitContractExpression(ctx.contractExpression(0))
                 val right = visitContractExpression(ctx.contractExpression(1))
@@ -275,22 +270,114 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitExpressionAtomic(ctx: LibSLParser.ExpressionAtomicContext): Atomic = when {
-        ctx.integerNumber() != null -> IntegerNumber(ctx.integerNumber().text.toInt())
-        ctx.floatNumber() != null -> FloatNumber(ctx.floatNumber().text.toFloat())
-        ctx.QuotedString() != null -> StringValue(removeQuotes(ctx.QuotedString().text))
+        ctx.primitiveLiteral()?.integerNumber() != null -> IntegerNumber(ctx.primitiveLiteral().integerNumber().text.toInt())
+        ctx.primitiveLiteral()?.floatNumber() != null -> FloatNumber(ctx.primitiveLiteral().floatNumber().text.toFloat())
+        ctx.primitiveLiteral()?.QuotedString() != null -> StringValue(ctx.primitiveLiteral().QuotedString().text.removeQuotes())
         ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
         else -> error("unknown atomic type")
     }
 
-    override fun visitQualifiedAccess(ctx: LibSLParser.QualifiedAccessContext): VariableAccess {
-        val name = ctx.periodSeparatedFullName().Identifier().map { it.text }
-        val variable = resolveVariableDependingOnContext(ctx, name, context) ?: error("unresolved variable: $name")
+    override fun visitQualifiedAccess(ctx: LibSLParser.QualifiedAccessContext): QualifiedAccess {
+        when {
+            ctx.periodSeparatedFullName() != null -> {
+                val namesChain = ctx.periodSeparatedFullName().Identifier().map { it.text }
+                val variable = resolveVariableDependingOnContext(ctx, namesChain.first(), context)
+                    ?: error("unresolved variable: $namesChain")
+                val currentVariableAccess = VariableAccess(variable.name, null, variable.type, variable)
 
-        return if (ctx.integerNumber() != null) {
-            val index = ctx.integerNumber().text.toInt()
-            VariableAccess(variable, index)
-        } else {
-            VariableAccess(variable)
+                return if (namesChain.size > 1) {
+                    currentVariableAccess.apply {
+                        lastChild.childAccess = resolveQualifiedAccessFullName(variable.type, namesChain.drop(1))
+                    }
+                } else {
+                    currentVariableAccess
+                }
+            }
+
+            ctx.qualifiedAccess() != null -> {
+                val parentQualifiedAccess = visitQualifiedAccess(ctx.qualifiedAccess())
+
+                return if (ctx.expressionAtomic() != null) {
+                    val indexCtx = ctx.expressionAtomic()
+                    val index = visitExpressionAtomic(indexCtx)
+
+                    parentQualifiedAccess.apply {
+                        lastChild.childAccess = ArrayAccess(
+                            index,
+                            parentQualifiedAccess.type
+                        )
+                    }
+                } else {
+                    parentQualifiedAccess
+                }
+            }
+            else -> error("unknown qualified access kind")
+        }
+    }
+
+    private fun resolveQualifiedAccessFullName(type: Type, nameParts: List<String>): QualifiedAccess {
+        val currentName = nameParts.first()
+        if (nameParts.size == 1) {
+            return VariableAccess(
+                currentName,
+                null,
+                type,
+                null
+            )
+        }
+
+        return when (type) {
+            is EnumLikeSemanticType -> {
+                val nextName = nameParts[2]
+                val child = VariableAccess(nextName, null, type.type, null)
+                VariableAccess(
+                    currentName,
+                    child,
+                    type,
+                    null
+                )
+            }
+
+            is EnumType -> {
+                val nextName = nameParts[2]
+                val child = VariableAccess(nextName, null, type, null)
+                VariableAccess(
+                    currentName,
+                    child,
+                    type,
+                    null
+                )
+            }
+
+            is StructuredType -> {
+                val nextType = type.entries.firstOrNull { it.first == currentName }?.second
+                    ?: error("unresolved field $currentName in type ${type.name}")
+                val child = resolveQualifiedAccessFullName(nextType, nameParts.drop(1))
+                VariableAccess(
+                    currentName,
+                    child,
+                    type,
+                    null
+                )
+            }
+            is SimpleType -> error("can't resolve reference chain. Simple type ${type.name} can't contain fields")
+            is TypeAlias -> {
+                AccessAlias(
+                    resolveQualifiedAccessFullName(type.originalType, nameParts.drop(1)),
+                    type
+                )
+            }
+            is RealType -> {
+                RealTypeAccess(
+                    type
+                )
+            }
+            is ArrayType -> {
+                ArrayAccess(
+                    null,
+                    type.generic
+                )
+            }
         }
     }
 
@@ -336,24 +423,24 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         }
     }
 
-    private fun resolveVariableDependingOnContext(ctx: RuleContext, variableNameParts: List<String>, context: LslContext): Variable? {
-        val name = variableNameParts.first() // todo
+    private fun resolveVariableDependingOnContext(ctx: RuleContext, variableName: String, context: LslContext): Variable? {
         val res = when (ctx) {
             is LibSLParser.FunctionDeclContext -> {
                 val func = resolveFunctionByCtx(ctx)!!
-                func.args.firstOrNull { it.name == name } ?: func.automaton.variables.firstOrNull { it.name == name }
+                func.args.firstOrNull { it.name == variableName }
+                    ?: func.automaton.variables.firstOrNull { it.name == variableName }
             }
             is LibSLParser.AutomatonDeclContext -> {
                 val automatonName = ctx.name.text
                 val automaton = context.resolveAutomaton(automatonName)!!
-                automaton.variables.firstOrNull { it.name == name }
+                automaton.variables.firstOrNull { it.name == variableName }
             }
             else -> null
         }
         return if (ctx.parent == null) {
-            context.resolveVariable(name)
+            context.resolveVariable(variableName)
         } else {
-            res ?: resolveVariableDependingOnContext(ctx.parent, variableNameParts, context)
+            res ?: resolveVariableDependingOnContext(ctx.parent, variableName, context)
         }
     }
 }

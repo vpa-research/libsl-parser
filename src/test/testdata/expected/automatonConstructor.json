@@ -4,16 +4,29 @@
   "types": [
     {
       "name": "Int",
-      "realName": "int"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "int",
+        "isPointer": false,
+        "kind": "real"
+      }
     },
     {
       "name": "String",
-      "realName": "string"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "string",
+        "isPointer": false,
+        "kind": "real"
+      }
     }
   ],
   "automata": [
     {
       "name": "A",
+      "type": "Int",
       "constructorVariables": [
         {
           "name": "i",
@@ -41,7 +54,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "A.i",
+              "variable": "i",
               "value": {
                 "kind": "callAutomatonConstructor",
                 "automatonName": "B",
@@ -63,6 +76,7 @@
     },
     {
       "name": "B",
+      "type": "Int",
       "constructorVariables": [
         {
           "name": "v",

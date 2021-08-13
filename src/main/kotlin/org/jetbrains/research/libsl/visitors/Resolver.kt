@@ -3,14 +3,26 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLBaseVisitor
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
+import org.jetbrains.research.libsl.asg.Bool
 
 class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
     private val asgBuilderVisitor = ASGBuilder(context)
 
     override fun visitFile(ctx: LibSLParser.FileContext) {
-        visitTypesSectionBody(ctx.typesSection().typesSectionBody())
+        val typeSections = ctx.globalStatement().mapNotNull { it.typesSection() }
+        if (typeSections.size > 1) {
+            error("only one types section could be provided")
+        }
+        for (statement in ctx.globalStatement()) {
+            when {
+                statement.typesSection() != null -> visitTypesSection(statement.typesSection())
+                statement.enumBlock() != null -> visitEnumBlock(statement.enumBlock())
+                statement.typeDefBlock() != null -> visitTypeDefBlock(statement.typeDefBlock())
+                statement.typealiasStatement() != null -> visitTypealiasStatement(statement.typealiasStatement())
+            }
+        }
 
-        val automata = ctx.declarations().declaration().mapNotNull { it.automatonDecl() }
+        val automata = ctx.globalStatement().mapNotNull { it.declaration()?.automatonDecl() }
         for (automatonCtx in automata) {
             val typeName = automatonCtx.type.text
             val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
@@ -66,11 +78,11 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
             visitAutomatonDecl(automaton)
         }
 
-        for (extensionFunction in ctx.declarations().declaration().mapNotNull { it.functionDecl() }) {
+        for (extensionFunction in ctx.globalStatement().mapNotNull { it.declaration()?.functionDecl() }) {
             visitFunctionDecl(extensionFunction)
         }
 
-        ctx.declarations().declaration().mapNotNull { it.variableDeclaration() }.map { variableDecl ->
+        ctx.globalStatement().mapNotNull { it.declaration()?.variableDeclaration() }.map { variableDecl ->
             val nameWithType = variableDecl.nameWithType()
             val type = context.resolveType(nameWithType.type.text) ?: error("unresolved type: ${nameWithType.type.text}")
             val init = if (variableDecl.assignmentRight() != null){
@@ -88,22 +100,30 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
         }
     }
 
-    override fun visitTypesSectionBody(ctx: LibSLParser.TypesSectionBodyContext) {
+    override fun visitTypesSection(ctx: LibSLParser.TypesSectionContext) {
         for (semanticTypeContext in ctx.semanticType()) {
             val type = when {
                 semanticTypeContext.simpleSemanticType() != null -> {
-                    val semanticType = semanticTypeContext.simpleSemanticType().semanticTypeName.text
-                    val realTypeCtx = semanticTypeContext.simpleSemanticType().realTypeName()
-                    val realName = processRealTypeName(realTypeCtx)
-                    SimpleType(semanticType, realName, context)
+                    val semanticType = semanticTypeContext.simpleSemanticType().semanticName.text
+                    val realTypeCtx = semanticTypeContext.simpleSemanticType().realName
+                    val resolvedRealType = context.resolveType(realTypeCtx.text)
+                        ?: processRealTypeIdentifier(realTypeCtx)
+                    val isPointer = realTypeCtx.asterisk != null
+
+                    SimpleType(semanticType, resolvedRealType, isPointer, context)
                 }
-                semanticTypeContext.enumLikeSemanticType() != null -> {
-                    val enum = semanticTypeContext.enumLikeSemanticType()
-                    val semanticType = enum.semanticTypeName.text
-                    val realName = processRealTypeName(enum.realTypeName())
-                    val body = enum.enumLikeSemanticTypeBody().enumLikeSemanticTypeBodyStatement()
-                        .map { it.Identifier().text to it.expressionAtomic().text }
-                    EnumLikeType(semanticType, realName, body, context)
+                semanticTypeContext.blockType() != null -> {
+                    val blockType = semanticTypeContext.blockType()
+                    val semanticType = blockType.semanticName.text
+                    val realName = blockType.realName
+                    val resolvedRealType = context.resolveType(realName.text)
+                        ?: processRealTypeIdentifier(realName)
+                    val body = blockType.blockTypeStatement().map { statement ->
+                        statement.Identifier().text to resolvePrimitiveLiteral(statement.expressionAtomic().primitiveLiteral())
+                    }
+                    // val genericTypeCtx = blockType.typeIdentifier().generic
+                    // todo? val genericType = genericTypeCtx?.let { processRealTypeIdentifier(it) }
+                    EnumLikeSemanticType(semanticType, resolvedRealType, body, context)
                 }
                 else -> error("unknown type's type")
             }
@@ -112,13 +132,74 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
         }
     }
 
-    private fun processRealTypeName(ctx: LibSLParser.RealTypeNameContext): RealType {
-        val name = ctx.periodSeparatedFullName().first().Identifier().map { it.text }
-        val generic = ctx.generic?.Identifier()?.map { it.text }
+    override fun visitTypealiasStatement(ctx: LibSLParser.TypealiasStatementContext) {
+        val name = ctx.left.text
+        val resolvedRealType = context.resolveType(ctx.right.text)
+            ?: processRealTypeIdentifier(ctx.right)
+        context.storeResolvedType(TypeAlias(
+            name,
+            resolvedRealType,
+            context
+        ))
+    }
+
+    override fun visitTypeDefBlock(ctx: LibSLParser.TypeDefBlockContext) {
+        val name = ctx.name.name.text
+        val typeIdentifier = ctx.typeIdentifier()
+        val resolvedRealType = context.resolveType(typeIdentifier.text)
+            ?: processRealTypeIdentifier(typeIdentifier)
+        val generic = if (typeIdentifier.generic != null) {
+            processRealTypeIdentifier(typeIdentifier.generic)
+        } else {
+            null
+        }
+
+        val entries = ctx.typeDefBlockStatement().map { statement ->
+            statement.nameWithType().let { it.name.text to processRealTypeIdentifier(it.type) }
+        }
+
+        context.storeResolvedType(StructuredType(
+            name,
+            resolvedRealType,
+            generic,
+            entries,
+            context
+        ))
+    }
+
+    private fun resolvePrimitiveLiteral(primitiveLiteralContext: LibSLParser.PrimitiveLiteralContext): Atomic {
+        return when {
+            primitiveLiteralContext.bool != null -> {
+                if (primitiveLiteralContext.bool.text == "true") {
+                    Bool(true)
+                } else {
+                    Bool(false)
+                }
+            }
+            primitiveLiteralContext.QuotedString() != null -> {
+                val literal = primitiveLiteralContext.QuotedString().text.removeQuotes()
+                StringValue(literal)
+            }
+            primitiveLiteralContext.floatNumber() != null -> {
+                FloatNumber(primitiveLiteralContext.floatNumber().text.toFloat())
+            }
+            primitiveLiteralContext.integerNumber() != null -> {
+                IntegerNumber(primitiveLiteralContext.integerNumber().text.toInt())
+            }
+            else -> error("unknown primitive literal type")
+        }
+    }
+
+    private fun processRealTypeIdentifier(ctx: LibSLParser.TypeIdentifierContext): RealType {
+        val name = ctx.periodSeparatedFullName().Identifier().map { it.text }
+        val generic = ctx.generic?.let { processRealTypeIdentifier(it) }
+        val isPointer = ctx.asterisk != null
 
         return RealType(
             name,
-            generic
+            isPointer,
+            generic,
+            context
         )
     }
 
@@ -161,5 +242,18 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
         context.storeResolvedFunction(func)
 
         args.forEach { it.function = func }
+    }
+
+    override fun visitEnumBlock(ctx: LibSLParser.EnumBlockContext) {
+        val semanticType = ctx.typeIdentifier().text
+        val body = ctx.enumBlockStatement().map { statement ->
+            statement.Identifier().text to IntegerNumber(statement.integerNumber().text.toInt())
+        }
+        context.storeResolvedType(
+            EnumType(
+                semanticType,
+                body,
+                context
+            ))
     }
 }

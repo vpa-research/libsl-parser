@@ -48,6 +48,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testTypes() {
+        testRunner("types")
+    }
+
+
+    @Test
     fun testVariableResolution() {
         testRunner("variableResolution")
     }

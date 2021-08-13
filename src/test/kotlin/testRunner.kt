@@ -47,6 +47,7 @@ fun testRunner(name: String) {
         .registerTypeAdapter(Variable::class.java, variableSerializer)
         .registerTypeAdapter(Function::class.java, functionSerializer)
         .registerTypeAdapter(Expression::class.java, expressionSerializer)
+        .registerTypeAdapter(QualifiedAccess::class.java, qualifiedAccessSerializer)
         .registerTypeAdapter(Statement::class.java, statementSerializer)
         .create()
     val prettyContent = gson.toJson(library)

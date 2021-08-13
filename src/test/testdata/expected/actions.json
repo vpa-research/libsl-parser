@@ -4,12 +4,19 @@
   "types": [
     {
       "name": "Int",
-      "realName": "int"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "int",
+        "isPointer": false,
+        "kind": "real"
+      }
     }
   ],
   "automata": [
     {
       "name": "A",
+      "type": "Int",
       "constructorVariables": [],
       "variables": [
         {
@@ -23,7 +30,12 @@
         {
           "name": "f",
           "automaton": "A",
-          "args": [],
+          "args": [
+            {
+              "name": "param",
+              "type": "Int"
+            }
+          ],
           "contracts": [],
           "statements": [
             {
@@ -39,8 +51,31 @@
                   "value": "123"
                 },
                 {
-                  "kind": "variableAccess",
-                  "variable": "f.param"
+                  "kind": "qualifiedAccess",
+                  "access": {
+                    "kind": "variableAccess",
+                    "name": "param",
+                    "variableInfo": {
+                      "name": "param",
+                      "fullName": "f.param",
+                      "type": {
+                        "name": "Int",
+                        "isPointer": false,
+                        "kind": "simple",
+                        "realType": {
+                          "name": "int",
+                          "isPointer": false,
+                          "kind": "real"
+                        }
+                      },
+                      "kind": "functionArgument",
+                      "function": "A.f",
+                      "functionArgTypes": [
+                        "Int"
+                      ]
+                    },
+                    "type": "Int"
+                  }
                 }
               ]
             },

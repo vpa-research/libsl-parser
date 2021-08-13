@@ -65,12 +65,13 @@ val librarySerializer = JsonSerializer<Library> { src, _, context ->
 val automatonSerializer = JsonSerializer<Automaton> { src, _, context ->
     JsonObject().apply {
         addProperty("name", src.name)
+        addProperty("type", src.type.fullName)
 
         add("constructorVariables", JsonArray().apply {
             src.constructorVariables.forEach { variable ->
                 val variableObject = JsonObject().apply {
                     addProperty("name", variable.name)
-                    addProperty("type", variable.type.semanticType)
+                    addProperty("type", variable.type.fullName)
                 }
                 add(variableObject)
             }
@@ -80,7 +81,7 @@ val automatonSerializer = JsonSerializer<Automaton> { src, _, context ->
             src.internalVariables.forEach { variable ->
                 val variableObject = JsonObject().apply {
                     addProperty("name", variable.name)
-                    addProperty("type", variable.type.semanticType)
+                    addProperty("type", variable.type.fullName)
                 }
                 add(variableObject)
             }
@@ -103,7 +104,7 @@ val automatonSerializer = JsonSerializer<Automaton> { src, _, context ->
                     addProperty("to", shift.to.name)
                     add("functions", JsonObject().apply { shift.functions.forEach { func ->
                         addProperty("name", func.name)
-                        add("args", context.serialize(func.args.map { it.type.semanticType }))
+                        add("args", context.serialize(func.args.map { it.type.fullName }))
                     } })
                 }
                 add(stateObject)
@@ -126,26 +127,78 @@ val variableSerializer = JsonSerializer<Variable> { src, _, context ->
         if (src.initValue != null) {
             add("initValue", context.serialize(src.initValue, Expression::class.java))
         }
+
+        when (src) {
+            is AutomatonVariableDeclaration -> {
+                addProperty("kind", "automatonVariable")
+                addProperty("automaton", src.automaton.name)
+            }
+            is ConstructorArgument -> {
+                addProperty("kind", "constructorArgument")
+                addProperty("automaton", src.automaton.name)
+            }
+            is FunctionArgument -> {
+                addProperty("kind", "functionArgument")
+                addProperty("function", src.function.qualifiedName)
+                add("functionArgTypes", JsonArray().apply { src.function.args.forEach { add(it.type.name) } })
+            }
+            is GlobalVariableDeclaration -> {
+                addProperty("kind", "global")
+            }
+        }
     }
 }
 
-val typeSerializer = JsonSerializer<Type> { src, _, _ ->
+val typeSerializer = JsonSerializer<Type> { src, _, context ->
     JsonObject().apply {
-        addProperty("name", src.semanticType)
-        addProperty("realName", src.realType.name.joinToString("."))
-        if (src.realType.generic != null) {
-            addProperty("realNameGeneric", src.realType.generic!!.joinToString("."))
-        }
-
-        if (src is EnumLikeType) {
-            add("entities", JsonArray().apply {
-                src.entities.forEach { entity ->
+        addProperty("name", src.name)
+        addProperty("isPointer", src.isPointer)
+        when (src) {
+            is EnumLikeSemanticType -> {
+                addProperty("kind", "enumLike")
+                add("type", context.serialize(src.type, Type::class.java))
+                add("entries", JsonArray().apply { src.entries.forEach { entry ->
                     add(JsonObject().apply {
-                        addProperty("name", entity.first)
-                        addProperty("value", entity.second)
+                        addProperty("name", entry.first)
+                        add("value", context.serialize(entry.second, Expression::class.java))
                     })
-                }
-            })
+                } })
+            }
+            is EnumType -> {
+                addProperty("kind", "enum")
+                add("entries", JsonArray().apply { src.entries.forEach { entry ->
+                    add(JsonObject().apply {
+                        addProperty("name", entry.first)
+                        add("value", context.serialize(entry.second, Expression::class.java))
+                    })
+                } })
+            }
+            is SimpleType -> {
+                addProperty("kind", "simple")
+                add("generic", context.serialize(src.generic, Type::class.java))
+                add("realType", context.serialize(src.realType, Type::class.java))
+            }
+            is StructuredType -> {
+                addProperty("kind", "structured")
+                add("entries", JsonArray().apply { src.entries.forEach { entry ->
+                    add(JsonObject().apply {
+                        addProperty("name", entry.first)
+                        add("type", context.serialize(entry.second, Type::class.java))
+                    })
+                } })
+            }
+            is TypeAlias -> {
+                addProperty("kind", "alias")
+                add("originalType", context.serialize(src.originalType, Type::class.java))
+            }
+            is RealType -> {
+                addProperty("kind", "real")
+                add("generic", context.serialize(src.generic, Type::class.java))
+            }
+            is ArrayType -> {
+                addProperty("kind", "array")
+                add("type", context.serialize(src.generic, Type::class.java))
+            }
         }
     }
 }
@@ -154,14 +207,14 @@ val functionSerializer = JsonSerializer<Function> { src, _, context ->
     JsonObject().apply {
         addProperty("name", src.name)
         addProperty("automaton", src.automatonName)
-        addProperty("returnType", src.returnType?.semanticType)
+        addProperty("returnType", src.returnType?.fullName)
 
         add("args", JsonArray().apply {
             src.args.forEach { arg ->
-                JsonObject().apply {
+                add(JsonObject().apply {
                     addProperty("name", arg.name)
-                    addProperty("type", arg.type.semanticType)
-                }
+                    addProperty("type", arg.type.fullName)
+                })
             }
         })
 
@@ -188,6 +241,7 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
         when(src) {
             is BinaryOpExpression -> {
                 addProperty("kind", "binary")
+                addProperty("op", src.op.name)
                 add("left", context.serialize(src.left, Expression::class.java))
                 add("right", context.serialize(src.right, Expression::class.java))
             }
@@ -217,18 +271,7 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
             }
             is Variable -> {
                 addProperty("kind", "variable")
-                addProperty("name", src.fullName)
-                addProperty("type", src.type.semanticType)
-                if (src.initValue != null) {
-                    add("initValue", context.serialize(src.initValue, Expression::class.java))
-                }
-            }
-            is VariableAccess -> {
-                addProperty("kind", "variableAccess")
-                addProperty("variable", src.variable.fullName)
-                if (src.arrayIndex != null) {
-                    addProperty("arrayIndex", src.arrayIndex)
-                }
+                add("variable", context.serialize(src, Variable::class.java))
             }
             is OldValue -> {
                 addProperty("kind", "oldValue")
@@ -247,6 +290,44 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
                     }
                 })
             }
+            is Bool -> {
+                addProperty("kind", "bool")
+                addProperty("value", src.value)
+            }
+            is QualifiedAccess -> {
+                addProperty("kind", "qualifiedAccess")
+                add("access", context.serialize(src, QualifiedAccess::class.java))
+            }
+        }
+    }
+}
+
+val qualifiedAccessSerializer = JsonSerializer<QualifiedAccess> { src, _, context ->
+    JsonObject().apply {
+        when (src) {
+            is AccessAlias -> {
+                addProperty("kind", "accessAlias")
+            }
+            is ArrayAccess -> {
+                addProperty("kind", "arrayAccess")
+                add("index", context.serialize(src.index, Expression::class.java))
+            }
+            is RealTypeAccess -> {
+                addProperty("kind", "realTypeAccess")
+                addProperty("name", src.type.name)
+            }
+            is VariableAccess -> {
+                addProperty("kind", "variableAccess")
+                addProperty("name", src.fieldName)
+                if (src.variable != null) {
+                    add("variableInfo", context.serialize(src.variable, Variable::class.java))
+                }
+            }
+        }
+
+        addProperty("type", src.type.fullName)
+        if (src.childAccess != null) {
+            add("child", context.serialize(src.childAccess, QualifiedAccess::class.java))
         }
     }
 }
@@ -255,9 +336,9 @@ val statementSerializer = JsonSerializer<Statement> { src, _, context ->
     when (src) {
         is Assignment -> JsonObject().apply {
             addProperty("kind", "assignment")
-            addProperty("variable", src.variable.variable.fullName)
-            if (src.variable.arrayIndex != null) {
-                addProperty("variableIndex", src.variable.arrayIndex)
+            addProperty("variable", src.left.text())
+            if (src.left is ArrayAccess) {
+                add("arrayIndex", context.serialize(src.left.index, Expression::class.java))
             }
             add("value", context.serialize(src.value, Expression::class.java))
         }

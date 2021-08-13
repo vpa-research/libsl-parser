@@ -1,5 +1,6 @@
 package org.jetbrains.research.libsl.visitors
 
+import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.research.libsl.LibSLParser
 
 fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, String> {
@@ -24,10 +25,11 @@ fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, Strin
     }
 }
 
-fun removeQuotes(string: String): String = string.removeSurrounding("\"", "\"")
+fun String.removeQuotes(): String = removeSurrounding("\"", "\"")
 
-val LibSLParser.SemanticTypeContext.semanticTypeName
-    get() = this.enumLikeSemanticType()?.semanticTypeName?.text
-        ?: this.simpleSemanticType()?.semanticTypeName?.text
-        ?: error("unknown type kind")
-
+inline fun <reified T> ParserRuleContext.getChild(): T? {
+    return children.firstOrNull { it is T } as T?
+}
+inline fun <reified T> ParserRuleContext.getChildren(): List<T> {
+    return children.filterIsInstance<T>()
+}

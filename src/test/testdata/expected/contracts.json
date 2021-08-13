@@ -4,12 +4,19 @@
   "types": [
     {
       "name": "Int",
-      "realName": "int"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "int",
+        "isPointer": false,
+        "kind": "real"
+      }
     }
   ],
   "automata": [
     {
       "name": "A",
+      "type": "Int",
       "constructorVariables": [],
       "variables": [
         {
@@ -23,20 +30,69 @@
         {
           "name": "f",
           "automaton": "A",
-          "args": [],
+          "args": [
+            {
+              "name": "param",
+              "type": "Int"
+            }
+          ],
           "contracts": [
             {
               "name": "test1",
               "kind": "REQUIRES",
               "expression": {
                 "kind": "binary",
+                "op": "GT_EQ",
                 "left": {
-                  "kind": "variableAccess",
-                  "variable": "f.param"
+                  "kind": "qualifiedAccess",
+                  "access": {
+                    "kind": "variableAccess",
+                    "name": "param",
+                    "variableInfo": {
+                      "name": "param",
+                      "fullName": "f.param",
+                      "type": {
+                        "name": "Int",
+                        "isPointer": false,
+                        "kind": "simple",
+                        "realType": {
+                          "name": "int",
+                          "isPointer": false,
+                          "kind": "real"
+                        }
+                      },
+                      "kind": "functionArgument",
+                      "function": "A.f",
+                      "functionArgTypes": [
+                        "Int"
+                      ]
+                    },
+                    "type": "Int"
+                  }
                 },
                 "right": {
-                  "kind": "variableAccess",
-                  "variable": "A.i"
+                  "kind": "qualifiedAccess",
+                  "access": {
+                    "kind": "variableAccess",
+                    "name": "i",
+                    "variableInfo": {
+                      "name": "i",
+                      "fullName": "A.i",
+                      "type": {
+                        "name": "Int",
+                        "isPointer": false,
+                        "kind": "simple",
+                        "realType": {
+                          "name": "int",
+                          "isPointer": false,
+                          "kind": "real"
+                        }
+                      },
+                      "kind": "automatonVariable",
+                      "automaton": "A"
+                    },
+                    "type": "Int"
+                  }
                 }
               }
             },
@@ -44,16 +100,63 @@
               "kind": "ENSURES",
               "expression": {
                 "kind": "binary",
+                "op": "LT",
                 "left": {
                   "kind": "oldValue",
                   "value": {
-                    "kind": "variableAccess",
-                    "variable": "f.param"
+                    "kind": "qualifiedAccess",
+                    "access": {
+                      "kind": "variableAccess",
+                      "name": "param",
+                      "variableInfo": {
+                        "name": "param",
+                        "fullName": "f.param",
+                        "type": {
+                          "name": "Int",
+                          "isPointer": false,
+                          "kind": "simple",
+                          "realType": {
+                            "name": "int",
+                            "isPointer": false,
+                            "kind": "real"
+                          }
+                        },
+                        "kind": "functionArgument",
+                        "function": "A.f",
+                        "functionArgTypes": [
+                          "Int"
+                        ]
+                      },
+                      "type": "Int"
+                    }
                   }
                 },
                 "right": {
-                  "kind": "variableAccess",
-                  "variable": "f.param"
+                  "kind": "qualifiedAccess",
+                  "access": {
+                    "kind": "variableAccess",
+                    "name": "param",
+                    "variableInfo": {
+                      "name": "param",
+                      "fullName": "f.param",
+                      "type": {
+                        "name": "Int",
+                        "isPointer": false,
+                        "kind": "simple",
+                        "realType": {
+                          "name": "int",
+                          "isPointer": false,
+                          "kind": "real"
+                        }
+                      },
+                      "kind": "functionArgument",
+                      "function": "A.f",
+                      "functionArgTypes": [
+                        "Int"
+                      ]
+                    },
+                    "type": "Int"
+                  }
                 }
               }
             }

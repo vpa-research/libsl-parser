@@ -4,56 +4,97 @@
   "lang": "java",
   "library-version": "1.0.0f",
   "url": "https://github.com/vldf/",
-  "imports": [
-    "another/one/file"
-  ],
-  "includes": [
-    "file.to.include"
-  ],
   "types": [
     {
       "name": "SimpleType",
-      "realName": "ru.vldf.Type"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "ru.vldf.Type",
+        "isPointer": false,
+        "kind": "real"
+      }
     },
     {
       "name": "SimpleTypeWithGeneric",
-      "realName": "ru.vldf.Type",
-      "realNameGeneric": "ru.vldf.Generic"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "ru.vldf.Type",
+        "isPointer": false,
+        "kind": "real",
+        "generic": {
+          "name": "ru.vldf.Generic",
+          "isPointer": false,
+          "kind": "real"
+        }
+      }
     },
     {
       "name": "EnumLikeType",
-      "realName": "ru.vldf.Type",
-      "entities": [
+      "isPointer": false,
+      "kind": "enumLike",
+      "type": {
+        "name": "ru.vldf.Type",
+        "isPointer": false,
+        "kind": "real"
+      },
+      "entries": [
         {
           "name": "VARIANT1",
-          "value": "-1"
+          "value": {
+            "kind": "integer",
+            "value": -1
+          }
         },
         {
           "name": "VARIANT2",
-          "value": "true"
+          "value": {
+            "kind": "bool",
+            "value": true
+          }
         },
         {
           "name": "VARIANT2",
-          "value": "1.0"
+          "value": {
+            "kind": "float",
+            "value": 1.0
+          }
         },
         {
           "name": "VARIANT3",
-          "value": "\"String\""
+          "value": {
+            "kind": "string",
+            "value": "String"
+          }
         }
       ]
     },
     {
       "name": "String",
-      "realName": "java.lang.String"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "java.lang.String",
+        "isPointer": false,
+        "kind": "real"
+      }
     },
     {
       "name": "Int",
-      "realName": "int"
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "int",
+        "isPointer": false,
+        "kind": "real"
+      }
     }
   ],
   "automata": [
     {
       "name": "A",
+      "type": "Int",
       "constructorVariables": [],
       "variables": [
         {
@@ -96,7 +137,12 @@
           "name": "func",
           "automaton": "A",
           "returnType": "SimpleTypeWithGeneric",
-          "args": [],
+          "args": [
+            {
+              "name": "arg1",
+              "type": "SimpleType"
+            }
+          ],
           "contracts": [],
           "statements": []
         },
@@ -108,7 +154,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "A.strVar",
+              "variable": "strVar",
               "value": {
                 "kind": "string",
                 "value": ""
@@ -116,7 +162,7 @@
             },
             {
               "kind": "assignment",
-              "variable": "A.b",
+              "variable": "b.v",
               "value": {
                 "kind": "integer",
                 "value": 1
@@ -128,6 +174,7 @@
     },
     {
       "name": "B",
+      "type": "Int",
       "constructorVariables": [],
       "variables": [
         {
@@ -180,7 +227,12 @@
           "name": "func",
           "automaton": "B",
           "returnType": "SimpleTypeWithGeneric",
-          "args": [],
+          "args": [
+            {
+              "name": "arg1",
+              "type": "SimpleType"
+            }
+          ],
           "contracts": [],
           "statements": []
         },
@@ -188,7 +240,12 @@
           "name": "func",
           "automaton": "B",
           "returnType": "SimpleTypeWithGeneric",
-          "args": [],
+          "args": [
+            {
+              "name": "arg1",
+              "type": "SimpleTypeWithGeneric"
+            }
+          ],
           "contracts": [],
           "statements": []
         }

@@ -6,9 +6,20 @@ grammar LibSL;
  * semantic types section and declarations (automata and extension functions)
  */
 file
-   :   header imports includes typesSection declarations EOF
+   :   header
+       globalStatement*
+       EOF
    ;
 
+globalStatement
+   :   importStatement
+   |   includeStatement
+   |   typesSection
+   |   typealiasStatement
+   |   typeDefBlock
+   |   enumBlock
+   |   declaration
+   ;
 /*
  * Header section
  * Includes 'libsl' keyword with LibSL version, 'library' keyword with name of the library, and any of these optionally:
@@ -22,62 +33,71 @@ header:
    ('url' link=QuotedString)?
    ';';
 
-imports
-   :   oneImport*
-   ;
-
-oneImport
+importStatement
    :   'import' importString=QuotedString ';'
    ;
 
-includes
-   :   include*
+includeStatement
+   :   'include' includeString=QuotedString ';'
    ;
 
-include
-   :   'include' includeString=QuotedString ';'
+/* typealias statement
+ * syntax: typealias name = origintlType
+ */
+typealiasStatement
+   :   'typealias' left=typeIdentifier '=' right=typeIdentifier ';'
+   ;
+
+/* type define block
+ * syntax: type full.name { field1: Type; field2: Type; ... }
+ */
+typeDefBlock
+   :   'type' name=typeIdentifier ('{' typeDefBlockStatement* '}')?
+   ;
+
+typeDefBlockStatement
+   :   nameWithType ';'
+   ;
+
+/* enum block
+ * syntax: enum Name { Variant1=0; Variant2=1; ... }
+ */
+enumBlock
+   :   'enum' typeIdentifier '{' enumBlockStatement* '}'
+   ;
+
+enumBlockStatement
+   :   Identifier '=' integerNumber ';'
    ;
 
 /*
  * Semantic types section
  */
 typesSection
-   :   ('types' '{' typesSectionBody '}')?
-   ;
-
-typesSectionBody
-   :    semanticType*
+   :   'types' '{' semanticType* '}'
    ;
 
 semanticType
-   :    simpleSemanticType  // todo: are we need change syntax?
-   |    enumLikeSemanticType
+   :    simpleSemanticType
+   |    blockType
    ;
 
 /*
  * syntax: semanticTypeName (realTypeName);
  */
 simpleSemanticType
-   :   semanticTypeName=Identifier '(' realTypeName ')' ';'
+   :   semanticName=typeIdentifier '(' realName=typeIdentifier ')' ';'
    ;
 
 /*
  * syntax: semanticTypeName (realTypeName) {variant1: Int; variant2: Int; ...};
  */
-enumLikeSemanticType
-   :   semanticTypeName=Identifier '(' realTypeName ')' '{' enumLikeSemanticTypeBody '}'
+blockType
+   :   semanticName=Identifier '(' realName=typeIdentifier ')' '{' blockTypeStatement+ '}'
    ;
 
-enumLikeSemanticTypeBody
-   :   enumLikeSemanticTypeBodyStatement+
-   ;
-
-enumLikeSemanticTypeBodyStatement
+blockTypeStatement
    :    Identifier ':' expressionAtomic ';'
-   ;
-
-declarations
-   :  declaration*
    ;
 
 declaration
@@ -135,7 +155,7 @@ variableDeclaration
    ;
 
 nameWithType
-   :   name=Identifier ':' type=Identifier
+   :   name=Identifier ':' type=typeIdentifier
    ;
 
 variableAssignment
@@ -211,7 +231,7 @@ ensuresContract
    ;
 
 contractExpression
-   :   '(' contractExpression ')'
+   :   lbracket='(' contractExpression rbracket=')'
    |   contractExpression op=('*' | '/') contractExpression
    |   contractExpression op='%' contractExpression
    |   contractExpression op=('+' | '-') contractExpression
@@ -225,22 +245,27 @@ contractExpression
    ;
 
 expressionAtomic
+   :   qualifiedAccess
+   |   primitiveLiteral
+   ;
+
+primitiveLiteral
    :   integerNumber
    |   floatNumber
-   |   qualifiedAccess
    |   QuotedString
+   |   bool=('true' | 'false')
    ;
 
 qualifiedAccess
    :   periodSeparatedFullName
-   |   qualifiedAccess '[' integerNumber ']'
+   |   qualifiedAccess '[' expressionAtomic ']'
    ;
 
 /*
  * syntax: one.two.three<T>
  */
-realTypeName
-   :   periodSeparatedFullName ('<' generic=periodSeparatedFullName '>')?
+typeIdentifier
+   :   (asterisk='*')? name=periodSeparatedFullName ('<' generic=typeIdentifier '>')?
    ;
 
 Identifier

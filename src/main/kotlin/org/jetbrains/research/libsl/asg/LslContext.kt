@@ -1,13 +1,13 @@
 package org.jetbrains.research.libsl.asg
 
 class LslContext {
-    private val typeStorage = mutableMapOf<String, Type>()
+    val typeStorage = mutableMapOf<String, Type>()
     private val functionStorage = mutableMapOf<String, MutableList<Function>>()
     private val automatonStorage = mutableMapOf<String, Automaton>()
     val globalVariables = mutableMapOf<String, GlobalVariableDeclaration>()
 
     fun storeResolvedType(type: Type) {
-        typeStorage[type.semanticType] = type
+        typeStorage[type.fullName] = type
     }
 
     fun resolveType(name: String) = typeStorage[name]
