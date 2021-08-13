@@ -1,0 +1,16 @@
+{
+  "name": "secondary",
+  "lslVersion": "1.0.0",
+  "types": [
+    {
+      "name": "Int",
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "foo.bar.int",
+        "isPointer": false,
+        "kind": "real"
+      }
+    }
+  ]
+}

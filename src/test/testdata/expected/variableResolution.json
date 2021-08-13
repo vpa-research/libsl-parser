@@ -41,7 +41,7 @@
               "kind": "REQUIRES",
               "expression": {
                 "kind": "binary",
-                "op": "EQ_EQ",
+                "op": "EQ",
                 "left": {
                   "kind": "qualifiedAccess",
                   "access": {
