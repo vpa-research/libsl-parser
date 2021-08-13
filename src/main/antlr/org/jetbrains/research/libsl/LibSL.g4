@@ -104,7 +104,6 @@ declaration
    :   automatonDecl
    |   functionDecl
    |   variableDeclaration
-   |   variableAssignment
    ;
 
 /*

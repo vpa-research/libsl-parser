@@ -74,21 +74,13 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
             constructorVariables.forEach { it.automaton = automaton }
         }
 
-        for (automaton in automata) {
-            visitAutomatonDecl(automaton)
-        }
-
-        for (extensionFunction in ctx.globalStatement().mapNotNull { it.declaration()?.functionDecl() }) {
-            visitFunctionDecl(extensionFunction)
-        }
-
         ctx.globalStatement().mapNotNull { it.declaration()?.variableDeclaration() }.map { variableDecl ->
             val nameWithType = variableDecl.nameWithType()
             val type = context.resolveType(nameWithType.type.text) ?: error("unresolved type: ${nameWithType.type.text}")
             val init = if (variableDecl.assignmentRight() != null){
                 asgBuilderVisitor.processAssignmentRight(variableDecl.assignmentRight())
             } else {
-                null
+                error("global variables must be initialized in their declarations")
             }
 
             val variable = GlobalVariableDeclaration(
@@ -97,6 +89,14 @@ class Resolver(private val context: LslContext) : LibSLBaseVisitor<Unit>() {
                 init
             )
             context.storeGlobalVariable(variable)
+        }
+
+        for (automaton in automata) {
+            visitAutomatonDecl(automaton)
+        }
+
+        for (extensionFunction in ctx.globalStatement().mapNotNull { it.declaration()?.functionDecl() }) {
+            visitFunctionDecl(extensionFunction)
         }
     }
 
