@@ -188,7 +188,7 @@ data class BinaryOpExpression(
 ) : Expression()
 
 enum class ArithmeticBinaryOps {
-    ADD, SUB, MUL, DIV, AND, OR, XOR, MOD, EQ_EQ, NOT_EQ, GT, GT_EQ, LT, LT_EQ;
+    ADD, SUB, MUL, DIV, AND, OR, XOR, MOD, EQ, NOT_EQ, GT, GT_EQ, LT, LT_EQ;
     companion object {
         fun fromString(str: String) = when (str) {
             "*" -> MUL
@@ -196,7 +196,7 @@ enum class ArithmeticBinaryOps {
             "+" -> ADD
             "-" -> SUB
             "%" -> MOD
-            "==" -> EQ_EQ
+            "=" -> EQ
             "!=" -> NOT_EQ
             ">=" -> GT_EQ
             ">" -> GT
