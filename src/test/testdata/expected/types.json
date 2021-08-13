@@ -502,7 +502,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "img.content.BlackAndWhiteImage[VariableAccess(fieldName\u003dy, childAccess\u003dnull, type\u003dSimpleType(name\u003dInt, realType\u003dRealType(nameParts\u003d[int], isPointer\u003dfalse, generic\u003dnull, context\u003dorg.jetbrains.research.libsl.asg.LslContext@6c9b6204), isPointer\u003dfalse, context\u003dorg.jetbrains.research.libsl.asg.LslContext@6c9b6204), variable\u003dFunctionArgument(name\u003dy, type\u003dSimpleType(name\u003dInt, realType\u003dRealType(nameParts\u003d[int], isPointer\u003dfalse, generic\u003dnull, context\u003dorg.jetbrains.research.libsl.asg.LslContext@6c9b6204), isPointer\u003dfalse, context\u003dorg.jetbrains.research.libsl.asg.LslContext@6c9b6204)))]",
+              "variable": "img.content.BlackAndWhiteImage[index]",
               "value": {
                 "kind": "qualifiedAccess",
                 "access": {

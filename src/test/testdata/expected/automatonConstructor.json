@@ -63,8 +63,24 @@
                   {
                     "name": "v",
                     "value": {
-                      "kind": "integer",
-                      "value": 0
+                      "kind": "binary",
+                      "op": "DIV",
+                      "left": {
+                        "kind": "binary",
+                        "op": "ADD",
+                        "left": {
+                          "kind": "integer",
+                          "value": 1
+                        },
+                        "right": {
+                          "kind": "integer",
+                          "value": 1
+                        }
+                      },
+                      "right": {
+                        "kind": "integer",
+                        "value": 2
+                      }
                     }
                   }
                 ]

@@ -13,7 +13,7 @@ automaton A (
    var i: Int;
 
    fun func() {
-      i = new B(state = s1, v = 0);
+      i = new B(state = s1, v = (1 + 1) / 2);
    }
 }
 

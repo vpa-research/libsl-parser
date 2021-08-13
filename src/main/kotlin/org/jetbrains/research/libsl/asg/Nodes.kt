@@ -305,7 +305,7 @@ data class ArrayAccess(
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
 
-    override fun text(): String = "${type.fullName}[$index]"
+    override fun text(): String = "${type.fullName}[index]"
 }
 
 sealed class Atomic : Expression()
@@ -338,5 +338,5 @@ data class CallAutomatonConstructor(
 
 data class ArgumentWithValue(
     val variable: Variable,
-    val init: Atomic
+    val init: Expression
 )

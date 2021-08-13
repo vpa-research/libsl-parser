@@ -164,10 +164,10 @@ variableAssignment
 
 assignmentRight
    :   expressionAtomic
-   |   'new' callAutomatonWithNamedArgs
+   |   'new' callAutomatonConstructorWithNamedArgs
    ;
 
-callAutomatonWithNamedArgs
+callAutomatonConstructorWithNamedArgs
    :   name=Identifier '(' (namedArgs)? ')'
    ;
 
@@ -176,8 +176,8 @@ namedArgs
    ;
 
 argPair
-   :   name='state' '=' value=expressionAtomic
-   |   name=Identifier '=' value=expressionAtomic
+   :   name='state' '=' expressionAtomic
+   |   name=Identifier '=' expression
    ;
 
 /*
@@ -223,22 +223,22 @@ valuesAndIdentifiersList
    ;
 
 requiresContract
-   :   'requires' (name=Identifier ':')? contractExpression ';'
+   :   'requires' (name=Identifier ':')? expression ';'
    ;
 
 ensuresContract
-   :   'ensures' (name=Identifier ':')? contractExpression ';'
+   :   'ensures' (name=Identifier ':')? expression ';'
    ;
 
-contractExpression
-   :   lbracket='(' contractExpression rbracket=')'
-   |   contractExpression op=('*' | '/') contractExpression
-   |   contractExpression op='%' contractExpression
-   |   contractExpression op=('+' | '-') contractExpression
-   |   '-' contractExpression
-   |   '!' contractExpression
-   |   contractExpression op=('==' | '!=' | '<=' | '<' | '>=' | '>') contractExpression
-   |   contractExpression op=('&' | '|' | '^') contractExpression
+expression
+   :   lbracket='(' expression rbracket=')'
+   |   expression op=('*' | '/') expression
+   |   expression op='%' expression
+   |   expression op=('+' | '-') expression
+   |   '-' expression
+   |   '!' expression
+   |   expression op=('==' | '!=' | '<=' | '<' | '>=' | '>') expression
+   |   expression op=('&' | '|' | '^') expression
    |   qualifiedAccess apostrophe='\''
    |   expressionAtomic
    |   qualifiedAccess

@@ -124,13 +124,13 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         ctx.expressionAtomic() != null -> {
             visitExpressionAtomic(ctx.expressionAtomic())
         }
-        ctx.callAutomatonWithNamedArgs() != null -> {
-            visitCallAutomatonWithNamedArgs(ctx.callAutomatonWithNamedArgs())
+        ctx.callAutomatonConstructorWithNamedArgs() != null -> {
+            visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
         }
         else -> error("can't parse init value in variable")
     }
 
-    override fun visitCallAutomatonWithNamedArgs(ctx: LibSLParser.CallAutomatonWithNamedArgsContext): Atomic {
+    override fun visitCallAutomatonConstructorWithNamedArgs(ctx: LibSLParser.CallAutomatonConstructorWithNamedArgsContext): Atomic {
         val calleeName = ctx.name.text
         val calleeAutomaton = context.resolveAutomaton(calleeName) ?: error("can't resolve automaton $calleeName")
 
@@ -140,12 +140,12 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 null
             } else {
                 val targetVariable = calleeAutomaton.constructorVariables.first { it.name == name }
-                val value = visitExpressionAtomic(pair.value)
+                val value = visitExpression(pair.expression())
                 ArgumentWithValue(targetVariable, value)
             }
         }.orEmpty()
 
-        val stateName = ctx.namedArgs()?.argPair()?.firstOrNull { it.name.text == "state" }?.value?.text
+        val stateName = ctx.namedArgs()?.argPair()?.firstOrNull { it.name.text == "state" }?.expressionAtomic()?.text
         val state = calleeAutomaton.states.firstOrNull { it.name == stateName } ?: error("unresolved state: $stateName")
 
         return CallAutomatonConstructor(calleeAutomaton, args, state)
@@ -166,12 +166,12 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             when {
                 part.requiresContract() != null -> {
                     val contractName = part.requiresContract().name?.text
-                    val contractExpression = visitContractExpression(part.requiresContract().contractExpression())
+                    val contractExpression = visitExpression(part.requiresContract().expression())
                     Contract(contractName, contractExpression, ContractKind.REQUIRES)
                 }
                 part.ensuresContract() != null -> {
                     val contractName = part.ensuresContract().name?.text
-                    val contractExpression = visitContractExpression(part.ensuresContract().contractExpression())
+                    val contractExpression = visitExpression(part.ensuresContract().expression())
                     Contract(contractName, contractExpression, ContractKind.ENSURES)
                 }
                 else -> error("unknown function statement's type: $ownerAutomatonName.$functionName")
@@ -220,7 +220,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     override fun visitEnsuresContract(ctx: LibSLParser.EnsuresContractContext): Contract {
         return Contract(
             name = ctx.name?.text,
-            expression = visitContractExpression(ctx.contractExpression()),
+            expression = visitExpression(ctx.expression()),
             kind = ContractKind.ENSURES
         )
     }
@@ -228,30 +228,30 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     override fun visitRequiresContract(ctx: LibSLParser.RequiresContractContext): Contract {
         return Contract(
             name = ctx.name?.text,
-            expression = visitContractExpression(ctx.contractExpression()),
+            expression = visitExpression(ctx.expression()),
             kind = ContractKind.REQUIRES
         )
     }
 
-    override fun visitContractExpression(ctx: LibSLParser.ContractExpressionContext): Expression {
+    override fun visitExpression(ctx: LibSLParser.ExpressionContext): Expression {
         return when {
             ctx.apostrophe != null -> OldValue(visitQualifiedAccess(ctx.qualifiedAccess()))
             ctx.UNARY_MINUS() != null -> {
-                val content = visitContractExpression(ctx.contractExpression(0))
+                val content = visitExpression(ctx.expression(0))
 
                 UnaryOpExpression(content, ArithmeticUnaryOp.MINUS)
             }
             ctx.INV() != null -> {
-                val content = visitContractExpression(ctx.contractExpression(0))
+                val content = visitExpression(ctx.expression(0))
 
                 UnaryOpExpression(content, ArithmeticUnaryOp.INVERSION)
             }
             ctx.expressionAtomic() != null -> visitExpressionAtomic(ctx.expressionAtomic())
             ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
-            ctx.lbracket != null -> visitContractExpression(ctx.contractExpression().first())
+            ctx.lbracket != null -> visitExpression(ctx.expression().first())
             else -> {
-                val left = visitContractExpression(ctx.contractExpression(0))
-                val right = visitContractExpression(ctx.contractExpression(1))
+                val left = visitExpression(ctx.expression(0))
+                val right = visitExpression(ctx.expression(1))
                 val op = ArithmeticBinaryOps.fromString(ctx.op.text)
 
                 BinaryOpExpression(left, right, op)
@@ -263,8 +263,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         ctx.expressionAtomic() != null -> {
             visitExpressionAtomic(ctx.expressionAtomic())
         }
-        ctx.callAutomatonWithNamedArgs() != null -> {
-            visitCallAutomatonWithNamedArgs(ctx.callAutomatonWithNamedArgs())
+        ctx.callAutomatonConstructorWithNamedArgs() != null -> {
+            visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
         }
         else -> error("can't parse init value in variable")
     }
