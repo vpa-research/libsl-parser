@@ -1,0 +1,41 @@
+{
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "types": [
+    {
+      "name": "Int",
+      "isPointer": false,
+      "kind": "simple",
+      "realType": {
+        "name": "int",
+        "isPointer": false,
+        "kind": "real"
+      }
+    }
+  ],
+  "automata": [
+    {
+      "name": "A",
+      "type": "Int",
+      "constructorVariables": [],
+      "variables": [],
+      "states": [],
+      "shifts": [],
+      "functions": [
+        {
+          "name": "f",
+          "automaton": "A",
+          "args": [
+            {
+              "name": "param",
+              "type": "Int",
+              "annotationName": "annotation"
+            }
+          ],
+          "contracts": [],
+          "statements": []
+        }
+      ]
+    }
+  ]
+}

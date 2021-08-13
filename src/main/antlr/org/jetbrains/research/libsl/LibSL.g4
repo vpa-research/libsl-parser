@@ -180,7 +180,7 @@ argPair
    ;
 
 /*
- * syntax: fun name(arg1: type, arg2: type, ...) [: type] { statement1; statement2; ... }
+ * syntax: fun name(@annotation arg1: type, arg2: type, ...) [: type] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
@@ -192,7 +192,14 @@ functionDeclArgList
    ;
 
 parameter
-   :   name=Identifier ':' type=Identifier
+   :   annotation? name=Identifier ':' type=Identifier
+   ;
+
+/* todo Should we allow multiple annotation per one parameter?
+ * syntax: @annotationName(args) todo: add args
+ */
+annotation
+   :   '@' Identifier
    ;
 
 functionPreamble

@@ -244,7 +244,7 @@ class Resolver(
 
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
-            FunctionArgument(arg.name.text, argType)
+            FunctionArgument(arg.name.text, argType, arg.annotation()?.Identifier()?.text)
         }?.toList().orEmpty()
 
         val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)

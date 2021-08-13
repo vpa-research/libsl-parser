@@ -247,7 +247,8 @@ data class AutomatonVariableDeclaration(
 
 data class FunctionArgument(
     override val name: String,
-    override val type: Type
+    override val type: Type,
+    val annotationName: String?
 ) : Variable() {
     lateinit var function: Function
 

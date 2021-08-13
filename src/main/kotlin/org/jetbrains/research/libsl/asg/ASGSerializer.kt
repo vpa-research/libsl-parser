@@ -140,6 +140,9 @@ val variableSerializer = JsonSerializer<Variable> { src, _, context ->
             is FunctionArgument -> {
                 addProperty("kind", "functionArgument")
                 addProperty("function", src.function.qualifiedName)
+                if (src.annotationName != null) {
+                    addProperty("annotationName", src.annotationName)
+                }
                 add("functionArgTypes", JsonArray().apply { src.function.args.forEach { add(it.type.name) } })
             }
             is GlobalVariableDeclaration -> {
@@ -214,6 +217,9 @@ val functionSerializer = JsonSerializer<Function> { src, _, context ->
                 add(JsonObject().apply {
                     addProperty("name", arg.name)
                     addProperty("type", arg.type.fullName)
+                    if (arg.annotationName != null) {
+                        addProperty("annotationName", arg.annotationName)
+                    }
                 })
             }
         })

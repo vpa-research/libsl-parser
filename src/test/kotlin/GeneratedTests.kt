@@ -12,6 +12,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testAnnotations() {
+        testRunner("annotations")
+    }
+
+
+    @Test
     fun testAutomatonConstructor() {
         testRunner("automatonConstructor")
     }

@@ -157,7 +157,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
 
-            FunctionArgument(argName, argType)
+            FunctionArgument(argName, argType, arg.annotation()?.Identifier()?.text)
         }.orEmpty()
         val typeName = ctx.functionType?.text
         val type = if (typeName != null) context.resolveType(typeName) ?: error("unresolved type: $typeName") else null
@@ -405,7 +405,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
 
-            FunctionArgument(argName, argType)
+            FunctionArgument(argName, argType, arg.annotation()?.Identifier()?.text)
         }.orEmpty()
 
         return if (ctx.name.Identifier().size > 1) {
