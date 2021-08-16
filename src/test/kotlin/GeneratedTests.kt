@@ -30,6 +30,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testCastAutomaton() {
+        testRunner("castAutomaton")
+    }
+
+
+    @Test
     fun testContracts() {
         testRunner("contracts")
     }

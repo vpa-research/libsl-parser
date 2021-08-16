@@ -113,7 +113,7 @@ val automatonSerializer = JsonSerializer<Automaton> { src, _, context ->
 
         add("functions", JsonArray().apply{
             src.functions.forEach { func ->
-                add(context.serialize(func))
+                add(context.serialize(func, Function::class.java))
             }
         })
     }
@@ -330,6 +330,10 @@ val qualifiedAccessSerializer = JsonSerializer<QualifiedAccess> { src, _, contex
                     add("variableInfo", context.serialize(src.variable, Variable::class.java))
                 }
             }
+            is AutomatonGetter -> {
+                addProperty("kind", "automatonGetter")
+                addProperty("automaton", src.automaton.name)
+            }
         }
 
         addProperty("type", src.type.fullName)
@@ -343,7 +347,7 @@ val statementSerializer = JsonSerializer<Statement> { src, _, context ->
     when (src) {
         is Assignment -> JsonObject().apply {
             addProperty("kind", "assignment")
-            addProperty("variable", src.left.text())
+            addProperty("variable", src.left.toString())
             if (src.left is ArrayAccess) {
                 add("arrayIndex", context.serialize(src.left.index, Expression::class.java))
             }

@@ -265,6 +265,11 @@ primitiveLiteral
 qualifiedAccess
    :   periodSeparatedFullName
    |   qualifiedAccess '[' expressionAtomic ']'
+   |   simpleCall '.' qualifiedAccess
+   ;
+
+simpleCall
+   :   Identifier '(' Identifier ')'
    ;
 
 /*

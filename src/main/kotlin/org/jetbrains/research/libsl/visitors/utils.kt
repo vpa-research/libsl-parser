@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.RuleContext
 import org.jetbrains.research.libsl.LibSLParser
 
 fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, String> {
@@ -32,4 +33,15 @@ inline fun <reified T> ParserRuleContext.getChild(): T? {
 }
 inline fun <reified T> ParserRuleContext.getChildren(): List<T> {
     return children.filterIsInstance<T>()
+}
+
+
+inline fun <reified T> RuleContext.getParentOfType(): T? {
+    var current: RuleContext? = this
+    while (current != null) {
+        if (current is T) return current
+        current = current.parent
+    }
+
+    return null
 }

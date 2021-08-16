@@ -183,7 +183,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 variableStatement.variableAssignment() != null -> {
                     val variableAssignment = variableStatement.variableAssignment()
                     val value = visitAssignmentRight(variableAssignment.assignmentRight())
-                    val variable = visitQualifiedAccess(variableAssignment.qualifiedAccess()) as? VariableAccess ?: error("")
+                    val variable = visitQualifiedAccess(variableAssignment.qualifiedAccess())
 
                     Assignment(variable, value)
                 }
@@ -299,6 +299,27 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 } else {
                     VariableAccess(variable.name, null, variable.type, variable)
                 }
+            }
+
+            ctx.simpleCall() != null -> {
+                val callName = ctx.simpleCall().Identifier(0).text
+                val automaton = context.resolveAutomaton(callName) ?: error("unresolved automaton: $callName")
+                val functionCtx = ctx.getParentOfType<LibSLParser.FunctionDeclContext>() ?: error("call $callName not in function!")
+                val function = resolveFunctionByCtx(functionCtx) ?: error("unresolved function for call $callName")
+                val argName = ctx.simpleCall().Identifier(1).text
+                val arg = function.args.firstOrNull { it.name == argName } ?: error("unknown argument name: $argName")
+
+                val qualifiedAccess = if (ctx.qualifiedAccess() != null) {
+                    visitQualifiedAccess(ctx.qualifiedAccess())
+                } else {
+                    null
+                }
+
+                return AutomatonGetter(
+                    automaton,
+                    arg,
+                    qualifiedAccess
+                )
             }
 
             ctx.qualifiedAccess() != null -> {

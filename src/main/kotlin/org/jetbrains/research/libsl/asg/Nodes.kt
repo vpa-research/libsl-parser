@@ -52,6 +52,8 @@ data class RealType (
 ) : Type() {
     override val name: String
         get() = nameParts.joinToString(".")
+
+    override fun toString(): String = "${if (isPointer) "*" else ""}$name<${generic?.fullName}>"
 }
 
 data class SimpleType(
@@ -276,7 +278,7 @@ sealed class QualifiedAccess : Atomic() {
     abstract var childAccess: QualifiedAccess?
     abstract val type: Type
 
-    open fun text(): String = (childAccess?.text() ?: "") + ":${type.fullName}"
+    override fun toString(): String = (childAccess?.toString() ?: "") + ":${type.fullName}"
 
     val lastChild: QualifiedAccess
         get() = childAccess?.lastChild ?: childAccess ?: this
@@ -288,14 +290,14 @@ data class VariableAccess(
     override val type: Type,
     val variable: Variable?
 ) : QualifiedAccess() {
-    override fun text(): String = "$fieldName${childAccess?.text()?.let { ".$it" } ?: ""}"
+    override fun toString(): String = "$fieldName${childAccess?.toString()?.let { ".$it" } ?: ""}"
 }
 
 data class AccessAlias(
     override var childAccess: QualifiedAccess?,
     override val type: Type
 ) : QualifiedAccess() {
-    override fun text(): String = "alias[${type.fullName}].${childAccess!!.text()}"
+    override fun toString(): String = "alias[${type.fullName}].${childAccess}"
 }
 
 data class RealTypeAccess(
@@ -303,7 +305,7 @@ data class RealTypeAccess(
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
 
-    override fun text(): String = type.name
+    override fun toString(): String = type.name
 }
 
 data class ArrayAccess(
@@ -312,7 +314,17 @@ data class ArrayAccess(
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
 
-    override fun text(): String = "${type.fullName}[index]"
+    override fun toString(): String = "${type.fullName}[index]"
+}
+
+data class AutomatonGetter(
+    val automaton: Automaton,
+    val arg: FunctionArgument,
+    override var childAccess: QualifiedAccess?,
+) : QualifiedAccess() {
+    override val type: Type = automaton.type
+
+    override fun toString(): String = "${automaton.name}(${arg.name}).${childAccess.toString()}"
 }
 
 sealed class Atomic : Expression()
