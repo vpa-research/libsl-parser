@@ -257,6 +257,16 @@ class Resolver(
         }?.toList().orEmpty()
 
         val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)
+
+        val targetName = args.firstOrNull { it.annotationName == "target" }
+
+        if (targetName != null) {
+            val target = context.resolveAutomaton(targetName.name) ?: error("unresolved automaton: $name")
+            func.target = target
+        } else {
+            func.target = context.resolveAutomaton(automatonName) ?: error("unresolved automaton: $automatonName")
+        }
+
         context.storeResolvedFunction(func)
 
         args.forEach { it.function = func }

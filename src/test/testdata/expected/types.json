@@ -162,6 +162,7 @@
         {
           "name": "inversePixel",
           "automaton": "Image",
+          "target": "Image",
           "args": [
             {
               "name": "img",

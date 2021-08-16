@@ -160,6 +160,7 @@ data class Function(
 ) : Node() {
     val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
     val qualifiedName: String by lazy { "${automaton.name}.$name" }
+    lateinit var target: Automaton
 }
 
 sealed class Statement: Node()

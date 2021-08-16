@@ -30,6 +30,7 @@
         {
           "name": "foo",
           "automaton": "A",
+          "target": "A",
           "args": [],
           "contracts": [],
           "statements": [

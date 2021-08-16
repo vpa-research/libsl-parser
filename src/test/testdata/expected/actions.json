@@ -30,6 +30,7 @@
         {
           "name": "f",
           "automaton": "A",
+          "target": "A",
           "args": [
             {
               "name": "param",

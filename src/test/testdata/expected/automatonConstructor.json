@@ -49,6 +49,7 @@
         {
           "name": "func",
           "automaton": "A",
+          "target": "A",
           "args": [],
           "contracts": [],
           "statements": [
