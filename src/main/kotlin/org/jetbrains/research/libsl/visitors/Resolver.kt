@@ -199,17 +199,26 @@ class Resolver(
         }
     }
 
-    private fun processRealTypeIdentifier(ctx: LibSLParser.TypeIdentifierContext): RealType {
+    private fun processRealTypeIdentifier(ctx: LibSLParser.TypeIdentifierContext): Type {
         val name = ctx.periodSeparatedFullName().Identifier().map { it.text }
         val generic = ctx.generic?.let { processRealTypeIdentifier(it) }
         val isPointer = ctx.asterisk != null
 
-        return RealType(
-            name,
-            isPointer,
-            generic,
-            context
-        )
+        return if (name.size == 1 && name.first() == "array" && generic != null) {
+            ArrayType(
+                name.first(),
+                isPointer,
+                generic,
+                context
+            )
+        } else {
+            RealType(
+                name,
+                isPointer,
+                generic,
+                context
+            )
+        }
     }
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {

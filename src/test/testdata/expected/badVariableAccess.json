@@ -1,0 +1,64 @@
+{
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "types": [
+    {
+      "name": "Int",
+      "isPointer": false,
+      "kind": "alias",
+      "originalType": {
+        "name": "int32",
+        "isPointer": false,
+        "kind": "real"
+      }
+    },
+    {
+      "name": "T",
+      "isPointer": false,
+      "kind": "alias",
+      "originalType": {
+        "name": "array",
+        "isPointer": false,
+        "kind": "real",
+        "generic": {
+          "name": "Int",
+          "isPointer": false,
+          "kind": "real"
+        }
+      }
+    }
+  ],
+  "automata": [
+    {
+      "name": "A",
+      "type": "Int",
+      "constructorVariables": [],
+      "variables": [],
+      "states": [],
+      "shifts": [],
+      "functions": [
+        {
+          "name": "f",
+          "automaton": "A",
+          "args": [
+            {
+              "name": "param",
+              "type": "T"
+            }
+          ],
+          "contracts": [],
+          "statements": [
+            {
+              "kind": "assignment",
+              "variable": "param.T[index]",
+              "value": {
+                "kind": "integer",
+                "value": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

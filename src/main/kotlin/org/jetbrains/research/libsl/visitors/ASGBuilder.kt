@@ -287,7 +287,11 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
                 return if (namesChain.size > 1) {
                     currentVariableAccess.apply {
-                        lastChild.childAccess = resolveQualifiedAccessFullName(variable.type, namesChain.drop(1))
+                        val child = resolveQualifiedAccessFullName(variable.type, namesChain.drop(1))
+                        if (child is ArrayAccess && this.variable?.type !is ArrayType) {
+                            error("variable access can't be performed on non-array type")
+                        }
+                        lastChild.childAccess = child
                     }
                 } else {
                     currentVariableAccess
@@ -302,10 +306,15 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                     val index = visitExpressionAtomic(indexCtx)
 
                     parentQualifiedAccess.apply {
-                        lastChild.childAccess = ArrayAccess(
+                        val child = ArrayAccess(
                             index,
                             parentQualifiedAccess.type
                         )
+
+                        if (!this.type.isArray) {
+                            error("variable access can't be performed on non-array type: ${parentQualifiedAccess.type.name}")
+                        }
+                        lastChild.childAccess = child
                     }
                 } else {
                     parentQualifiedAccess

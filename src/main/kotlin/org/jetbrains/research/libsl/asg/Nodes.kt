@@ -33,8 +33,13 @@ sealed class Type {
     abstract val isPointer: Boolean
     abstract val context: LslContext
     abstract val generic: Type?
+
     open val fullName: String
         get() = "${if (isPointer) "*" else ""}$name"
+
+    val isArray: Boolean
+        get() = (this as? TypeAlias)?.originalType?.isArray == true || this is ArrayType
+
 }
 
 sealed class LibslType : Type()

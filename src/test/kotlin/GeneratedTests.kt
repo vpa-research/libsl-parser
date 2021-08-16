@@ -24,6 +24,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testBadVariableAccess() {
+        testRunner("badVariableAccess")
+    }
+
+
+    @Test
     fun testContracts() {
         testRunner("contracts")
     }
