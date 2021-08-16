@@ -86,6 +86,21 @@
       }
     },
     {
+      "name": "StructureType",
+      "isPointer": false,
+      "kind": "structured",
+      "entries": [
+        {
+          "name": "field",
+          "type": {
+            "name": "Type",
+            "isPointer": false,
+            "kind": "real"
+          }
+        }
+      ]
+    },
+    {
       "name": "BlackAndWhiteImage",
       "isPointer": false,
       "kind": "structured",
@@ -102,6 +117,14 @@
           "name": "width",
           "type": {
             "name": "Int",
+            "isPointer": false,
+            "kind": "real"
+          }
+        },
+        {
+          "name": "tpe",
+          "type": {
+            "name": "StructureType",
             "isPointer": false,
             "kind": "real"
           }
@@ -271,6 +294,14 @@
                             }
                           },
                           {
+                            "name": "tpe",
+                            "type": {
+                              "name": "StructureType",
+                              "isPointer": false,
+                              "kind": "real"
+                            }
+                          },
+                          {
                             "name": "content",
                             "type": {
                               "name": "array",
@@ -399,6 +430,14 @@
                               "name": "width",
                               "type": {
                                 "name": "Int",
+                                "isPointer": false,
+                                "kind": "real"
+                              }
+                            },
+                            {
+                              "name": "tpe",
+                              "type": {
+                                "name": "StructureType",
                                 "isPointer": false,
                                 "kind": "real"
                               }
@@ -546,6 +585,14 @@
                             }
                           },
                           {
+                            "name": "tpe",
+                            "type": {
+                              "name": "StructureType",
+                              "isPointer": false,
+                              "kind": "real"
+                            }
+                          },
+                          {
                             "name": "content",
                             "type": {
                               "name": "array",
@@ -647,6 +694,14 @@
                     }
                   }
                 }
+              }
+            },
+            {
+              "kind": "assignment",
+              "variable": "img.StructureType",
+              "value": {
+                "kind": "integer",
+                "value": 1
               }
             }
           ]

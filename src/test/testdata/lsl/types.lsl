@@ -16,9 +16,14 @@ enum foo.vldf.Type { // enum type
 
 typealias MyType = foo.vldf.Type;
 
+type StructureType {
+    field: Type;
+}
+
 type BlackAndWhiteImage {
     height: Int;
     width: Int;
+    tpe: StructureType;
     content: array<array<Boolean>>;
 }
 
@@ -28,5 +33,6 @@ automaton Image : BlackAndWhiteImage {
    ensures img.content[y][x] != img.content[y][x]';
    {
        img.content[y][x] = !img.content[y][x];
+       img.tpe.field = 1;
    }
 }
