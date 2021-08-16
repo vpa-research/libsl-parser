@@ -9,7 +9,7 @@ automaton A : Int {
    var b: Int = new B(state = s);
 
    fun foo() {
-       b.i = 1;
+       b = 1;
    }
 }
 

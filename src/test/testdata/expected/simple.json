@@ -162,7 +162,7 @@
             },
             {
               "kind": "assignment",
-              "variable": "b.v",
+              "variable": "b",
               "value": {
                 "kind": "integer",
                 "value": 1

@@ -16,16 +16,16 @@ enum foo.vldf.Type { // enum type
 
 typealias MyType = foo.vldf.Type;
 
-type BlackAndWhiteImage {  // указываем полное имя типа
+type BlackAndWhiteImage {
     height: Int;
     width: Int;
-    content: Array<Array<Boolean>>;
+    content: array<array<Boolean>>;
 }
 
 automaton Image : BlackAndWhiteImage {
    fun inversePixel(img: BlackAndWhiteImage, x: Int, y: Int)
    requires size: (x > 0) & (y > 0);
-   ensures img[y][x] != img[y][x]';
+   ensures img.content[y][x] != img.content[y][x]';
    {
        img.content[y][x] = !img.content[y][x];
    }

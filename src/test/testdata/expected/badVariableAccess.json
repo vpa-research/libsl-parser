@@ -19,8 +19,8 @@
       "originalType": {
         "name": "array",
         "isPointer": false,
-        "kind": "real",
-        "generic": {
+        "kind": "array",
+        "type": {
           "name": "Int",
           "isPointer": false,
           "kind": "real"
@@ -44,6 +44,10 @@
             {
               "name": "param",
               "type": "T"
+            },
+            {
+              "name": "bad",
+              "type": "Int"
             }
           ],
           "contracts": [],

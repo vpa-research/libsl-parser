@@ -282,19 +282,22 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             ctx.periodSeparatedFullName() != null -> {
                 val namesChain = ctx.periodSeparatedFullName().Identifier().map { it.text }
                 val variable = resolveVariableDependingOnContext(ctx, namesChain.first(), context)
-                    ?: error("unresolved variable: $namesChain")
-                val currentVariableAccess = VariableAccess(variable.name, null, variable.type, variable)
+                    ?: error("unresolved variable: ${namesChain.first()}")
 
                 return if (namesChain.size > 1) {
+                    val parentType = variable.type as? StructuredType ?: error("only structured types allowed to have children")
+                    val childType = parentType.entries.firstOrNull { it.first == namesChain[1] }?.second ?: error("unresolved name: ${namesChain[1]}")
+                    val currentVariableAccess = VariableAccess(variable.name, null, childType, variable)
+
                     currentVariableAccess.apply {
-                        val child = resolveQualifiedAccessFullName(variable.type, namesChain.drop(1))
-                        if (child is ArrayAccess && this.variable?.type !is ArrayType) {
+                        val child = resolveQualifiedAccessFullName(childType, namesChain.drop(1))
+                        if (!lastChild.type.isArray && child is ArrayAccess) {
                             error("variable access can't be performed on non-array type")
                         }
                         lastChild.childAccess = child
                     }
                 } else {
-                    currentVariableAccess
+                    VariableAccess(variable.name, null, variable.type, variable)
                 }
             }
 
@@ -311,7 +314,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                             parentQualifiedAccess.type
                         )
 
-                        if (!this.type.isArray) {
+                        if (!(lastChild.type.isArray || lastChild is ArrayAccess && lastChild.type.isArray) ) {
                             error("variable access can't be performed on non-array type: ${parentQualifiedAccess.type.name}")
                         }
                         lastChild.childAccess = child

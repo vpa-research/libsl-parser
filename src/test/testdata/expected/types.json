@@ -109,14 +109,14 @@
         {
           "name": "content",
           "type": {
-            "name": "Array",
+            "name": "array",
             "isPointer": false,
-            "kind": "real",
-            "generic": {
-              "name": "Array",
+            "kind": "array",
+            "type": {
+              "name": "array",
               "isPointer": false,
-              "kind": "real",
-              "generic": {
+              "kind": "array",
+              "type": {
                 "name": "Boolean",
                 "isPointer": false,
                 "kind": "real"
@@ -273,14 +273,14 @@
                           {
                             "name": "content",
                             "type": {
-                              "name": "Array",
+                              "name": "array",
                               "isPointer": false,
-                              "kind": "real",
-                              "generic": {
-                                "name": "Array",
+                              "kind": "array",
+                              "type": {
+                                "name": "array",
                                 "isPointer": false,
-                                "kind": "real",
-                                "generic": {
+                                "kind": "array",
+                                "type": {
                                   "name": "Boolean",
                                   "isPointer": false,
                                   "kind": "real"
@@ -298,49 +298,21 @@
                         "Int"
                       ]
                     },
-                    "type": "BlackAndWhiteImage",
+                    "type": "array",
                     "child": {
-                      "kind": "arrayAccess",
-                      "index": {
-                        "kind": "qualifiedAccess",
-                        "access": {
-                          "kind": "variableAccess",
-                          "name": "y",
-                          "variableInfo": {
-                            "name": "y",
-                            "fullName": "inversePixel.y",
-                            "type": {
-                              "name": "Int",
-                              "isPointer": false,
-                              "kind": "simple",
-                              "realType": {
-                                "name": "int",
-                                "isPointer": false,
-                                "kind": "real"
-                              }
-                            },
-                            "kind": "functionArgument",
-                            "function": "Image.inversePixel",
-                            "functionArgTypes": [
-                              "BlackAndWhiteImage",
-                              "Int",
-                              "Int"
-                            ]
-                          },
-                          "type": "Int"
-                        }
-                      },
-                      "type": "BlackAndWhiteImage",
+                      "kind": "variableAccess",
+                      "name": "content",
+                      "type": "array",
                       "child": {
                         "kind": "arrayAccess",
                         "index": {
                           "kind": "qualifiedAccess",
                           "access": {
                             "kind": "variableAccess",
-                            "name": "x",
+                            "name": "y",
                             "variableInfo": {
-                              "name": "x",
-                              "fullName": "inversePixel.x",
+                              "name": "y",
+                              "fullName": "inversePixel.y",
                               "type": {
                                 "name": "Int",
                                 "isPointer": false,
@@ -362,7 +334,40 @@
                             "type": "Int"
                           }
                         },
-                        "type": "BlackAndWhiteImage"
+                        "type": "array",
+                        "child": {
+                          "kind": "arrayAccess",
+                          "index": {
+                            "kind": "qualifiedAccess",
+                            "access": {
+                              "kind": "variableAccess",
+                              "name": "x",
+                              "variableInfo": {
+                                "name": "x",
+                                "fullName": "inversePixel.x",
+                                "type": {
+                                  "name": "Int",
+                                  "isPointer": false,
+                                  "kind": "simple",
+                                  "realType": {
+                                    "name": "int",
+                                    "isPointer": false,
+                                    "kind": "real"
+                                  }
+                                },
+                                "kind": "functionArgument",
+                                "function": "Image.inversePixel",
+                                "functionArgTypes": [
+                                  "BlackAndWhiteImage",
+                                  "Int",
+                                  "Int"
+                                ]
+                              },
+                              "type": "Int"
+                            }
+                          },
+                          "type": "array"
+                        }
                       }
                     }
                   }
@@ -401,14 +406,14 @@
                             {
                               "name": "content",
                               "type": {
-                                "name": "Array",
+                                "name": "array",
                                 "isPointer": false,
-                                "kind": "real",
-                                "generic": {
-                                  "name": "Array",
+                                "kind": "array",
+                                "type": {
+                                  "name": "array",
                                   "isPointer": false,
-                                  "kind": "real",
-                                  "generic": {
+                                  "kind": "array",
+                                  "type": {
                                     "name": "Boolean",
                                     "isPointer": false,
                                     "kind": "real"
@@ -426,49 +431,21 @@
                           "Int"
                         ]
                       },
-                      "type": "BlackAndWhiteImage",
+                      "type": "array",
                       "child": {
-                        "kind": "arrayAccess",
-                        "index": {
-                          "kind": "qualifiedAccess",
-                          "access": {
-                            "kind": "variableAccess",
-                            "name": "y",
-                            "variableInfo": {
-                              "name": "y",
-                              "fullName": "inversePixel.y",
-                              "type": {
-                                "name": "Int",
-                                "isPointer": false,
-                                "kind": "simple",
-                                "realType": {
-                                  "name": "int",
-                                  "isPointer": false,
-                                  "kind": "real"
-                                }
-                              },
-                              "kind": "functionArgument",
-                              "function": "Image.inversePixel",
-                              "functionArgTypes": [
-                                "BlackAndWhiteImage",
-                                "Int",
-                                "Int"
-                              ]
-                            },
-                            "type": "Int"
-                          }
-                        },
-                        "type": "BlackAndWhiteImage",
+                        "kind": "variableAccess",
+                        "name": "content",
+                        "type": "array",
                         "child": {
                           "kind": "arrayAccess",
                           "index": {
                             "kind": "qualifiedAccess",
                             "access": {
                               "kind": "variableAccess",
-                              "name": "x",
+                              "name": "y",
                               "variableInfo": {
-                                "name": "x",
-                                "fullName": "inversePixel.x",
+                                "name": "y",
+                                "fullName": "inversePixel.y",
                                 "type": {
                                   "name": "Int",
                                   "isPointer": false,
@@ -490,7 +467,40 @@
                               "type": "Int"
                             }
                           },
-                          "type": "BlackAndWhiteImage"
+                          "type": "array",
+                          "child": {
+                            "kind": "arrayAccess",
+                            "index": {
+                              "kind": "qualifiedAccess",
+                              "access": {
+                                "kind": "variableAccess",
+                                "name": "x",
+                                "variableInfo": {
+                                  "name": "x",
+                                  "fullName": "inversePixel.x",
+                                  "type": {
+                                    "name": "Int",
+                                    "isPointer": false,
+                                    "kind": "simple",
+                                    "realType": {
+                                      "name": "int",
+                                      "isPointer": false,
+                                      "kind": "real"
+                                    }
+                                  },
+                                  "kind": "functionArgument",
+                                  "function": "Image.inversePixel",
+                                  "functionArgTypes": [
+                                    "BlackAndWhiteImage",
+                                    "Int",
+                                    "Int"
+                                  ]
+                                },
+                                "type": "Int"
+                              }
+                            },
+                            "type": "array"
+                          }
                         }
                       }
                     }
@@ -502,7 +512,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "img.content.BlackAndWhiteImage[index]",
+              "variable": "img.content.array[index]",
               "value": {
                 "kind": "unary",
                 "unaryOp": "inversion",
@@ -538,14 +548,14 @@
                           {
                             "name": "content",
                             "type": {
-                              "name": "Array",
+                              "name": "array",
                               "isPointer": false,
-                              "kind": "real",
-                              "generic": {
-                                "name": "Array",
+                              "kind": "array",
+                              "type": {
+                                "name": "array",
                                 "isPointer": false,
-                                "kind": "real",
-                                "generic": {
+                                "kind": "array",
+                                "type": {
                                   "name": "Boolean",
                                   "isPointer": false,
                                   "kind": "real"
@@ -563,11 +573,11 @@
                         "Int"
                       ]
                     },
-                    "type": "BlackAndWhiteImage",
+                    "type": "array",
                     "child": {
                       "kind": "variableAccess",
                       "name": "content",
-                      "type": "BlackAndWhiteImage",
+                      "type": "array",
                       "child": {
                         "kind": "arrayAccess",
                         "index": {
@@ -599,7 +609,7 @@
                             "type": "Int"
                           }
                         },
-                        "type": "BlackAndWhiteImage",
+                        "type": "array",
                         "child": {
                           "kind": "arrayAccess",
                           "index": {
@@ -631,7 +641,7 @@
                               "type": "Int"
                             }
                           },
-                          "type": "BlackAndWhiteImage"
+                          "type": "array"
                         }
                       }
                     }

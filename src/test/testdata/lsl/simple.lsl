@@ -44,5 +44,5 @@ automaton B : Int {
 
 fun A.extendedFunction() {
    strVar = "";
-   b.v = 1;
+   b = 1;
 }
