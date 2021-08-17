@@ -29,8 +29,7 @@
           "args": [
             {
               "name": "param",
-              "type": "Int",
-              "annotationName": "annotation"
+              "type": "Int"
             }
           ],
           "contracts": [],

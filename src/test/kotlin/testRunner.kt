@@ -3,6 +3,7 @@ import org.antlr.v4.runtime.*
 import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
+import org.jetbrains.research.libsl.asg.Annotation
 import org.jetbrains.research.libsl.asg.Function
 import org.jetbrains.research.libsl.visitors.ASGBuilder
 import org.jetbrains.research.libsl.visitors.Resolver
@@ -43,6 +44,7 @@ fun testRunner(name: String) {
         .registerTypeAdapter(Automaton::class.java, automatonSerializer)
         .registerTypeAdapter(Type::class.java, typeSerializer)
         .registerTypeAdapter(Variable::class.java, variableSerializer)
+        .registerTypeAdapter(Annotation::class.java, annotationSerializer)
         .registerTypeAdapter(Function::class.java, functionSerializer)
         .registerTypeAdapter(Expression::class.java, expressionSerializer)
         .registerTypeAdapter(QualifiedAccess::class.java, qualifiedAccessSerializer)

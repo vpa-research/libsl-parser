@@ -140,8 +140,8 @@ val variableSerializer = JsonSerializer<Variable> { src, _, context ->
             is FunctionArgument -> {
                 addProperty("kind", "functionArgument")
                 addProperty("function", src.function.qualifiedName)
-                if (src.annotationName != null) {
-                    addProperty("annotationName", src.annotationName)
+                if (src.annotation != null) {
+                    add("annotation", context.serialize(src.annotation, Annotation::class.java))
                 }
                 add("functionArgTypes", JsonArray().apply { src.function.args.forEach { add(it.type.name) } })
             }
@@ -149,6 +149,13 @@ val variableSerializer = JsonSerializer<Variable> { src, _, context ->
                 addProperty("kind", "global")
             }
         }
+    }
+}
+
+val annotationSerializer = JsonSerializer<Annotation> { src, _, context ->
+    JsonObject().apply {
+        addProperty("name", src.name)
+        add("args", JsonArray().apply { src.values.forEach { context.serialize(it, Expression::class.java) } })
     }
 }
 
@@ -218,8 +225,8 @@ val functionSerializer = JsonSerializer<Function> { src, _, context ->
                 add(JsonObject().apply {
                     addProperty("name", arg.name)
                     addProperty("type", arg.type.fullName)
-                    if (arg.annotationName != null) {
-                        addProperty("annotationName", arg.annotationName)
+                    if (arg.annotation != null) {
+                        add("annotation", context.serialize(arg.annotation, kotlin.Annotation::class.java))
                     }
                 })
             }

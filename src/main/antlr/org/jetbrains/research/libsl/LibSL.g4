@@ -199,7 +199,7 @@ parameter
  * syntax: @annotationName(args) todo: add args
  */
 annotation
-   :   '@' Identifier
+   :   '@' Identifier ('(' valuesAndIdentifiersList ')')?
    ;
 
 functionPreamble

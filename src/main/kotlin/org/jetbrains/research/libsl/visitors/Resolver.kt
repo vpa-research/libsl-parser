@@ -253,19 +253,10 @@ class Resolver(
 
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
-            FunctionArgument(arg.name.text, argType, arg.annotation()?.Identifier()?.text)
+            FunctionArgument(arg.name.text, argType, null)
         }?.toList().orEmpty()
 
         val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)
-
-        val targetName = args.firstOrNull { it.annotationName == "target" }
-
-        if (targetName != null) {
-            val target = context.resolveAutomaton(targetName.name) ?: error("unresolved automaton: $name")
-            func.target = target
-        } else {
-            func.target = context.resolveAutomaton(automatonName) ?: error("unresolved automaton: $automatonName")
-        }
 
         context.storeResolvedFunction(func)
 

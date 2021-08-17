@@ -256,13 +256,18 @@ data class AutomatonVariableDeclaration(
 data class FunctionArgument(
     override val name: String,
     override val type: Type,
-    val annotationName: String?
+    val annotation: Annotation?
 ) : Variable() {
     lateinit var function: Function
 
     override val fullName: String
         get() = "${function.name}.$name"
 }
+
+data class Annotation(
+    val name: String,
+    val values: List<Atomic>
+)
 
 data class ConstructorArgument(
     override val name: String,

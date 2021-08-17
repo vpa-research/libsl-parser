@@ -156,8 +156,13 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
+            val annotation = arg.annotation()?.let { anno ->
+                Annotation(anno.Identifier().text, anno.valuesAndIdentifiersList()?.expressionAtomic()?.map { atomic ->
+                    visitExpressionAtomic(atomic)
+                }.orEmpty())
+            }
 
-            FunctionArgument(argName, argType, arg.annotation()?.Identifier()?.text)
+            FunctionArgument(argName, argType, annotation)
         }.orEmpty()
         val typeName = ctx.functionType?.text
         val type = if (typeName != null) context.resolveType(typeName) ?: error("unresolved type: $typeName") else null
@@ -208,8 +213,21 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
         }.orEmpty()
 
-        val resolvedFunction = context.resolveFunction(functionName, automatonName=ownerAutomatonName, args = args, returnType = type)
-            ?: error("error on parsing function: $ownerAutomatonName.$functionName")
+        val targetAnnotation = args.firstOrNull { it.annotation?.name == "target" }
+        val resolvedFunction = context.resolveFunction(
+            functionName,
+            automatonName=ownerAutomatonName,
+            argsType = args.map { it.type },
+            returnType = type
+        ) ?: error("error on parsing function: $ownerAutomatonName.$functionName")
+
+        if (targetAnnotation != null) {
+            val target = context.resolveAutomaton(targetAnnotation.name) ?: error("unresolved automaton: $targetAnnotation")
+            resolvedFunction.target = target
+        } else {
+            val automatonName = resolvedFunction.automatonName
+            resolvedFunction.target = context.resolveAutomaton(automatonName) ?: error("unresolved automaton: $automatonName")
+        }
 
         return resolvedFunction.apply {
             contracts = preamble
@@ -437,8 +455,12 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
-
-            FunctionArgument(argName, argType, arg.annotation()?.Identifier()?.text)
+            val annotation = arg.annotation()?.let { anno ->
+                Annotation(anno.Identifier().text, anno.valuesAndIdentifiersList().expressionAtomic().map { atomic ->
+                    visitExpressionAtomic(atomic)
+                })
+            }
+            FunctionArgument(argName, argType, annotation)
         }.orEmpty()
 
         return if (ctx.name.Identifier().size > 1) {
