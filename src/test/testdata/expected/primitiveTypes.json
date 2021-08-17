@@ -1,0 +1,55 @@
+{
+  "name": "simple",
+  "lslVersion": "1.0.0",
+  "types": [
+    {
+      "name": "Int",
+      "isPointer": false,
+      "kind": "alias",
+      "originalType": {
+        "name": "int32",
+        "isPointer": false
+      }
+    },
+    {
+      "name": "V",
+      "isPointer": false,
+      "kind": "alias",
+      "originalType": {
+        "name": "void",
+        "isPointer": true
+      }
+    }
+  ],
+  "automata": [
+    {
+      "name": "A",
+      "type": "Int",
+      "constructorVariables": [],
+      "variables": [
+        {
+          "name": "i",
+          "type": "V"
+        }
+      ],
+      "states": [],
+      "shifts": [],
+      "functions": [
+        {
+          "name": "f",
+          "automaton": "A",
+          "returnType": "V",
+          "target": "A",
+          "args": [
+            {
+              "name": "param",
+              "type": "Int"
+            }
+          ],
+          "contracts": [],
+          "statements": []
+        }
+      ]
+    }
+  ]
+}

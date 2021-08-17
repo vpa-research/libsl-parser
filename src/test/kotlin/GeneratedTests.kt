@@ -60,6 +60,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testPrimitiveTypes() {
+        testRunner("primitiveTypes")
+    }
+
+
+    @Test
     fun testSimple() {
         testRunner("simple")
     }

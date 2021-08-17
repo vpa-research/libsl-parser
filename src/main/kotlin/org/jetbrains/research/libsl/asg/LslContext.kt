@@ -8,27 +8,29 @@ class LslContext {
 
     private val importedContexts = mutableListOf<LslContext>()
 
+    @OptIn(ExperimentalStdlibApi::class)
     fun init() {
-        val types = listOf(
-            IntType(this, IntType.IntCapacity.INT8),
-            IntType(this, IntType.IntCapacity.INT16),
-            IntType(this, IntType.IntCapacity.INT32),
-            IntType(this, IntType.IntCapacity.INT64),
+        val types = buildList<Type> {
+            for (pointer in listOf(true, false)) {
+                add(IntType(this@LslContext, IntType.IntCapacity.INT8, pointer))
+                add(IntType(this@LslContext, IntType.IntCapacity.INT16, pointer))
+                add(IntType(this@LslContext, IntType.IntCapacity.INT32, pointer))
+                add(IntType(this@LslContext, IntType.IntCapacity.INT64, pointer))
 
-            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED8),
-            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED16),
-            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED32),
-            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED64),
+                add(UnsignedType(this@LslContext, UnsignedType.UnsignedCapacity.UNSIGNED8, pointer))
+                add(UnsignedType(this@LslContext, UnsignedType.UnsignedCapacity.UNSIGNED16, pointer))
+                add(UnsignedType(this@LslContext, UnsignedType.UnsignedCapacity.UNSIGNED32, pointer))
+                add(UnsignedType(this@LslContext, UnsignedType.UnsignedCapacity.UNSIGNED64, pointer))
 
-            FloatType(this, FloatType.FloatCapacity.FLOAT32),
-            FloatType(this, FloatType.FloatCapacity.FLOAT64),
+                add(FloatType(this@LslContext, FloatType.FloatCapacity.FLOAT32, pointer))
+                add(FloatType(this@LslContext, FloatType.FloatCapacity.FLOAT64, pointer))
 
-            BoolType(this),
-
-            CharType(this),
-
-            StringType(this)
-        )
+                add(BoolType(this@LslContext, pointer))
+                add(CharType(this@LslContext, pointer))
+                add(StringType(this@LslContext, pointer))
+                add(VoidType(this@LslContext, pointer))
+            }
+        }
 
         types.forEach(::storeResolvedType)
     }

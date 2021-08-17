@@ -1,13 +1,11 @@
 package org.jetbrains.research.libsl.asg
 
-interface PrimitiveType : Type {
-    override val isPointer: Boolean
-        get() = false
-}
+interface PrimitiveType : Type
 
 data class IntType(
     override val context: LslContext,
-    val capacity: IntCapacity
+    val capacity: IntCapacity,
+    override val isPointer: Boolean
 ) : PrimitiveType {
     override val generic: Type? = null
     override val name: String = capacity.name.lowercase()
@@ -19,7 +17,8 @@ data class IntType(
 
 data class UnsignedType(
     override val context: LslContext,
-    val capacity: UnsignedCapacity
+    val capacity: UnsignedCapacity,
+    override val isPointer: Boolean
 ) : PrimitiveType {
     override val generic: Type? = null
     override val name: String = capacity.name.lowercase()
@@ -31,7 +30,8 @@ data class UnsignedType(
 
 data class FloatType(
     override val context: LslContext,
-    val capacity: FloatCapacity
+    val capacity: FloatCapacity,
+    override val isPointer: Boolean
 ) : PrimitiveType {
     override val generic: Type? = null
     override val name: String = capacity.name.lowercase()
@@ -43,21 +43,32 @@ data class FloatType(
 
 data class BoolType(
     override val context: LslContext,
+    override val isPointer: Boolean
 ) : PrimitiveType {
     override val generic: Type? = null
     override val name: String = "bool"
 }
 
 data class CharType(
-    override val context: LslContext
+    override val context: LslContext,
+    override val isPointer: Boolean
 ) : PrimitiveType {
     override val generic: Type? = null
     override val name: String = "char"
 }
 
 data class StringType(
-    override val context: LslContext
+    override val context: LslContext,
+    override val isPointer: Boolean
 ) : PrimitiveType {
     override val generic: Type? = null
     override val name: String = "string"
+}
+
+data class VoidType(
+    override val context: LslContext,
+    override val isPointer: Boolean
+) : PrimitiveType {
+    override val name: String = "void"
+    override val generic: Type? = null
 }
