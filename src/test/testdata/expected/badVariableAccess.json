@@ -8,8 +8,7 @@
       "kind": "alias",
       "originalType": {
         "name": "int32",
-        "isPointer": false,
-        "kind": "real"
+        "isPointer": false
       }
     },
     {
@@ -23,7 +22,11 @@
         "type": {
           "name": "Int",
           "isPointer": false,
-          "kind": "real"
+          "kind": "alias",
+          "originalType": {
+            "name": "int32",
+            "isPointer": false
+          }
         }
       }
     }

@@ -6,10 +6,9 @@
       "name": "Int",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
-        "name": "int",
-        "isPointer": false,
-        "kind": "real"
+      "originalType": {
+        "name": "int32",
+        "isPointer": false
       }
     },
     {
@@ -17,9 +16,13 @@
       "isPointer": false,
       "kind": "enumLike",
       "type": {
-        "name": "int",
+        "name": "Int",
         "isPointer": false,
-        "kind": "real"
+        "kind": "simple",
+        "originalType": {
+          "name": "int32",
+          "isPointer": false
+        }
       },
       "entries": [
         {
@@ -93,9 +96,13 @@
         {
           "name": "field",
           "type": {
-            "name": "Type",
+            "name": "Int",
             "isPointer": false,
-            "kind": "real"
+            "kind": "simple",
+            "originalType": {
+              "name": "int32",
+              "isPointer": false
+            }
           }
         }
       ]
@@ -110,7 +117,11 @@
           "type": {
             "name": "Int",
             "isPointer": false,
-            "kind": "real"
+            "kind": "simple",
+            "originalType": {
+              "name": "int32",
+              "isPointer": false
+            }
           }
         },
         {
@@ -118,7 +129,11 @@
           "type": {
             "name": "Int",
             "isPointer": false,
-            "kind": "real"
+            "kind": "simple",
+            "originalType": {
+              "name": "int32",
+              "isPointer": false
+            }
           }
         },
         {
@@ -126,7 +141,21 @@
           "type": {
             "name": "StructureType",
             "isPointer": false,
-            "kind": "real"
+            "kind": "structured",
+            "entries": [
+              {
+                "name": "field",
+                "type": {
+                  "name": "Int",
+                  "isPointer": false,
+                  "kind": "simple",
+                  "originalType": {
+                    "name": "int32",
+                    "isPointer": false
+                  }
+                }
+              }
+            ]
           }
         },
         {
@@ -199,10 +228,9 @@
                           "name": "Int",
                           "isPointer": false,
                           "kind": "simple",
-                          "realType": {
-                            "name": "int",
-                            "isPointer": false,
-                            "kind": "real"
+                          "originalType": {
+                            "name": "int32",
+                            "isPointer": false
                           }
                         },
                         "kind": "functionArgument",
@@ -236,10 +264,9 @@
                           "name": "Int",
                           "isPointer": false,
                           "kind": "simple",
-                          "realType": {
-                            "name": "int",
-                            "isPointer": false,
-                            "kind": "real"
+                          "originalType": {
+                            "name": "int32",
+                            "isPointer": false
                           }
                         },
                         "kind": "functionArgument",
@@ -283,7 +310,11 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "real"
+                              "kind": "simple",
+                              "originalType": {
+                                "name": "int32",
+                                "isPointer": false
+                              }
                             }
                           },
                           {
@@ -291,7 +322,11 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "real"
+                              "kind": "simple",
+                              "originalType": {
+                                "name": "int32",
+                                "isPointer": false
+                              }
                             }
                           },
                           {
@@ -299,7 +334,21 @@
                             "type": {
                               "name": "StructureType",
                               "isPointer": false,
-                              "kind": "real"
+                              "kind": "structured",
+                              "entries": [
+                                {
+                                  "name": "field",
+                                  "type": {
+                                    "name": "Int",
+                                    "isPointer": false,
+                                    "kind": "simple",
+                                    "originalType": {
+                                      "name": "int32",
+                                      "isPointer": false
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           },
                           {
@@ -330,7 +379,7 @@
                         "Int"
                       ]
                     },
-                    "type": "array",
+                    "type": "BlackAndWhiteImage",
                     "child": {
                       "kind": "variableAccess",
                       "name": "content",
@@ -349,10 +398,9 @@
                                 "name": "Int",
                                 "isPointer": false,
                                 "kind": "simple",
-                                "realType": {
-                                  "name": "int",
-                                  "isPointer": false,
-                                  "kind": "real"
+                                "originalType": {
+                                  "name": "int32",
+                                  "isPointer": false
                                 }
                               },
                               "kind": "functionArgument",
@@ -381,10 +429,9 @@
                                   "name": "Int",
                                   "isPointer": false,
                                   "kind": "simple",
-                                  "realType": {
-                                    "name": "int",
-                                    "isPointer": false,
-                                    "kind": "real"
+                                  "originalType": {
+                                    "name": "int32",
+                                    "isPointer": false
                                   }
                                 },
                                 "kind": "functionArgument",
@@ -424,7 +471,11 @@
                               "type": {
                                 "name": "Int",
                                 "isPointer": false,
-                                "kind": "real"
+                                "kind": "simple",
+                                "originalType": {
+                                  "name": "int32",
+                                  "isPointer": false
+                                }
                               }
                             },
                             {
@@ -432,7 +483,11 @@
                               "type": {
                                 "name": "Int",
                                 "isPointer": false,
-                                "kind": "real"
+                                "kind": "simple",
+                                "originalType": {
+                                  "name": "int32",
+                                  "isPointer": false
+                                }
                               }
                             },
                             {
@@ -440,7 +495,21 @@
                               "type": {
                                 "name": "StructureType",
                                 "isPointer": false,
-                                "kind": "real"
+                                "kind": "structured",
+                                "entries": [
+                                  {
+                                    "name": "field",
+                                    "type": {
+                                      "name": "Int",
+                                      "isPointer": false,
+                                      "kind": "simple",
+                                      "originalType": {
+                                        "name": "int32",
+                                        "isPointer": false
+                                      }
+                                    }
+                                  }
+                                ]
                               }
                             },
                             {
@@ -471,7 +540,7 @@
                           "Int"
                         ]
                       },
-                      "type": "array",
+                      "type": "BlackAndWhiteImage",
                       "child": {
                         "kind": "variableAccess",
                         "name": "content",
@@ -490,10 +559,9 @@
                                   "name": "Int",
                                   "isPointer": false,
                                   "kind": "simple",
-                                  "realType": {
-                                    "name": "int",
-                                    "isPointer": false,
-                                    "kind": "real"
+                                  "originalType": {
+                                    "name": "int32",
+                                    "isPointer": false
                                   }
                                 },
                                 "kind": "functionArgument",
@@ -522,10 +590,9 @@
                                     "name": "Int",
                                     "isPointer": false,
                                     "kind": "simple",
-                                    "realType": {
-                                      "name": "int",
-                                      "isPointer": false,
-                                      "kind": "real"
+                                    "originalType": {
+                                      "name": "int32",
+                                      "isPointer": false
                                     }
                                   },
                                   "kind": "functionArgument",
@@ -574,7 +641,11 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "real"
+                              "kind": "simple",
+                              "originalType": {
+                                "name": "int32",
+                                "isPointer": false
+                              }
                             }
                           },
                           {
@@ -582,7 +653,11 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "real"
+                              "kind": "simple",
+                              "originalType": {
+                                "name": "int32",
+                                "isPointer": false
+                              }
                             }
                           },
                           {
@@ -590,7 +665,21 @@
                             "type": {
                               "name": "StructureType",
                               "isPointer": false,
-                              "kind": "real"
+                              "kind": "structured",
+                              "entries": [
+                                {
+                                  "name": "field",
+                                  "type": {
+                                    "name": "Int",
+                                    "isPointer": false,
+                                    "kind": "simple",
+                                    "originalType": {
+                                      "name": "int32",
+                                      "isPointer": false
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           },
                           {
@@ -621,7 +710,7 @@
                         "Int"
                       ]
                     },
-                    "type": "array",
+                    "type": "BlackAndWhiteImage",
                     "child": {
                       "kind": "variableAccess",
                       "name": "content",
@@ -640,10 +729,9 @@
                                 "name": "Int",
                                 "isPointer": false,
                                 "kind": "simple",
-                                "realType": {
-                                  "name": "int",
-                                  "isPointer": false,
-                                  "kind": "real"
+                                "originalType": {
+                                  "name": "int32",
+                                  "isPointer": false
                                 }
                               },
                               "kind": "functionArgument",
@@ -672,10 +760,9 @@
                                   "name": "Int",
                                   "isPointer": false,
                                   "kind": "simple",
-                                  "realType": {
-                                    "name": "int",
-                                    "isPointer": false,
-                                    "kind": "real"
+                                  "originalType": {
+                                    "name": "int32",
+                                    "isPointer": false
                                   }
                                 },
                                 "kind": "functionArgument",
@@ -699,7 +786,7 @@
             },
             {
               "kind": "assignment",
-              "variable": "img.StructureType",
+              "variable": "img.tpe.field",
               "value": {
                 "kind": "integer",
                 "value": 1

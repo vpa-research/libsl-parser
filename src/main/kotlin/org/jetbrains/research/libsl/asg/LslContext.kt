@@ -6,7 +6,32 @@ class LslContext {
     private val automatonStorage = mutableMapOf<String, Automaton>()
     val globalVariables = mutableMapOf<String, GlobalVariableDeclaration>()
 
-    val importedContexts = mutableListOf<LslContext>()
+    private val importedContexts = mutableListOf<LslContext>()
+
+    fun init() {
+        val types = listOf(
+            IntType(this, IntType.IntCapacity.INT8),
+            IntType(this, IntType.IntCapacity.INT16),
+            IntType(this, IntType.IntCapacity.INT32),
+            IntType(this, IntType.IntCapacity.INT64),
+
+            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED8),
+            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED16),
+            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED32),
+            UnsignedType(this, UnsignedType.UnsignedCapacity.UNSIGNED64),
+
+            FloatType(this, FloatType.FloatCapacity.FLOAT32),
+            FloatType(this, FloatType.FloatCapacity.FLOAT64),
+
+            BoolType(this),
+
+            CharType(this),
+
+            StringType(this)
+        )
+
+        types.forEach(::storeResolvedType)
+    }
 
     fun storeResolvedType(type: Type) {
         typeStorage[type.fullName] = type

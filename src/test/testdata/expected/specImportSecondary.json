@@ -6,7 +6,7 @@
       "name": "Int",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
+      "originalType": {
         "name": "foo.bar.int",
         "isPointer": false,
         "kind": "real"

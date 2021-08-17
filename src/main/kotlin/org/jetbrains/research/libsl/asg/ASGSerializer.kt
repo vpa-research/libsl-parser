@@ -38,7 +38,7 @@ val librarySerializer = JsonSerializer<Library> { src, _, context ->
 
         if (src.semanticTypes.isNotEmpty()) {
             add("types", JsonArray().apply {
-                src.semanticTypes.forEach { type ->
+                src.semanticTypes.filter { it !is PrimitiveType }.forEach { type ->
                     add(context.serialize(type, Type::class.java))
                 }
             })
@@ -190,7 +190,7 @@ val typeSerializer = JsonSerializer<Type> { src, _, context ->
             is SimpleType -> {
                 addProperty("kind", "simple")
                 add("generic", context.serialize(src.generic, Type::class.java))
-                add("realType", context.serialize(src.realType, Type::class.java))
+                add("originalType", context.serialize(src.realType, Type::class.java))
             }
             is StructuredType -> {
                 addProperty("kind", "structured")

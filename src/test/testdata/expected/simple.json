@@ -9,7 +9,7 @@
       "name": "SimpleType",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
+      "originalType": {
         "name": "ru.vldf.Type",
         "isPointer": false,
         "kind": "real"
@@ -19,7 +19,7 @@
       "name": "SimpleTypeWithGeneric",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
+      "originalType": {
         "name": "ru.vldf.Type",
         "isPointer": false,
         "kind": "real",
@@ -74,7 +74,7 @@
       "name": "String",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
+      "originalType": {
         "name": "java.lang.String",
         "isPointer": false,
         "kind": "real"
@@ -84,10 +84,9 @@
       "name": "Int",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
-        "name": "int",
-        "isPointer": false,
-        "kind": "real"
+      "originalType": {
+        "name": "int32",
+        "isPointer": false
       }
     }
   ],

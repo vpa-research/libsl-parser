@@ -2,8 +2,8 @@ libsl "1.0.0";
 library simple;
 
 types {
-   Int(int); // simple type
-   Type(int) { // enum-like type
+   Int(int32); // simple type
+   Type(Int) { // enum-like type
       variant1: 0;
       variant2: 1;
    }
@@ -17,7 +17,7 @@ enum foo.vldf.Type { // enum type
 typealias MyType = foo.vldf.Type;
 
 type StructureType {
-    field: Type;
+    field: Int;
 }
 
 type BlackAndWhiteImage {

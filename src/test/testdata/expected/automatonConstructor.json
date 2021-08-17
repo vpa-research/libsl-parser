@@ -6,20 +6,18 @@
       "name": "Int",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
-        "name": "int",
-        "isPointer": false,
-        "kind": "real"
+      "originalType": {
+        "name": "int32",
+        "isPointer": false
       }
     },
     {
       "name": "String",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
+      "originalType": {
         "name": "string",
-        "isPointer": false,
-        "kind": "real"
+        "isPointer": false
       }
     }
   ],

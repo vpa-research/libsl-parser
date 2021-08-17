@@ -20,6 +20,7 @@ fun testRunner(name: String) {
     val lexer = LibSLLexer(stream)
     val tokenStream = CommonTokenStream(lexer)
     val context = LslContext()
+    context.init()
     val parser = LibSLParser(tokenStream)
     parser.addErrorListener(object : BaseErrorListener() {
         override fun syntaxError(

@@ -300,47 +300,34 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitQualifiedAccess(ctx: LibSLParser.QualifiedAccessContext): QualifiedAccess {
-        when {
+        return when {
             ctx.periodSeparatedFullName() != null -> {
-                val namesChain = ctx.periodSeparatedFullName().Identifier().map { it.text }
-                val variable = resolveVariableDependingOnContext(ctx, namesChain.first(), context)
-                    ?: error("unresolved variable: ${namesChain.first()}")
+                val names = ctx.periodSeparatedFullName().Identifier().map { it.text }
+                val name = names.first()
 
-                return if (namesChain.size > 1) {
-                    val parentType = variable.type as? StructuredType ?: error("only structured types allowed to have children")
-                    val childType = parentType.entries.firstOrNull { it.first == namesChain[1] }?.second ?: error("unresolved name: ${namesChain[1]}")
-                    val currentVariableAccess = VariableAccess(variable.name, null, childType, variable)
-
-                    currentVariableAccess.apply {
-                        val child = resolveQualifiedAccessFullName(childType, namesChain.drop(1))
-                        if (!lastChild.type.isArray && child is ArrayAccess) {
-                            error("variable access can't be performed on non-array type")
-                        }
-                        lastChild.childAccess = child
-                    }
-                } else {
-                    VariableAccess(variable.name, null, variable.type, variable)
-                }
+                val variable = resolveVariableDependingOnContext(ctx, name, context) ?: error("can't resolve variable: $name")
+                val baseType = variable.type
+                VariableAccess(
+                    name,
+                    resolvePeriodSeparatedChain(baseType, names.drop(1)),
+                    baseType,
+                    variable
+                )
             }
 
             ctx.simpleCall() != null -> {
-                val callName = ctx.simpleCall().Identifier(0).text
-                val automaton = context.resolveAutomaton(callName) ?: error("unresolved automaton: $callName")
-                val functionCtx = ctx.getParentOfType<LibSLParser.FunctionDeclContext>() ?: error("call $callName not in function!")
-                val function = resolveFunctionByCtx(functionCtx) ?: error("unresolved function for call $callName")
+                val automatonName = ctx.simpleCall().Identifier(0).text
+                val automaton = context.resolveAutomaton(automatonName) ?: error("unresolved automaton: $automatonName")
+                val functionCtx = ctx.getParentOfType<LibSLParser.FunctionDeclContext>() ?: error("access not in function")
+                val function = resolveFunctionByCtx(functionCtx) ?: error("unresolved function")
+
                 val argName = ctx.simpleCall().Identifier(1).text
-                val arg = function.args.firstOrNull { it.name == argName } ?: error("unknown argument name: $argName")
+                val arg = function.args.firstOrNull { it.name == argName } ?: error("unresolved argument: $argName")
 
-                val qualifiedAccess = if (ctx.qualifiedAccess() != null) {
-                    visitQualifiedAccess(ctx.qualifiedAccess())
-                } else {
-                    null
-                }
-
-                return AutomatonGetter(
+                AutomatonGetter(
                     automaton,
                     arg,
-                    qualifiedAccess
+                    visitQualifiedAccess(ctx.qualifiedAccess())
                 )
             }
 
@@ -354,7 +341,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                     parentQualifiedAccess.apply {
                         val child = ArrayAccess(
                             index,
-                            parentQualifiedAccess.type
+                            lastChild.type
                         )
 
                         if (!(lastChild.type.isArray || lastChild is ArrayAccess && lastChild.type.isArray) ) {
@@ -370,71 +357,58 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         }
     }
 
-    private fun resolveQualifiedAccessFullName(type: Type, nameParts: List<String>): QualifiedAccess {
-        val currentName = nameParts.first()
-        if (nameParts.size == 1) {
-            return VariableAccess(
-                currentName,
-                null,
-                type,
-                null
-            )
-        }
-
-        return when (type) {
-            is EnumLikeSemanticType -> {
-                val nextName = nameParts[2]
-                val child = VariableAccess(nextName, null, type.type, null)
-                VariableAccess(
-                    currentName,
-                    child,
-                    type,
-                    null
-                )
-            }
-
-            is EnumType -> {
-                val nextName = nameParts[2]
-                val child = VariableAccess(nextName, null, type, null)
-                VariableAccess(
-                    currentName,
-                    child,
-                    type,
-                    null
-                )
-            }
-
+    private fun resolvePeriodSeparatedChain(parentType: Type, names: List<String>): QualifiedAccess? {
+        if (names.isEmpty()) return null
+        val name = names.first()
+        return when(parentType) {
             is StructuredType -> {
-                val nextType = type.entries.firstOrNull { it.first == currentName }?.second
-                    ?: error("unresolved field $currentName in type ${type.name}")
-                val child = resolveQualifiedAccessFullName(nextType, nameParts.drop(1))
+                val entry = parentType.entries.firstOrNull { it.first == name }
+                    ?: error("unresolved field $name in type ${parentType.name}")
                 VariableAccess(
-                    currentName,
-                    child,
-                    type,
+                    name,
+                    resolvePeriodSeparatedChain(entry.second, names.drop(1)),
+                    entry.second,
                     null
                 )
             }
-            is SimpleType -> error("can't resolve reference chain. Simple type ${type.name} can't contain fields")
-            is TypeAlias -> {
-                AccessAlias(
-                    resolveQualifiedAccessFullName(type.originalType, nameParts.drop(1)),
-                    type
-                )
-            }
-            is RealType -> {
-                RealTypeAccess(
-                    type
-                )
-            }
-            is ArrayType -> {
-                ArrayAccess(
+            is EnumType -> {
+                val entry = parentType.entries.firstOrNull { it.first == name }
+                    ?: error("unresolved field $name in type ${parentType.name}")
+                VariableAccess(
+                    entry.first,
                     null,
-                    type.generic
+                    parentType,
+                    null
                 )
+            }
+            is EnumLikeSemanticType -> {
+                val entry = parentType.entries.firstOrNull { it.first == name }
+                    ?: error("unresolved field $name in type ${parentType.name}")
+                VariableAccess(
+                    entry.first,
+                    null,
+                    parentType,
+                    null
+                )
+            }
+            is TypeAlias -> {
+                resolvePeriodSeparatedChain(parentType.originalType, names.drop(1))
+            }
+            else -> {
+                if (names.size == 1) {
+                    VariableAccess(
+                        name,
+                        null,
+                        parentType.resolveFieldType(name) ?: error("can't resolve field $name in type ${parentType.name}"),
+                        null
+                    )
+                } else {
+                    error("can't resolve access chain. Unsupported part type: ${parentType::class.java}")
+                }
             }
         }
     }
+
 
     private fun getParentAutomatonOrNull(ctx: RuleContext): Automaton? {
         return when {

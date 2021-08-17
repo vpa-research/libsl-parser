@@ -13,7 +13,7 @@ types {
       VARIANT3: "String";
    }
    String(java.lang.String);
-   Int(int);
+   Int(int32);
 }
 
 automaton A : Int {

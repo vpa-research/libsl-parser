@@ -1,6 +1,17 @@
 {
   "name": "simple",
   "lslVersion": "1.0.0",
+  "types": [
+    {
+      "name": "Int",
+      "isPointer": false,
+      "kind": "alias",
+      "originalType": {
+        "name": "int64",
+        "isPointer": false
+      }
+    }
+  ],
   "automata": [
     {
       "name": "A",
@@ -50,11 +61,10 @@
                       "type": {
                         "name": "Int",
                         "isPointer": false,
-                        "kind": "simple",
-                        "realType": {
-                          "name": "foo.bar.int",
-                          "isPointer": false,
-                          "kind": "real"
+                        "kind": "alias",
+                        "originalType": {
+                          "name": "int64",
+                          "isPointer": false
                         }
                       },
                       "kind": "functionArgument",

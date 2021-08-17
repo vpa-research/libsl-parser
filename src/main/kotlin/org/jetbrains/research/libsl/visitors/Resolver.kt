@@ -212,7 +212,8 @@ class Resolver(
                 context
             )
         } else {
-            RealType(
+            return context.resolveType(name.joinToString("."))
+                ?: RealType(
                 name,
                 isPointer,
                 generic,
@@ -296,6 +297,7 @@ class Resolver(
         val parser = LibSLParser(tokenStream)
 
         val newContext = LslContext()
+        newContext.init()
         context.import(newContext)
         val resolver = Resolver(newContext, basePath)
         val fileCtx = parser.file()

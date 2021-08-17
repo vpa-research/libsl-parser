@@ -1,9 +1,7 @@
 libsl "1.0.0";
 library simple;
 
-types {
-   Int(int);
-}
+typealias Int=int32;
 
 automaton A : Int {
    fun f(@annotation param: Int);

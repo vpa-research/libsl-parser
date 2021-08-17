@@ -28,28 +28,44 @@ data class MetaNode(
         }
 }
 
-sealed class Type {
-    abstract val name: String
-    abstract val isPointer: Boolean
-    abstract val context: LslContext
-    abstract val generic: Type?
+interface Type {
+    val name: String
+    val isPointer: Boolean
+    val context: LslContext
+    val generic: Type?
 
-    open val fullName: String
+    val fullName: String
         get() = "${if (isPointer) "*" else ""}$name"
 
     val isArray: Boolean
         get() = (this as? TypeAlias)?.originalType?.isArray == true || this is ArrayType
 
+    fun resolveFieldType(name: String): Type? {
+        return when (this) {
+            is EnumLikeSemanticType -> {
+                this.entries.firstOrNull { it.first == name } ?: return null
+                this.childrenType
+            }
+            is EnumType -> {
+                this.entries.firstOrNull { it.first == name } ?: return null
+                this.childrenType
+            }
+            is StructuredType -> {
+                this.entries.firstOrNull { it.first == name }?.second
+            }
+            else -> null
+        }
+    }
 }
 
-sealed class LibslType : Type()
+sealed class LibslType : Type
 
 data class RealType (
     val nameParts: List<String>,
     override val isPointer: Boolean,
     override val generic: Type?,
     override val context: LslContext
-) : Type() {
+) : Type {
     override val name: String
         get() = nameParts.joinToString(".")
 
@@ -82,6 +98,16 @@ data class EnumLikeSemanticType(
 ) : LibslType() {
     override val isPointer: Boolean = false
     override val generic: Type? = null
+
+    val childrenType: Type = ChildrenType(name, context)
+}
+
+class ChildrenType(
+    override val name: String,
+    override val context: LslContext,
+) : Type {
+    override val generic: Type? = null
+    override val isPointer: Boolean = false
 }
 
 data class StructuredType(
@@ -101,6 +127,8 @@ data class EnumType(
 ) : LibslType() {
     override val isPointer: Boolean = false
     override val generic: Type? = null
+
+    val childrenType: Type = ChildrenType(name, context)
 }
 
 data class ArrayType(
@@ -292,6 +320,8 @@ sealed class QualifiedAccess : Atomic() {
 
     override fun toString(): String = (childAccess?.toString() ?: "") + ":${type.fullName}"
 
+    override val value: Any? = null
+
     val lastChild: QualifiedAccess
         get() = childAccess?.lastChild ?: childAccess ?: this
 }
@@ -339,24 +369,6 @@ data class AutomatonGetter(
     override fun toString(): String = "${automaton.name}(${arg.name}).${childAccess.toString()}"
 }
 
-sealed class Atomic : Expression()
-
-data class IntegerNumber(
-    val value: Int
-) : Atomic()
-
-data class FloatNumber(
-    val value: Float
-) : Atomic()
-
-data class StringValue(
-    val value: String
-) : Atomic()
-
-data class Bool(
-    val value: Boolean
-) : Atomic()
-
 data class OldValue(
     val value: QualifiedAccess
 ) : Expression()
@@ -365,7 +377,9 @@ data class CallAutomatonConstructor(
     val automaton: Automaton,
     val args: List<ArgumentWithValue>,
     val state: State
-) : Atomic()
+) : Atomic() {
+    override val value: Any? = null
+}
 
 data class ArgumentWithValue(
     val variable: Variable,

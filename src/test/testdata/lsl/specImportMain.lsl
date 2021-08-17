@@ -3,6 +3,8 @@ library simple;
 
 import 'specImportSecondary';
 
+typealias Int=int64;
+
 automaton A : Int {
    var i: Int;
 

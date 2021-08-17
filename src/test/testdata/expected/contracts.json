@@ -6,10 +6,9 @@
       "name": "Int",
       "isPointer": false,
       "kind": "simple",
-      "realType": {
-        "name": "int",
-        "isPointer": false,
-        "kind": "real"
+      "originalType": {
+        "name": "int32",
+        "isPointer": false
       }
     }
   ],
@@ -57,10 +56,9 @@
                         "name": "Int",
                         "isPointer": false,
                         "kind": "simple",
-                        "realType": {
-                          "name": "int",
-                          "isPointer": false,
-                          "kind": "real"
+                        "originalType": {
+                          "name": "int32",
+                          "isPointer": false
                         }
                       },
                       "kind": "functionArgument",
@@ -84,10 +82,9 @@
                         "name": "Int",
                         "isPointer": false,
                         "kind": "simple",
-                        "realType": {
-                          "name": "int",
-                          "isPointer": false,
-                          "kind": "real"
+                        "originalType": {
+                          "name": "int32",
+                          "isPointer": false
                         }
                       },
                       "kind": "automatonVariable",
@@ -120,10 +117,9 @@
                             "name": "Int",
                             "isPointer": false,
                             "kind": "simple",
-                            "realType": {
-                              "name": "int",
-                              "isPointer": false,
-                              "kind": "real"
+                            "originalType": {
+                              "name": "int32",
+                              "isPointer": false
                             }
                           },
                           "kind": "functionArgument",
@@ -148,10 +144,9 @@
                           "name": "Int",
                           "isPointer": false,
                           "kind": "simple",
-                          "realType": {
-                            "name": "int",
-                            "isPointer": false,
-                            "kind": "real"
+                          "originalType": {
+                            "name": "int32",
+                            "isPointer": false
                           }
                         },
                         "kind": "functionArgument",
@@ -179,10 +174,9 @@
                           "name": "Int",
                           "isPointer": false,
                           "kind": "simple",
-                          "realType": {
-                            "name": "int",
-                            "isPointer": false,
-                            "kind": "real"
+                          "originalType": {
+                            "name": "int32",
+                            "isPointer": false
                           }
                         },
                         "kind": "result"
