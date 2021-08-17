@@ -157,8 +157,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
             val annotation = arg.annotation()?.let { anno ->
-                Annotation(anno.Identifier().text, anno.valuesAndIdentifiersList()?.expressionAtomic()?.map { atomic ->
-                    visitExpressionAtomic(atomic)
+                Annotation(anno.Identifier().text, anno.valuesAndIdentifiersList()?.expression()?.map { atomic ->
+                    visitExpression(atomic)
                 }.orEmpty())
             }
 
@@ -198,8 +198,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                     val actionName = action.Identifier().text
                     val actionArgs = action
                         .valuesAndIdentifiersList()
-                        ?.expressionAtomic()
-                        ?.map { visitExpressionAtomic(it) }
+                        ?.expression()
+                        ?.map { visitExpression(it) }
                         .orEmpty()
 
                     Action(
@@ -456,8 +456,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
             val annotation = arg.annotation()?.let { anno ->
-                Annotation(anno.Identifier().text, anno.valuesAndIdentifiersList().expressionAtomic().map { atomic ->
-                    visitExpressionAtomic(atomic)
+                Annotation(anno.Identifier().text, anno.valuesAndIdentifiersList().expression().map { atomic ->
+                    visitExpression(atomic)
                 })
             }
             FunctionArgument(argName, argType, annotation)

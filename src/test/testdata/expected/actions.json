@@ -77,6 +77,18 @@
                     },
                     "type": "Int"
                   }
+                },
+                {
+                  "kind": "binary",
+                  "op": "ADD",
+                  "left": {
+                    "kind": "integer",
+                    "value": 1
+                  },
+                  "right": {
+                    "kind": "integer",
+                    "value": 123
+                  }
                 }
               ]
             },

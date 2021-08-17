@@ -225,7 +225,7 @@ action
    ;
 
 valuesAndIdentifiersList
-   :   expressionAtomic (',' expressionAtomic)*
+   :   expression (',' expression)*
    ;
 
 requiresContract

@@ -273,7 +273,7 @@ data class ResultVariable(
 
 data class Annotation(
     val name: String,
-    val values: List<Atomic>
+    val values: List<Expression>
 )
 
 data class ConstructorArgument(
