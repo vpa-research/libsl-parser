@@ -385,3 +385,23 @@ data class ArgumentWithValue(
     val variable: Variable,
     val init: Expression
 )
+
+sealed class Atomic : Expression() {
+    abstract val value: Any?
+}
+
+data class IntegerNumber(
+    override val value: Int
+) : Atomic()
+
+data class FloatNumber(
+    override val value: Float
+) : Atomic()
+
+data class StringValue(
+    override val value: String
+) : Atomic()
+
+data class Bool(
+    override val value: Boolean
+) : Atomic()

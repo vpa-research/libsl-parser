@@ -61,23 +61,3 @@ data class StringType(
     override val generic: Type? = null
     override val name: String = "string"
 }
-
-sealed class Atomic : Expression() {
-    abstract val value: Any?
-}
-
-data class IntegerNumber(
-    override val value: Int
-) : Atomic()
-
-data class FloatNumber(
-    override val value: Float
-) : Atomic()
-
-data class StringValue(
-    override val value: String
-) : Atomic()
-
-data class Bool(
-    override val value: Boolean
-) : Atomic()
