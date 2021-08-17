@@ -185,8 +185,8 @@ class Resolver(
                     Bool(false)
                 }
             }
-            primitiveLiteralContext.QuotedString() != null -> {
-                val literal = primitiveLiteralContext.QuotedString().text.removeQuotes()
+            primitiveLiteralContext.DoubleQuotedString() != null -> {
+                val literal = primitiveLiteralContext.DoubleQuotedString().text.removeDoubleQuotes()
                 StringValue(literal)
             }
             primitiveLiteralContext.floatNumber() != null -> {
@@ -281,7 +281,7 @@ class Resolver(
     }
 
     override fun visitImportStatement(ctx: LibSLParser.ImportStatementContext) {
-        // todo: forbid for recursive imports
+        // todo: forbid a recursive imports
         val importString = ctx.importString.text.removeQuotes()
         val filePath = "$basePath/$importString.lsl"
         val file = File(filePath)

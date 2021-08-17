@@ -26,7 +26,8 @@ fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, Strin
     }
 }
 
-fun String.removeQuotes(): String = removeSurrounding("\"", "\"")
+fun String.removeDoubleQuotes(): String = removeSurrounding("\"", "\"")
+fun String.removeQuotes(): String = removeSurrounding("'", "'")
 
 inline fun <reified T> ParserRuleContext.getChild(): T? {
     return children.firstOrNull { it is T } as T?

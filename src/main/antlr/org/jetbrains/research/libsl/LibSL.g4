@@ -26,11 +26,11 @@ globalStatement
  * 'version', 'language' and 'url'
  */
 header:
-   ('libsl' lslver=QuotedString ';')
+   ('libsl' lslver=DoubleQuotedString ';')
    ('library' libraryName=Identifier)
-   ('version' ver = QuotedString)?
-   ('language' lang=QuotedString)?
-   ('url' link=QuotedString)?
+   ('version' ver = DoubleQuotedString)?
+   ('language' lang=DoubleQuotedString)?
+   ('url' link=DoubleQuotedString)?
    ';';
 
 importStatement
@@ -258,7 +258,7 @@ expressionAtomic
 primitiveLiteral
    :   integerNumber
    |   floatNumber
-   |   QuotedString
+   |   DoubleQuotedString
    |   bool=('true' | 'false')
    ;
 
@@ -287,8 +287,12 @@ identifierList
    :   Identifier (',' Identifier)*
    ;
 
-QuotedString
+DoubleQuotedString
    :   '"' .*? '"'
+   ;
+
+QuotedString
+   :   '\'' .*? '\''
    ;
 
 periodSeparatedFullName

@@ -19,8 +19,12 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val url = header?.link?.text?.removeSurrounding("\"", "\"")
 
         val meta = MetaNode(libraryName, libraryVersion, language, url, lslVersion)
-        val imports = ctx.getChildren<LibSLParser.ImportStatementContext>().map { it.importString.text.removeSurrounding("\"", "\"") }.toList()
-        val includes = ctx.getChildren<LibSLParser.IncludeStatementContext>().map { it.includeString.text.removeSurrounding("\"", "\"") }.toList()
+        val imports = ctx.getChildren<LibSLParser.ImportStatementContext>().map {
+            it.importString.text.removeQuotes()
+        }.toList()
+        val includes = ctx.getChildren<LibSLParser.IncludeStatementContext>().map {
+            it.includeString.text.removeQuotes()
+        }.toList()
 
         val automata = ctx.globalStatement()
             .mapNotNull { it.declaration()?.automatonDecl() }
@@ -290,7 +294,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     override fun visitExpressionAtomic(ctx: LibSLParser.ExpressionAtomicContext): Atomic = when {
         ctx.primitiveLiteral()?.integerNumber() != null -> IntegerNumber(ctx.primitiveLiteral().integerNumber().text.toInt())
         ctx.primitiveLiteral()?.floatNumber() != null -> FloatNumber(ctx.primitiveLiteral().floatNumber().text.toFloat())
-        ctx.primitiveLiteral()?.QuotedString() != null -> StringValue(ctx.primitiveLiteral().QuotedString().text.removeQuotes())
+        ctx.primitiveLiteral()?.DoubleQuotedString() != null -> StringValue(ctx.primitiveLiteral().DoubleQuotedString().text.removeDoubleQuotes())
         ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
         else -> error("unknown atomic type")
     }
