@@ -46,3 +46,7 @@ inline fun <reified T> RuleContext.getParentOfType(): T? {
 
     return null
 }
+
+fun parseStringTokenStringSemicolon(str: String, prefix: String): String {
+    return str.removeSurrounding(prefix, ";").filter { !it.isWhitespace() }
+}

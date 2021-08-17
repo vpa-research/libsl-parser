@@ -12,8 +12,8 @@ file
    ;
 
 globalStatement
-   :   importStatement
-   |   includeStatement
+   :   ImportStatement
+   |   IncludeStatement
    |   typesSection
    |   typealiasStatement
    |   typeDefBlock
@@ -33,12 +33,16 @@ header:
    ('url' link=DoubleQuotedString)?
    ';';
 
-importStatement
-   :   'import' importString=QuotedString ';'
+LslVersion
+   :   'libsl' Digit+ '.' Digit+ '.' Digit+ ';'
    ;
 
-includeStatement
-   :   'include' includeString=QuotedString ';'
+ImportStatement
+   :   'import' .*? ';'
+   ;
+
+IncludeStatement
+   :   'include' .*? ';'
    ;
 
 /* typealias statement

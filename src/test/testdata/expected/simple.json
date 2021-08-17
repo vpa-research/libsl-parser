@@ -4,6 +4,9 @@
   "lang": "java",
   "library-version": "1.0.0f",
   "url": "https://github.com/vldf/",
+  "includes": [
+    "file.to.include"
+  ],
   "types": [
     {
       "name": "SimpleType",

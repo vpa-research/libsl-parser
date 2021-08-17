@@ -19,11 +19,11 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val url = header?.link?.text?.removeSurrounding("\"", "\"")
 
         val meta = MetaNode(libraryName, libraryVersion, language, url, lslVersion)
-        val imports = ctx.getChildren<LibSLParser.ImportStatementContext>().map {
-            it.importString.text.removeQuotes()
+        val imports = ctx.globalStatement().mapNotNull { it.ImportStatement() }.map {
+            parseStringTokenStringSemicolon(it.text, "import")
         }.toList()
-        val includes = ctx.getChildren<LibSLParser.IncludeStatementContext>().map {
-            it.includeString.text.removeQuotes()
+        val includes = ctx.globalStatement().mapNotNull { it.IncludeStatement() }.map {
+            parseStringTokenStringSemicolon(it.text, "include")
         }.toList()
 
         val automata = ctx.globalStatement()

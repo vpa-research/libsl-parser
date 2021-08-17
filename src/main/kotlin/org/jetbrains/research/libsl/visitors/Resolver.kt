@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.visitors
 
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.tree.TerminalNode
 import org.jetbrains.research.libsl.LibSLBaseVisitor
 import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
@@ -16,7 +17,7 @@ class Resolver(
     private val asgBuilderVisitor = ASGBuilder(context)
 
     override fun visitFile(ctx: LibSLParser.FileContext) {
-        ctx.globalStatement().mapNotNull { it.importStatement() }.forEach { visitImportStatement(it) }
+        ctx.globalStatement().mapNotNull { it.ImportStatement() }.forEach { processImportStatement(it) }
 
         val typeSections = ctx.globalStatement().mapNotNull { it.typesSection() }
         if (typeSections.size > 1) {
@@ -281,9 +282,9 @@ class Resolver(
             ))
     }
 
-    override fun visitImportStatement(ctx: LibSLParser.ImportStatementContext) {
+    private fun processImportStatement(terminal: TerminalNode) {
         // todo: forbid a recursive imports
-        val importString = ctx.importString.text.removeQuotes()
+        val importString = parseStringTokenStringSemicolon(terminal.text, "import")
         val filePath = "$basePath/$importString.lsl"
         val file = File(filePath)
 

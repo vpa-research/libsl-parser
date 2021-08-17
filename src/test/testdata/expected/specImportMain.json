@@ -1,6 +1,9 @@
 {
   "name": "simple",
   "lslVersion": "1.0.0",
+  "imports": [
+    "specImportSecondary"
+  ],
   "types": [
     {
       "name": "Int",
