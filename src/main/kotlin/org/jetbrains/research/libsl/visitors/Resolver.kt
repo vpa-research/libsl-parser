@@ -261,6 +261,10 @@ class Resolver(
         context.storeResolvedFunction(func)
 
         args.forEach { it.function = func }
+        if (returnType != null) {
+            val result = ResultVariable(returnType)
+            func.resultVariable = result
+        }
     }
 
     override fun visitEnumBlock(ctx: LibSLParser.EnumBlockContext) {

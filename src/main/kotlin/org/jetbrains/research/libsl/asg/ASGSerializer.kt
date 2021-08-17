@@ -148,6 +148,10 @@ val variableSerializer = JsonSerializer<Variable> { src, _, context ->
             is GlobalVariableDeclaration -> {
                 addProperty("kind", "global")
             }
+            is ResultVariable -> {
+                addProperty("kind", "result")
+                addProperty("name", "result")
+            }
         }
     }
 }

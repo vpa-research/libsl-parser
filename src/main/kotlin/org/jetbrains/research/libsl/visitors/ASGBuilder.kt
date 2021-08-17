@@ -482,8 +482,14 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val res = when (ctx) {
             is LibSLParser.FunctionDeclContext -> {
                 val func = resolveFunctionByCtx(ctx)!!
-                func.args.firstOrNull { it.name == variableName }
-                    ?: func.automaton.variables.firstOrNull { it.name == variableName }
+                if (variableName == "result") {
+                    func.resultVariable
+                } else {
+                    func.args.firstOrNull { it.name == variableName }
+                        ?: func.automaton.variables.firstOrNull {
+                            it.name == variableName
+                        }
+                }
             }
             is LibSLParser.AutomatonDeclContext -> {
                 val automatonName = ctx.name.text

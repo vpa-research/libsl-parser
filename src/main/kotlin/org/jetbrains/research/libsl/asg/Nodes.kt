@@ -163,6 +163,7 @@ data class Function(
     val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
     val qualifiedName: String by lazy { "${automaton.name}.$name" }
     lateinit var target: Automaton
+    var resultVariable: Variable? = null
 }
 
 sealed class Statement: Node()
@@ -262,6 +263,12 @@ data class FunctionArgument(
 
     override val fullName: String
         get() = "${function.name}.$name"
+}
+
+data class ResultVariable(
+    override val type: Type
+) : Variable() {
+    override val name: String = "result"
 }
 
 data class Annotation(
