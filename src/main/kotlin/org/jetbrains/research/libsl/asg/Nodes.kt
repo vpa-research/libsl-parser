@@ -158,7 +158,9 @@ data class State(
     val kind: StateKind,
     val isSelf: Boolean = false,
     val isAny: Boolean = false,
-) : Node()
+) : Node() {
+    lateinit var automaton: Automaton
+}
 
 data class Shift(
     val from: State,

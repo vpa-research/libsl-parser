@@ -82,6 +82,7 @@ class Resolver(
             context.storeResolvedAutomaton(automaton)
             variables.forEach { it.automaton = automaton }
             constructorVariables.forEach { it.automaton = automaton }
+            states.forEach { it.automaton = automaton }
         }
 
         ctx.globalStatement().mapNotNull { it.declaration()?.variableDeclaration() }.map { variableDecl ->
