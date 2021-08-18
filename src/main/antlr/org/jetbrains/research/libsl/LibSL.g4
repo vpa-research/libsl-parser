@@ -33,10 +33,6 @@ header:
    ('url' link=DoubleQuotedString)?
    ';';
 
-LslVersion
-   :   'libsl' Digit+ '.' Digit+ '.' Digit+ ';'
-   ;
-
 ImportStatement
    :   'import' .*? ';'
    ;
