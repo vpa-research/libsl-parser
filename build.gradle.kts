@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.5.10"
     antlr
     kotlin("plugin.serialization") version "1.5.10"
+    `maven-publish`
 }
 
 group = "com.jetbrains.research"
@@ -32,4 +33,22 @@ tasks.withType<KotlinCompile>() {
 tasks.generateGrammarSource {
     maxHeapSize = "64m"
     arguments = arguments + listOf("-visitor", "-no-listener", "-long-messages", "-package", "org.jetbrains.research.libsl")
+}
+
+val sourcesJar by tasks.creating(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.getByName("main").allSource)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.jetbrains.research"
+            artifactId = "libsl"
+            version = "1.0"
+
+            from(components["java"])
+            artifact(sourcesJar)
+        }
+    }
 }
