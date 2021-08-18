@@ -14,7 +14,7 @@ dependencies {
     implementation 'com.github.vorpal-research:libsl:Tag'
 }
 ```
-### kotlin scripts gradle
+### kotlin script gradle
 ```
 repositories {
     ...
