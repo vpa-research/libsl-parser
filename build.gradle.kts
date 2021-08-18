@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.5.10"
     antlr
     kotlin("plugin.serialization") version "1.5.10"
+    `maven-publish`
 }
 
 group = "com.jetbrains.research"
