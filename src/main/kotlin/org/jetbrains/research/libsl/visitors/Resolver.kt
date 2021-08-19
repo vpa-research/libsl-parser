@@ -254,9 +254,10 @@ class Resolver(
         val returnType = if (typeName != null) context.resolveType(typeName)
             ?: error("unresolved type: $typeName") else null
 
+        var argumentIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
-            FunctionArgument(arg.name.text, argType, null)
+            FunctionArgument(arg.name.text, argType, ++argumentIndex,null)
         }?.toList().orEmpty()
 
         val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)

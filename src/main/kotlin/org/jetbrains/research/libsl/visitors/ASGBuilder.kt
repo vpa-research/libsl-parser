@@ -157,6 +157,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext): Function {
         val (ownerAutomatonName, functionName) = parseFunctionName(ctx)
+        var argIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
@@ -166,7 +167,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 }.orEmpty())
             }
 
-            FunctionArgument(argName, argType, annotation)
+            FunctionArgument(argName, argType, ++argIndex, annotation)
         }.orEmpty()
         val typeName = ctx.functionType?.text
         val type = if (typeName != null) context.resolveType(typeName) ?: error("unresolved type: $typeName") else null
@@ -430,6 +431,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     private fun resolveFunctionByCtx(ctx: LibSLParser.FunctionDeclContext): Function? {
+        var argumentIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argName = arg.name.text
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
@@ -438,7 +440,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                     visitExpression(atomic)
                 })
             }
-            FunctionArgument(argName, argType, annotation)
+            FunctionArgument(argName, argType, ++argumentIndex, annotation)
         }.orEmpty()
 
         return if (ctx.name.Identifier().size > 1) {
