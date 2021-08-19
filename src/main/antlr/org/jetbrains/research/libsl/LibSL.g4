@@ -110,7 +110,7 @@ declaration
  * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   'automaton' name=Identifier ('(' 'var' nameWithType (',' 'var' nameWithType)* ')')? ':' type=Identifier '{' automatonStatement* '}'
+   :   'automaton' name=periodSeparatedFullName ('(' 'var' nameWithType (',' 'var' nameWithType)* ')')? ':' type=Identifier '{' automatonStatement* '}'
    ;
 
 automatonStatement
@@ -184,7 +184,7 @@ argPair
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   'fun' name=periodSeparatedFullName '(' functionDeclArgList? ')' (':' functionType=Identifier)? (';' | functionPreamble '{' functionBody '}')
+   :   'fun' name=periodSeparatedFullName '(' functionDeclArgList? ')' (':' functionType=Identifier)? (';' | functionPreamble ('{' functionBody '}')?)
    ;
 
 functionDeclArgList
