@@ -28,7 +28,7 @@ data class MetaNode(
         }
 }
 
-interface Type {
+sealed interface Type {
     val name: String
     val isPointer: Boolean
     val context: LslContext
@@ -393,18 +393,18 @@ sealed class Atomic : Expression() {
     abstract val value: Any?
 }
 
-data class IntegerNumber(
+data class IntegerLiteral(
     override val value: Int
 ) : Atomic()
 
-data class FloatNumber(
+data class FloatLiteral(
     override val value: Float
 ) : Atomic()
 
-data class StringValue(
+data class StringLiteral(
     override val value: String
 ) : Atomic()
 
-data class Bool(
+data class BoolLiteral(
     override val value: Boolean
 ) : Atomic()

@@ -97,7 +97,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val fromState = if (fromName == "any") {
             State("any", StateKind.SIMPLE, isAny = true)
         } else {
-            states.firstOrNull { it.name == fromName } ?: error("unknown state")
+            states.firstOrNull { it.name == fromName } ?: error("unknown state $fromName")
         }
 
         val toState = if (toName == "self") {
@@ -167,7 +167,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 }.orEmpty())
             }
 
-            FunctionArgument(argName, argType, ++argIndex, annotation)
+            FunctionArgument(argName, argType, argIndex++, annotation)
         }.orEmpty()
         val typeName = ctx.functionType?.text
         val type = if (typeName != null) context.resolveType(typeName) ?: error("unresolved type: $typeName") else null
@@ -293,9 +293,10 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitExpressionAtomic(ctx: LibSLParser.ExpressionAtomicContext): Atomic = when {
-        ctx.primitiveLiteral()?.integerNumber() != null -> IntegerNumber(ctx.primitiveLiteral().integerNumber().text.toInt())
-        ctx.primitiveLiteral()?.floatNumber() != null -> FloatNumber(ctx.primitiveLiteral().floatNumber().text.toFloat())
-        ctx.primitiveLiteral()?.DoubleQuotedString() != null -> StringValue(ctx.primitiveLiteral().DoubleQuotedString().text.removeDoubleQuotes())
+        ctx.primitiveLiteral()?.integerNumber() != null -> IntegerLiteral(ctx.primitiveLiteral().integerNumber().text.toInt())
+        ctx.primitiveLiteral()?.floatNumber() != null -> FloatLiteral(ctx.primitiveLiteral().floatNumber().text.toFloat())
+        ctx.primitiveLiteral()?.DoubleQuotedString() != null -> StringLiteral(ctx.primitiveLiteral().DoubleQuotedString().text.removeDoubleQuotes())
+        ctx.primitiveLiteral()?.bool != null -> BoolLiteral(ctx.primitiveLiteral()!!.bool!!.text.toBoolean())
         ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
         else -> error("unknown atomic type")
     }
@@ -440,7 +441,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                     visitExpression(atomic)
                 })
             }
-            FunctionArgument(argName, argType, ++argumentIndex, annotation)
+            FunctionArgument(argName, argType, argumentIndex++, annotation)
         }.orEmpty()
 
         return if (ctx.name.Identifier().size > 1) {

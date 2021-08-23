@@ -291,10 +291,6 @@ DoubleQuotedString
    :   '"' .*? '"'
    ;
 
-QuotedString
-   :   '\'' .*? '\''
-   ;
-
 periodSeparatedFullName
    :   Identifier
    |   Identifier ('.' Identifier)*

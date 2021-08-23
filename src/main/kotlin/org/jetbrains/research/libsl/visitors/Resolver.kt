@@ -7,7 +7,7 @@ import org.jetbrains.research.libsl.LibSLBaseVisitor
 import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
-import org.jetbrains.research.libsl.asg.Bool
+import org.jetbrains.research.libsl.asg.BoolLiteral
 import java.io.File
 
 class Resolver(
@@ -40,7 +40,7 @@ class Resolver(
             val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDeclaration() }.map { variable ->
                 val variableName = variable.nameWithType().name.text
                 val variableTypeName = variable.nameWithType().type.text
-                val variableType = context.resolveType(variableTypeName) ?: error("unresolved type")
+                val variableType = context.resolveType(variableTypeName) ?: error("unresolved type $variableTypeName")
 
                 AutomatonVariableDeclaration(
                     variableName,
@@ -182,20 +182,20 @@ class Resolver(
         return when {
             primitiveLiteralContext.bool != null -> {
                 if (primitiveLiteralContext.bool.text == "true") {
-                    Bool(true)
+                    BoolLiteral(true)
                 } else {
-                    Bool(false)
+                    BoolLiteral(false)
                 }
             }
             primitiveLiteralContext.DoubleQuotedString() != null -> {
                 val literal = primitiveLiteralContext.DoubleQuotedString().text.removeDoubleQuotes()
-                StringValue(literal)
+                StringLiteral(literal)
             }
             primitiveLiteralContext.floatNumber() != null -> {
-                FloatNumber(primitiveLiteralContext.floatNumber().text.toFloat())
+                FloatLiteral(primitiveLiteralContext.floatNumber().text.toFloat())
             }
             primitiveLiteralContext.integerNumber() != null -> {
-                IntegerNumber(primitiveLiteralContext.integerNumber().text.toInt())
+                IntegerLiteral(primitiveLiteralContext.integerNumber().text.toInt())
             }
             else -> error("unknown primitive literal type")
         }
@@ -257,7 +257,7 @@ class Resolver(
         var argumentIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
-            FunctionArgument(arg.name.text, argType, ++argumentIndex,null)
+            FunctionArgument(arg.name.text, argType, argumentIndex++,null)
         }?.toList().orEmpty()
 
         val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)
@@ -274,7 +274,7 @@ class Resolver(
     override fun visitEnumBlock(ctx: LibSLParser.EnumBlockContext) {
         val semanticType = ctx.typeIdentifier().text
         val body = ctx.enumBlockStatement().map { statement ->
-            statement.Identifier().text to IntegerNumber(statement.integerNumber().text.toInt())
+            statement.Identifier().text to IntegerLiteral(statement.integerNumber().text.toInt())
         }
         context.storeResolvedType(
             EnumType(

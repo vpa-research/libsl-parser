@@ -45,7 +45,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.jetbrains.research"
             artifactId = "libsl"
-            version = "1.0"
+            version = "1.0.0"
 
             from(components["java"])
             artifact(sourcesJar)

@@ -263,15 +263,15 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
                 add("left", context.serialize(src.left, Expression::class.java))
                 add("right", context.serialize(src.right, Expression::class.java))
             }
-            is FloatNumber ->  {
+            is FloatLiteral ->  {
                 addProperty("kind", "float")
                 addProperty("value", src.value)
             }
-            is IntegerNumber -> {
+            is IntegerLiteral -> {
                 addProperty("kind", "integer")
                 addProperty("value", src.value)
             }
-            is StringValue -> {
+            is StringLiteral -> {
                 addProperty("kind", "string")
                 addProperty("value", src.value)
             }
@@ -308,7 +308,7 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
                     }
                 })
             }
-            is Bool -> {
+            is BoolLiteral -> {
                 addProperty("kind", "bool")
                 addProperty("value", src.value)
             }
