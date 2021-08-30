@@ -281,6 +281,7 @@ typeIdentifier
 
 Identifier
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
+   |   '`' .*? '`'
    ;
 
 identifierList
@@ -294,6 +295,7 @@ DoubleQuotedString
 periodSeparatedFullName
    :   Identifier
    |   Identifier ('.' Identifier)*
+   |   '`' Identifier ('.' Identifier)* '`'
    ;
 
 

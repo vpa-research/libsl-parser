@@ -2,6 +2,8 @@ package org.jetbrains.research.libsl.visitors
 
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.RuleContext
+import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.tree.TerminalNode
 import org.jetbrains.research.libsl.LibSLParser
 
 fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, String> {
@@ -28,6 +30,12 @@ fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, Strin
 
 fun String.removeDoubleQuotes(): String = removeSurrounding("\"", "\"")
 fun String.removeQuotes(): String = removeSurrounding("'", "'")
+
+fun TerminalNode.processIdentifier(): String = this.text.removeSurrounding("`", "`")
+fun Token.processIdentifier(): String = this.text.removeSurrounding("`", "`")
+
+fun LibSLParser.PeriodSeparatedFullNameContext.processIdentifier(): String =
+    Identifier().joinToString(separator = ".") { it.processIdentifier() }
 
 inline fun <reified T> ParserRuleContext.getChild(): T? {
     return children.firstOrNull { it is T } as T?

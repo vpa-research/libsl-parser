@@ -63,14 +63,14 @@ class Resolver(
             val states = automatonCtx.automatonStatement()?.filter { it.automatonStateDecl() != null }?.flatMap { statesCtx ->
                 statesCtx.automatonStateDecl().identifierList().Identifier().map { stateCtx ->
                     val keyword = statesCtx.start.text
-                    val stateName = stateCtx.text
+                    val stateName = stateCtx.processIdentifier()
                     val stateKind = StateKind.fromString(keyword)
                     State(stateName, stateKind)
                 }
             }.orEmpty()
 
             val automaton = Automaton(
-                automatonCtx.name.text,
+                automatonCtx.name.processIdentifier(),
                 type,
                 states,
                 listOf(),
@@ -130,7 +130,7 @@ class Resolver(
                     val resolvedRealType = context.resolveType(realName.text)
                         ?: processRealTypeIdentifier(realName)
                     val body = blockType.blockTypeStatement().map { statement ->
-                        statement.Identifier().text to resolvePrimitiveLiteral(statement.expressionAtomic().primitiveLiteral())
+                        statement.Identifier().processIdentifier() to resolvePrimitiveLiteral(statement.expressionAtomic().primitiveLiteral())
                     }
                     // val genericTypeCtx = blockType.typeIdentifier().generic
                     // todo? val genericType = genericTypeCtx?.let { processRealTypeIdentifier(it) }
@@ -155,7 +155,7 @@ class Resolver(
     }
 
     override fun visitTypeDefBlock(ctx: LibSLParser.TypeDefBlockContext) {
-        val name = ctx.name.name.text
+        val name = ctx.name.name.processIdentifier()
         val typeIdentifier = ctx.typeIdentifier()
         val resolvedRealType = context.resolveType(typeIdentifier.text)
             ?: processRealTypeIdentifier(typeIdentifier)
@@ -225,7 +225,7 @@ class Resolver(
     }
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
-        val name = ctx.name.text
+        val name = ctx.name.processIdentifier()
         val automaton = context.resolveAutomaton(name) ?: error("")
 
         ctx.automatonStatement()
@@ -257,7 +257,7 @@ class Resolver(
         var argumentIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
             val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
-            FunctionArgument(arg.name.text, argType, argumentIndex++,null)
+            FunctionArgument(arg.name.processIdentifier(), argType, argumentIndex++,null)
         }?.toList().orEmpty()
 
         val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)
@@ -274,7 +274,7 @@ class Resolver(
     override fun visitEnumBlock(ctx: LibSLParser.EnumBlockContext) {
         val semanticType = ctx.typeIdentifier().text
         val body = ctx.enumBlockStatement().map { statement ->
-            statement.Identifier().text to IntegerLiteral(statement.integerNumber().text.toInt())
+            statement.Identifier().processIdentifier() to IntegerLiteral(statement.integerNumber().text.toInt())
         }
         context.storeResolvedType(
             EnumType(
