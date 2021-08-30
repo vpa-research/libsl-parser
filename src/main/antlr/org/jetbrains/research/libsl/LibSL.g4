@@ -167,7 +167,7 @@ assignmentRight
    ;
 
 callAutomatonConstructorWithNamedArgs
-   :   name=Identifier '(' (namedArgs)? ')'
+   :   name=periodSeparatedFullName '(' (namedArgs)? ')'
    ;
 
 namedArgs

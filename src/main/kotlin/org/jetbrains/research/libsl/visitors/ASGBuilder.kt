@@ -9,21 +9,21 @@ import org.jetbrains.research.libsl.asg.Function
 class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     override fun visitFile(ctx: LibSLParser.FileContext): Library {
         val header = ctx.header()
-        val libraryName = header.libraryName?.text ?: error("no library name specified")
-        val language = header.lang?.text?.removeSurrounding("\"", "\"")
-        val libraryVersion = header.ver?.text?.removeSurrounding("\"", "\"")
-        val lslVersion = header.lslver?.text?.removeSurrounding("\"", "\"")?.split(".")?.let {
+        val libraryName = header.libraryName?.processIdentifier() ?: error("no library name specified")
+        val language = header.lang?.processIdentifier()?.removeSurrounding("\"", "\"")
+        val libraryVersion = header.ver?.processIdentifier()?.removeSurrounding("\"", "\"")
+        val lslVersion = header.lslver?.processIdentifier()?.removeSurrounding("\"", "\"")?.split(".")?.let {
             val parts = it.map { part -> part.toUInt() }
             Triple(parts[0], parts[1], parts[2])
         }
-        val url = header?.link?.text?.removeSurrounding("\"", "\"")
+        val url = header?.link?.processIdentifier()?.removeSurrounding("\"", "\"")
 
         val meta = MetaNode(libraryName, libraryVersion, language, url, lslVersion)
         val imports = ctx.globalStatement().mapNotNull { it.ImportStatement() }.map {
-            parseStringTokenStringSemicolon(it.text, "import")
+            parseStringTokenStringSemicolon(it.processIdentifier(), "import")
         }.toList()
         val includes = ctx.globalStatement().mapNotNull { it.IncludeStatement() }.map {
-            parseStringTokenStringSemicolon(it.text, "include")
+            parseStringTokenStringSemicolon(it.processIdentifier(), "include")
         }.toList()
 
         val automata = ctx.globalStatement()
@@ -55,20 +55,20 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext): Automaton {
-        val name = ctx.name.text
+        val name = ctx.name.processIdentifier()
         val automaton = context.resolveAutomaton(name)
         val states = automaton!!.states
         val shifts = ctx.automatonStatement()?.filter { it.automatonShiftDecl() != null }?.flatMap { shiftCtx ->
             val parsedShift = shiftCtx.automatonShiftDecl()
-            val toName = parsedShift.to?.text!!
+            val toName = parsedShift.to?.processIdentifier()!!
             if (parsedShift.identifierList() != null) {
                 parsedShift.identifierList().Identifier().map { fromIdentifier ->
-                    val fromName = fromIdentifier.text!!
+                    val fromName = fromIdentifier.processIdentifier()!!
 
                     processShift(fromName, toName, shiftCtx, states, automatonName = name)
                 }
             } else {
-                val fromName = parsedShift.from.text!!
+                val fromName = parsedShift.from.processIdentifier()!!
                 listOf(processShift(fromName, toName, shiftCtx, states, automatonName = name))
             }
         }.orEmpty()
@@ -107,9 +107,9 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         }
 
         val functions = parsedShift.functionsList()?.functionsListPart()?.map { part ->
-            val functionName = part.name.text
+            val functionName = part.name.processIdentifier()
             val functionArgs = part.Identifier().drop(1).map { type ->
-                context.resolveType(type.processIdentifier()) ?: error("unresolved type: ${type.text}")
+                context.resolveType(type.processIdentifier()) ?: error("unresolved type: ${type.processIdentifier()}")
             }
 
             context.resolveFunction(functionName, automatonName = automatonName, argsType=functionArgs)
@@ -135,11 +135,11 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitCallAutomatonConstructorWithNamedArgs(ctx: LibSLParser.CallAutomatonConstructorWithNamedArgsContext): Atomic {
-        val calleeName = ctx.name.text
+        val calleeName = ctx.name.processIdentifier()
         val calleeAutomaton = context.resolveAutomaton(calleeName) ?: error("can't resolve automaton $calleeName")
 
         val args = ctx.namedArgs()?.argPair()?.mapNotNull { pair ->
-            val name = pair.name.text
+            val name = pair.name.processIdentifier()
             if (name == "state") {
                 null
             } else {
@@ -149,7 +149,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             }
         }.orEmpty()
 
-        val stateName = ctx.namedArgs()?.argPair()?.firstOrNull { it.name.text == "state" }?.expressionAtomic()?.text
+        val stateName = ctx.namedArgs()?.argPair()?.firstOrNull { it.name.processIdentifier() == "state" }?.expressionAtomic()?.text
         val state = calleeAutomaton.states.firstOrNull { it.name == stateName } ?: error("unresolved state: $stateName")
 
         return CallAutomatonConstructor(calleeAutomaton, args, state)
@@ -159,8 +159,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val (ownerAutomatonName, functionName) = parseFunctionName(ctx)
         var argIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
-            val argName = arg.name.text
-            val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
+            val argName = arg.name.processIdentifier()
+            val argType = context.resolveType(arg.type.processIdentifier()) ?: error("unresolved type")
             val annotation = arg.annotation()?.let { anno ->
                 Annotation(anno.Identifier().processIdentifier(), anno.valuesAndIdentifiersList()?.expression()?.map { atomic ->
                     visitExpression(atomic)
@@ -169,18 +169,18 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
             FunctionArgument(argName, argType, argIndex++, annotation)
         }.orEmpty()
-        val typeName = ctx.functionType?.text
+        val typeName = ctx.functionType?.processIdentifier()
         val type = if (typeName != null) context.resolveType(typeName) ?: error("unresolved type: $typeName") else null
 
         val preamble = ctx.functionPreamble()?.preamblePart()?.map { part ->
             when {
                 part.requiresContract() != null -> {
-                    val contractName = part.requiresContract().name?.text
+                    val contractName = part.requiresContract().name?.processIdentifier()
                     val contractExpression = visitExpression(part.requiresContract().expression())
                     Contract(contractName, contractExpression, ContractKind.REQUIRES)
                 }
                 part.ensuresContract() != null -> {
-                    val contractName = part.ensuresContract().name?.text
+                    val contractName = part.ensuresContract().name?.processIdentifier()
                     val contractExpression = visitExpression(part.ensuresContract().expression())
                     Contract(contractName, contractExpression, ContractKind.ENSURES)
                 }
@@ -242,7 +242,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
     override fun visitEnsuresContract(ctx: LibSLParser.EnsuresContractContext): Contract {
         return Contract(
-            name = ctx.name?.text,
+            name = ctx.name?.processIdentifier(),
             expression = visitExpression(ctx.expression()),
             kind = ContractKind.ENSURES
         )
@@ -250,7 +250,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
 
     override fun visitRequiresContract(ctx: LibSLParser.RequiresContractContext): Contract {
         return Contract(
-            name = ctx.name?.text,
+            name = ctx.name?.processIdentifier(),
             expression = visitExpression(ctx.expression()),
             kind = ContractKind.REQUIRES
         )
@@ -275,7 +275,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             else -> {
                 val left = visitExpression(ctx.expression(0))
                 val right = visitExpression(ctx.expression(1))
-                val op = ArithmeticBinaryOps.fromString(ctx.op.text)
+                val op = ArithmeticBinaryOps.fromString(ctx.op.processIdentifier())
 
                 BinaryOpExpression(left, right, op)
             }
@@ -295,8 +295,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     override fun visitExpressionAtomic(ctx: LibSLParser.ExpressionAtomicContext): Atomic = when {
         ctx.primitiveLiteral()?.integerNumber() != null -> IntegerLiteral(ctx.primitiveLiteral().integerNumber().text.toInt())
         ctx.primitiveLiteral()?.floatNumber() != null -> FloatLiteral(ctx.primitiveLiteral().floatNumber().text.toFloat())
-        ctx.primitiveLiteral()?.DoubleQuotedString() != null -> StringLiteral(ctx.primitiveLiteral().DoubleQuotedString().text.removeDoubleQuotes())
-        ctx.primitiveLiteral()?.bool != null -> BoolLiteral(ctx.primitiveLiteral()!!.bool!!.text.toBoolean())
+        ctx.primitiveLiteral()?.DoubleQuotedString() != null -> StringLiteral(ctx.primitiveLiteral().DoubleQuotedString().processIdentifier().removeDoubleQuotes())
+        ctx.primitiveLiteral()?.bool != null -> BoolLiteral(ctx.primitiveLiteral()!!.bool!!.processIdentifier().toBoolean())
         ctx.qualifiedAccess() != null -> visitQualifiedAccess(ctx.qualifiedAccess())
         else -> error("unknown atomic type")
     }
@@ -418,11 +418,11 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 null
             }
             ctx is LibSLParser.FunctionDeclContext -> {
-                val automatonName = resolveFunctionByCtx(ctx)?.automatonName ?: error("can't resolve function: ${ctx.name.text}")
+                val automatonName = resolveFunctionByCtx(ctx)?.automatonName ?: error("can't resolve function: ${ctx.name.processIdentifier()}")
                 context.resolveAutomaton(automatonName) ?: error("can't resolve automaton: $automatonName")
             }
             ctx is LibSLParser.AutomatonDeclContext -> {
-                val name = ctx.name.text
+                val name = ctx.name.processIdentifier()
                 context.resolveAutomaton(name) ?: error("can't resolve automaton: $name")
             }
             else -> {
@@ -434,8 +434,8 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
     private fun resolveFunctionByCtx(ctx: LibSLParser.FunctionDeclContext): Function? {
         var argumentIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
-            val argName = arg.name.text
-            val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
+            val argName = arg.name.processIdentifier()
+            val argType = context.resolveType(arg.type.processIdentifier()) ?: error("unresolved type")
             val annotation = arg.annotation()?.let { anno ->
                 Annotation(anno.Identifier().processIdentifier(), anno.valuesAndIdentifiersList().expression().map { atomic ->
                     visitExpression(atomic)
@@ -447,14 +447,14 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         return if (ctx.name.Identifier().size > 1) {
             // an extension function case
             val automatonName = ctx.name.Identifier(0)?.processIdentifier()
-            val funcName = ctx.name.text.removePrefix("$automatonName.")
+            val funcName = ctx.name.processIdentifier().removePrefix("$automatonName.")
             context.resolveFunction(funcName, automatonName, args)
         } else {
             // a standalone function case
             val funcName = ctx.name.Identifier().first().processIdentifier()
             val automaton = ctx.parent?.parent as? LibSLParser.AutomatonDeclContext
                 ?: error("non-extension function $funcName not in automaton")
-            val automatonName = automaton.name.text
+            val automatonName = automaton.name.processIdentifier()
             context.resolveFunction(funcName, automatonName, args)
         }
     }
@@ -473,7 +473,7 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 }
             }
             is LibSLParser.AutomatonDeclContext -> {
-                val automatonName = ctx.name.text
+                val automatonName = ctx.name.processIdentifier()
                 val automaton = context.resolveAutomaton(automatonName)!!
                 automaton.variables.firstOrNull { it.name == variableName }
             }

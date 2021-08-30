@@ -34,11 +34,11 @@ class Resolver(
 
         val automata = ctx.globalStatement().mapNotNull { it.declaration()?.automatonDecl() }
         for (automatonCtx in automata) {
-            val typeName = automatonCtx.type.text
+            val typeName = automatonCtx.type.processIdentifier()
             val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
 
             val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDeclaration() }.map { variable ->
-                val variableName = variable.nameWithType().name.text
+                val variableName = variable.nameWithType().name.processIdentifier()
                 val variableTypeName = variable.nameWithType().type.text
                 val variableType = context.resolveType(variableTypeName) ?: error("unresolved type $variableTypeName")
 
@@ -50,7 +50,7 @@ class Resolver(
             }
 
             val constructorVariables = automatonCtx.nameWithType().map { cVar ->
-                val argName = cVar.name.text
+                val argName = cVar.name.processIdentifier()
                 val argTypeName = cVar.type.text
                 val argType = context.resolveType(argTypeName) ?: error("unresolved type $argTypeName")
 
@@ -62,7 +62,7 @@ class Resolver(
 
             val states = automatonCtx.automatonStatement()?.filter { it.automatonStateDecl() != null }?.flatMap { statesCtx ->
                 statesCtx.automatonStateDecl().identifierList().Identifier().map { stateCtx ->
-                    val keyword = statesCtx.start.text
+                    val keyword = statesCtx.start.processIdentifier()
                     val stateName = stateCtx.processIdentifier()
                     val stateKind = StateKind.fromString(keyword)
                     State(stateName, stateKind)
@@ -95,7 +95,7 @@ class Resolver(
             }
 
             val variable = GlobalVariableDeclaration(
-                nameWithType.name.text,
+                nameWithType.name.processIdentifier(),
                 type,
                 init
             )
@@ -125,7 +125,7 @@ class Resolver(
                 }
                 semanticTypeContext.blockType() != null -> {
                     val blockType = semanticTypeContext.blockType()
-                    val semanticType = blockType.semanticName.text
+                    val semanticType = blockType.semanticName.processIdentifier()
                     val realName = blockType.realName
                     val resolvedRealType = context.resolveType(realName.text)
                         ?: processRealTypeIdentifier(realName)
@@ -166,7 +166,7 @@ class Resolver(
         }
 
         val entries = ctx.typeDefBlockStatement().map { statement ->
-            statement.nameWithType().let { it.name.text to processRealTypeIdentifier(it.type) }
+            statement.nameWithType().let { it.name.processIdentifier() to processRealTypeIdentifier(it.type) }
         }
 
         context.storeResolvedType(StructuredType(
@@ -181,14 +181,14 @@ class Resolver(
     private fun resolvePrimitiveLiteral(primitiveLiteralContext: LibSLParser.PrimitiveLiteralContext): Atomic {
         return when {
             primitiveLiteralContext.bool != null -> {
-                if (primitiveLiteralContext.bool.text == "true") {
+                if (primitiveLiteralContext.bool.processIdentifier() == "true") {
                     BoolLiteral(true)
                 } else {
                     BoolLiteral(false)
                 }
             }
             primitiveLiteralContext.DoubleQuotedString() != null -> {
-                val literal = primitiveLiteralContext.DoubleQuotedString().text.removeDoubleQuotes()
+                val literal = primitiveLiteralContext.DoubleQuotedString().processIdentifier().removeDoubleQuotes()
                 StringLiteral(literal)
             }
             primitiveLiteralContext.floatNumber() != null -> {
@@ -202,7 +202,7 @@ class Resolver(
     }
 
     private fun processRealTypeIdentifier(ctx: LibSLParser.TypeIdentifierContext): Type {
-        val name = ctx.periodSeparatedFullName().Identifier().map { it.text }
+        val name = ctx.periodSeparatedFullName().Identifier().map { it.processIdentifier() }
         val generic = ctx.generic?.let { processRealTypeIdentifier(it) }
         val isPointer = ctx.asterisk != null
 
@@ -231,7 +231,7 @@ class Resolver(
         ctx.automatonStatement()
             .mapNotNull { it.variableDeclaration() }
             .forEach { decl ->
-                val variableName = decl.nameWithType().name.text
+                val variableName = decl.nameWithType().name.processIdentifier()
                 val automatonVariable = automaton.internalVariables.first { it.name == variableName }
 
                 if (decl.assignmentRight() != null) {
@@ -250,13 +250,13 @@ class Resolver(
         val (automatonName, name) = parseFunctionName(ctx)
         automatonName ?: error("automaton name not specified for function: $name")
 
-        val typeName = ctx.functionType?.text
+        val typeName = ctx.functionType?.processIdentifier()
         val returnType = if (typeName != null) context.resolveType(typeName)
             ?: error("unresolved type: $typeName") else null
 
         var argumentIndex = 0
         val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
-            val argType = context.resolveType(arg.type.text) ?: error("unresolved type")
+            val argType = context.resolveType(arg.type.processIdentifier()) ?: error("unresolved type")
             FunctionArgument(arg.name.processIdentifier(), argType, argumentIndex++,null)
         }?.toList().orEmpty()
 
@@ -286,7 +286,7 @@ class Resolver(
 
     private fun processImportStatement(terminal: TerminalNode) {
         // todo: forbid a recursive imports
-        val importString = parseStringTokenStringSemicolon(terminal.text, "import")
+        val importString = parseStringTokenStringSemicolon(terminal.processIdentifier(), "import")
         val filePath = "$basePath/$importString.lsl"
         val file = File(filePath)
 
