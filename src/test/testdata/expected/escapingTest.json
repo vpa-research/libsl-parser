@@ -5,7 +5,7 @@
     {
       "name": "Int",
       "isPointer": false,
-      "kind": "simple",
+      "kind": "alias",
       "originalType": {
         "name": "int32",
         "isPointer": false,
@@ -19,18 +19,19 @@
       "name": "A",
       "type": "Int",
       "constructorVariables": [],
-      "variables": [],
-      "states": [
+      "variables": [
         {
-          "name": "S",
-          "kind": "SIMPLE"
+          "name": "i",
+          "type": "Int"
         }
       ],
+      "states": [],
       "shifts": [],
       "functions": [
         {
           "name": "f",
           "automaton": "A",
+          "returnType": "Int",
           "target": "A",
           "args": [
             {
@@ -42,39 +43,31 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "globalInt",
+              "variable": "result",
               "value": {
-                "kind": "integer",
-                "value": 1
+                "kind": "callAutomatonConstructor",
+                "automatonName": "123",
+                "state": "Init",
+                "args": []
               }
             }
           ]
         }
       ]
-    }
-  ],
-  "variables": [
+    },
     {
-      "name": "globalInt",
-      "fullName": "globalInt",
-      "type": {
-        "name": "Int",
-        "isPointer": false,
-        "kind": "simple",
-        "originalType": {
-          "name": "int32",
-          "isPointer": false,
-          "kind": "int32",
-          "capacity": "INT32"
+      "name": "123",
+      "type": "Int",
+      "constructorVariables": [],
+      "variables": [],
+      "states": [
+        {
+          "name": "Init",
+          "kind": "INIT"
         }
-      },
-      "initValue": {
-        "kind": "callAutomatonConstructor",
-        "automatonName": "A",
-        "state": "S",
-        "args": []
-      },
-      "kind": "global"
+      ],
+      "shifts": [],
+      "functions": []
     }
   ]
 }

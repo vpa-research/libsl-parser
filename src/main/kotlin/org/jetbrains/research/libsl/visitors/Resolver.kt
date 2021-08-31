@@ -32,12 +32,12 @@ class Resolver(
             }
         }
 
-        val automata = ctx.globalStatement().mapNotNull { it.declaration()?.automatonDecl() }
+        val automata = ctx.globalStatement().mapNotNull { it.topLevelDecl()?.automatonDecl() }
         for (automatonCtx in automata) {
             val typeName = automatonCtx.type.processIdentifier()
             val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
 
-            val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDeclaration() }.map { variable ->
+            val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDecl() }.map { variable ->
                 val variableName = variable.nameWithType().name.processIdentifier()
                 val variableTypeName = variable.nameWithType().type.text
                 val variableType = context.resolveType(variableTypeName) ?: error("unresolved type $variableTypeName")
@@ -85,7 +85,7 @@ class Resolver(
             states.forEach { it.automaton = automaton }
         }
 
-        ctx.globalStatement().mapNotNull { it.declaration()?.variableDeclaration() }.map { variableDecl ->
+        ctx.globalStatement().mapNotNull { it.topLevelDecl()?.variableDecl() }.map { variableDecl ->
             val nameWithType = variableDecl.nameWithType()
             val type = context.resolveType(nameWithType.type.text) ?: error("unresolved type: ${nameWithType.type.text}")
             val init = if (variableDecl.assignmentRight() != null){
@@ -106,13 +106,13 @@ class Resolver(
             visitAutomatonDecl(automaton)
         }
 
-        for (extensionFunction in ctx.globalStatement().mapNotNull { it.declaration()?.functionDecl() }) {
+        for (extensionFunction in ctx.globalStatement().mapNotNull { it.topLevelDecl()?.functionDecl() }) {
             visitFunctionDecl(extensionFunction)
         }
     }
 
     override fun visitTypesSection(ctx: LibSLParser.TypesSectionContext) {
-        for (semanticTypeContext in ctx.semanticType()) {
+        for (semanticTypeContext in ctx.semanticTypeDecl()) {
             val type = when {
                 semanticTypeContext.simpleSemanticType() != null -> {
                     val semanticType = semanticTypeContext.simpleSemanticType().semanticName.text
@@ -229,7 +229,7 @@ class Resolver(
         val automaton = context.resolveAutomaton(name) ?: error("")
 
         ctx.automatonStatement()
-            .mapNotNull { it.variableDeclaration() }
+            .mapNotNull { it.variableDecl() }
             .forEach { decl ->
                 val variableName = decl.nameWithType().name.processIdentifier()
                 val automatonVariable = automaton.internalVariables.first { it.name == variableName }

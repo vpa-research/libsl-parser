@@ -27,11 +27,11 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         }.toList()
 
         val automata = ctx.globalStatement()
-            .mapNotNull { it.declaration()?.automatonDecl() }
+            .mapNotNull { it.topLevelDecl()?.automatonDecl() }
             .map { visitAutomatonDecl(it) }
             .toMutableList()
         val nonlocalFunctions = ctx.globalStatement()
-            .mapNotNull { it.declaration()?.functionDecl() }
+            .mapNotNull { it.topLevelDecl()?.functionDecl() }
             .map { visitFunctionDecl(it) }
 
         val types = context.typeStorage.map { it.value }
@@ -63,12 +63,12 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
             val toName = parsedShift.to?.processIdentifier()!!
             if (parsedShift.identifierList() != null) {
                 parsedShift.identifierList().Identifier().map { fromIdentifier ->
-                    val fromName = fromIdentifier.processIdentifier()!!
+                    val fromName = fromIdentifier.processIdentifier()
 
                     processShift(fromName, toName, shiftCtx, states, automatonName = name)
                 }
             } else {
-                val fromName = parsedShift.from.processIdentifier()!!
+                val fromName = parsedShift.from.processIdentifier()
                 listOf(processShift(fromName, toName, shiftCtx, states, automatonName = name))
             }
         }.orEmpty()
@@ -407,26 +407,6 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
                 } else {
                     error("can't resolve access chain. Unsupported part type: ${parentType::class.java}")
                 }
-            }
-        }
-    }
-
-
-    private fun getParentAutomatonOrNull(ctx: RuleContext): Automaton? {
-        return when {
-            ctx.parent == null -> {
-                null
-            }
-            ctx is LibSLParser.FunctionDeclContext -> {
-                val automatonName = resolveFunctionByCtx(ctx)?.automatonName ?: error("can't resolve function: ${ctx.name.processIdentifier()}")
-                context.resolveAutomaton(automatonName) ?: error("can't resolve automaton: $automatonName")
-            }
-            ctx is LibSLParser.AutomatonDeclContext -> {
-                val name = ctx.name.processIdentifier()
-                context.resolveAutomaton(name) ?: error("can't resolve automaton: $name")
-            }
-            else -> {
-                getParentAutomatonOrNull(ctx.parent)
             }
         }
     }

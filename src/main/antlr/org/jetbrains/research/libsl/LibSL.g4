@@ -1,8 +1,8 @@
 grammar LibSL;
 
 /*
- * Entry rule
- * Specification starts with header block ('libsl', 'library' and other keywords), then
+ * entry rule
+ * specification starts with header block ('libsl', 'library' and other keywords), then
  * semantic types section and declarations (automata and extension functions)
  */
 file
@@ -18,11 +18,26 @@ globalStatement
    |   typealiasStatement
    |   typeDefBlock
    |   enumBlock
-   |   declaration
+   |   topLevelDecl
    ;
+
+ImportStatement
+   :   'import' .*? ';'
+   ;
+
+IncludeStatement
+   :   'include' .*? ';'
+   ;
+
+topLevelDecl
+   :   automatonDecl
+   |   functionDecl
+   |   variableDecl
+   ;
+
 /*
- * Header section
- * Includes 'libsl' keyword with LibSL version, 'library' keyword with name of the library, and any of these optionally:
+ * header section
+ * includes 'libsl' keyword with LibSL version, 'library' keyword with name of the library, and any of these optionally:
  * 'version', 'language' and 'url'
  */
 header:
@@ -32,14 +47,6 @@ header:
    ('language' lang=DoubleQuotedString)?
    ('url' link=DoubleQuotedString)?
    ';';
-
-ImportStatement
-   :   'import' .*? ';'
-   ;
-
-IncludeStatement
-   :   'include' .*? ';'
-   ;
 
 /* typealias statement
  * syntax: typealias name = origintlType
@@ -70,26 +77,26 @@ enumBlockStatement
    :   Identifier '=' integerNumber ';'
    ;
 
-/*
- * Semantic types section
+/* semantic types section
+ * syntax types { semanticTypeDeclaration1; semanticTypeDeclaration2; ... }
  */
 typesSection
-   :   'types' '{' semanticType* '}'
+   :   'types' '{' semanticTypeDecl* '}'
    ;
 
-semanticType
+semanticTypeDecl
    :    simpleSemanticType
    |    blockType
    ;
 
-/*
+/* simple semantic type
  * syntax: semanticTypeName (realTypeName);
  */
 simpleSemanticType
    :   semanticName=typeIdentifier '(' realName=typeIdentifier ')' ';'
    ;
 
-/*
+/* block semantic type
  * syntax: semanticTypeName (realTypeName) {variant1: Int; variant2: Int; ...};
  */
 blockType
@@ -100,13 +107,7 @@ blockTypeStatement
    :    Identifier ':' expressionAtomic ';'
    ;
 
-declaration
-   :   automatonDecl
-   |   functionDecl
-   |   variableDeclaration
-   ;
-
-/*
+/* automaton declaration
  * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
@@ -117,17 +118,17 @@ automatonStatement
    :   automatonStateDecl
    |   automatonShiftDecl
    |   functionDecl
-   |   variableDeclaration
+   |   variableDecl
    ;
 
-/*
- * syntax: on of {initstate; state; finishstate} name;
+/* state declaration
+ * syntax: one of {initstate; state; finishstate} name;
  */
 automatonStateDecl
    :   keyword=('initstate' | 'state' | 'finishstate') identifierList ';'
    ;
 
-/*
+/* shift declaration
  * syntax: shift from -> to(function1; function2(optional arg types); ...)
  * syntax: shift (from1, from2, ...) -> to(function1; function2(optional arg types); ...)
  */
@@ -140,21 +141,27 @@ functionsList
    :   functionsListPart (',' functionsListPart)*
    ;
 
-functionsListPart // todo: check, is it ok?
-   :   name=Identifier ('(' (Identifier)* ')')?
+functionsListPart
+   :   name=Identifier ('(' Identifier? (',' Identifier)* ')')?
    ;
 
-/*
- * syntax: var NAME [: type] = { new AutomatonName(args); atomic; nothing }
+/* variable declaration with optional initializers
+ * syntax: var NAME [= { new AutomatonName(args); atomic }]
  */
-
-variableDeclaration
+variableDecl
    :   'var' nameWithType ';'
    |   'var' nameWithType '=' assignmentRight ';'
    ;
 
 nameWithType
    :   name=Identifier ':' type=typeIdentifier
+   ;
+
+/*
+ * syntax: one.two.three<T>
+ */
+typeIdentifier
+   :   (asterisk='*')? name=periodSeparatedFullName ('<' generic=typeIdentifier '>')?
    ;
 
 variableAssignment
@@ -180,11 +187,12 @@ argPair
    ;
 
 /*
- * syntax: fun name(@annotation arg1: type, arg2: type, ...) [: type] { statement1; statement2; ... }
+ * syntax: fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   'fun' name=periodSeparatedFullName '(' functionDeclArgList? ')' (':' functionType=Identifier)? (';' | functionPreamble ('{' functionBody '}')?)
+   :   'fun' name=periodSeparatedFullName '(' functionDeclArgList? ')' (':' functionType=Identifier)?
+       (';' | functionPreamble ('{' functionBody '}')?)
    ;
 
 functionDeclArgList
@@ -195,13 +203,16 @@ parameter
    :   annotation? name=Identifier ':' type=Identifier
    ;
 
-/* todo Should we allow multiple annotation per one parameter?
- * syntax: @annotationName(args) todo: add args
+/* annotation
+ * syntax: @annotationName(args)
  */
 annotation
    :   '@' Identifier ('(' valuesAndIdentifiersList ')')?
    ;
 
+/*
+ * declarations between function's header and body-block
+ */
 functionPreamble
    :   preamblePart*
    ;
@@ -220,6 +231,9 @@ functionBodyStatements
    |   action
    ;
 
+/* semantic action
+ * syntax: action ActionName(args)
+ */
 action
    :  'action' Identifier '(' valuesAndIdentifiersList? ')' ';'
    ;
@@ -228,14 +242,23 @@ valuesAndIdentifiersList
    :   expression (',' expression)*
    ;
 
+/* requires contract
+ * syntax: requires [name:] condition
+ */
 requiresContract
    :   'requires' (name=Identifier ':')? expression ';'
    ;
 
+/* ensures contract
+ * syntax: ensures [name:] condition
+ */
 ensuresContract
    :   'ensures' (name=Identifier ':')? expression ';'
    ;
 
+/*
+ * expression
+ */
 expression
    :   lbracket='(' expression rbracket=')'
    |   expression op=('*' | '/') expression
@@ -272,13 +295,6 @@ simpleCall
    :   Identifier '(' Identifier ')'
    ;
 
-/*
- * syntax: one.two.three<T>
- */
-typeIdentifier
-   :   (asterisk='*')? name=periodSeparatedFullName ('<' generic=typeIdentifier '>')?
-   ;
-
 Identifier
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
    |   '`' .*? '`'
@@ -298,18 +314,11 @@ periodSeparatedFullName
    |   '`' Identifier ('.' Identifier)* '`'
    ;
 
+Digit: ('0'..'9');
 
-Digit
-   :   ('0'..'9')
-   ;
+UNARY_MINUS: '-';
 
-UNARY_MINUS
-   :   '-'
-   ;
-
-INV
-   :   '!'
-   ;
+INV: '!';
 
 integerNumber
    :   UNARY_MINUS? Digit+

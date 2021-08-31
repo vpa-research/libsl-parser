@@ -42,6 +42,12 @@ class GeneratedTests {
 
 
     @Test
+    fun testEscapingTest() {
+        testRunner("escapingTest")
+    }
+
+
+    @Test
     fun testGlobalVariables() {
         testRunner("globalVariables")
     }

@@ -213,6 +213,15 @@ val typeSerializer = JsonSerializer<Type> { src, _, context ->
                 addProperty("kind", "array")
                 add("type", context.serialize(src.generic, Type::class.java))
             }
+            is ChildrenType -> error("children type can't be serialized")
+            is PrimitiveType -> {
+                addProperty("kind", src.name)
+                when (src) {
+                    is IntType -> add("capacity", context.serialize(src.capacity))
+                    is FloatType -> add("capacity", context.serialize(src.capacity))
+                    is UnsignedType -> add("capacity", context.serialize(src.capacity))
+                }
+            }
         }
     }
 }

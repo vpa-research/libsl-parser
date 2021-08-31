@@ -8,7 +8,9 @@
       "kind": "simple",
       "originalType": {
         "name": "int32",
-        "isPointer": false
+        "isPointer": false,
+        "kind": "int32",
+        "capacity": "INT32"
       }
     }
   ],
@@ -56,7 +58,9 @@
                         "kind": "simple",
                         "originalType": {
                           "name": "int32",
-                          "isPointer": false
+                          "isPointer": false,
+                          "kind": "int32",
+                          "capacity": "INT32"
                         }
                       },
                       "kind": "automatonVariable",
@@ -112,7 +116,9 @@
                       "kind": "simple",
                       "originalType": {
                         "name": "int32",
-                        "isPointer": false
+                        "isPointer": false,
+                        "kind": "int32",
+                        "capacity": "INT32"
                       }
                     },
                     "kind": "functionArgument",

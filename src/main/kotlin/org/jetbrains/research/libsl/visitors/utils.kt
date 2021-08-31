@@ -8,7 +8,7 @@ import org.jetbrains.research.libsl.LibSLParser
 
 fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, String> {
     val parent = (ctx.parent as? LibSLParser.AutomatonStatementContext)?.parent as? LibSLParser.AutomatonDeclContext
-    val rawName = ctx.name.text
+    val rawName = ctx.name.processIdentifier()
 
     return when {
         ctx.periodSeparatedFullName() != null && rawName.contains(".") -> {
