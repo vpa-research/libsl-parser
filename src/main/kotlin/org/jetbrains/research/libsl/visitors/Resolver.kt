@@ -260,7 +260,8 @@ class Resolver(
             FunctionArgument(arg.name.processIdentifier(), argType, argumentIndex++,null)
         }?.toList().orEmpty()
 
-        val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context)
+        val hasBody = ctx.functionBody() != null
+        val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context, hasBody)
 
         context.storeResolvedFunction(func)
 

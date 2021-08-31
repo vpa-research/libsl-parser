@@ -188,7 +188,8 @@ data class Function(
     val returnType: Type?,
     var contracts: List<Contract>,
     var statements: List<Statement>,
-    val context: LslContext
+    val context: LslContext,
+    val hasBody: Boolean
 ) : Node() {
     val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
     val qualifiedName: String by lazy { "${automaton.name}.$name" }

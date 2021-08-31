@@ -232,6 +232,7 @@ val functionSerializer = JsonSerializer<Function> { src, _, context ->
         addProperty("automaton", src.automatonName)
         addProperty("returnType", src.returnType?.fullName)
         addProperty("target", src.target.name)
+        addProperty("hasBody", src.hasBody)
 
         add("args", JsonArray().apply {
             src.args.forEach { arg ->
