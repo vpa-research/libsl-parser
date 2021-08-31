@@ -66,6 +66,7 @@
           "name": "f",
           "automaton": "A",
           "target": "A",
+          "hasBody": false,
           "args": [
             {
               "name": "param",

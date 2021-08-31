@@ -32,6 +32,7 @@
           "name": "foo",
           "automaton": "A",
           "target": "A",
+          "hasBody": true,
           "args": [],
           "contracts": [],
           "statements": [

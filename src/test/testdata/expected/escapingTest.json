@@ -33,6 +33,7 @@
           "automaton": "A",
           "returnType": "Int",
           "target": "A",
+          "hasBody": true,
           "args": [
             {
               "name": "param",

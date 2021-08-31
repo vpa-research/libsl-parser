@@ -204,6 +204,7 @@
           "name": "inversePixel",
           "automaton": "Image",
           "target": "Image",
+          "hasBody": true,
           "args": [
             {
               "name": "img",
