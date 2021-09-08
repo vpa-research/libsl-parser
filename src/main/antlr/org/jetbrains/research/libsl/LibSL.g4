@@ -338,18 +338,18 @@ NEWLINE
  *  Whitespace and comments
  */
 WS
-   :   [ \t]+ -> skip
+   :   [ \t]+ -> channel(HIDDEN)
    ;
 
 BR
-   :   [\r\n\u000C]+ -> skip
+   :   [\r\n\u000C]+ -> channel(HIDDEN)
    ;
 
 COMMENT
-   :   '/*' .*? '*/' -> skip
+   :   '/*' .*? '*/' -> channel(HIDDEN)
    ;
 
 LINE_COMMENT
-   :   (' //' ~[\r\n]* | '// ' ~[\r\n]*) -> skip
+   :   (' //' ~[\r\n]* | '// ' ~[\r\n]*) -> channel(HIDDEN)
    ;
 
