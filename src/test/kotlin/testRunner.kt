@@ -5,6 +5,7 @@ import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Annotation
 import org.jetbrains.research.libsl.asg.Function
+import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.visitors.ASGBuilder
 import org.jetbrains.research.libsl.visitors.Resolver
 import org.junit.jupiter.api.Assertions
@@ -20,6 +21,7 @@ fun testRunner(name: String) {
     val lexer = LibSLLexer(stream)
     val tokenStream = CommonTokenStream(lexer)
     val context = LslContext()
+    val errorManager = ErrorManager()
     context.init()
     val parser = LibSLParser(tokenStream)
     parser.addErrorListener(object : BaseErrorListener() {
@@ -36,8 +38,8 @@ fun testRunner(name: String) {
     })
 
     val file = parser.file()
-    Resolver(context,"$testdataPath/lsl/").visitFile(file)
-    val library = ASGBuilder(context).visitFile(file)
+    Resolver(context,"$testdataPath/lsl/", errorManager).visitFile(file)
+    val library = ASGBuilder(context, errorManager).visitFile(file)
 
     val gson = GsonBuilder()
         .setPrettyPrinting()

@@ -16,7 +16,7 @@ class Resolver(
     private val basePath: String,
     val errorManager: ErrorManager
     ) : LibSLBaseVisitor<Unit>() {
-    private val asgBuilderVisitor = ASGBuilder(context)
+    private val asgBuilderVisitor = ASGBuilder(context, errorManager)
 
     override fun visitFile(ctx: LibSLParser.FileContext) {
         ctx.globalStatement().mapNotNull { it.ImportStatement() }.forEach { processImportStatement(it) }
@@ -342,7 +342,7 @@ class Resolver(
         val resolver = Resolver(newContext, basePath, errorManager)
         val fileCtx = parser.file()
         resolver.visitFile(fileCtx)
-        val asgBuilder = ASGBuilder(context)
+        val asgBuilder = ASGBuilder(context, errorManager)
         asgBuilder.visitFile(fileCtx)
     }
 }

@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTreeListener
 import org.jetbrains.research.libsl.asg.Library
 import org.jetbrains.research.libsl.asg.LslContext
+import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.visitors.ASGBuilder
 import org.jetbrains.research.libsl.visitors.Resolver
 import java.io.File
@@ -13,6 +14,7 @@ class LibSL(
     private val basePath: String
 ) {
     val context = LslContext()
+    val errorManager = ErrorManager()
     lateinit var library: Library
     private var isParsed = false
 
@@ -30,8 +32,8 @@ class LibSL(
         }
 
         val file = parser.file()
-        Resolver(context,basePath).visitFile(file)
-        return ASGBuilder(context).visitFile(file)
+        Resolver(context,basePath, errorManager).visitFile(file)
+        return ASGBuilder(context, errorManager).visitFile(file)
     }
 
     fun loadFromFile(file: File): Library {
