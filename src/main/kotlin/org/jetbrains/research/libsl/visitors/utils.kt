@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.RuleContext
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.errors.Position
 
 fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, String> {
     val parent = (ctx.parent as? LibSLParser.AutomatonStatementContext)?.parent as? LibSLParser.AutomatonDeclContext
@@ -58,3 +59,9 @@ inline fun <reified T> RuleContext.getParentOfType(): T? {
 fun parseStringTokenStringSemicolon(str: String, prefix: String): String {
     return str.removeSurrounding(prefix, ";").filter { !it.isWhitespace() }
 }
+
+fun Token.position(): Position {
+    return Position(this.line, this.charPositionInLine)
+}
+
+fun ParserRuleContext.position() = start.position()

@@ -5,8 +5,12 @@ import org.jetbrains.research.libsl.LibSLBaseVisitor
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Function
+import org.jetbrains.research.libsl.errors.*
 
-class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
+class ASGBuilder(
+    private val context: LslContext,
+    val errorManager: ErrorManager
+    ) : LibSLBaseVisitor<Node>() {
     override fun visitFile(ctx: LibSLParser.FileContext): Library {
         val header = ctx.header()
         val libraryName = header.libraryName?.processIdentifier() ?: error("no library name specified")
@@ -97,24 +101,44 @@ class ASGBuilder(private val context: LslContext) : LibSLBaseVisitor<Node>() {
         val fromState = if (fromName == "any") {
             State("any", StateKind.SIMPLE, isAny = true)
         } else {
-            states.firstOrNull { it.name == fromName } ?: error("unknown state $fromName")
+            val state = states.firstOrNull { it.name == fromName }
+            if (state == null) {
+                errorManager(UnresolvedState(fromName, parsedShift.position()))
+                State("unresolved", StateKind.SIMPLE)
+            } else state
         }
 
         val toState = if (toName == "self") {
             State("self", StateKind.SIMPLE, isSelf = true)
         } else {
-            states.firstOrNull { it.name == toName } ?: error("unknown state")
+            val state = states.firstOrNull { it.name == toName }
+            if (state == null) {
+                errorManager(UnresolvedState(toName, parsedShift.position()))
+                State("unresolved", StateKind.SIMPLE)
+            } else state
         }
 
-        val functions = parsedShift.functionsList()?.functionsListPart()?.map { part ->
+        val functions = parsedShift.functionsList()?.functionsListPart()?.mapNotNull { part ->
             val functionName = part.name.processIdentifier()
             val functionArgs = part.Identifier().drop(1).map { type ->
-                context.resolveType(type.processIdentifier()) ?: error("unresolved type: ${type.processIdentifier()}")
+                val typeName = type.processIdentifier()
+                val resolved = context.resolveType(typeName)
+                if (resolved == null) {
+                    errorManager(UnresolvedType(typeName, type.symbol.position()))
+                    return@mapNotNull null
+                }
+                resolved
             }
 
-            context.resolveFunction(functionName, automatonName = automatonName, argsType=functionArgs)
+            val resolved = context.resolveFunction(functionName, automatonName = automatonName, argsType=functionArgs)
                 ?: context.resolveFunction(functionName, automatonName = automatonName)
-                ?: error("unresolved function: $functionName")
+
+            if (resolved == null) {
+                errorManager(UnresolvedFunction(functionName, part.name.position()))
+                null
+            } else {
+                resolved
+            }
         } ?: error("empty functions list in shift $fromName -> $toName")
 
         return Shift(

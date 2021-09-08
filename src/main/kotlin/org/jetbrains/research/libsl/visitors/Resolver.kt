@@ -8,11 +8,13 @@ import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.BoolLiteral
+import org.jetbrains.research.libsl.errors.*
 import java.io.File
 
 class Resolver(
     private val context: LslContext,
-    private val basePath: String
+    private val basePath: String,
+    val errorManager: ErrorManager
     ) : LibSLBaseVisitor<Unit>() {
     private val asgBuilderVisitor = ASGBuilder(context)
 
@@ -21,7 +23,7 @@ class Resolver(
 
         val typeSections = ctx.globalStatement().mapNotNull { it.typesSection() }
         if (typeSections.size > 1) {
-            error("only one types section could be provided")
+            errorManager(MoreThanOneTypesSection(typeSections[1].position()))
         }
         for (statement in ctx.globalStatement()) {
             when {
@@ -35,29 +37,41 @@ class Resolver(
         val automata = ctx.globalStatement().mapNotNull { it.topLevelDecl()?.automatonDecl() }
         for (automatonCtx in automata) {
             val typeName = automatonCtx.type.processIdentifier()
-            val type = context.resolveType(typeName) ?: error("unresolved type: $typeName")
-
-            val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDecl() }.map { variable ->
-                val variableName = variable.nameWithType().name.processIdentifier()
-                val variableTypeName = variable.nameWithType().type.text
-                val variableType = context.resolveType(variableTypeName) ?: error("unresolved type $variableTypeName")
-
-                AutomatonVariableDeclaration(
-                    variableName,
-                    variableType,
-                    null
-                )
+            val type = context.resolveType(typeName)
+            if (type == null) {
+                errorManager(UnresolvedType(typeName, automatonCtx.type.position()))
+                continue
             }
 
-            val constructorVariables = automatonCtx.nameWithType().map { cVar ->
+            val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDecl() }.mapNotNull { variable ->
+                val variableName = variable.nameWithType().name.processIdentifier()
+                val variableTypeName = variable.nameWithType().type.text
+                val variableType = context.resolveType(variableTypeName)
+                if (variableType == null) {
+                    errorManager(UnresolvedType(variableTypeName, variable.nameWithType().type.position()))
+                    null
+                } else {
+                    AutomatonVariableDeclaration(
+                        variableName,
+                        variableType,
+                        null
+                    )
+                }
+            }
+
+            val constructorVariables = automatonCtx.nameWithType().mapNotNull { cVar ->
                 val argName = cVar.name.processIdentifier()
                 val argTypeName = cVar.type.text
-                val argType = context.resolveType(argTypeName) ?: error("unresolved type $argTypeName")
-
-                ConstructorArgument(
-                    argName,
-                    argType
-                )
+                val argType = context.resolveType(argTypeName)
+                if (argType == null) {
+                    errorManager(UnresolvedType(argTypeName, cVar.type.position()))
+                    null
+                } else {
+                    ConstructorArgument(
+                        argName,
+                        argType
+                    )
+                }
             }
 
             val states = automatonCtx.automatonStatement()?.filter { it.automatonStateDecl() != null }?.flatMap { statesCtx ->
@@ -87,15 +101,22 @@ class Resolver(
 
         ctx.globalStatement().mapNotNull { it.topLevelDecl()?.variableDecl() }.map { variableDecl ->
             val nameWithType = variableDecl.nameWithType()
-            val type = context.resolveType(nameWithType.type.text) ?: error("unresolved type: ${nameWithType.type.text}")
+            val typeName = nameWithType.type.text
+            val name = nameWithType.name.processIdentifier()
+            val type = context.resolveType(typeName)
+            if (type == null) {
+                errorManager(UnresolvedType(typeName, nameWithType.type.position()))
+                return@map
+            }
             val init = if (variableDecl.assignmentRight() != null){
                 asgBuilderVisitor.processAssignmentRight(variableDecl.assignmentRight())
             } else {
-                error("global variables must be initialized in their declarations")
+                errorManager(UninitializedGlobalVariable(name, nameWithType.name.position()))
+                return@map
             }
 
             val variable = GlobalVariableDeclaration(
-                nameWithType.name.processIdentifier(),
+                name,
                 type,
                 init
             )
@@ -226,7 +247,7 @@ class Resolver(
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.processIdentifier()
-        val automaton = context.resolveAutomaton(name) ?: error("")
+        val automaton = context.resolveAutomaton(name)!!
 
         ctx.automatonStatement()
             .mapNotNull { it.variableDecl() }
@@ -248,15 +269,29 @@ class Resolver(
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
         val (automatonName, name) = parseFunctionName(ctx)
-        automatonName ?: error("automaton name not specified for function: $name")
+        if (automatonName == null) {
+            errorManager(UnspecifiedAutomaton(name, ctx.position()))
+            return
+        }
 
         val typeName = ctx.functionType?.processIdentifier()
-        val returnType = if (typeName != null) context.resolveType(typeName)
-            ?: error("unresolved type: $typeName") else null
+        val returnType = if (typeName != null) {
+            val resolved = context.resolveType(typeName)
+            if (resolved == null) {
+                errorManager(UnresolvedType(typeName, ctx.functionType.position()))
+                return
+            }
+            resolved
+        } else null
 
         var argumentIndex = 0
-        val args = ctx.functionDeclArgList()?.parameter()?.map { arg ->
-            val argType = context.resolveType(arg.type.processIdentifier()) ?: error("unresolved type")
+        val args = ctx.functionDeclArgList()?.parameter()?.mapNotNull { arg ->
+            val argTypeName = arg.type.processIdentifier()
+            val argType = context.resolveType(argTypeName)
+            if (argType == null) {
+                errorManager(UnresolvedType(argTypeName, arg.type.position()))
+                return@mapNotNull null
+            }
             FunctionArgument(arg.name.processIdentifier(), argType, argumentIndex++,null)
         }?.toList().orEmpty()
 
@@ -292,7 +327,8 @@ class Resolver(
         val file = File(filePath)
 
         if (!file.exists()) {
-            error("unresolved import path $importString. Full path: $filePath")
+            errorManager(UnresolvedImportPath(filePath, terminal.symbol.position()))
+            return
         }
 
         val stream = CharStreams.fromString(file.readText())
@@ -303,7 +339,7 @@ class Resolver(
         val newContext = LslContext()
         newContext.init()
         context.import(newContext)
-        val resolver = Resolver(newContext, basePath)
+        val resolver = Resolver(newContext, basePath, errorManager)
         val fileCtx = parser.file()
         resolver.visitFile(fileCtx)
         val asgBuilder = ASGBuilder(context)
