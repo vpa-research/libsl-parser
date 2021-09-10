@@ -1,8 +1,8 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.antlr.v4.runtime.RuleContext
-import org.jetbrains.research.libsl.LibSLBaseVisitor
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Function
 import org.jetbrains.research.libsl.errors.*
@@ -10,7 +10,7 @@ import org.jetbrains.research.libsl.errors.*
 class ASGBuilder(
     private val context: LslContext,
     val errorManager: ErrorManager
-    ) : LibSLBaseVisitor<Node>() {
+    ) : LibSLParserBaseVisitor<Node>() {
     override fun visitFile(ctx: LibSLParser.FileContext): Library {
         val header = ctx.header()
         val libraryName = header.libraryName?.processIdentifier() ?: error("no library name specified")
@@ -283,12 +283,12 @@ class ASGBuilder(
     override fun visitExpression(ctx: LibSLParser.ExpressionContext): Expression {
         return when {
             ctx.apostrophe != null -> OldValue(visitQualifiedAccess(ctx.qualifiedAccess()))
-            ctx.UNARY_MINUS() != null -> {
+            ctx.MINUS() != null -> {
                 val content = visitExpression(ctx.expression(0))
 
                 UnaryOpExpression(content, ArithmeticUnaryOp.MINUS)
             }
-            ctx.INV() != null -> {
+            ctx.EXCLAMATION() != null -> {
                 val content = visitExpression(ctx.expression(0))
 
                 UnaryOpExpression(content, ArithmeticUnaryOp.INVERSION)

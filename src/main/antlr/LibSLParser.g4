@@ -1,4 +1,8 @@
-grammar LibSL;
+parser grammar LibSLParser;
+
+@header {package org.jetbrains.research.libsl;}
+
+options { tokenVocab = LibSLLexer; }
 
 /*
  * entry rule
@@ -21,14 +25,6 @@ globalStatement
    |   topLevelDecl
    ;
 
-ImportStatement
-   :   'import' .*? ';'
-   ;
-
-IncludeStatement
-   :   'include' .*? ';'
-   ;
-
 topLevelDecl
    :   automatonDecl
    |   functionDecl
@@ -41,47 +37,47 @@ topLevelDecl
  * 'version', 'language' and 'url'
  */
 header:
-   ('libsl' lslver=DoubleQuotedString ';')
-   ('library' libraryName=Identifier)
-   ('version' ver = DoubleQuotedString)?
-   ('language' lang=DoubleQuotedString)?
-   ('url' link=DoubleQuotedString)?
-   ';';
+   (LIBSL lslver=DoubleQuotedString SEMICOLON)
+   (LIBRARY libraryName=Identifier)
+   (VERSION ver = DoubleQuotedString)?
+   (LANGUAGE lang=DoubleQuotedString)?
+   (URL link=DoubleQuotedString)?
+   SEMICOLON;
 
 /* typealias statement
  * syntax: typealias name = origintlType
  */
 typealiasStatement
-   :   'typealias' left=typeIdentifier '=' right=typeIdentifier ';'
+   :   TYPEALIAS left=typeIdentifier EQ right=typeIdentifier SEMICOLON
    ;
 
 /* type define block
  * syntax: type full.name { field1: Type; field2: Type; ... }
  */
 typeDefBlock
-   :   'type' name=typeIdentifier ('{' typeDefBlockStatement* '}')?
+   :   TYPE name=typeIdentifier (L_BRACE typeDefBlockStatement* R_BRACE)?
    ;
 
 typeDefBlockStatement
-   :   nameWithType ';'
+   :   nameWithType SEMICOLON
    ;
 
 /* enum block
  * syntax: enum Name { Variant1=0; Variant2=1; ... }
  */
 enumBlock
-   :   'enum' typeIdentifier '{' enumBlockStatement* '}'
+   :   ENUM typeIdentifier L_BRACE enumBlockStatement* R_BRACE
    ;
 
 enumBlockStatement
-   :   Identifier '=' integerNumber ';'
+   :   Identifier EQ integerNumber SEMICOLON
    ;
 
 /* semantic types section
  * syntax types { semanticTypeDeclaration1; semanticTypeDeclaration2; ... }
  */
 typesSection
-   :   'types' '{' semanticTypeDecl* '}'
+   :   TYPES L_BRACE semanticTypeDecl* R_BRACE
    ;
 
 semanticTypeDecl
@@ -93,25 +89,25 @@ semanticTypeDecl
  * syntax: semanticTypeName (realTypeName);
  */
 simpleSemanticType
-   :   semanticName=typeIdentifier '(' realName=typeIdentifier ')' ';'
+   :   semanticName=typeIdentifier L_BRACKET realName=typeIdentifier R_BRACKET SEMICOLON
    ;
 
 /* block semantic type
  * syntax: semanticTypeName (realTypeName) {variant1: Int; variant2: Int; ...};
  */
 blockType
-   :   semanticName=Identifier '(' realName=typeIdentifier ')' '{' blockTypeStatement+ '}'
+   :   semanticName=Identifier L_BRACKET realName=typeIdentifier R_BRACKET L_BRACE blockTypeStatement+ R_BRACE
    ;
 
 blockTypeStatement
-   :    Identifier ':' expressionAtomic ';'
+   :    Identifier COLON expressionAtomic SEMICOLON
    ;
 
 /* automaton declaration
  * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   'automaton' name=periodSeparatedFullName ('(' 'var' nameWithType (',' 'var' nameWithType)* ')')? ':' type=Identifier '{' automatonStatement* '}'
+   :   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=Identifier L_BRACE automatonStatement* R_BRACE
    ;
 
 automatonStatement
@@ -125,7 +121,7 @@ automatonStatement
  * syntax: one of {initstate; state; finishstate} name;
  */
 automatonStateDecl
-   :   keyword=('initstate' | 'state' | 'finishstate') identifierList ';'
+   :   keyword=(INITSTATE | STATE | FINISHSTATE) identifierList SEMICOLON
    ;
 
 /* shift declaration
@@ -133,57 +129,57 @@ automatonStateDecl
  * syntax: shift (from1, from2, ...) -> to(function1; function2(optional arg types); ...)
  */
 automatonShiftDecl
-   :   'shift' from=Identifier '->' to=Identifier '(' functionsList? ')' ';'
-   |   'shift' from='(' identifierList ')' '->' to=Identifier '(' functionsList? ')' ';'
+   :   SHIFT from=Identifier MINUS_ARROW to=Identifier L_BRACKET functionsList? R_BRACKET SEMICOLON
+   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier L_BRACKET functionsList? R_BRACKET SEMICOLON
    ;
 
 functionsList
-   :   functionsListPart (',' functionsListPart)*
+   :   functionsListPart (COMMA functionsListPart)*
    ;
 
 functionsListPart
-   :   name=Identifier ('(' Identifier? (',' Identifier)* ')')?
+   :   name=Identifier (L_BRACKET Identifier? (COMMA Identifier)* R_BRACKET)?
    ;
 
 /* variable declaration with optional initializers
  * syntax: var NAME [= { new AutomatonName(args); atomic }]
  */
 variableDecl
-   :   'var' nameWithType ';'
-   |   'var' nameWithType '=' assignmentRight ';'
+   :   VAR nameWithType SEMICOLON
+   |   VAR nameWithType EQ assignmentRight SEMICOLON
    ;
 
 nameWithType
-   :   name=Identifier ':' type=typeIdentifier
+   :   name=Identifier COLON type=typeIdentifier
    ;
 
 /*
  * syntax: one.two.three<T>
  */
 typeIdentifier
-   :   (asterisk='*')? name=periodSeparatedFullName ('<' generic=typeIdentifier '>')?
+   :   (asterisk=ASTERISK)? name=periodSeparatedFullName (L_ARROW generic=typeIdentifier R_ARROW)?
    ;
 
 variableAssignment
-   :   qualifiedAccess '=' assignmentRight ';'
+   :   qualifiedAccess EQ assignmentRight SEMICOLON
    ;
 
 assignmentRight
    :   expression
-   |   'new' callAutomatonConstructorWithNamedArgs
+   |   NEW callAutomatonConstructorWithNamedArgs
    ;
 
 callAutomatonConstructorWithNamedArgs
-   :   name=periodSeparatedFullName '(' (namedArgs)? ')'
+   :   name=periodSeparatedFullName L_BRACKET (namedArgs)? R_BRACKET
    ;
 
 namedArgs
-   :   argPair (',' argPair)*
+   :   argPair (COMMA argPair)*
    ;
 
 argPair
-   :   name='state' '=' expressionAtomic
-   |   name=Identifier '=' expression
+   :   name=STATE EQ expressionAtomic
+   |   name=Identifier EQ expression
    ;
 
 /*
@@ -191,23 +187,23 @@ argPair
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   'fun' name=periodSeparatedFullName '(' functionDeclArgList? ')' (':' functionType=Identifier)?
-       (';' | functionPreamble ('{' functionBody '}')?)
+   :   FUN name=periodSeparatedFullName L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=Identifier)?
+       (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 functionDeclArgList
-   :   parameter (',' parameter)*
+   :   parameter (COMMA parameter)*
    ;
 
 parameter
-   :   annotation? name=Identifier ':' type=Identifier
+   :   annotation? name=Identifier COLON type=Identifier
    ;
 
 /* annotation
  * syntax: @annotationName(args)
  */
 annotation
-   :   '@' Identifier ('(' valuesAndIdentifiersList ')')?
+   :   AT Identifier (L_BRACKET valuesAndIdentifiersList R_BRACKET)?
    ;
 
 /*
@@ -235,40 +231,40 @@ functionBodyStatements
  * syntax: action ActionName(args)
  */
 action
-   :  'action' Identifier '(' valuesAndIdentifiersList? ')' ';'
+   :  ACTION Identifier L_BRACKET valuesAndIdentifiersList? R_BRACKET SEMICOLON
    ;
 
 valuesAndIdentifiersList
-   :   expression (',' expression)*
+   :   expression (COMMA expression)*
    ;
 
 /* requires contract
  * syntax: requires [name:] condition
  */
 requiresContract
-   :   'requires' (name=Identifier ':')? expression ';'
+   :   REQUIRES (name=Identifier COLON)? expression SEMICOLON
    ;
 
 /* ensures contract
  * syntax: ensures [name:] condition
  */
 ensuresContract
-   :   'ensures' (name=Identifier ':')? expression ';'
+   :   ENSURES (name=Identifier COLON)? expression SEMICOLON
    ;
 
 /*
  * expression
  */
 expression
-   :   lbracket='(' expression rbracket=')'
-   |   expression op=('*' | '/') expression
-   |   expression op='%' expression
-   |   expression op=('+' | '-') expression
-   |   '-' expression
-   |   '!' expression
-   |   expression op=('=' | '!=' | '<=' | '<' | '>=' | '>') expression
-   |   expression op=('&' | '|' | '^') expression
-   |   qualifiedAccess apostrophe='\''
+   :   lbracket=L_BRACKET expression rbracket=R_BRACKET
+   |   expression op=(ASTERISK | SLASH) expression
+   |   expression op=PERCENT expression
+   |   expression op=(PLUS | MINUS) expression
+   |   MINUS expression
+   |   EXCLAMATION expression
+   |   expression op=(EQ | NOT_EQ | LESS_EQ | L_ARROW | GREAT_EQ | R_ARROW) expression
+   |   expression op=(AND | OR | XOR) expression
+   |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
    ;
@@ -282,74 +278,34 @@ primitiveLiteral
    :   integerNumber
    |   floatNumber
    |   DoubleQuotedString
-   |   bool=('true' | 'false')
+   |   bool=(TRUE | FALSE)
    ;
 
 qualifiedAccess
    :   periodSeparatedFullName
-   |   qualifiedAccess '[' expressionAtomic ']'
-   |   simpleCall '.' qualifiedAccess
+   |   qualifiedAccess L_SQUARE_BRACKET expressionAtomic R_SQUARE_BRACKET
+   |   simpleCall DOT qualifiedAccess
    ;
 
 simpleCall
-   :   Identifier '(' Identifier ')'
-   ;
-
-Identifier
-   :   [a-zA-Z_$][a-zA-Z0-9_$]*
-   |   '`' .*? '`'
+   :   Identifier L_BRACKET Identifier R_BRACKET
    ;
 
 identifierList
-   :   Identifier (',' Identifier)*
-   ;
-
-DoubleQuotedString
-   :   '"' .*? '"'
+   :   Identifier (COMMA Identifier)*
    ;
 
 periodSeparatedFullName
    :   Identifier
-   |   Identifier ('.' Identifier)*
-   |   '`' Identifier ('.' Identifier)* '`'
+   |   Identifier (DOT Identifier)*
+   |   BACK_QOUTE Identifier (DOT Identifier)* BACK_QOUTE
    ;
 
-Digit: ('0'..'9');
-
-UNARY_MINUS: '-';
-
-INV: '!';
-
 integerNumber
-   :   UNARY_MINUS? Digit+
+   :   MINUS? Digit+
    |   Digit
    ;
 
 floatNumber
-   :  UNARY_MINUS? Digit+ '.' Digit+
+   :  MINUS? Digit+ DOT Digit+
    ;
-
-fragment
-NEWLINE
-  : '\r' '\n' | '\n' | '\r'
-  ;
-
-/*
- *  Whitespace and comments
- */
-WS
-   :   [ \t]+ -> channel(HIDDEN)
-   ;
-
-BR
-   :   [\r\n\u000C]+ -> channel(HIDDEN)
-   ;
-
-COMMENT
-   :   '/*' .*? '*/' -> channel(HIDDEN)
-   ;
-
-LINE_COMMENT
-   :   (' //' ~[\r\n]* | '// ' ~[\r\n]*) -> channel(HIDDEN)
-   ;
-

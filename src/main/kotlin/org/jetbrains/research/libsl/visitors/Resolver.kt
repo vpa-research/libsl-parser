@@ -3,9 +3,9 @@ package org.jetbrains.research.libsl.visitors
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.TerminalNode
-import org.jetbrains.research.libsl.LibSLBaseVisitor
 import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.BoolLiteral
 import org.jetbrains.research.libsl.errors.*
@@ -15,7 +15,7 @@ class Resolver(
     private val context: LslContext,
     private val basePath: String,
     val errorManager: ErrorManager
-    ) : LibSLBaseVisitor<Unit>() {
+    ) : LibSLParserBaseVisitor<Unit>() {
     private val asgBuilderVisitor = ASGBuilder(context, errorManager)
 
     override fun visitFile(ctx: LibSLParser.FileContext) {
