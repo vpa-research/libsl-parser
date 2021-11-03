@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.jetbrains.research"
+group = "org.jetbrains.research"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -44,7 +44,7 @@ val sourcesJar by tasks.creating(Jar::class) {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.jetbrains.research"
+            groupId = "org.jetbrains.research"
             artifactId = "libsl"
             version = "1.0.0"
 
