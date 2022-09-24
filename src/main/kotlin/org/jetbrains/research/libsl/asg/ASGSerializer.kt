@@ -1,15 +1,16 @@
 package org.jetbrains.research.libsl.asg
 
-import com.google.gson.*
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonSerializer
 
 val librarySerializer = JsonSerializer<Library> { src, _, context ->
     JsonObject().apply {
         addProperty("name", src.metadata.name)
 
         // add meta-information
-        if (src.metadata.lslVersion != null) {
-            addProperty("lslVersion", src.metadata.stringVersion)
-        }
+        addProperty("lslVersion", src.metadata.stringVersion)
+
         if (src.metadata.language != null) {
             addProperty("lang", src.metadata.language)
         }
@@ -236,7 +237,7 @@ val functionSerializer = JsonSerializer<Function> { src, _, context ->
         addProperty("name", src.name)
         addProperty("automaton", src.automatonName)
         addProperty("returnType", src.returnType?.fullName)
-        addProperty("target", src.target.name)
+        addProperty("target", src.target?.name)
         addProperty("hasBody", src.hasBody)
 
         add("args", JsonArray().apply {

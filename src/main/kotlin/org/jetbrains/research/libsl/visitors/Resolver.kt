@@ -57,7 +57,7 @@ class Resolver(
                         null
                     )
                 }
-            }
+            }.toMutableList()
 
             val constructorVariables = automatonCtx.nameWithType().mapNotNull { cVar ->
                 val argName = cVar.name.processIdentifier()
@@ -72,7 +72,7 @@ class Resolver(
                         argType
                     )
                 }
-            }
+            }.toMutableList()
 
             val states = automatonCtx.automatonStatement()?.filter { it.automatonStateDecl() != null }?.flatMap { statesCtx ->
                 statesCtx.automatonStateDecl().identifierList().Identifier().map { stateCtx ->
@@ -81,16 +81,16 @@ class Resolver(
                     val stateKind = StateKind.fromString(keyword)
                     State(stateName, stateKind)
                 }
-            }.orEmpty()
+            }.orEmpty().toMutableList()
 
             val automaton = Automaton(
                 automatonCtx.name.processIdentifier(),
                 type,
                 states,
-                listOf(),
+                mutableListOf(),
                 variables,
                 constructorVariables,
-                listOf(),
+                mutableListOf(),
             )
 
             context.storeResolvedAutomaton(automaton)
@@ -299,10 +299,19 @@ class Resolver(
                 return@mapNotNull null
             }
             FunctionArgument(arg.name.processIdentifier(), argType, argumentIndex++,null)
-        }?.toList().orEmpty()
+        }.orEmpty().toMutableList()
 
         val hasBody = ctx.functionBody() != null
-        val func = Function(name, automatonName, args, returnType, listOf(), listOf(), context, hasBody)
+        val func = Function(
+            name,
+            automatonName,
+            args,
+            returnType,
+            mutableListOf(),
+            mutableListOf(),
+            context = context,
+            hasBody = hasBody
+        )
 
         context.storeResolvedFunction(func)
 

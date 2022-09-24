@@ -6,24 +6,23 @@ sealed class Node {
 
 data class Library(
     val metadata: MetaNode,
-    val imports: List<String>,
-    val includes: List<String> ,
-    val semanticTypes: List<Type>,
-    val automata: List<Automaton>,
-    val extensionFunctions: Map<String, List<Function>>,
-    val globalVariables: Map<String, GlobalVariableDeclaration>
+    val imports: MutableList<String> = mutableListOf(),
+    val includes: MutableList<String> = mutableListOf(),
+    val semanticTypes: MutableList<Type> = mutableListOf(),
+    val automata: MutableList<Automaton> = mutableListOf(),
+    val extensionFunctions: MutableMap<String, MutableList<Function>> = mutableMapOf(),
+    val globalVariables: MutableMap<String, GlobalVariableDeclaration> = mutableMapOf()
 ) : Node()
 
-data class MetaNode(
-    val name: String,
-    val libraryVersion: String?,
-    val language: String?,
-    val url: String?,
-    val lslVersion: Triple<UInt, UInt, UInt>?
+class MetaNode(
+    var name: String,
+    val libraryVersion: String? = null,
+    val language: String? = null,
+    var url: String? = null,
+    val lslVersion: Triple<UInt, UInt, UInt>
 ) : Node() {
-    val stringVersion: String?
+    val stringVersion: String
         get() {
-            if (lslVersion == null) return null
             return "${lslVersion.first}.${lslVersion.second}.${lslVersion.third}"
         }
 }
@@ -62,8 +61,8 @@ sealed class LibslType : Type
 
 data class RealType (
     val nameParts: List<String>,
-    override val isPointer: Boolean,
-    override val generic: Type?,
+    override val isPointer: Boolean = false,
+    override val generic: Type? = null,
     override val context: LslContext
 ) : Type {
     override val name: String
@@ -75,7 +74,7 @@ data class RealType (
 data class SimpleType(
     override val name: String,
     val realType: Type,
-    override val isPointer: Boolean,
+    override val isPointer: Boolean = false,
     override val context: LslContext
 ) : LibslType() {
     override val generic: Type? = null
@@ -113,7 +112,7 @@ class ChildrenType(
 data class StructuredType(
     override val name: String,
     val type: Type,
-    override val generic: Type?,
+    override val generic: Type? = null,
     val entries: List<Pair<String, Type>>,
     override val context: LslContext
 ) : LibslType() {
@@ -133,7 +132,7 @@ data class EnumType(
 
 data class ArrayType(
     override val name: String,
-    override val isPointer: Boolean,
+    override val isPointer: Boolean = false,
     override val generic: Type,
     override val context: LslContext
 ) :  LibslType()
@@ -141,11 +140,11 @@ data class ArrayType(
 data class Automaton(
     val name: String,
     val type: Type,
-    var states: List<State>,
-    var shifts: List<Shift>,
-    var internalVariables: List<AutomatonVariableDeclaration>,
-    var constructorVariables: List<Variable>,
-    var localFunctions: List<Function>
+    var states: MutableList<State> = mutableListOf(),
+    var shifts: MutableList<Shift> = mutableListOf(),
+    var internalVariables: MutableList<AutomatonVariableDeclaration> = mutableListOf(),
+    var constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
+    var localFunctions: MutableList<Function> = mutableListOf()
 ) : Node() {
     val functions: List<Function>
         get() = localFunctions + (parent.node as Library).extensionFunctions[name].orEmpty()
@@ -165,13 +164,13 @@ data class State(
 data class Shift(
     val from: State,
     val to: State,
-    val functions: List<Function>
+    val functions: MutableList<Function> = mutableListOf()
 ) : Node()
 
 enum class StateKind {
     INIT, SIMPLE, FINISH;
 
-    companion object {
+    internal companion object {
         fun fromString(str: String) = when(str) {
             "finishstate" -> FINISH
             "state" -> SIMPLE
@@ -184,16 +183,17 @@ enum class StateKind {
 data class Function(
     val name: String,
     val automatonName: String,
-    var args: List<FunctionArgument>,
+    var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: Type?,
-    var contracts: List<Contract>,
-    var statements: List<Statement>,
-    val context: LslContext,
-    val hasBody: Boolean
+    var contracts: MutableList<Contract> = mutableListOf(),
+    var statements: MutableList<Statement> = mutableListOf(),
+    val hasBody: Boolean = statements.isNotEmpty(),
+    var target: Automaton? = null,
+    val context: LslContext
 ) : Node() {
     val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
-    val qualifiedName: String by lazy { "${automaton.name}.$name" }
-    lateinit var target: Automaton
+    val qualifiedName: String
+        get() = "${automaton.name}.$name"
     var resultVariable: Variable? = null
 }
 
@@ -206,7 +206,7 @@ data class Assignment(
 
 data class Action(
     val name: String,
-    val arguments: List<Expression>
+    val arguments: MutableList<Expression> = mutableListOf()
 ) : Statement()
 
 data class Contract(
@@ -245,7 +245,7 @@ enum class ArithmeticBinaryOps {
             "&" -> AND
             "|" -> OR
             "^" -> XOR
-            else -> error("unknown binary operator type")
+            else -> error("unknown binary operator type: $str. Only ${ArithmeticBinaryOps.values()} are allowed")
         }
     }
 }
@@ -289,7 +289,7 @@ data class FunctionArgument(
     override val name: String,
     override val type: Type,
     val index: Int,
-    val annotation: Annotation?
+    var annotation: Annotation? = null
 ) : Variable() {
     lateinit var function: Function
 
@@ -305,7 +305,7 @@ data class ResultVariable(
 
 open class Annotation(
     val name: String,
-    val values: List<Expression>
+    val values: MutableList<Expression> = mutableListOf()
 ) {
     override fun toString(): String {
         return "Annotation(name='$name', values=$values)"
@@ -314,7 +314,7 @@ open class Annotation(
 
 class TargetAnnotation(
     name: String,
-    values: List<Expression>,
+    values: MutableList<Expression>,
     val targetAutomaton: Automaton
 ) : Annotation(name, values) {
     override fun toString(): String {

@@ -16,7 +16,7 @@ class ASGBuilder(
         val libraryName = header.libraryName?.processIdentifier() ?: error("no library name specified")
         val language = header.lang?.processIdentifier()?.removeSurrounding("\"", "\"")
         val libraryVersion = header.ver?.processIdentifier()?.removeSurrounding("\"", "\"")
-        val lslVersion = header.lslver?.processIdentifier()?.removeSurrounding("\"", "\"")?.split(".")?.let {
+        val lslVersion = header.lslver.processIdentifier().removeSurrounding("\"", "\"").split(".").let {
             val parts = it.map { part -> part.toUInt() }
             Triple(parts[0], parts[1], parts[2])
         }
@@ -25,10 +25,10 @@ class ASGBuilder(
         val meta = MetaNode(libraryName, libraryVersion, language, url, lslVersion)
         val imports = ctx.globalStatement().mapNotNull { it.ImportStatement() }.map {
             parseStringTokenStringSemicolon(it.processIdentifier(), "import")
-        }.toList()
+        }.toMutableList()
         val includes = ctx.globalStatement().mapNotNull { it.IncludeStatement() }.map {
             parseStringTokenStringSemicolon(it.processIdentifier(), "include")
-        }.toList()
+        }.toMutableList()
 
         val automata = ctx.globalStatement()
             .mapNotNull { it.topLevelDecl()?.automatonDecl() }
@@ -38,7 +38,7 @@ class ASGBuilder(
             .mapNotNull { it.topLevelDecl()?.functionDecl() }
             .map { visitFunctionDecl(it) }
 
-        val types = context.typeStorage.map { it.value }
+        val types = context.typeStorage.map { it.value }.toMutableList()
 
         val library = Library(
             meta,
@@ -46,7 +46,7 @@ class ASGBuilder(
             includes,
             types,
             automata,
-            nonlocalFunctions.fold(mutableMapOf<String, MutableList<Function>>()) { old, curr ->
+            nonlocalFunctions.fold(mutableMapOf()) { old, curr ->
                     old.getOrPut(curr.automatonName) { mutableListOf()}.add(curr); old
                 },
             context.globalVariables
@@ -75,10 +75,12 @@ class ASGBuilder(
                 val fromName = parsedShift.from.processIdentifier()
                 listOf(processShift(fromName, toName, shiftCtx, states, automatonName = name))
             }
-        }.orEmpty()
+        }.orEmpty().toMutableList()
 
         val functions = ctx.automatonStatement()
-            .mapNotNull { it.functionDecl() }.map { visitFunctionDecl(it) }
+            .mapNotNull { it.functionDecl() }
+            .map { visitFunctionDecl(it) }
+            .toMutableList()
 
         automaton.apply {
             this.shifts = shifts
@@ -139,7 +141,7 @@ class ASGBuilder(
             } else {
                 resolved
             }
-        } ?: error("empty functions list in shift $fromName -> $toName")
+        }?.toMutableList() ?: error("empty functions list in shift $fromName -> $toName")
 
         return Shift(
             fromState,
@@ -202,7 +204,8 @@ class ASGBuilder(
                 val name = anno.Identifier().processIdentifier()
                 val values = anno.valuesAndIdentifiersList()?.expression()?.map { atomic ->
                     visitExpression(atomic)
-                }.orEmpty()
+                }.orEmpty().toMutableList()
+
                 if (name == "target") {
                     val targetAutomatonName = arg.type.processIdentifier()
                     val targetAutomaton = context.resolveAutomaton(targetAutomatonName)!!
@@ -214,7 +217,8 @@ class ASGBuilder(
             }
 
             FunctionArgument(argName, argType, argIndex++, annotation)
-        }.orEmpty()
+        }.orEmpty().toMutableList()
+
         val typeName = ctx.functionType?.processIdentifier()
         val type = if (typeName != null) context.resolveType(typeName) ?: error("unresolved type: $typeName") else null
 
@@ -232,7 +236,7 @@ class ASGBuilder(
                 }
                 else -> error("unknown function statement's type: $ownerAutomatonName.$functionName")
             }
-        }.orEmpty()
+        }.orEmpty().toMutableList()
 
         val statementList = ctx.functionBody()?.functionBodyStatements()?.map { variableStatement ->
             when {
@@ -252,6 +256,7 @@ class ASGBuilder(
                         ?.expression()
                         ?.map { visitExpression(it) }
                         .orEmpty()
+                        .toMutableList()
 
                     Action(
                         actionName,
@@ -261,8 +266,7 @@ class ASGBuilder(
 
                 else -> error("unknown statement type")
             }
-
-        }.orEmpty()
+        }.orEmpty().toMutableList()
 
         val argumentWithTargetAnno = args.firstOrNull { it.annotation?.name == "target" }
         val resolvedFunction = context.resolveFunction(
@@ -470,7 +474,7 @@ class ASGBuilder(
             val annotation = arg.annotation()?.let { anno ->
                 Annotation(anno.Identifier().processIdentifier(), anno.valuesAndIdentifiersList().expression().map { atomic ->
                     visitExpression(atomic)
-                })
+                }.toMutableList())
             }
             FunctionArgument(argName, argType, argumentIndex++, annotation)
         }.orEmpty()
