@@ -7,10 +7,8 @@ abstract class ExpressionVisitor <T> {
             is CallAutomatonConstructor -> visitCallAutomatonConstructor(node)
             is FloatLiteral -> visitFloatNumber(node)
             is IntegerLiteral -> visitIntegerNumber(node)
-            is AccessAlias -> visitAccessAlias(node)
             is ArrayAccess -> visitArrayAccess(node)
             is AutomatonGetter -> visitAutomatonGetter(node)
-            is RealTypeAccess -> visitRealTypeAccess(node)
             is VariableAccess -> visitVariableAccess(node)
             is StringLiteral -> visitStringValue(node)
             is BinaryOpExpression -> visitBinaryOpExpression(node)
@@ -28,10 +26,8 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitCallAutomatonConstructor(node: CallAutomatonConstructor): T
     abstract fun visitFloatNumber(node: FloatLiteral): T
     abstract fun visitIntegerNumber(node: IntegerLiteral): T
-    abstract fun visitAccessAlias(node: AccessAlias): T
     abstract fun visitArrayAccess(node: ArrayAccess): T
     abstract fun visitAutomatonGetter(node: AutomatonGetter): T
-    abstract fun visitRealTypeAccess(node: RealTypeAccess): T
     abstract fun visitVariableAccess(node: VariableAccess): T
     abstract fun visitStringValue(node: StringLiteral): T
     abstract fun visitBinaryOpExpression(node: BinaryOpExpression): T

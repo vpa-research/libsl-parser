@@ -142,6 +142,8 @@ class Resolver(
                         ?: processRealTypeIdentifier(realTypeCtx)
                     val isPointer = realTypeCtx.asterisk != null
 
+                    check(resolvedRealType is RealType || resolvedRealType is PrimitiveType)
+
                     SimpleType(semanticType, resolvedRealType, isPointer, context)
                 }
                 semanticTypeContext.blockType() != null -> {
@@ -168,6 +170,9 @@ class Resolver(
         val name = ctx.left.text
         val resolvedRealType = context.resolveType(ctx.right.text)
             ?: processRealTypeIdentifier(ctx.right)
+
+        check(resolvedRealType is AliassableType)
+
         context.storeResolvedType(TypeAlias(
             name,
             resolvedRealType,

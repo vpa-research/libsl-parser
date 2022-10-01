@@ -8,7 +8,6 @@ class LslContext {
 
     private val importedContexts = mutableListOf<LslContext>()
 
-    @OptIn(ExperimentalStdlibApi::class)
     fun init() {
         val types = buildList<Type> {
             for (pointer in listOf(true, false)) {

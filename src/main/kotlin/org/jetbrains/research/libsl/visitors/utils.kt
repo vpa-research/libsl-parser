@@ -65,3 +65,11 @@ fun Token.position(): Position {
 }
 
 fun ParserRuleContext.position() = start.position()
+fun addBacktickIfNeeded(identifier: String): String {
+    val idPattern = Regex("[a-zA-Z_\$][a-zA-Z\\d_\$]*")
+    return if (identifier.matches(idPattern)) {
+        identifier
+    } else {
+        "`$identifier`"
+    }
+}

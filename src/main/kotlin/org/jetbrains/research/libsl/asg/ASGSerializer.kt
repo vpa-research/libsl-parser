@@ -333,16 +333,9 @@ val expressionSerializer = JsonSerializer<Expression> { src, _, context ->
 val qualifiedAccessSerializer = JsonSerializer<QualifiedAccess> { src, _, context ->
     JsonObject().apply {
         when (src) {
-            is AccessAlias -> {
-                addProperty("kind", "accessAlias")
-            }
             is ArrayAccess -> {
                 addProperty("kind", "arrayAccess")
                 add("index", context.serialize(src.index, Expression::class.java))
-            }
-            is RealTypeAccess -> {
-                addProperty("kind", "realTypeAccess")
-                addProperty("name", src.type.name)
             }
             is VariableAccess -> {
                 addProperty("kind", "variableAccess")
