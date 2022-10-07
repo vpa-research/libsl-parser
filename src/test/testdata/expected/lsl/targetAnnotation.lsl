@@ -2,12 +2,11 @@ libsl "1.0.0";
 library targetAnnotation;
 
 types {
-    Int(int32); // simple type
+    Int(int32);
     A(int16);
 }
-
-automaton B : Int {}
-
+automaton B : Int {
+}
 automaton A : Int {
-    fun foo (@target self: B);
+    fun foo(@target self: B);
 }

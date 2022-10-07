@@ -3,49 +3,6 @@
   "lslVersion": "1.0.0",
   "types": [
     {
-      "name": "Int",
-      "isPointer": false,
-      "kind": "simple",
-      "originalType": {
-        "name": "int32",
-        "isPointer": false,
-        "kind": "int32",
-        "capacity": "INT32"
-      }
-    },
-    {
-      "name": "Type",
-      "isPointer": false,
-      "kind": "enumLike",
-      "type": {
-        "name": "Int",
-        "isPointer": false,
-        "kind": "simple",
-        "originalType": {
-          "name": "int32",
-          "isPointer": false,
-          "kind": "int32",
-          "capacity": "INT32"
-        }
-      },
-      "entries": [
-        {
-          "name": "variant1",
-          "value": {
-            "kind": "integer",
-            "value": 0
-          }
-        },
-        {
-          "name": "variant2",
-          "value": {
-            "kind": "integer",
-            "value": 1
-          }
-        }
-      ]
-    },
-    {
       "name": "foo.vldf.Type",
       "isPointer": false,
       "kind": "enum",
@@ -102,13 +59,7 @@
           "type": {
             "name": "Int",
             "isPointer": false,
-            "kind": "simple",
-            "originalType": {
-              "name": "int32",
-              "isPointer": false,
-              "kind": "int32",
-              "capacity": "INT32"
-            }
+            "kind": "real"
           }
         }
       ]
@@ -123,13 +74,7 @@
           "type": {
             "name": "Int",
             "isPointer": false,
-            "kind": "simple",
-            "originalType": {
-              "name": "int32",
-              "isPointer": false,
-              "kind": "int32",
-              "capacity": "INT32"
-            }
+            "kind": "real"
           }
         },
         {
@@ -137,13 +82,7 @@
           "type": {
             "name": "Int",
             "isPointer": false,
-            "kind": "simple",
-            "originalType": {
-              "name": "int32",
-              "isPointer": false,
-              "kind": "int32",
-              "capacity": "INT32"
-            }
+            "kind": "real"
           }
         },
         {
@@ -158,13 +97,7 @@
                 "type": {
                   "name": "Int",
                   "isPointer": false,
-                  "kind": "simple",
-                  "originalType": {
-                    "name": "int32",
-                    "isPointer": false,
-                    "kind": "int32",
-                    "capacity": "INT32"
-                  }
+                  "kind": "real"
                 }
               }
             ]
@@ -186,6 +119,49 @@
                 "kind": "real"
               }
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Int",
+      "isPointer": false,
+      "kind": "simple",
+      "originalType": {
+        "name": "int32",
+        "isPointer": false,
+        "kind": "int32",
+        "capacity": "INT32"
+      }
+    },
+    {
+      "name": "Type",
+      "isPointer": false,
+      "kind": "enumLike",
+      "type": {
+        "name": "Int",
+        "isPointer": false,
+        "kind": "simple",
+        "originalType": {
+          "name": "int32",
+          "isPointer": false,
+          "kind": "int32",
+          "capacity": "INT32"
+        }
+      },
+      "entries": [
+        {
+          "name": "variant1",
+          "value": {
+            "kind": "integer",
+            "value": 0
+          }
+        },
+        {
+          "name": "variant2",
+          "value": {
+            "kind": "integer",
+            "value": 1
           }
         }
       ]
@@ -327,13 +303,7 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "simple",
-                              "originalType": {
-                                "name": "int32",
-                                "isPointer": false,
-                                "kind": "int32",
-                                "capacity": "INT32"
-                              }
+                              "kind": "real"
                             }
                           },
                           {
@@ -341,13 +311,7 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "simple",
-                              "originalType": {
-                                "name": "int32",
-                                "isPointer": false,
-                                "kind": "int32",
-                                "capacity": "INT32"
-                              }
+                              "kind": "real"
                             }
                           },
                           {
@@ -362,13 +326,7 @@
                                   "type": {
                                     "name": "Int",
                                     "isPointer": false,
-                                    "kind": "simple",
-                                    "originalType": {
-                                      "name": "int32",
-                                      "isPointer": false,
-                                      "kind": "int32",
-                                      "capacity": "INT32"
-                                    }
+                                    "kind": "real"
                                   }
                                 }
                               ]
@@ -498,13 +456,7 @@
                               "type": {
                                 "name": "Int",
                                 "isPointer": false,
-                                "kind": "simple",
-                                "originalType": {
-                                  "name": "int32",
-                                  "isPointer": false,
-                                  "kind": "int32",
-                                  "capacity": "INT32"
-                                }
+                                "kind": "real"
                               }
                             },
                             {
@@ -512,13 +464,7 @@
                               "type": {
                                 "name": "Int",
                                 "isPointer": false,
-                                "kind": "simple",
-                                "originalType": {
-                                  "name": "int32",
-                                  "isPointer": false,
-                                  "kind": "int32",
-                                  "capacity": "INT32"
-                                }
+                                "kind": "real"
                               }
                             },
                             {
@@ -533,13 +479,7 @@
                                     "type": {
                                       "name": "Int",
                                       "isPointer": false,
-                                      "kind": "simple",
-                                      "originalType": {
-                                        "name": "int32",
-                                        "isPointer": false,
-                                        "kind": "int32",
-                                        "capacity": "INT32"
-                                      }
+                                      "kind": "real"
                                     }
                                   }
                                 ]
@@ -656,7 +596,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "img.content.array\u003carray\u003cBoolean\u003e\u003e[index]",
+              "variable": "imgcontentnull[x][y]",
               "value": {
                 "kind": "unary",
                 "unaryOp": "inversion",
@@ -678,13 +618,7 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "simple",
-                              "originalType": {
-                                "name": "int32",
-                                "isPointer": false,
-                                "kind": "int32",
-                                "capacity": "INT32"
-                              }
+                              "kind": "real"
                             }
                           },
                           {
@@ -692,13 +626,7 @@
                             "type": {
                               "name": "Int",
                               "isPointer": false,
-                              "kind": "simple",
-                              "originalType": {
-                                "name": "int32",
-                                "isPointer": false,
-                                "kind": "int32",
-                                "capacity": "INT32"
-                              }
+                              "kind": "real"
                             }
                           },
                           {
@@ -713,13 +641,7 @@
                                   "type": {
                                     "name": "Int",
                                     "isPointer": false,
-                                    "kind": "simple",
-                                    "originalType": {
-                                      "name": "int32",
-                                      "isPointer": false,
-                                      "kind": "int32",
-                                      "capacity": "INT32"
-                                    }
+                                    "kind": "real"
                                   }
                                 }
                               ]
@@ -833,7 +755,7 @@
             },
             {
               "kind": "assignment",
-              "variable": "img.tpe.field",
+              "variable": "imgtpefield",
               "value": {
                 "kind": "integer",
                 "value": 1

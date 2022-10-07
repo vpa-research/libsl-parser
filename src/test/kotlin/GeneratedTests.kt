@@ -6,104 +6,173 @@ import org.junit.jupiter.api.Test
 
 class GeneratedTests {
     @Test
-    fun testActions() {
-        testRunner("actions")
+    fun testActionsJson() {
+        runJsonTest("actions")
     }
 
-
     @Test
-    fun testAnnotations() {
-        testRunner("annotations")
+    fun testActionsLsl() {
+        runLslTest("actions")
     }
 
-
     @Test
-    fun testAutomatonConstructor() {
-        testRunner("automatonConstructor")
+    fun testAnnotationsJson() {
+        runJsonTest("annotations")
     }
 
-
     @Test
-    fun testBadVariableAccess() {
-        testRunner("badVariableAccess")
+    fun testAnnotationsLsl() {
+        runLslTest("annotations")
     }
 
-
     @Test
-    fun testCastAutomaton() {
-        testRunner("castAutomaton")
+    fun testAutomatonConstructorJson() {
+        runJsonTest("automatonConstructor")
     }
 
-
     @Test
-    fun testContracts() {
-        testRunner("contracts")
+    fun testAutomatonConstructorLsl() {
+        runLslTest("automatonConstructor")
     }
 
-
     @Test
-    fun testEscapingTest() {
-        testRunner("escapingTest")
+    fun testBadVariableAccessJson() {
+        runJsonTest("badVariableAccess")
     }
 
-
     @Test
-    fun testGlobalVariables() {
-        testRunner("globalVariables")
+    fun testBadVariableAccessLsl() {
+        runLslTest("badVariableAccess")
     }
 
-
     @Test
-    fun testInternalVariables() {
-        testRunner("internalVariables")
+    fun testCastAutomatonJson() {
+        runJsonTest("castAutomaton")
     }
 
-
     @Test
-    fun testMultipleFromInShift() {
-        testRunner("multipleFromInShift")
+    fun testCastAutomatonLsl() {
+        runLslTest("castAutomaton")
     }
 
-
     @Test
-    fun testPrimitiveTypes() {
-        testRunner("primitiveTypes")
+    fun testContractsJson() {
+        runJsonTest("contracts")
     }
 
-
     @Test
-    fun testSimple() {
-        testRunner("simple")
+    fun testContractsLsl() {
+        runLslTest("contracts")
     }
 
-
     @Test
-    fun testSpecImportMain() {
-        testRunner("specImportMain")
+    fun testEscapingTestJson() {
+        runJsonTest("escapingTest")
     }
 
-
     @Test
-    fun testSpecImportSecondary() {
-        testRunner("specImportSecondary")
+    fun testEscapingTestLsl() {
+        runLslTest("escapingTest")
     }
 
-
     @Test
-    fun testTargetAnnotation() {
-        testRunner("targetAnnotation")
+    fun testGlobalVariablesJson() {
+        runJsonTest("globalVariables")
     }
 
-
     @Test
-    fun testTypes() {
-        testRunner("types")
+    fun testGlobalVariablesLsl() {
+        runLslTest("globalVariables")
     }
 
+    @Test
+    fun testInternalVariablesJson() {
+        runJsonTest("internalVariables")
+    }
 
     @Test
-    fun testVariableResolution() {
-        testRunner("variableResolution")
+    fun testInternalVariablesLsl() {
+        runLslTest("internalVariables")
+    }
+
+    @Test
+    fun testMultipleFromInShiftJson() {
+        runJsonTest("multipleFromInShift")
+    }
+
+    @Test
+    fun testMultipleFromInShiftLsl() {
+        runLslTest("multipleFromInShift")
+    }
+
+    @Test
+    fun testPrimitiveTypesJson() {
+        runJsonTest("primitiveTypes")
+    }
+
+    @Test
+    fun testPrimitiveTypesLsl() {
+        runLslTest("primitiveTypes")
+    }
+
+    @Test
+    fun testSimpleJson() {
+        runJsonTest("simple")
+    }
+
+    @Test
+    fun testSimpleLsl() {
+        runLslTest("simple")
+    }
+
+    @Test
+    fun testSpecImportMainJson() {
+        runJsonTest("specImportMain")
+    }
+
+    @Test
+    fun testSpecImportMainLsl() {
+        runLslTest("specImportMain")
+    }
+
+    @Test
+    fun testSpecImportSecondaryJson() {
+        runJsonTest("specImportSecondary")
+    }
+
+    @Test
+    fun testSpecImportSecondaryLsl() {
+        runLslTest("specImportSecondary")
+    }
+
+    @Test
+    fun testTargetAnnotationJson() {
+        runJsonTest("targetAnnotation")
+    }
+
+    @Test
+    fun testTargetAnnotationLsl() {
+        runLslTest("targetAnnotation")
+    }
+
+    @Test
+    fun testTypesJson() {
+        runJsonTest("types")
+    }
+
+    @Test
+    fun testTypesLsl() {
+        runLslTest("types")
+    }
+
+    @Test
+    fun testVariableResolutionJson() {
+        runJsonTest("variableResolution")
+    }
+
+    @Test
+    fun testVariableResolutionLsl() {
+        runLslTest("variableResolution")
     }
 
 }

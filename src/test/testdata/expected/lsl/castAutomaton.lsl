@@ -4,13 +4,10 @@ library simple;
 types {
     Int(int32);
 }
-
 automaton A : Int {
     var i: Int;
-
-    state s1, s2, s3;
-
-    shift (s1, s2) -> s3 (f);
-
-    fun f(param: Int);
+    
+    fun f(a: Int) {
+        A(a).i = 0;
+    }
 }

@@ -1,4 +1,5 @@
 import java.io.File
+import java.util.*
 
 fun main() {
     val lslDir = File("$testdataPath/lsl/")
@@ -10,7 +11,8 @@ fun main() {
 
     val generatedFunctions = mutableListOf<String>()
     for (file in lsls) {
-        generatedFunctions.add(generateFunction(file))
+        generatedFunctions.add(generateTestFunction(file, TestType.JSON))
+        generatedFunctions.add(generateTestFunction(file, TestType.LSL))
     }
 
     val resultFile = buildString {
@@ -21,7 +23,7 @@ fun main() {
         appendLine("import org.junit.jupiter.api.Test")
         appendLine()
         appendLine("class GeneratedTests {")
-        appendLine(generatedFunctions.joinToString(separator = "\n\n"))
+        appendLine(generatedFunctions.joinToString(separator = "\n"))
         appendLine("}")
         appendLine()
     }
@@ -30,9 +32,20 @@ fun main() {
     targetFile.writeText(resultFile)
 }
 
-fun generateFunction(name: String) = buildString {
+private fun generateTestFunction(testName: String, testType: TestType) = buildString {
+    val capitalizedTestName = testName.replaceFirstChar { firstChar ->
+        if (firstChar.isLowerCase()) firstChar.titlecase(Locale.getDefault()) else firstChar.toString()
+    }
+    val testFunctionName = "test$capitalizedTestName${testType.text}"
+    val runTestFunction = testType.function
+
     appendLine("    @Test")
-    appendLine("    fun test${name.capitalize()}() {")
-    appendLine("        testRunner(\"$name\")")
+    appendLine("    fun $testFunctionName() {")
+    appendLine("        $runTestFunction(\"$testName\")")
     appendLine("    }")
+}
+
+
+enum class TestType(val text: String, val function: String) {
+    JSON("Json", "runJsonTest"), LSL("Lsl", "runLslTest")
 }

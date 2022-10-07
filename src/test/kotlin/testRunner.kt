@@ -15,13 +15,25 @@ import java.io.FileNotFoundException
 const val baseRoot = "./src/test/"
 const val testdataPath = "$baseRoot/testdata/"
 
-fun testRunner(name: String) {
-    val fileContent = getLslFileAsStream(name)
+
+fun runJsonTest(testName: String) {
+    val errorManager = ErrorManager()
+    val library = getLibrary(testName, errorManager)
+    checkJsonContent(testName, library, errorManager)
+}
+
+fun runLslTest(testName: String) {
+    val errorManager = ErrorManager()
+    val library = getLibrary(testName, errorManager)
+    checkLslContent(testName, library, errorManager)
+}
+
+private fun getLibrary(testName: String, errorManager: ErrorManager): Library {
+    val fileContent = getLslFileContent(testName)
     val stream = CharStreams.fromString(fileContent)
     val lexer = LibSLLexer(stream)
     val tokenStream = CommonTokenStream(lexer)
     val context = LslContext()
-    val errorManager = ErrorManager()
     context.init()
     val parser = LibSLParser(tokenStream)
     parser.addErrorListener(object : BaseErrorListener() {
@@ -39,33 +51,10 @@ fun testRunner(name: String) {
 
     val file = parser.file()
     Resolver(context,"$testdataPath/lsl/", errorManager).visitFile(file)
-    val library = ASGBuilder(context, errorManager).visitFile(file)
-
-    val gson = GsonBuilder()
-        .setPrettyPrinting()
-        .registerTypeAdapter(Library::class.java, librarySerializer)
-        .registerTypeAdapter(Automaton::class.java, automatonSerializer)
-        .registerTypeAdapter(Type::class.java, typeSerializer)
-        .registerTypeAdapter(FunctionArgument::class.java, functionArgumentsSerializer)
-        .registerTypeAdapter(Variable::class.java, variableSerializer)
-        .registerTypeAdapter(Annotation::class.java, annotationSerializer)
-        .registerTypeAdapter(Function::class.java, functionSerializer)
-        .registerTypeAdapter(Expression::class.java, expressionSerializer)
-        .registerTypeAdapter(QualifiedAccess::class.java, qualifiedAccessSerializer)
-        .registerTypeAdapter(Statement::class.java, statementSerializer)
-        .create()
-    val prettyContent = gson.toJson(library)
-
-    val expectedFile = File("$testdataPath/expected/$name.json")
-    if (!expectedFile.exists()) {
-        expectedFile.writeText(prettyContent)
-        Assertions.fail<FileNotFoundException>("new file was created: $name")
-    }
-
-    Assertions.assertEquals(expectedFile.readText(), prettyContent)
+    return ASGBuilder(context, errorManager).visitFile(file)
 }
 
-private fun getLslFileAsStream(name: String): String {
+private fun getLslFileContent(name: String): String {
     val file = File("$testdataPath/lsl/$name.lsl")
     if (!file.exists()) {
         error("can't find file $name")
@@ -73,3 +62,43 @@ private fun getLslFileAsStream(name: String): String {
 
     return file.readText()
 }
+
+private fun checkJsonContent(testName: String, library: Library, errorManager: ErrorManager) {
+    val jsonContent = gson.toJson(library)
+
+    val expectedFile = File("$testdataPath/expected/json/$testName.json")
+    if (!expectedFile.exists()) {
+        expectedFile.writeText(jsonContent)
+        Assertions.fail<FileNotFoundException>("new file was created: $testName")
+    }
+
+    Assertions.assertEquals(expectedFile.readText(), jsonContent)
+    Assertions.assertTrue(errorManager.errors.isEmpty())
+}
+
+private fun checkLslContent(testName: String, library: Library, errorManager: ErrorManager) {
+    val lslContent = library.dumpToString()
+
+    val expectedFile = File("$testdataPath/expected/lsl/$testName.lsl")
+    if (!expectedFile.exists()) {
+        expectedFile.writeText(lslContent)
+        Assertions.fail<FileNotFoundException>("new file was created: $testName")
+    }
+
+    Assertions.assertEquals(expectedFile.readText(), lslContent)
+    Assertions.assertTrue(errorManager.errors.isEmpty())
+}
+
+private val gson = GsonBuilder()
+    .setPrettyPrinting()
+    .registerTypeAdapter(Library::class.java, librarySerializer)
+    .registerTypeAdapter(Automaton::class.java, automatonSerializer)
+    .registerTypeAdapter(Type::class.java, typeSerializer)
+    .registerTypeAdapter(FunctionArgument::class.java, functionArgumentsSerializer)
+    .registerTypeAdapter(Variable::class.java, variableSerializer)
+    .registerTypeAdapter(Annotation::class.java, annotationSerializer)
+    .registerTypeAdapter(Function::class.java, functionSerializer)
+    .registerTypeAdapter(Expression::class.java, expressionSerializer)
+    .registerTypeAdapter(QualifiedAccess::class.java, qualifiedAccessSerializer)
+    .registerTypeAdapter(Statement::class.java, statementSerializer)
+    .create()
