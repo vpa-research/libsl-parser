@@ -225,14 +225,25 @@ class ASGBuilder(
         val preamble = ctx.functionPreamble()?.preamblePart()?.map { part ->
             when {
                 part.requiresContract() != null -> {
-                    val contractName = part.requiresContract().name?.processIdentifier()
-                    val contractExpression = visitExpression(part.requiresContract().expression())
-                    Contract(contractName, contractExpression, ContractKind.REQUIRES)
+                    createContract(
+                        ContractKind.REQUIRES,
+                        expression = visitExpression(part.requiresContract().expression()),
+                        name = part.requiresContract().name?.processIdentifier()
+                    )
                 }
                 part.ensuresContract() != null -> {
-                    val contractName = part.ensuresContract().name?.processIdentifier()
-                    val contractExpression = visitExpression(part.ensuresContract().expression())
-                    Contract(contractName, contractExpression, ContractKind.ENSURES)
+                    createContract(
+                        ContractKind.ENSURES,
+                        expression = visitExpression(part.ensuresContract().expression()),
+                        name = part.ensuresContract().name?.processIdentifier()
+                    )
+                }
+                part.assignsContract() != null -> {
+                    createContract(
+                        ContractKind.ASSIGNS,
+                        expression = visitExpression(part.assignsContract().expression()),
+                        name = part.assignsContract().name?.processIdentifier()
+                    )
                 }
                 else -> error("unknown function statement's type: $ownerAutomatonName.$functionName")
             }
@@ -293,6 +304,10 @@ class ASGBuilder(
             statements = statementList
             this.args = args
         }
+    }
+
+    private fun createContract(kind: ContractKind, expression: Expression, name: String?): Contract {
+        return Contract(name, expression, kind)
     }
 
     override fun visitEnsuresContract(ctx: LibSLParser.EnsuresContractContext): Contract {

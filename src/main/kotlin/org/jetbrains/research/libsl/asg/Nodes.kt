@@ -451,7 +451,7 @@ data class Contract(
 }
 
 enum class ContractKind(val keyword: String) {
-    REQUIRES("requires"), ENSURES("ensures")
+    REQUIRES("requires"), ENSURES("ensures"), ASSIGNS("assigns")
 }
 
 sealed class Expression: Node(), IPrinter

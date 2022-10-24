@@ -216,6 +216,7 @@ functionPreamble
 preamblePart
    :   requiresContract
    |   ensuresContract
+   |   assignsContract
    ;
 
 functionBody
@@ -250,6 +251,13 @@ requiresContract
  */
 ensuresContract
    :   ENSURES (name=Identifier COLON)? expression SEMICOLON
+   ;
+
+/* assigns contract
+ * syntax: assigns [name:] condition
+ */
+assignsContract
+   :   ASSIGNS (name=Identifier COLON)? expression SEMICOLON
    ;
 
 /*

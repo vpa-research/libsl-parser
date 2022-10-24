@@ -157,6 +157,10 @@ ENSURES
    :   'ensures'
    ;
 
+ASSIGNS
+   :   'assigns'
+   ;
+
 TRUE
    :   'true'
    ;

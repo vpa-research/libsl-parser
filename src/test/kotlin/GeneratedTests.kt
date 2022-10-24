@@ -66,6 +66,16 @@ class GeneratedTests {
     }
 
     @Test
+    fun testEnsuresContractJson() {
+        runJsonTest("ensuresContract")
+    }
+
+    @Test
+    fun testEnsuresContractLsl() {
+        runLslTest("ensuresContract")
+    }
+
+    @Test
     fun testEscapingTestJson() {
         runJsonTest("escapingTest")
     }
