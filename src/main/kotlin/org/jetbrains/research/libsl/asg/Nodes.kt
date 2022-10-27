@@ -216,7 +216,7 @@ data class StructuredType(
     override val name: String,
     val type: Type,
     override val generic: Type? = null,
-    val entries: List<Pair<String, Type>>,
+    var entries: List<Pair<String, Type>>,
     override val context: LslContext
 ) : AliassableType {
     override val isPointer: Boolean = false
