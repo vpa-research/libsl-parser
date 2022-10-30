@@ -68,6 +68,7 @@ private fun checkJsonContent(testName: String, library: Library, errorManager: E
 
     val expectedFile = File("$testdataPath/expected/json/$testName.json")
     if (!expectedFile.exists()) {
+        expectedFile.parentFile.mkdirs()
         expectedFile.writeText(jsonContent)
         Assertions.fail<FileNotFoundException>("new file was created: $testName")
     }
@@ -93,6 +94,7 @@ private val gson = GsonBuilder()
     .setPrettyPrinting()
     .registerTypeAdapter(Library::class.java, librarySerializer)
     .registerTypeAdapter(Automaton::class.java, automatonSerializer)
+    .registerTypeAdapter(VariableDeclaration::class.java, variableDeclaration)
     .registerTypeAdapter(Type::class.java, typeSerializer)
     .registerTypeAdapter(FunctionArgument::class.java, functionArgumentsSerializer)
     .registerTypeAdapter(Variable::class.java, variableSerializer)

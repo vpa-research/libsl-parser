@@ -53,13 +53,21 @@ val librarySerializer = JsonSerializer<Library> { src, _, context ->
             })
         }
 
-        if (src.globalVariables.isNotEmpty()) {
+        if (src.globalVariableDeclarations.isNotEmpty()) {
             add("variables", JsonArray().apply {
-                src.globalVariables.forEach { (_, variable) ->
-                    add(context.serialize(variable, Variable::class.java))
+                src.globalVariableDeclarations.forEach { (_, variableDeclaration) ->
+                    add(context.serialize(variableDeclaration, VariableDeclaration::class.java))
                 }
             })
         }
+    }
+}
+
+val variableDeclaration = JsonSerializer<VariableDeclaration> { src, _, context ->
+    JsonObject().apply {
+        addProperty("name", src.variable.name)
+        add("type", context.serialize(src.variable.type))
+        add("init", context.serialize(src.initValue))
     }
 }
 
@@ -79,10 +87,10 @@ val automatonSerializer = JsonSerializer<Automaton> { src, _, context ->
         })
 
         add("variables", JsonArray().apply {
-            src.internalVariables.forEach { variable ->
+            src.internalVariableDeclarations.forEach { varDeclaration ->
                 val variableObject = JsonObject().apply {
-                    addProperty("name", variable.name)
-                    addProperty("type", variable.type.fullName)
+                    addProperty("name", varDeclaration.variable.name)
+                    addProperty("type", varDeclaration.variable.type.fullName)
                 }
                 add(variableObject)
             }
@@ -125,29 +133,19 @@ val variableSerializer = JsonSerializer<Variable> { src, _, context ->
         addProperty("name", src.name)
         addProperty("fullName", src.fullName)
         add("type", context.serialize(src.type, Type::class.java))
-        if (src.initValue != null) {
-            add("initValue", context.serialize(src.initValue, Expression::class.java))
-        }
 
         when (src) {
-            is AutomatonVariableDeclaration -> {
-                addProperty("kind", "automatonVariable")
-                addProperty("automaton", src.automaton.name)
-            }
             is ConstructorArgument -> {
                 addProperty("kind", "constructorArgument")
                 addProperty("automaton", src.automaton.name)
             }
             is FunctionArgument -> {
                 addProperty("kind", "functionArgument")
-                addProperty("function", src.function.qualifiedName)
+                addProperty("function", src.function.fullName)
                 if (src.annotation != null) {
                     add("annotation", context.serialize(src.annotation, Annotation::class.java))
                 }
                 add("functionArgTypes", JsonArray().apply { src.function.args.forEach { add(it.type.name) } })
-            }
-            is GlobalVariableDeclaration -> {
-                addProperty("kind", "global")
             }
             is ResultVariable -> {
                 addProperty("kind", "result")

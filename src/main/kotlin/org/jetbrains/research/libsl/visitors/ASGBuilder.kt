@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.visitors
 
 import org.antlr.v4.runtime.RuleContext
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.LibSLParser.HeaderContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Function
@@ -10,19 +11,11 @@ import org.jetbrains.research.libsl.errors.*
 class ASGBuilder(
     private val context: LslContext,
     val errorManager: ErrorManager
-    ) : LibSLParserBaseVisitor<Node>() {
+) : LibSLParserBaseVisitor<Node>() {
+    private lateinit var library: Library
+    private lateinit var extensionFunctionsMap: Map<String, MutableList<Function>>
     override fun visitFile(ctx: LibSLParser.FileContext): Library {
-        val header = ctx.header()
-        val libraryName = header.libraryName?.processIdentifier() ?: error("no library name specified")
-        val language = header.lang?.processIdentifier()?.removeSurrounding("\"", "\"")
-        val libraryVersion = header.ver?.processIdentifier()?.removeSurrounding("\"", "\"")
-        val lslVersion = header.lslver.processIdentifier().removeSurrounding("\"", "\"").split(".").let {
-            val parts = it.map { part -> part.toUInt() }
-            Triple(parts[0], parts[1], parts[2])
-        }
-        val url = header?.link?.processIdentifier()?.removeSurrounding("\"", "\"")
-
-        val meta = MetaNode(libraryName, libraryVersion, language, url, lslVersion)
+        library = visitLibrary(ctx.header())
         val imports = ctx.globalStatement().mapNotNull { it.ImportStatement() }.map {
             parseStringTokenStringSemicolon(it.processIdentifier(), "import")
         }.toMutableList()
@@ -30,32 +23,46 @@ class ASGBuilder(
             parseStringTokenStringSemicolon(it.processIdentifier(), "include")
         }.toMutableList()
 
+        val extensionFunctions = ctx.globalStatement()
+            .mapNotNull { it.topLevelDecl()?.functionDecl() }
+            .map { visitFunctionDecl(it) }
+
+        extensionFunctionsMap = extensionFunctions.fold(mutableMapOf()) { old, curr ->
+            old.getOrPut(curr.automatonName) { mutableListOf()}.add(curr); old
+        }
+
         val automata = ctx.globalStatement()
             .mapNotNull { it.topLevelDecl()?.automatonDecl() }
             .map { visitAutomatonDecl(it) }
             .toMutableList()
-        val nonlocalFunctions = ctx.globalStatement()
-            .mapNotNull { it.topLevelDecl()?.functionDecl() }
-            .map { visitFunctionDecl(it) }
 
         val types = context.typeStorage.map { it.value }.toMutableList()
 
-        val library = Library(
-            meta,
-            imports,
-            includes,
-            types,
-            automata,
-            nonlocalFunctions.fold(mutableMapOf()) { old, curr ->
-                    old.getOrPut(curr.automatonName) { mutableListOf()}.add(curr); old
-                },
-            context.globalVariables
-        )
-
-        automata.forEach { it.parent.node = library }
-        nonlocalFunctions.forEach { it.parent.node = library }
+        library.apply {
+            this.imports.addAll(imports)
+            this.includes.addAll(includes)
+            this.semanticTypes.addAll(types)
+            this.automata.addAll(automata)
+            this.globalVariableDeclarations.putAll(context.globalVariables)
+            this.extensionFunctions.putAll(extensionFunctionsMap)
+        }
 
         return library
+    }
+
+    private fun visitLibrary(header: HeaderContext): Library {
+        val libraryName = header.libraryName?.processIdentifier() ?: error("no library name specified")
+        val language = header.lang?.processIdentifier()?.removeSurrounding("\"", "\"")
+        val libraryVersion = header.ver?.processIdentifier()?.removeSurrounding("\"", "\"")
+        val lslVersion = header.lslver.processIdentifier().removeSurrounding("\"", "\"").split(".").let {
+            val parts = it.map { part -> part.toUInt() }
+            Triple(parts[0], parts[1], parts[2])
+        }
+        val url = header.link?.processIdentifier()?.removeSurrounding("\"", "\"")
+
+        val meta = MetaNode(libraryName, libraryVersion, language, url, lslVersion)
+
+        return Library(meta)
     }
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext): Automaton {
@@ -82,12 +89,13 @@ class ASGBuilder(
             .map { visitFunctionDecl(it) }
             .toMutableList()
 
-        automaton.apply {
-            this.shifts = shifts
-            this.localFunctions = functions
-        }
+        val extensionFunctions = extensionFunctionsMap[name].orEmpty()
 
-        functions.forEach { it.parent.node = automaton }
+        automaton.apply {
+            this.shifts.addAll(shifts)
+            this.localFunctions.addAll(functions)
+            this.extensionFunctions.addAll(extensionFunctions)
+        }
 
         return automaton
     }
@@ -530,7 +538,7 @@ class ASGBuilder(
             else -> null
         }
         return if (ctx.parent == null) {
-            context.resolveVariable(variableName)
+            context.resolveGlobalVariable(variableName)?.variable
         } else {
             res ?: resolveVariableDependingOnContext(ctx.parent, variableName, context)
         }

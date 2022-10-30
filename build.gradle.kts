@@ -44,7 +44,7 @@ val sourcesJar by tasks.creating(Jar::class) {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "org.jetbrains.research"
+            groupId = "com.github.vldf"
             artifactId = "libsl"
             version = "1.0.0"
 

@@ -14,28 +14,40 @@ abstract class ExpressionVisitor <T> {
             is BinaryOpExpression -> visitBinaryOpExpression(node)
             is OldValue -> visitOldValue(node)
             is UnaryOpExpression -> visitUnaryOpExpression(node)
-            is AutomatonVariableDeclaration -> visitAutomatonVariableDeclaration(node)
             is ConstructorArgument -> visitConstructorArgument(node)
             is FunctionArgument -> visitFunctionArgument(node)
-            is GlobalVariableDeclaration -> visitGlobalVariableDeclaration(node)
             is ResultVariable -> visitResultVariable(node)
+            is Variable -> visitVariable(node)
         }
     }
 
     abstract fun visitBool(node: BoolLiteral): T
+
     abstract fun visitCallAutomatonConstructor(node: CallAutomatonConstructor): T
+
     abstract fun visitFloatNumber(node: FloatLiteral): T
+
     abstract fun visitIntegerNumber(node: IntegerLiteral): T
+
     abstract fun visitArrayAccess(node: ArrayAccess): T
+
     abstract fun visitAutomatonGetter(node: AutomatonGetter): T
+
     abstract fun visitVariableAccess(node: VariableAccess): T
+
     abstract fun visitStringValue(node: StringLiteral): T
+
     abstract fun visitBinaryOpExpression(node: BinaryOpExpression): T
+
     abstract fun visitOldValue(node: OldValue): T
+
     abstract fun visitUnaryOpExpression(node: UnaryOpExpression): T
-    abstract fun visitAutomatonVariableDeclaration(node: AutomatonVariableDeclaration): T
+
     abstract fun visitConstructorArgument(node: ConstructorArgument): T
+
     abstract fun visitFunctionArgument(node: FunctionArgument): T
-    abstract fun visitGlobalVariableDeclaration(node: GlobalVariableDeclaration): T
+
     abstract fun visitResultVariable(node: ResultVariable): T
+
+    abstract fun visitVariable(node: Variable): T
 }

@@ -57,25 +57,370 @@
   "variables": [
     {
       "name": "globalInt",
-      "fullName": "globalInt",
       "type": {
         "name": "Int",
-        "isPointer": false,
-        "kind": "simple",
-        "originalType": {
+        "realType": {
           "name": "int32",
           "isPointer": false,
           "kind": "int32",
           "capacity": "INT32"
+        },
+        "isPointer": false,
+        "context": {
+          "typeStorage": {
+            "*int8": {
+              "name": "int8",
+              "isPointer": true,
+              "kind": "int8",
+              "capacity": "INT8"
+            },
+            "*int16": {
+              "name": "int16",
+              "isPointer": true,
+              "kind": "int16",
+              "capacity": "INT16"
+            },
+            "*int32": {
+              "name": "int32",
+              "isPointer": true,
+              "kind": "int32",
+              "capacity": "INT32"
+            },
+            "*int64": {
+              "name": "int64",
+              "isPointer": true,
+              "kind": "int64",
+              "capacity": "INT64"
+            },
+            "*unsigned8": {
+              "name": "unsigned8",
+              "isPointer": true,
+              "kind": "unsigned8",
+              "capacity": "UNSIGNED8"
+            },
+            "*unsigned16": {
+              "name": "unsigned16",
+              "isPointer": true,
+              "kind": "unsigned16",
+              "capacity": "UNSIGNED16"
+            },
+            "*unsigned32": {
+              "name": "unsigned32",
+              "isPointer": true,
+              "kind": "unsigned32",
+              "capacity": "UNSIGNED32"
+            },
+            "*unsigned64": {
+              "name": "unsigned64",
+              "isPointer": true,
+              "kind": "unsigned64",
+              "capacity": "UNSIGNED64"
+            },
+            "*float32": {
+              "name": "float32",
+              "isPointer": true,
+              "kind": "float32",
+              "capacity": "FLOAT32"
+            },
+            "*float64": {
+              "name": "float64",
+              "isPointer": true,
+              "kind": "float64",
+              "capacity": "FLOAT64"
+            },
+            "*bool": {
+              "name": "bool",
+              "isPointer": true,
+              "kind": "bool"
+            },
+            "*char": {
+              "name": "char",
+              "isPointer": true,
+              "kind": "char"
+            },
+            "*string": {
+              "name": "string",
+              "isPointer": true,
+              "kind": "string"
+            },
+            "*void": {
+              "name": "void",
+              "isPointer": true,
+              "kind": "void"
+            },
+            "int8": {
+              "name": "int8",
+              "isPointer": false,
+              "kind": "int8",
+              "capacity": "INT8"
+            },
+            "int16": {
+              "name": "int16",
+              "isPointer": false,
+              "kind": "int16",
+              "capacity": "INT16"
+            },
+            "int32": {
+              "name": "int32",
+              "isPointer": false,
+              "kind": "int32",
+              "capacity": "INT32"
+            },
+            "int64": {
+              "name": "int64",
+              "isPointer": false,
+              "kind": "int64",
+              "capacity": "INT64"
+            },
+            "unsigned8": {
+              "name": "unsigned8",
+              "isPointer": false,
+              "kind": "unsigned8",
+              "capacity": "UNSIGNED8"
+            },
+            "unsigned16": {
+              "name": "unsigned16",
+              "isPointer": false,
+              "kind": "unsigned16",
+              "capacity": "UNSIGNED16"
+            },
+            "unsigned32": {
+              "name": "unsigned32",
+              "isPointer": false,
+              "kind": "unsigned32",
+              "capacity": "UNSIGNED32"
+            },
+            "unsigned64": {
+              "name": "unsigned64",
+              "isPointer": false,
+              "kind": "unsigned64",
+              "capacity": "UNSIGNED64"
+            },
+            "float32": {
+              "name": "float32",
+              "isPointer": false,
+              "kind": "float32",
+              "capacity": "FLOAT32"
+            },
+            "float64": {
+              "name": "float64",
+              "isPointer": false,
+              "kind": "float64",
+              "capacity": "FLOAT64"
+            },
+            "bool": {
+              "name": "bool",
+              "isPointer": false,
+              "kind": "bool"
+            },
+            "char": {
+              "name": "char",
+              "isPointer": false,
+              "kind": "char"
+            },
+            "string": {
+              "name": "string",
+              "isPointer": false,
+              "kind": "string"
+            },
+            "void": {
+              "name": "void",
+              "isPointer": false,
+              "kind": "void"
+            },
+            "Int": {
+              "name": "Int",
+              "isPointer": false,
+              "kind": "simple",
+              "originalType": {
+                "name": "int32",
+                "isPointer": false,
+                "kind": "int32",
+                "capacity": "INT32"
+              }
+            }
+          },
+          "functionStorage": {
+            "f": [
+              {
+                "name": "f",
+                "automaton": "A",
+                "target": "A",
+                "hasBody": true,
+                "args": [
+                  {
+                    "name": "param",
+                    "type": "Int"
+                  }
+                ],
+                "contracts": [],
+                "statements": [
+                  {
+                    "kind": "assignment",
+                    "variable": "globalInt",
+                    "value": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "automatonStorage": {
+            "A": {
+              "name": "A",
+              "type": "Int",
+              "constructorVariables": [],
+              "variables": [],
+              "states": [
+                {
+                  "name": "S",
+                  "kind": "SIMPLE"
+                }
+              ],
+              "shifts": [],
+              "functions": [
+                {
+                  "name": "f",
+                  "automaton": "A",
+                  "target": "A",
+                  "hasBody": true,
+                  "args": [
+                    {
+                      "name": "param",
+                      "type": "Int"
+                    }
+                  ],
+                  "contracts": [],
+                  "statements": [
+                    {
+                      "kind": "assignment",
+                      "variable": "globalInt",
+                      "value": {
+                        "kind": "integer",
+                        "value": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "globalVariables": {
+            "globalInt": {
+              "variable": {
+                "name": "globalInt",
+                "fullName": "globalInt",
+                "type": {
+                  "name": "Int",
+                  "isPointer": false,
+                  "kind": "simple",
+                  "originalType": {
+                    "name": "int32",
+                    "isPointer": false,
+                    "kind": "int32",
+                    "capacity": "INT32"
+                  }
+                }
+              },
+              "initValue": {
+                "kind": "callAutomatonConstructor",
+                "automatonName": "A",
+                "state": "S",
+                "args": []
+              }
+            }
+          },
+          "importedContexts": []
+        },
+        "isTypeBlockType": true
+      },
+      "init": {
+        "automaton": {
+          "name": "A",
+          "type": "Int",
+          "constructorVariables": [],
+          "variables": [],
+          "states": [
+            {
+              "name": "S",
+              "kind": "SIMPLE"
+            }
+          ],
+          "shifts": [],
+          "functions": [
+            {
+              "name": "f",
+              "automaton": "A",
+              "target": "A",
+              "hasBody": true,
+              "args": [
+                {
+                  "name": "param",
+                  "type": "Int"
+                }
+              ],
+              "contracts": [],
+              "statements": [
+                {
+                  "kind": "assignment",
+                  "variable": "globalInt",
+                  "value": {
+                    "kind": "integer",
+                    "value": 1
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "args": [],
+        "state": {
+          "name": "S",
+          "kind": "SIMPLE",
+          "isSelf": false,
+          "isAny": false,
+          "automaton": {
+            "name": "A",
+            "type": "Int",
+            "constructorVariables": [],
+            "variables": [],
+            "states": [
+              {
+                "name": "S",
+                "kind": "SIMPLE"
+              }
+            ],
+            "shifts": [],
+            "functions": [
+              {
+                "name": "f",
+                "automaton": "A",
+                "target": "A",
+                "hasBody": true,
+                "args": [
+                  {
+                    "name": "param",
+                    "type": "Int"
+                  }
+                ],
+                "contracts": [],
+                "statements": [
+                  {
+                    "kind": "assignment",
+                    "variable": "globalInt",
+                    "value": {
+                      "kind": "integer",
+                      "value": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          }
         }
-      },
-      "initValue": {
-        "kind": "callAutomatonConstructor",
-        "automatonName": "A",
-        "state": "S",
-        "args": []
-      },
-      "kind": "global"
+      }
     }
   ]
 }

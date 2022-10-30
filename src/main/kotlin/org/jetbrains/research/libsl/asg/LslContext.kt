@@ -66,12 +66,12 @@ class LslContext {
     fun resolveAutomaton(name: String): Automaton? = automatonStorage[name]
         ?: importedContexts.firstNotNullOfOrNull { it.resolveAutomaton(name) }
 
-    fun storeGlobalVariable(variable: GlobalVariableDeclaration) {
-        globalVariables[variable.name] = variable
+    fun storeGlobalVariableDeclaration(variableDeclaration: GlobalVariableDeclaration) {
+        globalVariables[variableDeclaration.variable.name] = variableDeclaration
     }
 
-    fun resolveVariable(name: String): GlobalVariableDeclaration? = globalVariables[name]
-        ?: importedContexts.firstNotNullOfOrNull { it.resolveVariable(name) }
+    fun resolveGlobalVariable(name: String): GlobalVariableDeclaration? = globalVariables[name]
+        ?: importedContexts.firstNotNullOfOrNull { it.resolveGlobalVariable(name) }
 
     fun import(context: LslContext) {
         importedContexts.add(context)

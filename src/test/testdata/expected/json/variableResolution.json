@@ -52,7 +52,7 @@
                     "name": "i",
                     "variableInfo": {
                       "name": "i",
-                      "fullName": "A.i",
+                      "fullName": "i",
                       "type": {
                         "name": "Int",
                         "isPointer": false,
@@ -63,9 +63,7 @@
                           "kind": "int32",
                           "capacity": "INT32"
                         }
-                      },
-                      "kind": "automatonVariable",
-                      "automaton": "A"
+                      }
                     },
                     "type": "Int"
                   }

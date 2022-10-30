@@ -1,3 +1,3 @@
 
-rootProject.name = "lsl_new"
+rootProject.name = "libsl"
 

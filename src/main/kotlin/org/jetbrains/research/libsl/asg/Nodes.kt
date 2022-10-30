@@ -4,9 +4,7 @@ import org.jetbrains.research.libsl.utils.IPrinter
 import org.jetbrains.research.libsl.utils.IPrinter.Companion.SPACE
 import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
 
-sealed class Node {
-    open val parent: NodeHolder = NodeHolder()
-}
+sealed class Node
 
 data class Library(
     val metadata: MetaNode,
@@ -15,7 +13,7 @@ data class Library(
     val semanticTypes: MutableList<Type> = mutableListOf(),
     val automata: MutableList<Automaton> = mutableListOf(),
     val extensionFunctions: MutableMap<String, MutableList<Function>> = mutableMapOf(),
-    val globalVariables: MutableMap<String, GlobalVariableDeclaration> = mutableMapOf()
+    val globalVariableDeclarations: MutableMap<String, GlobalVariableDeclaration> = mutableMapOf()
 ) : Node(), IPrinter {
     override fun dumpToString(): String = buildString {
         appendLine(metadata.dumpToString())
@@ -59,7 +57,7 @@ data class Library(
         append(formatListEmptyLineAtEndIfNeeded(automata))
     }
 
-    private fun formatGlobalVariables(): String = formatListEmptyLineAtEndIfNeeded(globalVariables.values.toList())
+    private fun formatGlobalVariables(): String = formatListEmptyLineAtEndIfNeeded(globalVariableDeclarations.values.toList())
 }
 
 class MetaNode(
@@ -228,6 +226,40 @@ data class StructuredType(
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
     }
+
+    override fun toString(): String {
+        return "StructuredType(name='$name', type=$type, generic=$generic, isPointer=$isPointer, isTopLevelType=$isTopLevelType)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as StructuredType
+
+        if (name != other.name) return false
+        if (type != other.type) return false
+        if (generic != other.generic) return false
+        if (entries != other.entries.map { it.first }) return false
+        if (context != other.context) return false
+        if (isPointer != other.isPointer) return false
+        if (isTopLevelType != other.isTopLevelType) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + (generic?.hashCode() ?: 0)
+        result = 31 * result + entries.map { it.first }.hashCode()
+        result = 31 * result + context.hashCode()
+        result = 31 * result + isPointer.hashCode()
+        result = 31 * result + isTopLevelType.hashCode()
+        return result
+    }
+
+
 }
 
 data class EnumType(
@@ -263,16 +295,17 @@ data class ArrayType(
 data class Automaton(
     val name: String,
     val type: Type,
-    var states: MutableList<State> = mutableListOf(),
-    var shifts: MutableList<Shift> = mutableListOf(),
-    var internalVariables: MutableList<AutomatonVariableDeclaration> = mutableListOf(),
-    var constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
-    var localFunctions: MutableList<Function> = mutableListOf()
+    val states: MutableList<State> = mutableListOf(),
+    val shifts: MutableList<Shift> = mutableListOf(),
+    val internalVariableDeclarations: MutableList<AutomatonVariableDeclaration> = mutableListOf(),
+    val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
+    val localFunctions: MutableList<Function> = mutableListOf(),
+    val extensionFunctions: MutableList<Function> = mutableListOf()
 ) : Node(), IPrinter {
     val functions: List<Function>
-        get() = localFunctions + (parent.node as Library).extensionFunctions[name].orEmpty()
+        get() = localFunctions + extensionFunctions
     val variables: List<Variable>
-        get() = internalVariables + constructorVariables
+        get() = internalVariableDeclarations.map { decl -> decl.variable } + constructorVariables
 
     override fun dumpToString(): String = buildString {
         append("automaton ${addBacktickIfNeeded(name)}")
@@ -292,13 +325,15 @@ data class Automaton(
         append(formatFunctions())
     }
 
-    private fun formatInternalVariables(): String = formatListEmptyLineAtEndIfNeeded(internalVariables)
+    private fun formatInternalVariables(): String = formatListEmptyLineAtEndIfNeeded(internalVariableDeclarations)
 
     private fun formatStates(): String = formatListEmptyLineAtEndIfNeeded(states)
 
     private fun formatShifts(): String = formatListEmptyLineAtEndIfNeeded(shifts)
 
     private fun formatFunctions(): String = formatListEmptyLineAtEndIfNeeded(functions, appendEndLineAtTheEnd = false)
+
+    override fun toString(): String = dumpToString()
 }
 
 data class State(
@@ -355,7 +390,7 @@ data class Function(
     val context: LslContext
 ) : Node(), IPrinter {
     val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
-    val qualifiedName: String
+    val fullName: String
         get() = "${automaton.name}.$name"
     var resultVariable: Variable? = null
 
@@ -484,42 +519,41 @@ enum class ArithmeticUnaryOp(val string: String) {
     MINUS("-"), INVERSION("!")
 }
 
-sealed class Variable : Expression() {
-    abstract val name: String
-    abstract val type: Type
-    open val initValue: Expression? = null
-
+open class Variable(
+    open val name: String,
+    open val type: Type
+) : Expression() {
     open val fullName: String
         get() = name
-}
 
-data class GlobalVariableDeclaration(
-    override val name: String,
-    override val type: Type,
-    override val initValue: Expression?
-) : Variable() {
-    override fun dumpToString(): String = buildString {
-        append("var ${addBacktickIfNeeded(name)}: ${type.fullName}")
-        if (initValue != null) {
-            append(" = ${initValue.dumpToString()}")
-        }
+    override fun dumpToString(): String = name
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Variable) return false
 
-        appendLine()
+        if (name != other.name) return false
+        if (type != other.type) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + type.hashCode()
+        return result
     }
 }
 
-data class AutomatonVariableDeclaration(
-    override val name: String,
-    override val type: Type,
-    override var initValue: Expression?
-) : Variable() {
-    lateinit var automaton: Automaton
+data class ResultVariable(
+    override val type: Type
+) : Variable(name = "result", type)
 
-    override val fullName: String
-        get() = "${automaton.name}.${name}"
+sealed class VariableDeclaration : Node(), IPrinter {
+    abstract val variable: Variable
+    abstract val initValue: Expression?
 
     override fun dumpToString(): String = buildString {
-        append("var $name: ${type.fullName}")
+        append("var ${addBacktickIfNeeded(variable.name)}: ${variable.type.fullName}")
         if (initValue != null) {
             append(" = ${initValue!!.dumpToString()}")
         }
@@ -528,31 +562,16 @@ data class AutomatonVariableDeclaration(
     }
 }
 
-data class FunctionArgument(
-    override val name: String,
-    override val type: Type,
-    val index: Int,
-    var annotation: Annotation? = null
-) : Variable() {
-    lateinit var function: Function
+data class GlobalVariableDeclaration(
+    override val variable: Variable,
+    override val initValue: Expression?
+) : VariableDeclaration()
 
-    override val fullName: String
-        get() = "${function.name}.$name"
-
-    override fun dumpToString(): String = buildString {
-        if (annotation != null) {
-            append("@${annotation!!.dumpToString()} ")
-        }
-        appendLine("$name: ${type.dumpToString()}")
-    }
-}
-
-data class ResultVariable(
-    override val type: Type
-) : Variable() {
-    override val name: String = "result"
-
-    override fun dumpToString(): String = error("unsupported function call")
+data class AutomatonVariableDeclaration(
+    override val variable: Variable,
+    override var initValue: Expression?
+) : VariableDeclaration() {
+    lateinit var automaton: Automaton
 }
 
 open class Annotation(
@@ -583,10 +602,30 @@ class TargetAnnotation(
     }
 }
 
-data class ConstructorArgument(
-    override val name: String,
-    override val type: Type,
-) : Variable() {
+
+class FunctionArgument(
+    name: String,
+    type: Type,
+    val index: Int,
+    var annotation: Annotation? = null
+) : Variable(name, type) {
+    lateinit var function: Function
+
+    override val fullName: String
+        get() = "${function.name}.$name"
+
+    override fun dumpToString(): String = buildString {
+        if (annotation != null) {
+            append("@${annotation!!.dumpToString()} ")
+        }
+        appendLine("$name: ${type.dumpToString()}")
+    }
+}
+
+class ConstructorArgument(
+    name: String,
+    type: Type,
+) : Variable(name, type) {
     lateinit var automaton: Automaton
 
     override val fullName: String
@@ -599,7 +638,7 @@ sealed class QualifiedAccess : Atomic() {
     abstract var childAccess: QualifiedAccess?
     abstract val type: Type
 
-    override fun toString(): String = (childAccess?.toString() ?: "") + ":${type.fullName}"
+    override fun toString(): String = (childAccess?.toString()?.plus(".") ?: "") + ":${type.fullName}"
 
     override val value: Any? = null
 
@@ -607,6 +646,9 @@ sealed class QualifiedAccess : Atomic() {
         get() = childAccess?.lastChild ?: childAccess ?: this
 }
 
+/**
+ * Access for variable.field[.childAccess]
+ */
 data class VariableAccess(
     val fieldName: String,
     override var childAccess: QualifiedAccess?,

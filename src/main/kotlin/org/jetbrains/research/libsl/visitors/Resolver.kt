@@ -51,10 +51,13 @@ class Resolver(
                     errorManager(UnresolvedType(variableTypeName, variable.nameWithType().type.position()))
                     null
                 } else {
-                    AutomatonVariableDeclaration(
+                    val automatonVariable = Variable(
                         variableName,
-                        variableType,
-                        null
+                        variableType
+                    )
+                    AutomatonVariableDeclaration(
+                        automatonVariable,
+                        initValue = null
                     )
                 }
             }.toMutableList()
@@ -89,8 +92,7 @@ class Resolver(
                 states,
                 mutableListOf(),
                 variables,
-                constructorVariables,
-                mutableListOf(),
+                constructorVariables
             )
 
             context.storeResolvedAutomaton(automaton)
@@ -115,12 +117,12 @@ class Resolver(
                 return@map
             }
 
+            val globalVariable = Variable(name, type)
             val variable = GlobalVariableDeclaration(
-                name,
-                type,
+                globalVariable,
                 init
             )
-            context.storeGlobalVariable(variable)
+            context.storeGlobalVariableDeclaration(variable)
         }
 
         for (automaton in automata) {
@@ -258,7 +260,7 @@ class Resolver(
             .mapNotNull { it.variableDecl() }
             .forEach { decl ->
                 val variableName = decl.nameWithType().name.processIdentifier()
-                val automatonVariable = automaton.internalVariables.first { it.name == variableName }
+                val automatonVariable = automaton.internalVariableDeclarations.first { it.variable.name == variableName }
 
                 if (decl.assignmentRight() != null) {
                     automatonVariable.initValue = asgBuilderVisitor.processAssignmentRight(decl.assignmentRight())
