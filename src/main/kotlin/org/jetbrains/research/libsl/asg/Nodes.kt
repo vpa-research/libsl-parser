@@ -4,7 +4,7 @@ import org.jetbrains.research.libsl.utils.IPrinter
 import org.jetbrains.research.libsl.utils.IPrinter.Companion.SPACE
 import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
 
-sealed class Node
+sealed class Node : IPrinter
 
 data class Library(
     val metadata: MetaNode,
@@ -14,7 +14,7 @@ data class Library(
     val automata: MutableList<Automaton> = mutableListOf(),
     val extensionFunctions: MutableMap<String, MutableList<Function>> = mutableMapOf(),
     val globalVariableDeclarations: MutableMap<String, GlobalVariableDeclaration> = mutableMapOf()
-) : Node(), IPrinter {
+) : Node() {
     override fun dumpToString(): String = buildString {
         appendLine(metadata.dumpToString())
         append(formatImports())
@@ -66,7 +66,7 @@ class MetaNode(
     val language: String? = null,
     var url: String? = null,
     val lslVersion: Triple<UInt, UInt, UInt>
-) : Node(), IPrinter {
+) : Node() {
     val stringVersion: String
         get() {
             return "${lslVersion.first}.${lslVersion.second}.${lslVersion.third}"
@@ -301,7 +301,7 @@ data class Automaton(
     val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
     val extensionFunctions: MutableList<Function> = mutableListOf()
-) : Node(), IPrinter {
+) : Node() {
     val functions: List<Function>
         get() = localFunctions + extensionFunctions
     val variables: List<Variable>
@@ -341,7 +341,7 @@ data class State(
     val kind: StateKind,
     val isSelf: Boolean = false,
     val isAny: Boolean = false,
-) : Node(), IPrinter {
+) : Node() {
     lateinit var automaton: Automaton
 
     override fun dumpToString(): String = "${kind.keyword} $name;"
@@ -351,7 +351,7 @@ data class Shift(
     val from: State,
     val to: State,
     val functions: MutableList<Function> = mutableListOf()
-) : Node(), IPrinter {
+) : Node() {
     override fun dumpToString(): String = buildString {
         append("shift ")
         append(from.name)
@@ -388,7 +388,7 @@ data class Function(
     val hasBody: Boolean = statements.isNotEmpty(),
     var target: Automaton? = null,
     val context: LslContext
-) : Node(), IPrinter {
+) : Node() {
     val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
     val fullName: String
         get() = "${automaton.name}.$name"
@@ -447,7 +447,7 @@ data class Function(
     }
 }
 
-sealed class Statement: Node(), IPrinter
+sealed class Statement: Node()
 
 data class Assignment(
     val left: QualifiedAccess,
@@ -472,7 +472,7 @@ data class Contract(
     val name: String?,
     val expression: Expression,
     val kind: ContractKind
-) : Node(), IPrinter {
+) : Node() {
     override fun dumpToString(): String = buildString {
         append(kind.keyword)
         append(SPACE)
@@ -489,7 +489,7 @@ enum class ContractKind(val keyword: String) {
     REQUIRES("requires"), ENSURES("ensures"), ASSIGNS("assigns")
 }
 
-sealed class Expression: Node(), IPrinter
+sealed class Expression: Node()
 
 data class BinaryOpExpression(
     val left: Expression,
@@ -548,7 +548,7 @@ data class ResultVariable(
     override val type: Type
 ) : Variable(name = "result", type)
 
-sealed class VariableDeclaration : Node(), IPrinter {
+sealed class VariableDeclaration : Node() {
     abstract val variable: Variable
     abstract val initValue: Expression?
 
@@ -737,7 +737,7 @@ data class ArgumentWithValue(
     override fun dumpToString(): String = "${variable.name} = ${init.dumpToString()}"
 }
 
-sealed class Atomic : Expression(), IPrinter {
+sealed class Atomic : Expression() {
     abstract val value: Any?
 
     override fun dumpToString(): String = value?.toString() ?: ""
