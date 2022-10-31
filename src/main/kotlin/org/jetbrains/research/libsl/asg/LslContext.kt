@@ -78,4 +78,23 @@ class LslContext {
     fun import(context: LslContext) {
         importedContexts.add(context)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LslContext) return false
+
+        if (typeStorage != other.typeStorage) return false
+        if (globalVariables != other.globalVariables) return false
+        if (typeInferer != other.typeInferer) return false
+        if (functionStorage != other.functionStorage) return false
+        if (automatonStorage != other.automatonStorage) return false
+        if (importedContexts != other.importedContexts) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        // DO NOT USE HERE ANY NODE because it could contain a reference to context consequently a SOF will occur
+        return 42
+    }
 }
