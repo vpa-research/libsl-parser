@@ -2,9 +2,11 @@ package org.jetbrains.research.libsl.asg
 
 class LslContext {
     val typeStorage = mutableMapOf<String, Type>()
+    val globalVariables = mutableMapOf<String, GlobalVariableDeclaration>()
+    val typeInferer = TypeInferer(this)
+
     private val functionStorage = mutableMapOf<String, MutableList<Function>>()
     private val automatonStorage = mutableMapOf<String, Automaton>()
-    val globalVariables = mutableMapOf<String, GlobalVariableDeclaration>()
 
     private val importedContexts = mutableListOf<LslContext>()
 

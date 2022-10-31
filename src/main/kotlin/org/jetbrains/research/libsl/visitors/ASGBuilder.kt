@@ -442,30 +442,29 @@ class ASGBuilder(
         val name = names.first()
         return when(parentType) {
             is StructuredType -> {
-                val entry = parentType.entries.firstOrNull { it.first == name }
+                val entry = parentType.entries.entries.firstOrNull { it.key == name }
                     ?: error("unresolved field $name in type ${parentType.name}")
                 VariableAccess(
                     name,
-                    resolvePeriodSeparatedChain(entry.second, names.drop(1)),
-                    entry.second,
+                    resolvePeriodSeparatedChain(entry.value, names.drop(1)),
+                    entry.value,
                     null
                 )
             }
             is EnumType -> {
-                val entry = parentType.entries.firstOrNull { it.first == name }
-                    ?: error("unresolved field $name in type ${parentType.name}")
+                parentType.getFieldValue(name) ?: error("unresolved field $name in type ${parentType.name}")
                 VariableAccess(
-                    entry.first,
+                    name,
                     null,
                     parentType,
                     null
                 )
             }
             is EnumLikeSemanticType -> {
-                val entry = parentType.entries.firstOrNull { it.first == name }
+                val entry = parentType.entries.entries.firstOrNull { it.key == name }
                     ?: error("unresolved field $name in type ${parentType.name}")
                 VariableAccess(
-                    entry.first,
+                    entry.key,
                     null,
                     parentType,
                     null
@@ -476,10 +475,11 @@ class ASGBuilder(
             }
             else -> {
                 if (names.size == 1) {
+                    check(parentType is FieldTypedType) { "can't resolve chain for $parentType" }
                     VariableAccess(
                         name,
                         null,
-                        parentType.resolveFieldType(name) ?: error("can't resolve field $name in type ${parentType.name}"),
+                        parentType.getFieldType(name) ?: error("can't resolve field $name in type ${parentType.name}"),
                         null
                     )
                 } else {

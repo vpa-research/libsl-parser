@@ -154,7 +154,7 @@ class Resolver(
                     val realName = blockType.realName
                     val resolvedRealType = context.resolveType(realName.text)
                         ?: processRealTypeIdentifier(realName)
-                    val body = blockType.blockTypeStatement().map { statement ->
+                    val body = blockType.blockTypeStatement().associate { statement ->
                         statement.Identifier().processIdentifier() to resolvePrimitiveLiteral(statement.expressionAtomic().primitiveLiteral())
                     }
                     // val genericTypeCtx = blockType.typeIdentifier().generic
@@ -193,7 +193,7 @@ class Resolver(
             null
         }
 
-        val entries = ctx.typeDefBlockStatement().map { statement ->
+        val entries = ctx.typeDefBlockStatement().associate { statement ->
             statement.nameWithType().let { it.name.processIdentifier() to processRealTypeIdentifier(it.type) }
         }
 
@@ -331,7 +331,7 @@ class Resolver(
 
     override fun visitEnumBlock(ctx: LibSLParser.EnumBlockContext) {
         val semanticType = ctx.typeIdentifier().text
-        val body = ctx.enumBlockStatement().map { statement ->
+        val body = ctx.enumBlockStatement().associate { statement ->
             statement.Identifier().processIdentifier() to IntegerLiteral(statement.integerNumber().text.toInt())
         }
         context.storeResolvedType(

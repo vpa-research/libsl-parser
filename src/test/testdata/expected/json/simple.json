@@ -58,13 +58,6 @@
           }
         },
         {
-          "name": "VARIANT2",
-          "value": {
-            "kind": "float",
-            "value": 1.0
-          }
-        },
-        {
           "name": "VARIANT3",
           "value": {
             "kind": "string",

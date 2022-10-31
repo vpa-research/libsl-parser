@@ -66,7 +66,7 @@ val librarySerializer = JsonSerializer<Library> { src, _, context ->
 val variableDeclaration = JsonSerializer<VariableDeclaration> { src, _, context ->
     JsonObject().apply {
         addProperty("name", src.variable.name)
-        add("type", context.serialize(src.variable.type))
+        add("type", context.serialize(src.variable.type, Type::class.java))
         add("init", context.serialize(src.initValue))
     }
 }
@@ -177,17 +177,17 @@ val typeSerializer = JsonSerializer<Type> { src, _, context ->
                 add("type", context.serialize(src.type, Type::class.java))
                 add("entries", JsonArray().apply { src.entries.forEach { entry ->
                     add(JsonObject().apply {
-                        addProperty("name", entry.first)
-                        add("value", context.serialize(entry.second, Expression::class.java))
+                        addProperty("name", entry.key)
+                        add("value", context.serialize(entry.value, Expression::class.java))
                     })
                 } })
             }
             is EnumType -> {
                 addProperty("kind", "enum")
-                add("entries", JsonArray().apply { src.entries.forEach { entry ->
+                add("entries", JsonArray().apply { src.entries.forEach { (name, value) ->
                     add(JsonObject().apply {
-                        addProperty("name", entry.first)
-                        add("value", context.serialize(entry.second, Expression::class.java))
+                        addProperty("name", name)
+                        add("value", context.serialize(value, Expression::class.java))
                     })
                 } })
             }
@@ -200,8 +200,8 @@ val typeSerializer = JsonSerializer<Type> { src, _, context ->
                 addProperty("kind", "structured")
                 add("entries", JsonArray().apply { src.entries.forEach { entry ->
                     add(JsonObject().apply {
-                        addProperty("name", entry.first)
-                        add("type", context.serialize(entry.second, Type::class.java))
+                        addProperty("name", entry.key)
+                        add("type", context.serialize(entry.value, Type::class.java))
                     })
                 } })
             }

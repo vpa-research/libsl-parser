@@ -9,7 +9,6 @@ types {
     EnumLikeType(ru.vldf.Type) {
         VARIANT1: -1;
         VARIANT2: true;
-        VARIANT2: 1.0;
         VARIANT3: "String";
     }
     String(java.lang.String);
