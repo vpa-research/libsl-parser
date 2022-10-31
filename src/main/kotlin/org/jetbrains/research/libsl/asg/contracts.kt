@@ -1,7 +1,5 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.utils.IPrinter
-
 data class Contract(
     val name: String?,
     val expression: Expression,

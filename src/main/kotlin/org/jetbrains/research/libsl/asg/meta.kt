@@ -1,7 +1,5 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.utils.IPrinter
-
 data class Library(
     val metadata: MetaNode,
     val imports: MutableList<String> = mutableListOf(),

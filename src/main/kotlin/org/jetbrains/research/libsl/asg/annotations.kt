@@ -1,7 +1,5 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.utils.IPrinter
-
 open class Annotation(
     val name: String,
     val values: MutableList<Expression> = mutableListOf()

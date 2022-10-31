@@ -1,7 +1,5 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.utils.IPrinter
-
 sealed interface Type : IPrinter {
     val name: String
     val isPointer: Boolean

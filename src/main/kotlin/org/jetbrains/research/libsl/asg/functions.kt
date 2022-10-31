@@ -1,6 +1,5 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.utils.IPrinter
 import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
 
 data class Function(

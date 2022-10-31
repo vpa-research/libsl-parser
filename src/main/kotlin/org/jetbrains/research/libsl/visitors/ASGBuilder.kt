@@ -7,6 +7,7 @@ import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.asg.*
 import org.jetbrains.research.libsl.asg.Function
 import org.jetbrains.research.libsl.errors.*
+import org.jetbrains.research.libsl.utils.QualifiedAccessUtils
 
 class ASGBuilder(
     private val context: LslContext,
@@ -389,7 +390,7 @@ class ASGBuilder(
                 val baseType = variable.type
                 VariableAccess(
                     name,
-                    resolvePeriodSeparatedChain(baseType, names.drop(1)),
+                    QualifiedAccessUtils.resolvePeriodSeparatedChain(baseType, names.drop(1)),
                     baseType,
                     variable
                 )
@@ -434,58 +435,6 @@ class ASGBuilder(
                 }
             }
             else -> error("unknown qualified access kind")
-        }
-    }
-
-    private fun resolvePeriodSeparatedChain(parentType: Type, names: List<String>): QualifiedAccess? {
-        if (names.isEmpty()) return null
-        val name = names.first()
-        return when(parentType) {
-            is StructuredType -> {
-                val entry = parentType.entries.entries.firstOrNull { it.key == name }
-                    ?: error("unresolved field $name in type ${parentType.name}")
-                VariableAccess(
-                    name,
-                    resolvePeriodSeparatedChain(entry.value, names.drop(1)),
-                    entry.value,
-                    null
-                )
-            }
-            is EnumType -> {
-                parentType.getFieldValue(name) ?: error("unresolved field $name in type ${parentType.name}")
-                VariableAccess(
-                    name,
-                    null,
-                    parentType,
-                    null
-                )
-            }
-            is EnumLikeSemanticType -> {
-                val entry = parentType.entries.entries.firstOrNull { it.key == name }
-                    ?: error("unresolved field $name in type ${parentType.name}")
-                VariableAccess(
-                    entry.key,
-                    null,
-                    parentType,
-                    null
-                )
-            }
-            is TypeAlias -> {
-                resolvePeriodSeparatedChain(parentType.originalType, names.drop(1))
-            }
-            else -> {
-                if (names.size == 1) {
-                    check(parentType is FieldTypedType) { "can't resolve chain for $parentType" }
-                    VariableAccess(
-                        name,
-                        null,
-                        parentType.getFieldType(name) ?: error("can't resolve field $name in type ${parentType.name}"),
-                        null
-                    )
-                } else {
-                    error("can't resolve access chain. Unsupported part type: ${parentType::class.java}")
-                }
-            }
         }
     }
 
