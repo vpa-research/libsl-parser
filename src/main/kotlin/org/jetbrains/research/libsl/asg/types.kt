@@ -153,9 +153,6 @@ data class StructuredType(
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + type.hashCode()
-        result = 31 * result + (generic?.hashCode() ?: 0)
-        result = 31 * result + entries.hashCode()
-        result = 31 * result + context.hashCode()
         result = 31 * result + isPointer.hashCode()
         result = 31 * result + isTopLevelType.hashCode()
         return result

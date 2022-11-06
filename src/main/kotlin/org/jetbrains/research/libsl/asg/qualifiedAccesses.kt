@@ -4,7 +4,7 @@ sealed class QualifiedAccess : Atomic() {
     abstract var childAccess: QualifiedAccess?
     abstract val type: Type
 
-    override fun toString(): String = (childAccess?.toString()?.plus(".") ?: "") + ":${type.fullName}"
+    override fun toString(): String = dumpToString()
 
     override val value: Any? = null
 
@@ -21,8 +21,7 @@ data class VariableAccess(
     override val type: Type,
     val variable: Variable?
 ) : QualifiedAccess() {
-    override fun toString(): String = "$fieldName${childAccess?.toString() ?: ""}"
-
+    override fun toString(): String = dumpToString()
     override fun dumpToString(): String = when {
         childAccess != null && childAccess is VariableAccess -> "$fieldName.${childAccess?.dumpToString()}"
         childAccess != null -> "$fieldName${childAccess?.dumpToString()}"
@@ -36,7 +35,7 @@ data class ArrayAccess(
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
 
-    override fun toString(): String = "${childAccess.toString()}[$index]"
+    override fun toString(): String = dumpToString()
 
     override fun dumpToString(): String = buildString {
         append("[${index.dumpToString()}]")
@@ -53,7 +52,7 @@ data class AutomatonGetter(
 ) : QualifiedAccess() {
     override val type: Type = automaton.type
 
-    override fun toString(): String = "${automaton.name}(${arg.name}).${childAccess.toString()}"
+    override fun toString(): String = dumpToString()
 
     override fun dumpToString(): String = buildString {
         append(automaton.name)
