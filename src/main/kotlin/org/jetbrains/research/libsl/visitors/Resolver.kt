@@ -43,6 +43,11 @@ class Resolver(
                 continue
             }
 
+            if (type !is LibslType) {
+                errorManager(SemanticTypeExpected(typeName, automatonCtx.type.position()))
+                continue
+            }
+
             val variables = automatonCtx.automatonStatement().mapNotNull { it.variableDecl() }.mapNotNull { variable ->
                 val variableName = variable.nameWithType().name.processIdentifier()
                 val variableTypeName = variable.nameWithType().type.text

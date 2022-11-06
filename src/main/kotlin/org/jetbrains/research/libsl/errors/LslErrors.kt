@@ -44,6 +44,11 @@ class UnresolvedType(
     position: Position
 ) : UnresolvedReference(text, position, ReferenceKind.Type)
 
+class SemanticTypeExpected(
+    text: String,
+    position: Position
+) : UnresolvedReference("expected semantic type but got $text", position, ReferenceKind.Type)
+
 
 enum class ReferenceKind {
     Variable, Function, Automaton, State, Type

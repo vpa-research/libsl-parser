@@ -107,7 +107,7 @@ blockTypeStatement
  * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=Identifier L_BRACE automatonStatement* R_BRACE
+   :   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
    ;
 
 automatonStatement
