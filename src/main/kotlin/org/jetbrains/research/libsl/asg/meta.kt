@@ -1,5 +1,7 @@
 package org.jetbrains.research.libsl.asg
 
+import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+
 data class Library(
     val metadata: MetaNode,
     val imports: MutableList<String> = mutableListOf(),
@@ -70,7 +72,7 @@ class MetaNode(
     // library $libraryName version "$libraryVersion" language "$language" url "libraryUrl"
     override fun dumpToString(): String = buildString {
         appendLine("libsl \"$stringVersion\";")
-        append("library $name")
+        append("library ${addBacktickIfNeeded(name)}")
 
         if (libraryVersion != null) {
             append(IPrinter.SPACE + "version \"$libraryVersion\"")
