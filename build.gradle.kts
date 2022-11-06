@@ -49,7 +49,9 @@ publishing {
             version = "1.0.0"
 
             from(components["java"])
-            artifact(sourcesJar)
+            artifact(sourcesJar) {
+                classifier = "sources"
+            }
         }
     }
 }
