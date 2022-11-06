@@ -11,9 +11,9 @@ import java.io.File
 import java.nio.file.Path
 
 class LibSL(
-    private val basePath: String
+    private val basePath: String,
+    val context: LslContext = LslContext()
 ) {
-    val context = LslContext()
     val errorManager = ErrorManager()
     lateinit var library: Library
     private var isParsed = false

@@ -4,6 +4,8 @@ class LslContext {
     val typeStorage = mutableMapOf<String, Type>()
     val globalVariables = mutableMapOf<String, GlobalVariableDeclaration>()
     val typeInferer = TypeInferer(this)
+    @Suppress("MemberVisibilityCanBePrivate")
+    var isInitialized: Boolean = false
 
     private val functionStorage = mutableMapOf<String, MutableList<Function>>()
     private val automatonStorage = mutableMapOf<String, Automaton>()
@@ -11,6 +13,8 @@ class LslContext {
     private val importedContexts = mutableListOf<LslContext>()
 
     fun init() {
+        if (isInitialized)
+            return
         val types = buildList<Type> {
             for (pointer in listOf(true, false)) {
                 add(IntType(this@LslContext, IntType.IntCapacity.INT8, pointer))
@@ -34,6 +38,7 @@ class LslContext {
         }
 
         types.forEach(::storeResolvedType)
+        this.isInitialized = true
     }
 
     fun storeResolvedType(type: Type) {
