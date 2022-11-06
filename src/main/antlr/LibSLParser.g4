@@ -187,7 +187,7 @@ argPair
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   FUN name=periodSeparatedFullName L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=Identifier)?
+   :   FUN name=periodSeparatedFullName L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=periodSeparatedFullName)?
        (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
@@ -196,7 +196,7 @@ functionDeclArgList
    ;
 
 parameter
-   :   annotation? name=Identifier COLON type=Identifier
+   :   annotation? name=periodSeparatedFullName COLON type=periodSeparatedFullName
    ;
 
 /* annotation
