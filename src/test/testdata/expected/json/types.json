@@ -596,7 +596,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "imgcontentnull[x][y]",
+              "variable": "img.content[y][x]",
               "value": {
                 "kind": "unary",
                 "unaryOp": "inversion",
@@ -755,7 +755,7 @@
             },
             {
               "kind": "assignment",
-              "variable": "imgtpefield",
+              "variable": "img.tpe.field",
               "value": {
                 "kind": "integer",
                 "value": 1

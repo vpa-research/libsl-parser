@@ -63,7 +63,7 @@
           "statements": [
             {
               "kind": "assignment",
-              "variable": "paramnull[IntegerLiteral(value\u003d0)]",
+              "variable": "param[0]",
               "value": {
                 "kind": "integer",
                 "value": 1
