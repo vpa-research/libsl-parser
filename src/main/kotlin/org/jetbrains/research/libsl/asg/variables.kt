@@ -89,5 +89,5 @@ class ConstructorArgument(
     override val fullName: String
         get() = "${automaton.name}.$name"
 
-    override fun dumpToString(): String = "var $name: ${type.fullName}"
+    override fun dumpToString(): String = "var ${addBacktickIfNeeded(name)}: ${type.fullName}"
 }
