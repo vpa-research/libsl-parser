@@ -143,22 +143,23 @@ class Resolver(
         for (semanticTypeContext in ctx.semanticTypeDecl()) {
             val type = when {
                 semanticTypeContext.simpleSemanticType() != null -> {
-                    val semanticType = semanticTypeContext.simpleSemanticType().semanticName.text
+                    val semanticType = semanticTypeContext.simpleSemanticType().semanticName.text.extractIdentifier()
                     val realTypeCtx = semanticTypeContext.simpleSemanticType().realName
-                    val resolvedRealType = context.resolveType(realTypeCtx.text)
-                        ?: processRealTypeIdentifier(realTypeCtx)
+                    val realTypeName = realTypeCtx.text.extractIdentifier()
+                    val resolvedRealType = context.resolveType(realTypeName) ?: processRealTypeIdentifier(realTypeCtx)
                     val isPointer = realTypeCtx.asterisk != null
 
                     check(resolvedRealType is RealType || resolvedRealType is PrimitiveType)
 
                     SimpleType(semanticType, resolvedRealType, isPointer, context)
                 }
+
                 semanticTypeContext.blockType() != null -> {
                     val blockType = semanticTypeContext.blockType()
                     val semanticType = blockType.semanticName.processIdentifier()
-                    val realName = blockType.realName
-                    val resolvedRealType = context.resolveType(realName.text)
-                        ?: processRealTypeIdentifier(realName)
+                    val realNameCtx = blockType.realName
+                    val realTypeName = realNameCtx.text.extractIdentifier()
+                    val resolvedRealType = context.resolveType(realTypeName) ?: processRealTypeIdentifier(realNameCtx)
                     val body = blockType.blockTypeStatement().associate { statement ->
                         statement.Identifier().processIdentifier() to resolvePrimitiveLiteral(statement.expressionAtomic().primitiveLiteral())
                     }
@@ -174,9 +175,10 @@ class Resolver(
     }
 
     override fun visitTypealiasStatement(ctx: LibSLParser.TypealiasStatementContext) {
-        val name = ctx.left.text
-        val resolvedRealType = context.resolveType(ctx.right.text)
-            ?: processRealTypeIdentifier(ctx.right)
+        val name = ctx.left.text.extractIdentifier()
+        val realTypeCtx = ctx.right
+        val realTypeName = realTypeCtx.text.extractIdentifier()
+        val resolvedRealType = context.resolveType(realTypeName) ?: processRealTypeIdentifier(realTypeCtx)
 
         check(resolvedRealType is AliassableType)
 
@@ -188,12 +190,11 @@ class Resolver(
     }
 
     override fun visitTypeDefBlock(ctx: LibSLParser.TypeDefBlockContext) {
-        val name = ctx.name.name.processIdentifier()
-        val typeIdentifier = ctx.typeIdentifier()
-        val resolvedRealType = context.resolveType(typeIdentifier.text)
-            ?: processRealTypeIdentifier(typeIdentifier)
-        val generic = if (typeIdentifier.generic != null) {
-            processRealTypeIdentifier(typeIdentifier.generic)
+        val typeIdentifierCtx = ctx.name
+        val name = typeIdentifierCtx.name.processIdentifier()
+        val resolvedRealType = context.resolveType(name) ?: processRealTypeIdentifier(typeIdentifierCtx)
+        val generic = if (typeIdentifierCtx.generic != null) {
+            processRealTypeIdentifier(typeIdentifierCtx.generic)
         } else {
             null
         }

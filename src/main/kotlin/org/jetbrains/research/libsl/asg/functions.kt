@@ -25,7 +25,7 @@ data class Function(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> buildString {
                 if (arg.annotation != null) {
                     append("@")
-                    append(arg.annotation!!.name)
+                    append(addBacktickIfNeeded(arg.annotation!!.name))
 
                     if (arg.annotation!!.values.isNotEmpty()) {
                         append("(")
@@ -55,7 +55,7 @@ data class Function(
 
         if (contracts.isNotEmpty()) {
             appendLine()
-            append(formatListEmptyLineAtEndIfNeeded(contracts))
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
         }
 
         if (!hasBody && contracts.isEmpty()) {

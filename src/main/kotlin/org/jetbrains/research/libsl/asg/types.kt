@@ -1,5 +1,7 @@
 package org.jetbrains.research.libsl.asg
 
+import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+
 sealed interface Type : IPrinter {
     val name: String
     val isPointer: Boolean
@@ -7,7 +9,11 @@ sealed interface Type : IPrinter {
     val generic: Type?
 
     val fullName: String
-        get() = "${if (isPointer) "*" else ""}$name${if (generic != null) "<${generic!!.fullName}>" else ""}"
+        get() = buildString {
+            append(if (isPointer) "*" else "")
+            append(name)
+            append(if (generic != null) "<${generic!!.fullName}>" else "")
+        }
 
     val isArray: Boolean
         get() = (this as? TypeAlias)?.originalType?.isArray == true || this is ArrayType
@@ -29,11 +35,9 @@ data class RealType (
     override val name: String
         get() = nameParts.joinToString(".")
 
-    override fun toString(): String = "${if (isPointer) "*" else ""}$name${if (generic != null) "<${generic.fullName}>" else ""}"
+    override fun toString(): String = dumpToString()
 
-    override fun dumpToString(): String {
-        return toString()
-    }
+    override fun dumpToString(): String  = addBacktickIfNeeded(fullName)
 }
 
 data class SimpleType(
@@ -46,8 +50,10 @@ data class SimpleType(
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String {
-        return "$name(${realType.dumpToString()});"
+        return "${addBacktickIfNeeded(name)}(${realType.dumpToString()});"
     }
+
+    override fun toString() = dumpToString()
 }
 
 sealed interface AliassableType : LibslType
@@ -62,8 +68,16 @@ data class TypeAlias (
     override val isTopLevelType: Boolean = true
 
     override fun dumpToString(): String {
-        return "typealias $name = ${originalType.fullName};"
+        return buildString {
+            append("typealias ")
+            append(addBacktickIfNeeded(name, canBePeriodSeparated = true))
+            append(" = ")
+            append(addBacktickIfNeeded(originalType.fullName, canBePeriodSeparated = true))
+            append(";")
+        }
     }
+
+    override fun toString() = dumpToString()
 }
 
 data class EnumLikeSemanticType(
@@ -92,10 +106,12 @@ data class EnumLikeSemanticType(
 
     override fun dumpToString(): String = buildString {
         appendLine("$name(${type.fullName}) {")
-        val formattedEntries = entries.map { (k, v) -> "$k: ${v.dumpToString()}" }
+        val formattedEntries = entries.map { (k, v) -> "${addBacktickIfNeeded(k)}: ${v.dumpToString()}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
     }
+
+    override fun toString() = dumpToString()
 }
 
 class ChildrenType(
@@ -108,6 +124,8 @@ class ChildrenType(
     override fun dumpToString(): String {
         error("unsupported operation exception")
     }
+
+    override fun toString() = dumpToString()
 }
 
 data class StructuredType(
@@ -126,13 +144,9 @@ data class StructuredType(
 
     override fun dumpToString(): String = buildString {
         appendLine("type ${type.fullName} {")
-        val formattedEntries = entries.map { (k, v) -> "$k: ${v.fullName}" }
+        val formattedEntries = entries.map { (k, v) -> "${addBacktickIfNeeded(k)}: ${addBacktickIfNeeded(v.fullName)}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
-    }
-
-    override fun toString(): String {
-        return "StructuredType(name='$name', type=$type, generic=$generic, isPointer=$isPointer, isTopLevelType=$isTopLevelType)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -157,6 +171,8 @@ data class StructuredType(
         result = 31 * result + isTopLevelType.hashCode()
         return result
     }
+
+    override fun toString() = dumpToString()
 }
 
 data class EnumType(
@@ -184,10 +200,12 @@ data class EnumType(
 
     override fun dumpToString(): String = buildString {
         appendLine("enum $name {")
-        val formattedEntries = entries.map { (k, v) -> "$k = ${v.dumpToString()}" }
+        val formattedEntries = entries.map { (k, v) -> "${addBacktickIfNeeded(k)} = ${v.dumpToString()}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
     }
+
+    override fun toString() = dumpToString()
 }
 
 data class ArrayType(
@@ -199,6 +217,8 @@ data class ArrayType(
     override fun dumpToString(): String {
         return fullName
     }
+
+    override fun toString() = dumpToString()
 }
 
 sealed interface FieldTypedType {

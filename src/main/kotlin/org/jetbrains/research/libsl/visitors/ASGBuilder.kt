@@ -19,10 +19,10 @@ class ASGBuilder(
         library = visitLibrary(ctx.header())
         val imports = ctx.globalStatement().mapNotNull { it.ImportStatement() }.map {
             parseStringTokenStringSemicolon(it.processIdentifier(), "import")
-        }.toMutableList()
+        }
         val includes = ctx.globalStatement().mapNotNull { it.IncludeStatement() }.map {
             parseStringTokenStringSemicolon(it.processIdentifier(), "include")
-        }.toMutableList()
+        }
 
         val extensionFunctions = ctx.globalStatement()
             .mapNotNull { it.topLevelDecl()?.functionDecl() }
@@ -35,9 +35,8 @@ class ASGBuilder(
         val automata = ctx.globalStatement()
             .mapNotNull { it.topLevelDecl()?.automatonDecl() }
             .map { visitAutomatonDecl(it) }
-            .toMutableList()
 
-        val types = context.typeStorage.map { it.value }.toMutableList()
+        val types = context.typeStorage.map { it.value }
 
         library.apply {
             this.imports.addAll(imports)

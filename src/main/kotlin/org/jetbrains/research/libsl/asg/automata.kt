@@ -18,7 +18,7 @@ data class Automaton(
         get() = internalVariableDeclarations.map { decl -> decl.variable } + constructorVariables
 
     override fun dumpToString(): String = buildString {
-        append("automaton ${addBacktickIfNeeded(name)}")
+        append("automaton ${addBacktickIfNeeded(name, canBePeriodSeparated = true)}")
         if (constructorVariables.isNotEmpty()) {
             append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
         }

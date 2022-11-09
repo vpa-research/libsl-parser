@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.visitors
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.RuleContext
 import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.VocabularyImpl
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.errors.Position
@@ -32,8 +33,10 @@ fun parseFunctionName(ctx: LibSLParser.FunctionDeclContext): Pair<String?, Strin
 fun String.removeDoubleQuotes(): String = removeSurrounding("\"", "\"")
 fun String.removeQuotes(): String = removeSurrounding("'", "'")
 
-fun TerminalNode.processIdentifier(): String = this.text.removeSurrounding("`", "`")
-fun Token.processIdentifier(): String = this.text.removeSurrounding("`", "`")
+fun TerminalNode.processIdentifier(): String = this.text.extractIdentifier()
+fun Token.processIdentifier(): String = this.text.extractIdentifier()
+
+fun String.extractIdentifier(): String = removeSurrounding("`", "`")
 
 fun LibSLParser.PeriodSeparatedFullNameContext.processIdentifier(): String =
     Identifier().joinToString(separator = ".") { it.processIdentifier() }
@@ -65,11 +68,22 @@ fun Token.position(): Position {
 }
 
 fun ParserRuleContext.position() = start.position()
-fun addBacktickIfNeeded(identifier: String): String {
+
+val keywords = (LibSLParser.VOCABULARY as VocabularyImpl).literalNames.filterNotNull().map { k -> k.removeQuotes() }
+
+fun addBacktickIfNeeded(identifier: String, canBePeriodSeparated: Boolean = false): String {
     val idPattern = Regex("[a-zA-Z_\$][a-zA-Z\\d_\$]*")
-    return if (identifier.matches(idPattern)) {
-        identifier
-    } else {
-        "`$identifier`"
+    val periodSeparatedIdPattern = Regex("([a-zA-Z_\$][a-zA-Z\\d_\$]*\\.)*[a-zA-Z_\$][a-zA-Z\\d_\$]*")
+
+    return when {
+        keywords.contains(identifier) -> {
+            "`$identifier`"
+        }
+        identifier.matches(idPattern) || canBePeriodSeparated && identifier.matches(periodSeparatedIdPattern) -> {
+            identifier
+        }
+        else -> {
+            "`$identifier`"
+        }
     }
 }

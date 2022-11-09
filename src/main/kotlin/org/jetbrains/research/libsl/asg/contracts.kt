@@ -1,5 +1,7 @@
 package org.jetbrains.research.libsl.asg
 
+import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+
 data class Contract(
     val name: String?,
     val expression: Expression,
@@ -9,7 +11,7 @@ data class Contract(
         append(kind.keyword)
         append(IPrinter.SPACE)
         if (name != null) {
-            append(name)
+            append(addBacktickIfNeeded(name))
             append(": ")
         }
         append(expression.dumpToString())

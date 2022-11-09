@@ -76,7 +76,7 @@ class FunctionArgument(
         if (annotation != null) {
             append("@${annotation!!.dumpToString()} ")
         }
-        appendLine("$name: ${type.dumpToString()}")
+        append(name)
     }
 }
 
