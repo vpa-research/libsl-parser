@@ -9,8 +9,8 @@ type StructureType {
 
 automaton A : Int {
     fun foo(param: Int)
-    assigns param;
-    
+        assigns param;
+
     fun foo(param: StructureType)
-    assigns namedAssigns: param.field;
+        assigns namedAssigns: param.field;
 }

@@ -8,8 +8,8 @@ automaton A : Int {
     var i: Int;
     
     fun f(param: Int): Int
-    requires test1: (param >= i);
-    ensures ((param' < param) & (result = 1));
+        requires test1: (param >= i);
+        ensures ((param' < param) & (result = 1));
     {
     }
 }

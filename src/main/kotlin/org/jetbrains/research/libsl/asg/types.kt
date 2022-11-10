@@ -37,7 +37,7 @@ data class RealType (
 
     override fun toString(): String = dumpToString()
 
-    override fun dumpToString(): String  = addBacktickIfNeeded(fullName)
+    override fun dumpToString(): String  = fullName
 }
 
 data class SimpleType(
@@ -70,9 +70,9 @@ data class TypeAlias (
     override fun dumpToString(): String {
         return buildString {
             append("typealias ")
-            append(addBacktickIfNeeded(name, canBePeriodSeparated = true))
+            append(addBacktickIfNeeded(name, canBePeriodSeparated = true, canHaveAsterisk = true))
             append(" = ")
-            append(addBacktickIfNeeded(originalType.fullName, canBePeriodSeparated = true))
+            append(addBacktickIfNeeded(originalType.fullName, canBePeriodSeparated = true, canHaveAsterisk = true))
             append(";")
         }
     }
@@ -144,7 +144,9 @@ data class StructuredType(
 
     override fun dumpToString(): String = buildString {
         appendLine("type ${type.fullName} {")
-        val formattedEntries = entries.map { (k, v) -> "${addBacktickIfNeeded(k)}: ${addBacktickIfNeeded(v.fullName)}" }
+        val formattedEntries = entries.map { (k, v) ->
+            "${addBacktickIfNeeded(k)}: ${addBacktickIfNeeded(v.fullName, canBePeriodSeparated = true, canHaveAsterisk = true)}"
+        }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
     }

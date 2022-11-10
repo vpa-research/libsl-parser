@@ -71,7 +71,11 @@ fun ParserRuleContext.position() = start.position()
 
 val keywords = (LibSLParser.VOCABULARY as VocabularyImpl).literalNames.filterNotNull().map { k -> k.removeQuotes() }
 
-fun addBacktickIfNeeded(identifier: String, canBePeriodSeparated: Boolean = false): String {
+fun addBacktickIfNeeded(
+    identifier: String,
+    canBePeriodSeparated: Boolean = false,
+    canHaveAsterisk: Boolean = false
+): String {
     val idPattern = Regex("[a-zA-Z_\$][a-zA-Z\\d_\$]*")
     val periodSeparatedIdPattern = Regex("([a-zA-Z_\$][a-zA-Z\\d_\$]*\\.)*[a-zA-Z_\$][a-zA-Z\\d_\$]*")
 
@@ -79,7 +83,13 @@ fun addBacktickIfNeeded(identifier: String, canBePeriodSeparated: Boolean = fals
         keywords.contains(identifier) -> {
             "`$identifier`"
         }
-        identifier.matches(idPattern) || canBePeriodSeparated && identifier.matches(periodSeparatedIdPattern) -> {
+        identifier.matches(idPattern) -> {
+            identifier
+        }
+        canBePeriodSeparated && identifier.matches(periodSeparatedIdPattern) -> {
+            identifier
+        }
+        canHaveAsterisk && (identifier.removePrefix("*").matches(periodSeparatedIdPattern)) -> {
             identifier
         }
         else -> {

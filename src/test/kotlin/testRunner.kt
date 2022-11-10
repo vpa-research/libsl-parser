@@ -78,7 +78,7 @@ private fun checkJsonContent(testName: String, library: Library, errorManager: E
 }
 
 private fun checkLslContent(testName: String, library: Library, errorManager: ErrorManager) {
-    val lslContent = library.dumpToString()
+    val lslContent = removeBlankLines(library.dumpToString())
 
     val expectedFile = File("$testdataPath/expected/lsl/$testName.lsl")
     if (!expectedFile.exists()) {
@@ -86,8 +86,12 @@ private fun checkLslContent(testName: String, library: Library, errorManager: Er
         Assertions.fail<FileNotFoundException>("new file was created: $testName")
     }
 
-    Assertions.assertEquals(expectedFile.readText(), lslContent)
+    Assertions.assertEquals(removeBlankLines(expectedFile.readText()), lslContent)
     Assertions.assertTrue(errorManager.errors.isEmpty())
+}
+
+private fun removeBlankLines(text: String): String {
+    return text.lines().filter { line -> line.isNotBlank() }.joinToString(separator = "\n")
 }
 
 private val gson = GsonBuilder()
