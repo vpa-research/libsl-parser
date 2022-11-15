@@ -25,12 +25,12 @@ dependencies {
 }
 ```
 
-Attention: do not forget to replace `Tag` to version
+Attention: do not forget to replace `Tag` to the needed version
 
 ## Writing tests
-Write new `.lsl` file in `./src/test/testdata/lsl/`. After it, run `main()` function in 
-`generateTests.kt` or `Generate tests` run configuration preset in IntelliJ Idea. 
-New test runners can be found in file `GeneratedTests.kt`
+Create the new `.lsl` file in `./src/test/testdata/lsl/`. Then run the `main()` function in 
+`generateTests.kt` or run the `Generate tests` configuration preset in IntelliJ Idea. 
+New test runners can be found in the file `GeneratedTests.kt`
 
-On each test received by parser ASG (abstract semantic graph) is being compared with the 
-result of the previous run. These results storing in `./src/test/testdata/expected/`
+Each ASG (abstract semantic graph) received by the parser (abstract semantic graph) is being compared with the 
+result of the previous run. These results are located in `./src/test/testdata/expected/`
