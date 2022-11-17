@@ -1,7 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Generate tests" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="GenerateTestsKt" />
-    <module name="lsl_new.test" />
+    <module name="libsl.test" />
+    <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
