@@ -133,7 +133,6 @@ class GeneratedTests {
     @Test
     fun testSimpleLsl() {
         runLslTest("simple")
-        runLslTest("simple")
     }
 
     @Test

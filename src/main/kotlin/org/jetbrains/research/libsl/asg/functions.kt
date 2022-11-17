@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Function(
     val name: String,
@@ -19,13 +19,13 @@ data class Function(
     var resultVariable: Variable? = null
 
     override fun dumpToString(): String = buildString {
-        append("fun ${addBacktickIfNeeded(name)}")
+        append("fun ${BackticksPolitics.forIdentifier(name)}")
 
         append(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> buildString {
                 if (arg.annotation != null) {
                     append("@")
-                    append(addBacktickIfNeeded(arg.annotation!!.name))
+                    append(BackticksPolitics.forIdentifier(arg.annotation!!.name))
 
                     if (arg.annotation!!.values.isNotEmpty()) {
                         append("(")
@@ -37,7 +37,7 @@ data class Function(
 
                     append(IPrinter.SPACE)
                 }
-                append(arg.name)
+                append(BackticksPolitics.forIdentifier(arg.name))
                 append(": ")
 
                 if (arg.annotation != null && arg.annotation is TargetAnnotation) {
@@ -75,5 +75,5 @@ data class ArgumentWithValue(
     val variable: Variable,
     val init: Expression
 ) : IPrinter {
-    override fun dumpToString(): String = "${variable.name} = ${init.dumpToString()}"
+    override fun dumpToString(): String = "${BackticksPolitics.forIdentifier(variable.name)} = ${init.dumpToString()}"
 }

@@ -53,6 +53,16 @@
               }
             }
           ]
+        },
+        {
+          "name": "\u003ctest\u003e",
+          "automaton": "A",
+          "returnType": "Int",
+          "target": "A",
+          "hasBody": true,
+          "args": [],
+          "contracts": [],
+          "statements": []
         }
       ]
     },

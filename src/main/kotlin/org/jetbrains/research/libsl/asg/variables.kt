@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 enum class ArithmeticUnaryOp(val string: String) {
     MINUS("-"), INVERSION("!")
@@ -40,7 +40,7 @@ sealed class VariableDeclaration : Node() {
     abstract val initValue: Expression?
 
     override fun dumpToString(): String = buildString {
-        append("var ${addBacktickIfNeeded(variable.name)}: ${variable.type.fullName}")
+        append("var ${BackticksPolitics.forIdentifier(variable.name)}: ${BackticksPolitics.forTypeIdentifier(variable.type.fullName)}")
         if (initValue != null) {
             append(" = ${initValue!!.dumpToString()}")
         }
@@ -89,5 +89,5 @@ class ConstructorArgument(
     override val fullName: String
         get() = "${automaton.name}.$name"
 
-    override fun dumpToString(): String = "var ${addBacktickIfNeeded(name)}: ${type.fullName}"
+    override fun dumpToString(): String = "var ${BackticksPolitics.forIdentifier(name)}: ${BackticksPolitics.forTypeIdentifier(type.fullName)}"
 }

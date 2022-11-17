@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Contract(
     val name: String?,
@@ -11,7 +11,7 @@ data class Contract(
         append(kind.keyword)
         append(IPrinter.SPACE)
         if (name != null) {
-            append(addBacktickIfNeeded(name))
+            append(BackticksPolitics.forIdentifier(name))
             append(": ")
         }
         append(expression.dumpToString())

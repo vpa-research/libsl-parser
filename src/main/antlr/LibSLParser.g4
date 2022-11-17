@@ -196,7 +196,7 @@ functionDeclArgList
    ;
 
 parameter
-   :   annotation? name=periodSeparatedFullName COLON type=periodSeparatedFullName
+   :   annotation? name=Identifier COLON type=periodSeparatedFullName
    ;
 
 /* annotation

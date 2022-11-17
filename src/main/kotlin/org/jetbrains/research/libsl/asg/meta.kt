@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
+
 
 data class Library(
     val metadata: MetaNode,
@@ -72,7 +73,7 @@ class MetaNode(
     // library $libraryName version "$libraryVersion" language "$language" url "libraryUrl"
     override fun dumpToString(): String = buildString {
         appendLine("libsl \"$stringVersion\";")
-        append("library ${addBacktickIfNeeded(name)}")
+        append("library ${BackticksPolitics.forIdentifier(name)}")
 
         if (libraryVersion != null) {
             append(IPrinter.SPACE + "version \"$libraryVersion\"")

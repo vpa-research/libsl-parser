@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Automaton(
     val name: String,
@@ -18,11 +18,11 @@ data class Automaton(
         get() = internalVariableDeclarations.map { decl -> decl.variable } + constructorVariables
 
     override fun dumpToString(): String = buildString {
-        append("automaton ${addBacktickIfNeeded(name, canBePeriodSeparated = true)}")
+        append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
         if (constructorVariables.isNotEmpty()) {
             append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
         }
-        appendLine(" : ${type.fullName} {")
+        appendLine(" : ${BackticksPolitics.forPeriodSeparated(type.fullName)} {")
 
         append(withIndent(formatBody()))
         append("}")
@@ -64,9 +64,9 @@ data class Shift(
 ) : Node() {
     override fun dumpToString(): String = buildString {
         append("shift ")
-        append(from.name)
+        append(BackticksPolitics.forIdentifier(from.name))
         append(" -> ")
-        append(to.name)
+        append(BackticksPolitics.forTypeIdentifier(to.name))
 
         if (functions.isNotEmpty()) {
             append(

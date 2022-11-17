@@ -1,5 +1,7 @@
 package org.jetbrains.research.libsl.asg
 
+import org.jetbrains.research.libsl.utils.BackticksPolitics
+
 sealed class QualifiedAccess : Atomic() {
     abstract var childAccess: QualifiedAccess?
     abstract val type: Type
@@ -23,8 +25,8 @@ data class VariableAccess(
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = when {
-        childAccess != null && childAccess is VariableAccess -> "$fieldName.${childAccess?.dumpToString()}"
-        childAccess != null -> "$fieldName${childAccess?.dumpToString()}"
+        childAccess != null && childAccess is VariableAccess -> "${BackticksPolitics.forIdentifier(fieldName)}.${childAccess?.dumpToString()}"
+        childAccess != null -> "${BackticksPolitics.forIdentifier(fieldName)}${childAccess?.dumpToString()}"
         else -> fieldName
     }
 }
@@ -55,9 +57,9 @@ data class AutomatonGetter(
     override fun toString(): String = dumpToString()
 
     override fun dumpToString(): String = buildString {
-        append(automaton.name)
+        append(BackticksPolitics.forPeriodSeparated(automaton.name))
         append("(")
-        append(arg.name)
+        append(BackticksPolitics.forIdentifier(arg.name))
         append(")")
 
         if (childAccess != null) {

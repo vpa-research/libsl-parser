@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Expression: Node()
 data class BinaryOpExpression(
@@ -43,10 +43,10 @@ data class CallAutomatonConstructor(
     override fun toString(): String = dumpToString()
 
     override fun dumpToString(): String = buildString {
-        append("new ${addBacktickIfNeeded(automaton.name)}")
+        append("new ${BackticksPolitics.forPeriodSeparated(automaton.name)}")
 
         val formattedArgs = buildList {
-            add("state = ${state.name}")
+            add("state = ${BackticksPolitics.forIdentifier(state.name)}")
             for (arg in args) {
                 add(arg.dumpToString())
             }

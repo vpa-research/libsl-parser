@@ -3,7 +3,7 @@ library simple;
 
 typealias Int = int32;
 
-typealias T = `array<Int>`;
+typealias T = array<Int>;
 
 automaton A : Int {
     fun f(param: T, bad: Int) {

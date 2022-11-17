@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed interface Type : IPrinter {
     val name: String
@@ -50,7 +50,7 @@ data class SimpleType(
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String {
-        return "${addBacktickIfNeeded(name)}(${realType.dumpToString()});"
+        return "${BackticksPolitics.forTypeIdentifier(name)}(${BackticksPolitics.forTypeIdentifier(realType.fullName)});"
     }
 
     override fun toString() = dumpToString()
@@ -70,9 +70,9 @@ data class TypeAlias (
     override fun dumpToString(): String {
         return buildString {
             append("typealias ")
-            append(addBacktickIfNeeded(name, canBePeriodSeparated = true, canHaveAsterisk = true))
+            append(BackticksPolitics.forTypeIdentifier(name))
             append(" = ")
-            append(addBacktickIfNeeded(originalType.fullName, canBePeriodSeparated = true, canHaveAsterisk = true))
+            append(BackticksPolitics.forTypeIdentifier(originalType.fullName))
             append(";")
         }
     }
@@ -106,7 +106,7 @@ data class EnumLikeSemanticType(
 
     override fun dumpToString(): String = buildString {
         appendLine("$name(${type.fullName}) {")
-        val formattedEntries = entries.map { (k, v) -> "${addBacktickIfNeeded(k)}: ${v.dumpToString()}" }
+        val formattedEntries = entries.map { (k, v) -> "${BackticksPolitics.forIdentifier(k)}: ${v.dumpToString()}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
     }
@@ -145,7 +145,7 @@ data class StructuredType(
     override fun dumpToString(): String = buildString {
         appendLine("type ${type.fullName} {")
         val formattedEntries = entries.map { (k, v) ->
-            "${addBacktickIfNeeded(k)}: ${addBacktickIfNeeded(v.fullName, canBePeriodSeparated = true, canHaveAsterisk = true)}"
+            "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.fullName)}"
         }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
@@ -202,7 +202,7 @@ data class EnumType(
 
     override fun dumpToString(): String = buildString {
         appendLine("enum $name {")
-        val formattedEntries = entries.map { (k, v) -> "${addBacktickIfNeeded(k)} = ${v.dumpToString()}" }
+        val formattedEntries = entries.map { (k, v) -> "${BackticksPolitics.forIdentifier(k)} = ${v.dumpToString()}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
     }
@@ -217,7 +217,7 @@ data class ArrayType(
     override val context: LslContext
 ) : AliassableType {
     override fun dumpToString(): String {
-        return fullName
+        return BackticksPolitics.forTypeIdentifier(fullName)
     }
 
     override fun toString() = dumpToString()

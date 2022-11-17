@@ -16,7 +16,7 @@ type BlackAndWhiteImage {
     height: Int;
     width: Int;
     tpe: StructureType;
-    content: `array<array<Boolean>>`;
+    content: array<array<Boolean>>;
 }
 
 types {

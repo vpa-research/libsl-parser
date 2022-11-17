@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.asg
 
-import org.jetbrains.research.libsl.visitors.addBacktickIfNeeded
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Statement: Node()
 data class Assignment(
@@ -15,7 +15,7 @@ data class Action(
     val arguments: MutableList<Expression> = mutableListOf()
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        append("action ${addBacktickIfNeeded(name)}(")
+        append("action ${BackticksPolitics.forIdentifier(name)}(")
         val args = arguments.map { it.dumpToString() }.toMutableList()
         append(args.joinToString(separator = ", "))
         append(");")
