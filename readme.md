@@ -72,7 +72,6 @@ Getting the context of library:
 
 ```kotlin
 val context = libSL.context
-
 ```
 **Tip**: The context can be also set to LibSL object via the constructor.
 
