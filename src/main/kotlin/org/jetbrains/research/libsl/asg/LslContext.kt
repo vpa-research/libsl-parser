@@ -45,7 +45,9 @@ class LslContext {
         typeStorage[type.fullName] = type
     }
 
-    fun resolveType(name: String): Type? = typeStorage[name] ?: importedContexts.firstNotNullOfOrNull { it.resolveType(name) }
+    fun resolveType(name: String): Type? = acyclicResolver {
+        typeStorage[name]
+    }
 
     fun storeResolvedFunction(function: Function) {
         functionStorage.getOrPut(function.name) { mutableListOf() }.add(function)
@@ -57,31 +59,54 @@ class LslContext {
         args: List<FunctionArgument>? = null,
         argsType: List<Type>? = null,
         returnType: Type? = null
-    ): Function? = functionStorage[name]
+    ): Function? = acyclicResolver {
+        functionStorage[name]
         ?.asSequence()
         ?.filter { it.automatonName == automatonName }
         ?.filter { if (args != null) it.args == args else true }
         ?.filter { if (argsType != null) it.args.map { arg -> arg.type }.toList() == argsType else true }
         ?.filter { if (returnType != null) it.returnType == returnType else true }
         ?.firstOrNull()
-        ?: importedContexts.firstNotNullOfOrNull { it.resolveFunction(name, automatonName, args, argsType, returnType) }
+    }
 
     fun storeResolvedAutomaton(automaton: Automaton) {
         automatonStorage[automaton.name] = automaton
     }
 
-    fun resolveAutomaton(name: String): Automaton? = automatonStorage[name]
-        ?: importedContexts.firstNotNullOfOrNull { it.resolveAutomaton(name) }
+    fun resolveAutomaton(name: String): Automaton? = acyclicResolver {
+        automatonStorage[name]
+    }
 
     fun storeGlobalVariableDeclaration(variableDeclaration: GlobalVariableDeclaration) {
         globalVariables[variableDeclaration.variable.name] = variableDeclaration
     }
 
-    fun resolveGlobalVariable(name: String): GlobalVariableDeclaration? = globalVariables[name]
-        ?: importedContexts.firstNotNullOfOrNull { it.resolveGlobalVariable(name) }
+    fun resolveGlobalVariable(name: String): GlobalVariableDeclaration? = acyclicResolver {
+        globalVariables[name]
+    }
 
     fun import(context: LslContext) {
         importedContexts.add(context)
+    }
+
+    private fun <T> acyclicResolver(
+        visited: MutableList<LslContext> = mutableListOf(),
+        resolve: LslContext.() -> T?
+    ): T? {
+        for (importedContext in (listOf(this) + this.importedContexts)) {
+            if (importedContext in visited)
+                continue
+
+            visited.add(importedContext)
+            val result = importedContext.resolve()
+            if (result != null) {
+                return result
+            }
+
+            return importedContext.acyclicResolver(visited, resolve) ?: continue
+        }
+
+        return null
     }
 
     override fun equals(other: Any?): Boolean {
@@ -101,5 +126,9 @@ class LslContext {
     override fun hashCode(): Int {
         // DO NOT USE HERE ANY NODE because it could contain a reference to context consequently a SOF will occur
         return 42
+    }
+
+    companion object {
+        internal val importedSpecsContexts = mutableMapOf<String, LslContext>()
     }
 }

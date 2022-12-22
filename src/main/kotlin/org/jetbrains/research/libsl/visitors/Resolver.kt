@@ -19,6 +19,8 @@ class Resolver(
     private val asgBuilderVisitor = ASGBuilder(context, errorManager)
 
     override fun visitFile(ctx: LibSLParser.FileContext) {
+        storeCurrentContext(ctx.header().libraryName.processIdentifier())
+
         ctx.globalStatement().mapNotNull { it.ImportStatement() }.forEach { processImportStatement(it) }
 
         val typeSections = ctx.globalStatement().mapNotNull { it.typesSection() }
@@ -137,6 +139,10 @@ class Resolver(
         for (extensionFunction in ctx.globalStatement().mapNotNull { it.topLevelDecl()?.functionDecl() }) {
             visitFunctionDecl(extensionFunction)
         }
+    }
+
+    private fun storeCurrentContext(libraryName: String) {
+        LslContext.importedSpecsContexts[libraryName] = context
     }
 
     override fun visitTypesSection(ctx: LibSLParser.TypesSectionContext) {
@@ -350,8 +356,14 @@ class Resolver(
 
     private fun processImportStatement(terminal: TerminalNode) {
         // todo: forbid a recursive imports
-        val importString = parseStringTokenStringSemicolon(terminal.processIdentifier(), "import")
-        val filePath = "$basePath/$importString.lsl"
+        val importSpecificationName = parseStringTokenStringSemicolon(terminal.processIdentifier(), "import")
+        val previousLoadedContextOrNull = LslContext.importedSpecsContexts[importSpecificationName]
+        if (previousLoadedContextOrNull != null) {
+            context.import(previousLoadedContextOrNull)
+            return
+        }
+
+        val filePath = "$basePath/$importSpecificationName.lsl"
         val file = File(filePath)
 
         if (!file.exists()) {
@@ -370,7 +382,7 @@ class Resolver(
         val resolver = Resolver(newContext, basePath, errorManager)
         val fileCtx = parser.file()
         resolver.visitFile(fileCtx)
-        val asgBuilder = ASGBuilder(context, errorManager)
-        asgBuilder.visitFile(fileCtx)
+//        val asgBuilder = ASGBuilder(context, errorManager)
+//        asgBuilder.visitFile(fileCtx)
     }
 }

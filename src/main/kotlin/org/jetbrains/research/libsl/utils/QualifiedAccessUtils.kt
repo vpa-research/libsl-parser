@@ -27,7 +27,7 @@ object QualifiedAccessUtils {
 
                 VariableAccess(
                     name,
-                    if (names.size > 1) resolvePeriodSeparatedChain(entry.value, names.drop(1)) else null,
+                    if (names.size > 1) resolvePeriodSeparatedChain(entry.value, names.drop(1), throwExceptions) else null,
                     entry.value,
                     null
                 )
@@ -64,9 +64,12 @@ object QualifiedAccessUtils {
                 )
             }
 
+            is TypeAlias -> {
+                return resolvePeriodSeparatedChain(parentType.originalType, names, throwExceptions)
+            }
+
             else -> {
                 if (names.size == 1) {
-
                     if (parentType !is FieldTypedType) {
                         if (throwExceptions) {
                             error("can't resolve chain for $parentType")
@@ -89,7 +92,11 @@ object QualifiedAccessUtils {
                         null
                     )
                 } else {
-                    error("can't resolve access chain. Unsupported part type: ${parentType::class.java}")
+                    if (throwExceptions) {
+                        error("can't resolve access chain. Unsupported part type: ${parentType::class.java}")
+                    }
+
+                    return null
                 }
             }
         }
@@ -98,7 +105,7 @@ object QualifiedAccessUtils {
             return access
 
         return access.apply {
-            this.childAccess = resolvePeriodSeparatedChain(this.type, names.drop(1))
+            this.childAccess = resolvePeriodSeparatedChain(this.type, names.drop(1), throwExceptions)
         }
     }
 }

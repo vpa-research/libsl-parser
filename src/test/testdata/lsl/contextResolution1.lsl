@@ -1,0 +1,12 @@
+libsl "1.0.0";
+library contextResolution1;
+
+import contextResolution2;
+
+typealias TypeFrom1File=int32;
+
+automaton AutomatonFrom1File : Int {
+    initstate S1;
+}
+
+fun AutomatonFrom1File.functionFrom1File()

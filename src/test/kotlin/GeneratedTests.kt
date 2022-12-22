@@ -56,6 +56,26 @@ class GeneratedTests {
     }
 
     @Test
+    fun testContextResolution1Json() {
+        runJsonTest("contextResolution1")
+    }
+
+    @Test
+    fun testContextResolution1Lsl() {
+        runLslTest("contextResolution1")
+    }
+
+    @Test
+    fun testContextResolution2Json() {
+        runJsonTest("contextResolution2")
+    }
+
+    @Test
+    fun testContextResolution2Lsl() {
+        runLslTest("contextResolution2")
+    }
+
+    @Test
     fun testContractsJson() {
         runJsonTest("contracts")
     }
