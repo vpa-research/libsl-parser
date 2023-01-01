@@ -1,6 +1,9 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.type
 
-class TypeInferer(private val context: LslContext) {
+import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.nodes.*
+
+class TypeInferer(private val context: LslContextBase) {
     @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun getExpressionTypeOrNull(expression: Expression): Type? {
         return try {
@@ -18,9 +21,9 @@ class TypeInferer(private val context: LslContext) {
                 val typeB = getExpressionType(expression.right)
                 mergeTypes(typeA, typeB)
             }
-            is OldValue -> expression.value.type
             is UnaryOpExpression -> getExpressionType(expression.value)
-            is Variable -> expression.type
+            is Variable -> expression.typeReference.resolveOrError()
+            is OldValue -> getExpressionType(expression.value)
         }
     }
 
@@ -30,8 +33,16 @@ class TypeInferer(private val context: LslContext) {
             is FloatLiteral -> FloatType(context, FloatType.FloatCapacity.UNKNOWN)
             is IntegerLiteral -> IntType(context, IntType.IntCapacity.UNKNOWN)
             is StringLiteral -> StringType(context)
-            is CallAutomatonConstructor -> atomic.automaton.type
-            is QualifiedAccess -> atomic.type
+            is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
+            is QualifiedAccess -> getQualifiedAccessType(atomic)
+        }
+    }
+
+    private fun getQualifiedAccessType(access: QualifiedAccess): Type {
+        return when (access) {
+            is ArrayAccess -> TODO()
+            is AutomatonOfFunctionArgumentInvoke -> access.automatonReference.resolveOrError().typeReference.resolveOrError()
+            is VariableAccess -> access.variable.resolveOrError().typeReference.resolveOrError()
         }
     }
 

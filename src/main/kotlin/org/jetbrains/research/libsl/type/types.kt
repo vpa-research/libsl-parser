@@ -1,22 +1,29 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.type
 
+import org.jetbrains.research.libsl.context.LslContext
+import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.nodes.Atomic
+import org.jetbrains.research.libsl.nodes.Expression
+import org.jetbrains.research.libsl.nodes.IPrinter
+import org.jetbrains.research.libsl.context.LslGlobalContext
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed interface Type : IPrinter {
     val name: String
     val isPointer: Boolean
-    val context: LslContext
-    val generic: Type?
+    val context: LslContextBase
+    val generic: TypeReference?
 
     val fullName: String
         get() = buildString {
             append(if (isPointer) "*" else "")
             append(name)
-            append(if (generic != null) "<${generic!!.fullName}>" else "")
+            append(if (generic != null) "<${generic!!.resolveOrError().fullName}>" else "")
         }
 
     val isArray: Boolean
-        get() = (this as? TypeAlias)?.originalType?.isArray == true || this is ArrayType
+        get() = (this as? TypeAlias)?.originalType?.resolveOrError()?.isArray == true || this is ArrayType
 
     val isTopLevelType: Boolean
         get() = false
@@ -29,8 +36,8 @@ sealed interface LibslType : Type
 data class RealType (
     val nameParts: List<String>,
     override val isPointer: Boolean = false,
-    override val generic: Type? = null,
-    override val context: LslContext
+    override val generic: TypeReference? = null,
+    override val context: LslContextBase
 ) : Type {
     override val name: String
         get() = nameParts.joinToString(".")
@@ -44,9 +51,9 @@ data class SimpleType(
     override val name: String,
     val realType: Type,
     override val isPointer: Boolean = false,
-    override val context: LslContext
+    override val context: LslContextBase
 ) : LibslType {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String {
@@ -56,14 +63,13 @@ data class SimpleType(
     override fun toString() = dumpToString()
 }
 
-sealed interface AliassableType : LibslType
 data class TypeAlias (
     override val name: String,
-    val originalType: AliassableType,
-    override val context: LslContext
+    val originalType: TypeReference,
+    override val context: LslContextBase
 ) : LibslType {
     override val isPointer: Boolean = false
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
 
     override val isTopLevelType: Boolean = true
 
@@ -72,7 +78,7 @@ data class TypeAlias (
             append("typealias ")
             append(BackticksPolitics.forTypeIdentifier(name))
             append(" = ")
-            append(BackticksPolitics.forTypeIdentifier(originalType.fullName))
+            append(BackticksPolitics.forTypeIdentifier(originalType.resolveOrError().fullName))
             append(";")
         }
     }
@@ -84,24 +90,26 @@ data class EnumLikeSemanticType(
     override val name: String,
     val type: Type,
     val entries: Map<String, Atomic>,
-    override val context: LslContext
+    override val context: LslContextBase
 ) : LibslType, FieldValuedType, FieldTypedType {
     override val isPointer: Boolean = false
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val isTypeBlockType: Boolean = true
 
     override fun getFieldValue(name: String): Expression? {
         return entries[name]
     }
 
-    override fun getFieldType(name: String): Type? {
+    override fun getFieldTypeReference(name: String): TypeReference? {
         if (entries.isEmpty())
             return null
 
         val valueTypes = entries.values.map { context.typeInferer.getExpressionType(it) }
-        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
-            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
-        }
+        return TODO()
+
+//        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
+//            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
+//        }
     }
 
     override fun dumpToString(): String = buildString {
@@ -116,9 +124,9 @@ data class EnumLikeSemanticType(
 
 class ChildrenType(
     override val name: String,
-    override val context: LslContext,
+    override val context: LslContextBase,
 ) : Type {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val isPointer: Boolean = false
 
     override fun dumpToString(): String {
@@ -130,22 +138,22 @@ class ChildrenType(
 
 data class StructuredType(
     override val name: String,
-    val type: Type,
-    override val generic: Type? = null,
-    var entries: Map<String, Type>,
-    override val context: LslContext
-) : AliassableType, FieldTypedType {
+    val type: RealType,
+    var entries: Map<String, TypeReference>,
+    override val context: LslContextBase
+) : Type, FieldTypedType {
     override val isPointer: Boolean = false
     override val isTopLevelType: Boolean = true
+    override val generic: TypeReference? = null
 
-    override fun getFieldType(name: String): Type? {
+    override fun getFieldTypeReference(name: String): TypeReference? {
         return entries[name]
     }
 
     override fun dumpToString(): String = buildString {
         appendLine("type ${type.fullName} {")
         val formattedEntries = entries.map { (k, v) ->
-            "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.fullName)}"
+            "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.resolveOrError().fullName)}"
         }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
@@ -180,24 +188,25 @@ data class StructuredType(
 data class EnumType(
     override val name: String,
     val entries: Map<String, Atomic>,
-    override val context: LslContext
-) : AliassableType, FieldValuedType, FieldTypedType {
+    override val context: LslContextBase
+) : Type, FieldValuedType, FieldTypedType {
     override val isPointer: Boolean = false
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val isTopLevelType: Boolean = true
 
     override fun getFieldValue(name: String): Expression? {
         return entries[name]
     }
 
-    override fun getFieldType(name: String): Type? {
+    override fun getFieldTypeReference(name: String): TypeReference? {
         if (entries.isEmpty())
             return null
 
         val valueTypes = entries.values.map { context.typeInferer.getExpressionType(it) }
-        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
-            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
-        }
+        return TODO()
+//        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
+//            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
+//        }
     }
 
     override fun dumpToString(): String = buildString {
@@ -211,11 +220,12 @@ data class EnumType(
 }
 
 data class ArrayType(
-    override val name: String,
     override val isPointer: Boolean = false,
-    override val generic: Type,
-    override val context: LslContext
-) : AliassableType {
+    override val generic: TypeReference,
+    override val context: LslContextBase
+) : Type {
+    override val name: String = "array"
+
     override fun dumpToString(): String {
         return BackticksPolitics.forTypeIdentifier(fullName)
     }
@@ -224,7 +234,7 @@ data class ArrayType(
 }
 
 sealed interface FieldTypedType {
-    fun getFieldType(name: String): Type?
+    fun getFieldTypeReference(name: String): TypeReference?
 }
 
 sealed interface FieldValuedType {

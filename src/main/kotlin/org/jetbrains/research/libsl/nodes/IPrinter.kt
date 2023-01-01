@@ -1,4 +1,4 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
 interface IPrinter {
     fun dumpToString(): String

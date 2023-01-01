@@ -1,21 +1,23 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.nodes.references.AutomatonReference
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Function(
     val name: String,
-    val automatonName: String,
+    val automatonReference: AutomatonReference,
     var args: MutableList<FunctionArgument> = mutableListOf(),
-    val returnType: Type?,
+    val returnType: TypeReference?,
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
-    var target: Automaton? = null,
-    val context: LslContext
+    var targetAutomatonRef: AutomatonReference? = null,
+    val context: LslContextBase
 ) : Node() {
-    val automaton: Automaton by lazy { context.resolveAutomaton(automatonName) ?: error("unresolved automaton") }
     val fullName: String
-        get() = "${automaton.name}.$name"
+        get() = "${automatonReference.name}.$name"
     var resultVariable: Variable? = null
 
     override fun dumpToString(): String = buildString {
@@ -41,16 +43,16 @@ data class Function(
                 append(": ")
 
                 if (arg.annotation != null && arg.annotation is TargetAnnotation) {
-                    append((arg.annotation as TargetAnnotation).targetAutomaton.name)
+                    append(targetAutomatonRef!!.name)
                 } else {
-                    append(arg.type.fullName)
+                    append(arg.typeReference.resolveOrError().fullName)
                 }
             } }
         )
 
         if (returnType != null) {
             append(": ")
-            append(returnType.fullName)
+            append(returnType.resolveOrError().fullName)
         }
 
         if (contracts.isNotEmpty()) {
@@ -72,8 +74,8 @@ data class Function(
 }
 
 data class ArgumentWithValue(
-    val variable: Variable,
-    val init: Expression
+    val name: String,
+    val value: Expression
 ) : IPrinter {
-    override fun dumpToString(): String = "${BackticksPolitics.forIdentifier(variable.name)} = ${init.dumpToString()}"
+    override fun dumpToString(): String = "${BackticksPolitics.forIdentifier(name)} = ${value.dumpToString()}"
 }

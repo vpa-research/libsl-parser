@@ -6,18 +6,8 @@ import org.junit.jupiter.api.Test
 
 class GeneratedTests {
     @Test
-    fun testActionsJson() {
-        runJsonTest("actions")
-    }
-
-    @Test
     fun testActionsLsl() {
         runLslTest("actions")
-    }
-
-    @Test
-    fun testAnnotationsJson() {
-        runJsonTest("annotations")
     }
 
     @Test
@@ -26,18 +16,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testAutomatonConstructorJson() {
-        runJsonTest("automatonConstructor")
-    }
-
-    @Test
     fun testAutomatonConstructorLsl() {
         runLslTest("automatonConstructor")
-    }
-
-    @Test
-    fun testBadVariableAccessJson() {
-        runJsonTest("badVariableAccess")
     }
 
     @Test
@@ -46,18 +26,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testCastAutomatonJson() {
-        runJsonTest("castAutomaton")
-    }
-
-    @Test
     fun testCastAutomatonLsl() {
         runLslTest("castAutomaton")
-    }
-
-    @Test
-    fun testContextResolution1Json() {
-        runJsonTest("contextResolution1")
     }
 
     @Test
@@ -66,18 +36,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testContextResolution2Json() {
-        runJsonTest("contextResolution2")
-    }
-
-    @Test
     fun testContextResolution2Lsl() {
         runLslTest("contextResolution2")
-    }
-
-    @Test
-    fun testContractsJson() {
-        runJsonTest("contracts")
     }
 
     @Test
@@ -86,18 +46,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testEnsuresContractJson() {
-        runJsonTest("ensuresContract")
-    }
-
-    @Test
     fun testEnsuresContractLsl() {
         runLslTest("ensuresContract")
-    }
-
-    @Test
-    fun testEscapingTestJson() {
-        runJsonTest("escapingTest")
     }
 
     @Test
@@ -106,18 +56,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testGlobalVariablesJson() {
-        runJsonTest("globalVariables")
-    }
-
-    @Test
     fun testGlobalVariablesLsl() {
         runLslTest("globalVariables")
-    }
-
-    @Test
-    fun testInternalVariablesJson() {
-        runJsonTest("internalVariables")
     }
 
     @Test
@@ -126,18 +66,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testMultipleFromInShiftJson() {
-        runJsonTest("multipleFromInShift")
-    }
-
-    @Test
     fun testMultipleFromInShiftLsl() {
         runLslTest("multipleFromInShift")
-    }
-
-    @Test
-    fun testPrimitiveTypesJson() {
-        runJsonTest("primitiveTypes")
     }
 
     @Test
@@ -146,18 +76,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testSimpleJson() {
-        runJsonTest("simple")
-    }
-
-    @Test
     fun testSimpleLsl() {
         runLslTest("simple")
-    }
-
-    @Test
-    fun testSpecImportMainJson() {
-        runJsonTest("specImportMain")
     }
 
     @Test
@@ -166,18 +86,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testSpecImportSecondaryJson() {
-        runJsonTest("specImportSecondary")
-    }
-
-    @Test
     fun testSpecImportSecondaryLsl() {
         runLslTest("specImportSecondary")
-    }
-
-    @Test
-    fun testTargetAnnotationJson() {
-        runJsonTest("targetAnnotation")
     }
 
     @Test
@@ -186,18 +96,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testTypesJson() {
-        runJsonTest("types")
-    }
-
-    @Test
     fun testTypesLsl() {
         runLslTest("types")
-    }
-
-    @Test
-    fun testVariableResolutionJson() {
-        runJsonTest("variableResolution")
     }
 
     @Test

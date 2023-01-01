@@ -1,10 +1,12 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.AutomatonReference
+import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.nodes.references.VariableReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class QualifiedAccess : Atomic() {
     abstract var childAccess: QualifiedAccess?
-    abstract val type: Type
 
     override fun toString(): String = dumpToString()
 
@@ -20,8 +22,7 @@ sealed class QualifiedAccess : Atomic() {
 data class VariableAccess(
     val fieldName: String,
     override var childAccess: QualifiedAccess?,
-    override val type: Type,
-    val variable: Variable?
+    val variable: VariableReference
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = when {
@@ -33,7 +34,6 @@ data class VariableAccess(
 
 data class ArrayAccess(
     var index: Atomic,
-    override val type: Type
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
 
@@ -47,17 +47,15 @@ data class ArrayAccess(
     }
 }
 
-data class AutomatonGetter(
-    val automaton: Automaton,
+data class AutomatonOfFunctionArgumentInvoke(
+    val automatonReference: AutomatonReference,
     val arg: FunctionArgument,
     override var childAccess: QualifiedAccess?,
 ) : QualifiedAccess() {
-    override val type: Type = automaton.type
-
     override fun toString(): String = dumpToString()
 
     override fun dumpToString(): String = buildString {
-        append(BackticksPolitics.forPeriodSeparated(automaton.name))
+        append(BackticksPolitics.forPeriodSeparated(automatonReference.name))
         append("(")
         append(BackticksPolitics.forIdentifier(arg.name))
         append(")")

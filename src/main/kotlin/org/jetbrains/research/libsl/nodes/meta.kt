@@ -1,5 +1,9 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.AutomatonReference
+import org.jetbrains.research.libsl.nodes.references.FunctionReference
+import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.nodes.references.VariableReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 
@@ -7,11 +11,15 @@ data class Library(
     val metadata: MetaNode,
     val imports: MutableList<String> = mutableListOf(),
     val includes: MutableList<String> = mutableListOf(),
-    val semanticTypes: MutableList<Type> = mutableListOf(),
-    val automata: MutableList<Automaton> = mutableListOf(),
-    val extensionFunctions: MutableMap<String, MutableList<Function>> = mutableMapOf(),
-    val globalVariableDeclarations: MutableMap<String, GlobalVariableDeclaration> = mutableMapOf()
+    val semanticTypesReferences: MutableList<TypeReference> = mutableListOf(),
+    val automataReferences: MutableList<AutomatonReference> = mutableListOf(),
+    val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
+    val globalVariableReferences: MutableList<VariableReference> = mutableListOf()
 ) : Node() {
+    private val resolvedTypes by lazy { semanticTypesReferences.map { it.resolveOrError() } }
+    private val automata by lazy { automataReferences.map { it.resolveOrError() } }
+    private val globalVariables by lazy { globalVariableReferences.map { it.resolveOrError() } }
+
     override fun dumpToString(): String = buildString {
         appendLine(metadata.dumpToString())
         append(formatImports())
@@ -31,14 +39,19 @@ data class Library(
     }
 
     private fun formatTopLevelSemanticTypes(): String {
-        val topLevelTypes = semanticTypes.filter { type -> type.isTopLevelType }
+        val topLevelTypes = resolvedTypes.filter { type ->
+            type.isTopLevelType
+        }
         val formattedTypes = topLevelTypes.map { type -> type.dumpToString() }
 
         return simpleCollectionFormatter(collection = formattedTypes, suffix = "\n")
     }
 
     private fun formatSemanticTypeBlock(): String = buildString {
-        val types = semanticTypes.filter { type -> type.isTypeBlockType }
+        val types = resolvedTypes.filter { type ->
+            type.isTypeBlockType
+        }
+
         if (types.isEmpty())
             return@buildString
 
@@ -54,19 +67,19 @@ data class Library(
         append(formatListEmptyLineAtEndIfNeeded(automata))
     }
 
-    private fun formatGlobalVariables(): String = formatListEmptyLineAtEndIfNeeded(globalVariableDeclarations.values.toList())
+    private fun formatGlobalVariables(): String = formatListEmptyLineAtEndIfNeeded(globalVariables)
 }
 
 class MetaNode(
+    val lslVersion: LslVersion,
     var name: String,
     val libraryVersion: String? = null,
     val language: String? = null,
-    var url: String? = null,
-    val lslVersion: Triple<UInt, UInt, UInt>
+    var url: String? = null
 ) : Node() {
     val stringVersion: String
         get() {
-            return "${lslVersion.first}.${lslVersion.second}.${lslVersion.third}"
+            return lslVersion.dumpToString()
         }
 
     // libsl "$libslVersion";
@@ -87,5 +100,28 @@ class MetaNode(
             append(IPrinter.SPACE + "url \"$url\"")
         }
         appendLine(";")
+    }
+}
+
+data class LslVersion(
+    val major: Int,
+    val minor: Int,
+    val patch: Int
+) : IPrinter {
+    override fun dumpToString(): String {
+        return "$major.$minor.$patch"
+    }
+
+    companion object {
+        fun fromString(str: String): LslVersion {
+            val parts = str.split(".").mapNotNull { part -> part.toIntOrNull() }
+            check(parts.size == 3) { "Unknown LibSL version format: $str" }
+
+            val major = parts[0]
+            val minor = parts[1]
+            val patch = parts[2]
+
+            return LslVersion(major, minor, patch)
+        }
     }
 }

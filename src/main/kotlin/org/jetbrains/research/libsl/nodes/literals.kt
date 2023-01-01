@@ -1,4 +1,4 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
 data class IntegerLiteral(
     override val value: Int

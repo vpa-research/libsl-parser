@@ -1,4 +1,4 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
@@ -19,9 +19,6 @@ open class Annotation(
 }
 
 class TargetAnnotation(
-    name: String,
-    values: MutableList<Expression>,
-    val targetAutomaton: Automaton
-) : Annotation(name, values) {
+) : Annotation("target", mutableListOf()) {
     override fun toString(): String = dumpToString()
 }

@@ -76,7 +76,7 @@ class MoreThanOneTypesSection(
     override fun toString(): String = "Only one `types` section must be provided. Another one provided at ${position.string}"
 }
 
-class UnresolvedImportPath(
+class UnresolvedImportOrInclude(
     override val text: String,
     override val position: Position
 ) : LslError {

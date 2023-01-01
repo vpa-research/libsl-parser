@@ -1,17 +1,20 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.type
 
-interface PrimitiveType : Type, AliassableType {
+import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.nodes.references.TypeReference
+
+interface PrimitiveType : Type {
     override fun dumpToString(): String {
         return fullName
     }
 }
 
 data class IntType(
-    override val context: LslContext,
+    override val context: LslContextBase,
     val capacity: IntCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val name: String = capacity.name.lowercase()
 
     enum class IntCapacity {
@@ -20,11 +23,11 @@ data class IntType(
 }
 
 data class UnsignedType(
-    override val context: LslContext,
+    override val context: LslContextBase,
     val capacity: UnsignedCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val name: String = capacity.name.lowercase()
 
     enum class UnsignedCapacity {
@@ -33,11 +36,11 @@ data class UnsignedType(
 }
 
 data class FloatType(
-    override val context: LslContext,
+    override val context: LslContextBase,
     val capacity: FloatCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val name: String = capacity.name.lowercase()
 
     enum class FloatCapacity {
@@ -46,33 +49,33 @@ data class FloatType(
 }
 
 data class BoolType(
-    override val context: LslContext,
+    override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val name: String = "bool"
 }
 
 data class CharType(
-    override val context: LslContext,
+    override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val name: String = "char"
 }
 
 data class StringType(
-    override val context: LslContext,
+    override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
     override val name: String = "string"
 }
 
 data class VoidType(
-    override val context: LslContext,
+    override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
     override val name: String = "void"
-    override val generic: Type? = null
+    override val generic: TypeReference? = null
 }

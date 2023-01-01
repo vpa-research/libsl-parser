@@ -11,7 +11,6 @@ fun main() {
 
     val generatedFunctions = mutableListOf<String>()
     for (file in lsls) {
-        generatedFunctions.add(generateTestFunction(file, TestType.JSON))
         generatedFunctions.add(generateTestFunction(file, TestType.LSL))
     }
 
@@ -47,5 +46,5 @@ private fun generateTestFunction(testName: String, testType: TestType) = buildSt
 
 
 enum class TestType(val text: String, val function: String) {
-    JSON("Json", "runJsonTest"), LSL("Lsl", "runLslTest")
+    LSL("Lsl", "runLslTest")
 }

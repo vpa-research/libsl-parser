@@ -47,7 +47,7 @@ library.metadata.name
 ```
 
 Also, field `metadata` contains field such as `lslVersion` and some optional fields (see sources of the 
-[meta.kt](src/main/kotlin/org/jetbrains/research/libsl/asg/meta.kt))
+[meta.kt](src/main/kotlin/org/jetbrains/research/libsl/nodes/meta.kt))
 
 Let's get the list of all library's automata:
 ```kotlin
@@ -87,7 +87,7 @@ val type = context.resolveType("my.type")
 ```
 
 There are some other functions for name resolution, see sources of 
-[LslContext.kt](src/main/kotlin/org/jetbrains/research/libsl/asg/LslContext.kt).
+[LslContext.kt](src/main/kotlin/org/jetbrains/research/libsl/nodes/LslContext.kt).
 
 **IMPORTANT**: when the new node is being added to the ASG and the node can be resolved via context, you must add it
 to the context too:
@@ -105,13 +105,13 @@ Optionally, the 'previous' node could be removed from the context (but this feat
 
 ### 4. Expressions
 LibSL has expressions. They are used in contracts and as function's arguments. Under the hood they are represented by
-[ASG nodes](src/main/kotlin/org/jetbrains/research/libsl/asg/expressions.kt).
+[ASG nodes](src/main/kotlin/org/jetbrains/research/libsl/nodes/expressions.kt).
 
 There are some utilities to improve an expression experience:
-#### 4.1. [ExpressionVisitor](src/main/kotlin/org/jetbrains/research/libsl/asg/ExpressionVisitor.kt)
+#### 4.1. [ExpressionVisitor](src/main/kotlin/org/jetbrains/research/libsl/nodes/ExpressionVisitor.kt)
 This class could be used to visit expressions.
 
-#### 4.2 [TypeInferer](src/main/kotlin/org/jetbrains/research/libsl/asg/TypeInferer.kt)
+#### 4.2 [TypeInferer](src/main/kotlin/org/jetbrains/research/libsl/nodes/TypeInferer.kt)
 This class could be used to simple type resolution. Example:
 ```kotlin
 context.typeInferer.getExpressionTypeOrNull(myExpression)

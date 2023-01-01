@@ -1,14 +1,19 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 enum class ArithmeticUnaryOp(val string: String) {
-    MINUS("-"), INVERSION("!")
+    MINUS("-"), INVERSION("!");
+
+    companion object {
+        fun fromString(str: String) = ArithmeticUnaryOp.values().first { op -> op.string == str }
+    }
 }
 
 open class Variable(
     open val name: String,
-    open val type: Type
+    open val typeReference: TypeReference
 ) : Expression() {
     open val fullName: String
         get() = name
@@ -19,28 +24,31 @@ open class Variable(
         if (other !is Variable) return false
 
         if (name != other.name) return false
-        if (type != other.type) return false
+        if (typeReference != other.typeReference) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = name.hashCode()
-        result = 31 * result + type.hashCode()
+        result = 31 * result + typeReference.hashCode()
         return result
     }
 }
 
 data class ResultVariable(
-    override val type: Type
-) : Variable(name = "result", type)
+    override val typeReference: TypeReference
+) : Variable(name = "result", typeReference)
 
 sealed class VariableDeclaration : Node() {
-    abstract val variable: Variable
+    abstract val name: String
+    abstract val typeReference: TypeReference
     abstract val initValue: Expression?
 
     override fun dumpToString(): String = buildString {
-        append("var ${BackticksPolitics.forIdentifier(variable.name)}: ${BackticksPolitics.forTypeIdentifier(variable.type.fullName)}")
+        append("var ${BackticksPolitics.forIdentifier(name)}: " +
+                BackticksPolitics.forTypeIdentifier(typeReference.resolveOrError().fullName)
+        )
         if (initValue != null) {
             append(" = ${initValue!!.dumpToString()}")
         }
@@ -49,24 +57,19 @@ sealed class VariableDeclaration : Node() {
     }
 }
 
-data class GlobalVariableDeclaration(
-    override val variable: Variable,
+data class VariableDeclarationImpl(
+    override val name: String,
+    override val typeReference: TypeReference,
     override val initValue: Expression?
 ) : VariableDeclaration()
 
-data class AutomatonVariableDeclaration(
-    override val variable: Variable,
-    override var initValue: Expression?
-) : VariableDeclaration() {
-    lateinit var automaton: Automaton
-}
-
+@Suppress("unused")
 class FunctionArgument(
     name: String,
-    type: Type,
+    typeReference: TypeReference,
     val index: Int,
     var annotation: Annotation? = null
-) : Variable(name, type) {
+) : Variable(name, typeReference) {
     lateinit var function: Function
 
     override val fullName: String
@@ -82,12 +85,13 @@ class FunctionArgument(
 
 class ConstructorArgument(
     name: String,
-    type: Type,
-) : Variable(name, type) {
+    typeReference: TypeReference,
+) : Variable(name, typeReference) {
     lateinit var automaton: Automaton
 
     override val fullName: String
         get() = "${automaton.name}.$name"
 
-    override fun dumpToString(): String = "var ${BackticksPolitics.forIdentifier(name)}: ${BackticksPolitics.forTypeIdentifier(type.fullName)}"
+    override fun dumpToString(): String = "var ${BackticksPolitics.forIdentifier(name)}: " +
+            BackticksPolitics.forTypeIdentifier(typeReference.resolveOrError().fullName)
 }

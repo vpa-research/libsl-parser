@@ -1,28 +1,28 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.FunctionReference
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Automaton(
     val name: String,
-    val type: Type,
+    val typeReference: TypeReference,
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
-    val internalVariableDeclarations: MutableList<AutomatonVariableDeclaration> = mutableListOf(),
+    val internalVariableDeclarations: MutableList<VariableDeclaration> = mutableListOf(),
     val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
     val extensionFunctions: MutableList<Function> = mutableListOf()
 ) : Node() {
     val functions: List<Function>
         get() = localFunctions + extensionFunctions
-    val variables: List<Variable>
-        get() = internalVariableDeclarations.map { decl -> decl.variable } + constructorVariables
 
     override fun dumpToString(): String = buildString {
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
         if (constructorVariables.isNotEmpty()) {
             append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
         }
-        appendLine(" : ${BackticksPolitics.forPeriodSeparated(type.fullName)} {")
+        appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolveOrError().fullName)} {")
 
         append(withIndent(formatBody()))
         append("}")
@@ -60,7 +60,7 @@ data class State(
 data class Shift(
     val from: State,
     val to: State,
-    val functions: MutableList<Function> = mutableListOf()
+    val functions: MutableList<FunctionReference> = mutableListOf()
 ) : Node() {
     override fun dumpToString(): String = buildString {
         append("shift ")

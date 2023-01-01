@@ -82,7 +82,7 @@ typesSection
 
 semanticTypeDecl
    :    simpleSemanticType
-   |    blockType
+   |    enumSemanticType
    ;
 
 /* simple semantic type
@@ -93,13 +93,13 @@ simpleSemanticType
    ;
 
 /* block semantic type
- * syntax: semanticTypeName (realTypeName) {variant1: Int; variant2: Int; ...};
+ * syntax: semanticTypeName (realTypeName) {variant1: 0; variant2: 1; ...};
  */
-blockType
-   :   semanticName=Identifier L_BRACKET realName=typeIdentifier R_BRACKET L_BRACE blockTypeStatement+ R_BRACE
+enumSemanticType
+   :   semanticName=Identifier L_BRACKET realName=typeIdentifier R_BRACKET L_BRACE enumSemanticTypeEntry+ R_BRACE
    ;
 
-blockTypeStatement
+enumSemanticTypeEntry
    :    Identifier COLON expressionAtomic SEMICOLON
    ;
 
@@ -187,8 +187,9 @@ argPair
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   FUN name=periodSeparatedFullName L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=periodSeparatedFullName)?
-       (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   :   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 functionDeclArgList
@@ -196,14 +197,14 @@ functionDeclArgList
    ;
 
 parameter
-   :   annotation? name=Identifier COLON type=periodSeparatedFullName
+   :   annotation? name=Identifier COLON type=typeIdentifier
    ;
 
 /* annotation
  * syntax: @annotationName(args)
  */
 annotation
-   :   AT Identifier (L_BRACKET valuesAndIdentifiersList R_BRACKET)?
+   :   AT Identifier (L_BRACKET argsList R_BRACKET)?
    ;
 
 /*
@@ -232,10 +233,10 @@ functionBodyStatements
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET valuesAndIdentifiersList? R_BRACKET SEMICOLON
+   :  ACTION Identifier L_BRACKET argsList? R_BRACKET SEMICOLON
    ;
 
-valuesAndIdentifiersList
+argsList
    :   expression (COMMA expression)*
    ;
 
@@ -268,8 +269,8 @@ expression
    |   expression op=(ASTERISK | SLASH) expression
    |   expression op=PERCENT expression
    |   expression op=(PLUS | MINUS) expression
-   |   MINUS expression
-   |   EXCLAMATION expression
+   |   op=MINUS expression
+   |   op=EXCLAMATION expression
    |   expression op=(EQ | NOT_EQ | LESS_EQ | L_ARROW | GREAT_EQ | R_ARROW) expression
    |   expression op=(AND | OR | XOR) expression
    |   qualifiedAccess apostrophe=APOSTROPHE

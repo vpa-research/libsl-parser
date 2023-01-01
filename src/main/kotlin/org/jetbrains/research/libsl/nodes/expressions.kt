@@ -1,5 +1,7 @@
-package org.jetbrains.research.libsl.asg
+package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.AutomatonReference
+import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Expression: Node()
@@ -34,19 +36,19 @@ data class OldValue(
 }
 
 data class CallAutomatonConstructor(
-    val automaton: Automaton,
+    val automatonRef: AutomatonReference,
     val args: List<ArgumentWithValue>,
-    val state: State
+    val stateRef: AutomatonStateReference
 ) : Atomic() {
     override val value: Any? = null
 
     override fun toString(): String = dumpToString()
 
     override fun dumpToString(): String = buildString {
-        append("new ${BackticksPolitics.forPeriodSeparated(automaton.name)}")
+        append("new ${BackticksPolitics.forPeriodSeparated(automatonRef.name)}")
 
         val formattedArgs = buildList {
-            add("state = ${BackticksPolitics.forIdentifier(state.name)}")
+            add("state = ${BackticksPolitics.forIdentifier(stateRef.name)}")
             for (arg in args) {
                 add(arg.dumpToString())
             }
