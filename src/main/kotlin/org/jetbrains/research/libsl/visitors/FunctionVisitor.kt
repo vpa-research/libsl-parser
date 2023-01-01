@@ -16,7 +16,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReference
 
 class FunctionVisitor(
     private val functionContext: FunctionContext,
-    private val parentAutomaton: Automaton?,
+    private var parentAutomaton: Automaton?,
     val errorManager: ErrorManager
 ) : LibSLParserVisitor<Unit>(functionContext) {
     private lateinit var buildingFunction: Function
@@ -28,8 +28,15 @@ class FunctionVisitor(
             return
         }
 
+        check((automatonName != null) xor (parentAutomaton != null))
+
+
         val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) } ?: parentAutomaton?.getReference(functionContext)
         check(automatonReference != null)
+
+        if (automatonName != null) {
+            parentAutomaton = automatonReference.resolveOrError()
+        }
 
         val functionName = ctx.functionName.text.extractIdentifier()
 
@@ -57,12 +64,13 @@ class FunctionVisitor(
     private val FunctionDeclContext.args: List<FunctionArgument>
         get() = this
             .functionDeclArgList()
-            .parameter()
-            .mapIndexed { i, parameter ->
+            ?.parameter()
+            ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotation = processAnnotation(parameter.annotation())
                 FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotation)
             }
+            .orEmpty()
 
     private fun processAnnotation(ctx: AnnotationContext?): Annotation? {
         ctx ?: return null

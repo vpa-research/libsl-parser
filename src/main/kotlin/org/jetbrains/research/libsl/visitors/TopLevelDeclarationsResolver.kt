@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.AutomatonContext
+import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 
@@ -16,7 +17,8 @@ class TopLevelDeclarationsResolver(
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
-        super.visitFunctionDecl(ctx)
+        val functionContext = FunctionContext(context)
+        FunctionVisitor(functionContext, parentAutomaton = null, errorManager).visitFunctionDecl(ctx)
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
