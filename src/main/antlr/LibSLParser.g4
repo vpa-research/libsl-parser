@@ -55,7 +55,7 @@ typealiasStatement
  * syntax: type full.name { field1: Type; field2: Type; ... }
  */
 typeDefBlock
-   :   TYPE name=typeIdentifier (L_BRACE typeDefBlockStatement* R_BRACE)?
+   :   TYPE name=periodSeparatedFullName (L_BRACE typeDefBlockStatement* R_BRACE)?
    ;
 
 typeDefBlockStatement
@@ -233,7 +233,7 @@ functionBodyStatements
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET argsList? R_BRACKET SEMICOLON
+   :  ACTION Identifier L_BRACKET argsList R_BRACKET SEMICOLON
    ;
 
 argsList
