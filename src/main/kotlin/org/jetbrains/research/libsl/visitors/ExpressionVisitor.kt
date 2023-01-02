@@ -18,7 +18,7 @@ class ExpressionVisitor(
 ) : LibSLParserBaseVisitor<Expression>() {
     override fun visitExpression(ctx: ExpressionContext): Expression {
         return when {
-            ctx.expression().size == 1 -> {
+            ctx.expression().size == 1 && ctx.op == null -> {
                 // brackets expression
                 visitExpression(ctx.expression()!![0])
             }
@@ -147,7 +147,7 @@ class ExpressionVisitor(
                 val qualifiedArrayAccess = ArrayAccess(arrayIndex)
 
                 parentQualifiedAccess.also {
-                    it.childAccess = qualifiedArrayAccess
+                    it.lastChild.childAccess = qualifiedArrayAccess
                 }
             }
 
@@ -159,19 +159,19 @@ class ExpressionVisitor(
         periodSeparatedFullNameContext: PeriodSeparatedFullNameContext
     ): QualifiedAccess {
         val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
-        val variableName = names.first()
-        val variableReference = VariableReferenceBuilder.build(variableName, context)
+        val lastFieldName = names.last()
+        val lastVariableReference = VariableReferenceBuilder.build(lastFieldName, context)
 
-        val baseVariableAccess = VariableAccess(
-            variableName,
+        val lastVariableAccess = VariableAccess(
+            lastFieldName,
             childAccess = null,
-            variableReference
+            lastVariableReference
         )
 
-        return names.fold(baseVariableAccess) { access, name ->
+        return names.dropLast(1).foldRight(lastVariableAccess) { name, access ->
             val childVariableReference = VariableReferenceBuilder.build(name, context)
             val childAccess = VariableAccess(name, childAccess = null, childVariableReference)
-            access.childAccess = childAccess
+            childAccess.childAccess = access
 
             childAccess
         }
