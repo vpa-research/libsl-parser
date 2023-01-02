@@ -1,14 +1,10 @@
-import com.google.gson.GsonBuilder
-import org.antlr.v4.runtime.*
-import org.jetbrains.research.libsl.LibSLLexer
-import org.jetbrains.research.libsl.LibSLParser
+import org.antlr.v4.runtime.BaseErrorListener
+import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.Recognizer
+import org.jetbrains.research.libsl.LibSL
 import org.jetbrains.research.libsl.context.LslGlobalContext
-import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.nodes.Annotation
-import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.type.Type
-import org.jetbrains.research.libsl.visitors.LibrarySpecificationVisitor
+import org.jetbrains.research.libsl.nodes.Library
 import org.junit.jupiter.api.Assertions
 import java.io.File
 import java.io.FileNotFoundException
@@ -18,26 +14,26 @@ const val testdataPath = "$baseRoot/testdata/"
 
 
 fun runJsonTest(testName: String) {
-    val errorManager = ErrorManager()
-    val library = getLibrary(testName, errorManager)
+    val library = getLibraryAndErrorManager(testName)
 //    checkJsonContent(testName, library, errorManager)
 }
 
 fun runLslTest(testName: String) {
-    val errorManager = ErrorManager()
-    val library = getLibrary(testName, errorManager)
+    val (library, errorManager) = getLibraryAndErrorManager(testName)
     checkLslContent(testName, library, errorManager)
 }
 
-private fun getLibrary(testName: String, errorManager: ErrorManager): Library {
-    val fileContent = getLslFileContent(testName)
-    val stream = CharStreams.fromString(fileContent)
-    val lexer = LibSLLexer(stream)
-    val tokenStream = CommonTokenStream(lexer)
+private fun getLibraryAndErrorManager(testName: String): Pair<Library, ErrorManager> {
+    val libsl = libslFactory()
+    return libsl.loadFromFileName("$testName.lsl") to libsl.errorManager
+}
+
+private fun libslFactory(): LibSL {
     val context = LslGlobalContext()
     context.init()
-    val parser = LibSLParser(tokenStream)
-    parser.addErrorListener(object : BaseErrorListener() {
+
+    val libsl = LibSL(testdataPath + "lsl/", context)
+    libsl.errorListener = object : BaseErrorListener() {
         override fun syntaxError(
             recognizer: Recognizer<*, *>?,
             offendingSymbol: Any?,
@@ -48,20 +44,9 @@ private fun getLibrary(testName: String, errorManager: ErrorManager): Library {
         ) {
             Assertions.fail<RecognitionException>("$line:$charPositionInLine: $msg", e)
         }
-    })
-
-    val file = parser.file()
-    val librarySpecificationVisitor = LibrarySpecificationVisitor("$testdataPath/lsl/", errorManager, context)
-    return librarySpecificationVisitor.processFile(file)
-}
-
-private fun getLslFileContent(name: String): String {
-    val file = File("$testdataPath/lsl/$name.lsl")
-    if (!file.exists()) {
-        error("can't find file $name")
     }
 
-    return file.readText()
+    return libsl
 }
 
 //private fun checkJsonContent(testName: String, library: Library, errorManager: ErrorManager) {

@@ -32,7 +32,7 @@ class LibrarySpecificationVisitor(
             header
         )
 
-        super.visitFile(file)
+        file.globalStatement().forEach { visitGlobalStatement(it) }
 
         representTypesFromContextInLibrary()
         representAutomataFromContextInLibrary()
@@ -78,6 +78,7 @@ class LibrarySpecificationVisitor(
         }
 
         library.imports.add(importName)
+
     }
 
     private fun processInclude(str: String, position: Position) {

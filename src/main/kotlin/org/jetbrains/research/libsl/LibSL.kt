@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl
 
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTreeListener
+import org.jetbrains.annotations.TestOnly
 import org.jetbrains.research.libsl.LibSLParser.FileContext
 import org.jetbrains.research.libsl.nodes.Library
 import org.jetbrains.research.libsl.context.LslGlobalContext
@@ -20,10 +21,16 @@ class LibSL(
     val errorManager = ErrorManager()
     lateinit var library: Library
     private var isParsed = false
+    private val processedFiles = mutableSetOf<String>()
 
-    var errorListener: ParseTreeListener? = null
-    
+    init {
+        context.init()
+    }
+
+    var errorListener: BaseErrorListener? = null
+
     fun loadFromFile(file: File): Library {
+        processedFiles.add(file.nameWithoutExtension)
         return loadFromString(file.readText())
     }
 
@@ -35,18 +42,31 @@ class LibSL(
         return loadFromFile(File(path))
     }
 
+    fun loadFromFileName(name: String): Library {
+        return loadByPath(Path.of(basePath).resolve(name))
+    }
+
     fun loadFromString(string: String): Library {
         val stream = CharStreams.fromString(string)
         val lexer = LibSLLexer(stream)
         val tokenStream = CommonTokenStream(lexer)
-        context.init()
         val parser = LibSLParser(tokenStream)
+
         if (errorListener != null) {
-            parser.addParseListener(errorListener)
+            parser.addErrorListener(errorListener)
         }
 
         val file = parser.file()
-        return processFileRule(file)
+        val library = processFileRule(file)
+
+        for (importName in library.imports) {
+            if (importName in processedFiles)
+                continue
+
+            loadFromFileName("$importName.lsl")
+        }
+
+        return library
     }
 
     private fun processFileRule(file: FileContext): Library {
