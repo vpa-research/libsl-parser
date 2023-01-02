@@ -2,9 +2,11 @@ package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.EnumSemanticTypeEntryContext
+import org.jetbrains.research.libsl.LibSLParser.TypeDefBlockStatementContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.Atomic
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.*
 
 class TypeResolver(
@@ -90,5 +92,21 @@ class TypeResolver(
         val atomic = expressionVisitor.visit(atomicContext) as Atomic
 
         return name to atomic
+    }
+
+    override fun visitTypeDefBlock(ctx: LibSLParser.TypeDefBlockContext) {
+        val name = ctx.name.asPeriodSeparatedString()
+
+        val statements = ctx.typeDefBlockStatement().associate { processTypeDefBlockStatement(it) }
+
+        val type = StructuredType(name, statements, context)
+        context.storeType(type)
+    }
+
+    private fun processTypeDefBlockStatement(ctx: TypeDefBlockStatementContext): Pair<String, TypeReference> {
+        val name = ctx.nameWithType().name.text.extractIdentifier()
+        val typeRef = processTypeIdentifier(ctx.nameWithType().type)
+
+        return name to typeRef
     }
 }

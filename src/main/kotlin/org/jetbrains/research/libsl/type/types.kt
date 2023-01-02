@@ -138,7 +138,6 @@ class ChildrenType(
 
 data class StructuredType(
     override val name: String,
-    val type: RealType,
     var entries: Map<String, TypeReference>,
     override val context: LslContextBase
 ) : Type, FieldTypedType {
@@ -151,7 +150,7 @@ data class StructuredType(
     }
 
     override fun dumpToString(): String = buildString {
-        appendLine("type ${type.fullName} {")
+        appendLine("type ${name} {")
         val formattedEntries = entries.map { (k, v) ->
             "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.resolveOrError().fullName)}"
         }
@@ -164,7 +163,6 @@ data class StructuredType(
         if (other !is StructuredType) return false
 
         if (name != other.name) return false
-        if (type != other.type) return false
         if (generic != other.generic) return false
         if (entries != other.entries) return false
         if (context != other.context) return false
@@ -176,7 +174,6 @@ data class StructuredType(
 
     override fun hashCode(): Int {
         var result = name.hashCode()
-        result = 31 * result + type.hashCode()
         result = 31 * result + isPointer.hashCode()
         result = 31 * result + isTopLevelType.hashCode()
         return result
