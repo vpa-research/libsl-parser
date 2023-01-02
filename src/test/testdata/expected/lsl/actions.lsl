@@ -8,6 +8,6 @@ automaton A : Int {
     
     fun f(param: Int) {
         action TEST_ACTION(1, "123", param, (1 + 123));
-        action TEST_ACTION_TWO();
+        action TEST_ACTION_TWO("foo");
     }
 }
