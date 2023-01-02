@@ -113,16 +113,16 @@ class ExpressionVisitor(
                 StringLiteral(literal)
             }
 
-            primitiveLiteralContext.floatNumber() != null -> {
-                FloatLiteral(primitiveLiteralContext.floatNumber().text.toFloat())
-            }
-
-            primitiveLiteralContext.integerNumber() != null -> {
-                IntegerLiteral(primitiveLiteralContext.integerNumber().text.toInt())
-            }
-
-            else -> error("unknown primitive literal type")
+            else -> super.visitPrimitiveLiteral(primitiveLiteralContext) as Atomic
         }
+    }
+
+    override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): IntegerLiteral {
+        return IntegerLiteral(ctx.text.toInt())
+    }
+
+    override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
+        return FloatLiteral(ctx.text.toFloat())
     }
 
     override fun visitQualifiedAccess(ctx: QualifiedAccessContext): QualifiedAccess {
