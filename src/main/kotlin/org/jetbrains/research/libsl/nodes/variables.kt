@@ -95,3 +95,13 @@ class ConstructorArgument(
     override fun dumpToString(): String = "var ${BackticksPolitics.forIdentifier(name)}: " +
             BackticksPolitics.forTypeIdentifier(typeReference.resolveOrError().fullName)
 }
+
+class VariableWithInitialValue(
+    name: String,
+    typeReference: TypeReference,
+    val initialValue: Expression?
+) : Variable(name, typeReference) {
+    override fun dumpToString() = "var ${BackticksPolitics.forIdentifier(name)}: " +
+            BackticksPolitics.forTypeIdentifier(typeReference.resolveOrError().fullName) +
+            if (initialValue != null) " = ${initialValue.dumpToString()};" else ";"
+}
