@@ -2,12 +2,10 @@ name: Kotlin CI
 
 on:
   pull_request:
-    branches:
-      - master
+  workflow_dispatch:
   push:
     branches:
-      - master
-  workflow_dispatch:
+      - main
 
 jobs:
   Tests:
