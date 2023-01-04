@@ -76,4 +76,15 @@ class LslGlobalContext : LslContextBase() {
         // DO NOT USE HERE ANY NODE because it could contain a reference to context consequently a SOF will occur
         return 42
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LslGlobalContext) return false
+
+        if (isInitialized != other.isInitialized) return false
+        if (importedContexts != other.importedContexts) return false
+        if (parentContext != other.parentContext) return false
+
+        return true
+    }
 }

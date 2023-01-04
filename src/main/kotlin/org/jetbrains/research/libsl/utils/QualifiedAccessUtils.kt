@@ -1,4 +1,4 @@
-//package org.jetbrains.research.libsl.utils
+package org.jetbrains.research.libsl.utils
 //
 //import org.jetbrains.research.libsl.nodes.*
 //import org.jetbrains.research.libsl.type.*
