@@ -18,6 +18,7 @@ abstract class LslContextBase {
     private val functions = mutableListOf<Function>()
     private val variables = mutableListOf<Variable>()
 
+    @Suppress("LeakingThis")
     val typeInferer = TypeInferer(this)
 
     fun storeAutomata(automaton: Automaton) {
