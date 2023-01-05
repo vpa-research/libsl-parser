@@ -76,6 +76,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testQualifiedAccessesLsl() {
+        runLslTest("qualifiedAccesses")
+    }
+
+    @Test
     fun testSimpleLsl() {
         runLslTest("simple")
     }

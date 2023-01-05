@@ -4,6 +4,7 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
+import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 
@@ -16,9 +17,12 @@ data class Library(
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
     val globalVariableReferences: MutableList<VariableReference> = mutableListOf()
 ) : Node() {
-    private val resolvedTypes by lazy { semanticTypesReferences.map { it.resolveOrError() } }
-    private val automata by lazy { automataReferences.map { it.resolveOrError() } }
-    private val globalVariables by lazy { globalVariableReferences.map { it.resolveOrError() } }
+    private val resolvedTypes: List<Type>
+        get() = semanticTypesReferences.map { it.resolveOrError() }
+    private val automata: List<Automaton>
+        get() = automataReferences.map { it.resolveOrError() }
+    private val globalVariables: List<Variable>
+        get() = globalVariableReferences.map { it.resolveOrError() }
 
     override fun dumpToString(): String = buildString {
         appendLine(metadata.dumpToString())

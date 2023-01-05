@@ -47,6 +47,11 @@ class FunctionVisitor(
 
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
+        if (returnType != null) {
+            val resultVariable = ResultVariable(returnType)
+            context.storeVariable(resultVariable)
+        }
+
         buildingFunction = Function(
             functionName,
             automatonReference,
@@ -68,7 +73,15 @@ class FunctionVisitor(
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotation = processAnnotation(parameter.annotation())
-                FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotation)
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotation)
+                if (annotation != null && annotation.name == "target") {
+                    val targetAutomatonName = typeRef.name
+                    val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
+                    arg.targetAutomaton = targetAutomatonReference
+                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
+                }
+
+                arg
             }
             .orEmpty()
 

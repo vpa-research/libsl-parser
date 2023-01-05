@@ -5,8 +5,10 @@ import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.nodes.VariableDeclarationImpl
+import org.jetbrains.research.libsl.nodes.Automaton
 import org.jetbrains.research.libsl.nodes.VariableWithInitialValue
+import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
+import javax.naming.Context
 
 class TopLevelDeclarationsResolver(
     private val basePath: String,
@@ -19,7 +21,14 @@ class TopLevelDeclarationsResolver(
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
-        val functionContext = FunctionContext(context)
+        val parentContext = if (ctx.automatonName != null) {
+            val automatonRef = AutomatonReferenceBuilder.build(ctx.automatonName.text.extractIdentifier(), context)
+            globalContext.resolveAutomaton(automatonRef)!!.context
+        } else {
+            globalContext
+        }
+
+        val functionContext = FunctionContext(parentContext)
         FunctionVisitor(functionContext, parentAutomaton = null, errorManager).visitFunctionDecl(ctx)
     }
 

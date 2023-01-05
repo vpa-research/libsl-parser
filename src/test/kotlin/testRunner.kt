@@ -2,9 +2,12 @@ import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.jetbrains.research.libsl.LibSL
+import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.nodes.Library
+import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.Function
+import org.jetbrains.research.libsl.type.*
 import org.junit.jupiter.api.Assertions
 import java.io.File
 import java.io.FileNotFoundException
@@ -19,16 +22,16 @@ fun runJsonTest(testName: String) {
 }
 
 fun runLslTest(testName: String) {
-    val (library, errorManager) = getLibraryAndErrorManager(testName)
-    checkLslContent(testName, library, errorManager)
+    val (library, errorManager, context) = getLibraryAndErrorManager(testName)
+    checkLslContent(testName, library, context, errorManager)
 }
 
-private fun getLibraryAndErrorManager(testName: String): Pair<Library, ErrorManager> {
-    val libsl = libslFactory()
-    return libsl.loadFromFileName("$testName.lsl") to libsl.errorManager
+private fun getLibraryAndErrorManager(testName: String): Triple<Library, ErrorManager, LslContextBase> {
+    val (libsl, context) = libslFactory()
+    return Triple(libsl.loadFromFileName("$testName.lsl"), libsl.errorManager, context)
 }
 
-private fun libslFactory(): LibSL {
+private fun libslFactory(): Pair<LibSL, LslContextBase> {
     val context = LslGlobalContext()
     context.init()
 
@@ -46,7 +49,7 @@ private fun libslFactory(): LibSL {
         }
     }
 
-    return libsl
+    return libsl to context
 }
 
 //private fun checkJsonContent(testName: String, library: Library, errorManager: ErrorManager) {
@@ -63,8 +66,10 @@ private fun libslFactory(): LibSL {
 //    Assertions.assertTrue(errorManager.errors.isEmpty())
 //}
 
-private fun checkLslContent(testName: String, library: Library, errorManager: ErrorManager) {
+private fun checkLslContent(testName: String, library: Library, context: LslContextBase, errorManager: ErrorManager) {
     val lslContent = removeBlankLines(library.dumpToString())
+
+    checkEverythingIsResolved(library, context)
 
     val expectedFile = File("$testdataPath/expected/lsl/$testName.lsl")
     if (!expectedFile.exists()) {
@@ -74,6 +79,56 @@ private fun checkLslContent(testName: String, library: Library, errorManager: Er
 
     Assertions.assertEquals(removeBlankLines(expectedFile.readText()), lslContent)
     Assertions.assertTrue(errorManager.errors.isEmpty())
+}
+
+private fun checkEverythingIsResolved(library: Library, context: LslContextBase) {
+    library.automataReferences.forEach { ref ->
+        val automaton = ref.resolveOrError()
+        checkAutomatonIsResolved(automaton)
+    }
+
+    library.semanticTypesReferences.forEach { ref ->
+        val type = ref.resolveOrError()
+        checkTypeIsResolved(type)
+    }
+}
+
+private fun checkAutomatonIsResolved(automaton: Automaton) {
+    automaton.typeReference.resolveOrError()
+    automaton.constructorVariables.forEach { it.typeReference.resolveOrError() }
+    automaton.internalVariables.forEach { it.typeReference.resolveOrError() }
+
+    automaton.functions.forEach { func -> checkFunctionIsResolved(func) }
+}
+
+private fun checkFunctionIsResolved(function: Function) {
+    function.statements.forEach { statement ->
+        when (statement) {
+            is Action -> {}
+            is Assignment -> {
+                function.context.typeInferer.getExpressionType(statement.left)
+                function.context.typeInferer.getExpressionType(statement.value)
+            }
+        }
+    }
+
+    function.returnType?.resolveOrError()
+    function.args.forEach { arg -> arg.typeReference.resolveOrError() }
+}
+
+private fun checkTypeIsResolved(type: Type) {
+    when (type) {
+        is ArrayType -> type.generic.resolveOrError()
+        is EnumType -> {}
+        is EnumLikeSemanticType -> {}
+        is SimpleType -> {}
+        is TypeAlias -> type.originalType.resolveOrError()
+        is PrimitiveType -> {}
+        is RealType -> {}
+        is StructuredType -> {
+            type.entries.forEach{ entryType -> entryType.value.resolveOrError()}
+        }
+    }
 }
 
 private fun removeBlankLines(text: String): String {

@@ -1,5 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
@@ -9,10 +10,11 @@ data class Automaton(
     val typeReference: TypeReference,
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
-    val internalVariableDeclarations: MutableList<VariableDeclaration> = mutableListOf(),
+    val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
     val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
-    val extensionFunctions: MutableList<Function> = mutableListOf()
+    val extensionFunctions: MutableList<Function> = mutableListOf(),
+    val context: AutomatonContext
 ) : Node() {
     val functions: List<Function>
         get() = localFunctions + extensionFunctions
@@ -35,7 +37,7 @@ data class Automaton(
         append(formatFunctions())
     }
 
-    private fun formatInternalVariables(): String = formatListEmptyLineAtEndIfNeeded(internalVariableDeclarations)
+    private fun formatInternalVariables(): String = formatListEmptyLineAtEndIfNeeded(internalVariables)
 
     private fun formatStates(): String = formatListEmptyLineAtEndIfNeeded(states)
 

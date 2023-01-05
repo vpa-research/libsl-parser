@@ -1,5 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
@@ -12,8 +13,8 @@ enum class ArithmeticUnaryOp(val string: String) {
 }
 
 open class Variable(
-    open val name: String,
-    open val typeReference: TypeReference
+    open var name: String,
+    open var typeReference: TypeReference
 ) : Expression() {
     open val fullName: String
         get() = name
@@ -37,38 +38,16 @@ open class Variable(
 }
 
 data class ResultVariable(
-    override val typeReference: TypeReference
+    override var typeReference: TypeReference
 ) : Variable(name = "result", typeReference)
-
-sealed class VariableDeclaration : Node() {
-    abstract val name: String
-    abstract val typeReference: TypeReference
-    abstract val initValue: Expression?
-
-    override fun dumpToString(): String = buildString {
-        append("var ${BackticksPolitics.forIdentifier(name)}: " +
-                BackticksPolitics.forTypeIdentifier(typeReference.resolveOrError().fullName)
-        )
-        if (initValue != null) {
-            append(" = ${initValue!!.dumpToString()}")
-        }
-
-        appendLine(";")
-    }
-}
-
-data class VariableDeclarationImpl(
-    override val name: String,
-    override val typeReference: TypeReference,
-    override val initValue: Expression?
-) : VariableDeclaration()
 
 @Suppress("unused")
 class FunctionArgument(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotation: Annotation? = null
+    var annotation: Annotation? = null,
+    var targetAutomaton: AutomatonReference? = null
 ) : Variable(name, typeReference) {
     lateinit var function: Function
 
@@ -77,9 +56,29 @@ class FunctionArgument(
 
     override fun dumpToString(): String = buildString {
         if (annotation != null) {
-            append("@${annotation!!.dumpToString()} ")
+            append("@")
+            append(BackticksPolitics.forIdentifier(annotation!!.name))
+
+            if (annotation!!.values.isNotEmpty()) {
+                append("(")
+                append(annotation!!.values.joinToString(separator = ", ") { v ->
+                    v.dumpToString()
+                })
+                append(")")
+            }
+
+            append(IPrinter.SPACE)
         }
-        append(name)
+        append(BackticksPolitics.forIdentifier(name))
+        append(": ")
+
+        val typeName = if (targetAutomaton != null) {
+            targetAutomaton!!.name
+        } else {
+            typeReference.name
+        }
+
+        append(typeName)
     }
 }
 

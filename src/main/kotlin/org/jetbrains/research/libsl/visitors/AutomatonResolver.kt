@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.NameWithTypeContext
+import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.errors.ErrorManager
@@ -14,8 +15,8 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 class AutomatonResolver(
     private val basePath: String,
     private val errorManager: ErrorManager,
-    context: LslContextBase
-) : LibSLParserVisitor<Unit>(context) {
+    private val automatonContext: AutomatonContext
+) : LibSLParserVisitor<Unit>(automatonContext) {
     private lateinit var buildingAutomaton: Automaton
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.asPeriodSeparatedString()
@@ -25,6 +26,7 @@ class AutomatonResolver(
         buildingAutomaton = Automaton(
             name,
             typeReference,
+            context = automatonContext
         )
 
         super.visitAutomatonDecl(ctx)
@@ -141,8 +143,9 @@ class AutomatonResolver(
             }
         }
 
-        val variableDecl = VariableDeclarationImpl(name, typeReference, initValue)
-        buildingAutomaton.internalVariableDeclarations.add(variableDecl)
+        val variable = VariableWithInitialValue(name, typeReference, initValue)
+        buildingAutomaton.internalVariables.add(variable)
+        context.storeVariable(variable)
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {

@@ -133,7 +133,7 @@ class ExpressionVisitor(
 
             ctx.simpleCall() != null -> {
                 val automatonByFunctionArgumentCreation = visitSimpleCall(ctx.simpleCall())
-                val childQualifiedAccess = ctx.qualifiedAccess()?.let { visitQualifiedAccess(it) }
+                val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it) }
 
                 automatonByFunctionArgumentCreation.also {
                     it.childAccess = childQualifiedAccess
@@ -141,10 +141,12 @@ class ExpressionVisitor(
             }
 
             ctx.expressionAtomic() != null -> {
-                val parentQualifiedAccess = visitQualifiedAccess(ctx.qualifiedAccess())
+                val parentQualifiedAccess = visitQualifiedAccess(ctx.qualifiedAccess(0))
                 val arrayIndex = visitExpressionAtomic(ctx.expressionAtomic())
 
                 val qualifiedArrayAccess = ArrayAccess(arrayIndex)
+                val afterArrayQualifiedAccess = ctx.qualifiedAccess(1)?.let { visitQualifiedAccess(it) }
+                qualifiedArrayAccess.childAccess = afterArrayQualifiedAccess
 
                 parentQualifiedAccess.also {
                     it.lastChild.childAccess = qualifiedArrayAccess

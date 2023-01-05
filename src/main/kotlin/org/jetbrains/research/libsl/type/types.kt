@@ -122,20 +122,6 @@ data class EnumLikeSemanticType(
     override fun toString() = dumpToString()
 }
 
-class ChildrenType(
-    override val name: String,
-    override val context: LslContextBase,
-) : Type {
-    override val generic: TypeReference? = null
-    override val isPointer: Boolean = false
-
-    override fun dumpToString(): String {
-        error("unsupported operation exception")
-    }
-
-    override fun toString() = dumpToString()
-}
-
 data class StructuredType(
     override val name: String,
     var entries: Map<String, TypeReference>,
