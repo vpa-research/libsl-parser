@@ -42,6 +42,10 @@ data class ArrayAccess(
     override fun dumpToString(): String = buildString {
         append("[${index.dumpToString()}]")
         if (childAccess != null) {
+            if (childAccess is VariableAccess) {
+                append(".")
+            }
+
             append(childAccess!!.dumpToString())
         }
     }

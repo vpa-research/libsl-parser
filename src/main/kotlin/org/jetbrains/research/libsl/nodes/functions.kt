@@ -24,30 +24,7 @@ data class Function(
         append("fun ${BackticksPolitics.forIdentifier(name)}")
 
         append(
-            args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> buildString {
-                if (arg.annotation != null) {
-                    append("@")
-                    append(BackticksPolitics.forIdentifier(arg.annotation!!.name))
-
-                    if (arg.annotation!!.values.isNotEmpty()) {
-                        append("(")
-                        append(arg.annotation!!.values.joinToString(separator = ", ") { v ->
-                            v.dumpToString()
-                        })
-                        append(")")
-                    }
-
-                    append(IPrinter.SPACE)
-                }
-                append(BackticksPolitics.forIdentifier(arg.name))
-                append(": ")
-
-                if (arg.annotation != null && arg.annotation is TargetAnnotation) {
-                    append(targetAutomatonRef!!.name)
-                } else {
-                    append(arg.typeReference.resolveOrError().fullName)
-                }
-            } }
+            args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString()}
         )
 
         if (returnType != null) {

@@ -7,6 +7,7 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
+import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.type.TypeInferer
 
@@ -28,6 +29,11 @@ abstract class LslContextBase {
     fun storeType(type: Type) {
         if (type in types)
             return
+
+        // hack to kick out real types when semantic type is being resolved after reference to it
+        if (type !is RealType) {
+            types.removeIf { storedType -> storedType.name == type.name && storedType is RealType }
+        }
 
         types.add(type)
     }
