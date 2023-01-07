@@ -17,8 +17,8 @@ open class TypeReference(
     private fun resolveArrayType(): ArrayType? {
         if (name != "array")
             return null
-
-        return ArrayType(isPointer, genericReference!!, context)
+        genericReference!!.resolve() ?: return null
+        return ArrayType(isPointer, genericReference, context)
     }
 
     override fun isReferenceMatchWithNode(node: Type): Boolean {
