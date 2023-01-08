@@ -3,7 +3,7 @@ package org.jetbrains.research.libsl.nodes.references
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Function
 
-class FunctionReference(
+data class FunctionReference(
     val name: String,
     val argTypes: List<TypeReference>,
     override val context: LslContextBase

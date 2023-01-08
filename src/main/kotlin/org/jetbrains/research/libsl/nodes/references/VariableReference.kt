@@ -3,7 +3,7 @@ package org.jetbrains.research.libsl.nodes.references
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Variable
 
-class VariableReference(
+data class VariableReference(
     val name: String,
     override val context: LslContextBase
 ) : LslReference<Variable, VariableReference> {

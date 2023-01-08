@@ -3,7 +3,7 @@ package org.jetbrains.research.libsl.nodes.references
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.State
 
-class AutomatonStateReference(
+data class AutomatonStateReference(
     val name: String,
     private val automatonReference: AutomatonReference,
     override val context: LslContextBase
