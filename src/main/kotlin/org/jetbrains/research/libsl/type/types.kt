@@ -94,26 +94,10 @@ data class EnumLikeSemanticType(
     val type: Type,
     val entries: Map<String, Atomic>,
     override val context: LslContextBase
-) : LibslType, FieldValuedType, FieldTypedType {
+) : LibslType {
     override val isPointer: Boolean = false
     override val generic: TypeReference? = null
     override val isTypeBlockType: Boolean = true
-
-    override fun getFieldValue(name: String): Expression? {
-        return entries[name]
-    }
-
-    override fun getFieldTypeReference(name: String): TypeReference? {
-        if (entries.isEmpty())
-            return null
-
-        val valueTypes = entries.values.map { context.typeInferer.getExpressionType(it) }
-        return TODO()
-
-//        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
-//            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
-//        }
-    }
 
     override fun dumpToString(): String = buildString {
         appendLine("$name(${type.fullName}) {")
@@ -129,14 +113,10 @@ data class StructuredType(
     override val name: String,
     var entries: Map<String, TypeReference>,
     override val context: LslContextBase
-) : Type, FieldTypedType {
+) : Type {
     override val isPointer: Boolean = false
     override val isTopLevelType: Boolean = true
     override val generic: TypeReference? = null
-
-    override fun getFieldTypeReference(name: String): TypeReference? {
-        return entries[name]
-    }
 
     override fun dumpToString(): String = buildString {
         appendLine("type ${name} {")
@@ -175,25 +155,10 @@ data class EnumType(
     override val name: String,
     val entries: Map<String, Atomic>,
     override val context: LslContextBase
-) : Type, FieldValuedType, FieldTypedType {
+) : Type {
     override val isPointer: Boolean = false
     override val generic: TypeReference? = null
     override val isTopLevelType: Boolean = true
-
-    override fun getFieldValue(name: String): Expression? {
-        return entries[name]
-    }
-
-    override fun getFieldTypeReference(name: String): TypeReference? {
-        if (entries.isEmpty())
-            return null
-
-        val valueTypes = entries.values.map { context.typeInferer.getExpressionType(it) }
-        return TODO()
-//        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
-//            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
-//        }
-    }
 
     override fun dumpToString(): String = buildString {
         appendLine("enum $name {")
@@ -217,12 +182,4 @@ data class ArrayType(
     }
 
     override fun toString() = dumpToString()
-}
-
-sealed interface FieldTypedType {
-    fun getFieldTypeReference(name: String): TypeReference?
-}
-
-sealed interface FieldValuedType {
-    fun getFieldValue(name: String): Expression?
 }
