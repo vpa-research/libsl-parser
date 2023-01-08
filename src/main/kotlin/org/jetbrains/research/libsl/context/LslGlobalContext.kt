@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
 import org.jetbrains.research.libsl.type.*
+import java.util.Objects
 
 class LslGlobalContext : LslContextBase() {
     @Suppress("MemberVisibilityCanBePrivate")
@@ -51,25 +52,48 @@ class LslGlobalContext : LslContextBase() {
     }
 
     override fun resolveVariable(reference: VariableReference): Variable? {
-        return super.resolveVariable(reference) ?: resolveInImportedContexts { resolveVariable(reference) }
+        return resolveVariable(reference, setOf(this))
     }
 
     override fun resolveType(reference: TypeReference): Type? {
-        return super.resolveType(reference) ?: resolveInImportedContexts { resolveType(reference) }
+        return resolveType(reference, setOf(this))
     }
 
     override fun resolveAutomaton(reference: AutomatonReference): Automaton? {
-        return super.resolveAutomaton(reference) ?: resolveInImportedContexts { resolveAutomaton(reference) }
+        return resolveAutomaton(reference, setOf(this))
     }
 
     override fun resolveFunction(reference: FunctionReference): Function? {
-        return super.resolveFunction(reference) ?: resolveInImportedContexts { resolveFunction(reference) }
+        return resolveFunction(reference, setOf(this))
+    }
+
+    private fun resolveVariable(reference: VariableReference, visitedScopes: Set<LslGlobalContext>): Variable? {
+        return super.resolveVariable(reference)
+            ?: resolveInImportedContexts(visitedScopes) { v -> resolveVariable(reference, v) }
+    }
+
+    private fun resolveType(reference: TypeReference, visitedScopes: Set<LslGlobalContext>): Type? {
+        return super.resolveType(reference)
+            ?: resolveInImportedContexts(visitedScopes) { v -> resolveType(reference, v) }
+    }
+
+    private fun resolveAutomaton(reference: AutomatonReference, visitedScopes: Set<LslGlobalContext>): Automaton? {
+        return super.resolveAutomaton(reference)
+            ?: resolveInImportedContexts(visitedScopes) { v -> resolveAutomaton(reference, v) }
+    }
+
+    private fun resolveFunction(reference: FunctionReference, visitedScopes: Set<LslGlobalContext>): Function? {
+        return super.resolveFunction(reference)
+            ?: resolveInImportedContexts(visitedScopes) { v -> resolveFunction(reference, v) }
     }
 
     private fun <T> resolveInImportedContexts(
-        resolve: LslGlobalContext.() -> T
+        visitedScopes: Set<LslGlobalContext>,
+        resolve: LslGlobalContext.(Set<LslGlobalContext>) -> T
     ): T? {
-        return importedContexts.firstNotNullOfOrNull { ctx -> ctx.resolve() }
+        return importedContexts
+            .filter { it !in visitedScopes }
+            .firstNotNullOfOrNull { ctx -> ctx.resolve(visitedScopes + ctx) }
     }
 
     override fun hashCode(): Int {
@@ -78,13 +102,6 @@ class LslGlobalContext : LslContextBase() {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LslGlobalContext) return false
-
-        if (isInitialized != other.isInitialized) return false
-        if (importedContexts != other.importedContexts) return false
-        if (parentContext != other.parentContext) return false
-
-        return true
+        return this === other
     }
 }

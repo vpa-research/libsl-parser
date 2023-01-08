@@ -1,12 +1,11 @@
 package org.jetbrains.research.libsl.type
 
-import org.jetbrains.research.libsl.context.LslContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Atomic
 import org.jetbrains.research.libsl.nodes.Expression
 import org.jetbrains.research.libsl.nodes.IPrinter
-import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed interface Type : IPrinter {
@@ -19,17 +18,21 @@ sealed interface Type : IPrinter {
         get() = buildString {
             append(if (isPointer) "*" else "")
             append(name)
-            append(if (generic != null) "<${generic!!.resolveOrError().fullName}>" else "")
+            append(if (generic != null) "<${generic!!.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL}>" else "")
         }
 
     val isArray: Boolean
-        get() = (this as? TypeAlias)?.originalType?.resolveOrError()?.isArray == true || this is ArrayType
+        get() = (this as? TypeAlias)?.originalType?.resolve()?.isArray == true || this is ArrayType
 
     val isTopLevelType: Boolean
         get() = false
 
     val isTypeBlockType: Boolean
         get() = false
+
+    companion object {
+        const val UNRESOLVED_TYPE_SYMBOL = "`<UNRESOLVED_TYPE>`"
+    }
 }
 
 sealed interface LibslType : Type
@@ -78,7 +81,7 @@ data class TypeAlias (
             append("typealias ")
             append(BackticksPolitics.forTypeIdentifier(name))
             append(" = ")
-            append(BackticksPolitics.forTypeIdentifier(originalType.resolveOrError().fullName))
+            append(BackticksPolitics.forTypeIdentifier(originalType.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
             append(";")
         }
     }
@@ -91,26 +94,10 @@ data class EnumLikeSemanticType(
     val type: Type,
     val entries: Map<String, Atomic>,
     override val context: LslContextBase
-) : LibslType, FieldValuedType, FieldTypedType {
+) : LibslType {
     override val isPointer: Boolean = false
     override val generic: TypeReference? = null
     override val isTypeBlockType: Boolean = true
-
-    override fun getFieldValue(name: String): Expression? {
-        return entries[name]
-    }
-
-    override fun getFieldTypeReference(name: String): TypeReference? {
-        if (entries.isEmpty())
-            return null
-
-        val valueTypes = entries.values.map { context.typeInferer.getExpressionType(it) }
-        return TODO()
-
-//        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
-//            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
-//        }
-    }
 
     override fun dumpToString(): String = buildString {
         appendLine("$name(${type.fullName}) {")
@@ -126,19 +113,15 @@ data class StructuredType(
     override val name: String,
     var entries: Map<String, TypeReference>,
     override val context: LslContextBase
-) : Type, FieldTypedType {
+) : Type {
     override val isPointer: Boolean = false
     override val isTopLevelType: Boolean = true
     override val generic: TypeReference? = null
 
-    override fun getFieldTypeReference(name: String): TypeReference? {
-        return entries[name]
-    }
-
     override fun dumpToString(): String = buildString {
         appendLine("type ${name} {")
         val formattedEntries = entries.map { (k, v) ->
-            "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.resolveOrError().fullName)}"
+            "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}"
         }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
@@ -172,25 +155,10 @@ data class EnumType(
     override val name: String,
     val entries: Map<String, Atomic>,
     override val context: LslContextBase
-) : Type, FieldValuedType, FieldTypedType {
+) : Type {
     override val isPointer: Boolean = false
     override val generic: TypeReference? = null
     override val isTopLevelType: Boolean = true
-
-    override fun getFieldValue(name: String): Expression? {
-        return entries[name]
-    }
-
-    override fun getFieldTypeReference(name: String): TypeReference? {
-        if (entries.isEmpty())
-            return null
-
-        val valueTypes = entries.values.map { context.typeInferer.getExpressionType(it) }
-        return TODO()
-//        return valueTypes.drop(1).fold(valueTypes.first()) { acc, next ->
-//            context.typeInferer.mergeTypesOrNull(acc, next) ?: return null
-//        }
-    }
 
     override fun dumpToString(): String = buildString {
         appendLine("enum $name {")
@@ -214,12 +182,4 @@ data class ArrayType(
     }
 
     override fun toString() = dumpToString()
-}
-
-sealed interface FieldTypedType {
-    fun getFieldTypeReference(name: String): TypeReference?
-}
-
-sealed interface FieldValuedType {
-    fun getFieldValue(name: String): Expression?
 }

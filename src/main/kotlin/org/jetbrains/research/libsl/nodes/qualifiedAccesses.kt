@@ -30,6 +30,24 @@ data class VariableAccess(
         childAccess != null -> "${BackticksPolitics.forIdentifier(fieldName)}${childAccess?.dumpToString()}"
         else -> fieldName
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is VariableAccess) return false
+
+        if (fieldName != other.fieldName) return false
+        if (childAccess != other.childAccess) return false
+        if (variable != other.variable) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = fieldName.hashCode()
+        result = 31 * result + (childAccess?.hashCode() ?: 0)
+        result = 31 * result + variable.hashCode()
+        return result
+    }
 }
 
 data class ArrayAccess(
@@ -48,6 +66,22 @@ data class ArrayAccess(
 
             append(childAccess!!.dumpToString())
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ArrayAccess) return false
+
+        if (index != other.index) return false
+        if (childAccess != other.childAccess) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = index.hashCode()
+        result = 31 * result + (childAccess?.hashCode() ?: 0)
+        return result
     }
 }
 
@@ -68,5 +102,23 @@ data class AutomatonOfFunctionArgumentInvoke(
             append(".")
             append(childAccess!!.dumpToString())
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AutomatonOfFunctionArgumentInvoke) return false
+
+        if (automatonReference != other.automatonReference) return false
+        if (arg != other.arg) return false
+        if (childAccess != other.childAccess) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = automatonReference.hashCode()
+        result = 31 * result + arg.hashCode()
+        result = 31 * result + (childAccess?.hashCode() ?: 0)
+        return result
     }
 }

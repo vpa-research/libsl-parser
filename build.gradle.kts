@@ -46,7 +46,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.vldf"
             artifactId = "libsl"
-            version = "1.0.0"
+            version = "1.1.1"
 
             from(components["java"])
             artifact(sourcesJar) {
