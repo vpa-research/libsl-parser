@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 enum class ArithmeticUnaryOp(val string: String) {
@@ -92,7 +93,7 @@ class ConstructorArgument(
         get() = "${automaton.name}.$name"
 
     override fun dumpToString(): String = "var ${BackticksPolitics.forIdentifier(name)}: " +
-            BackticksPolitics.forTypeIdentifier(typeReference.resolveOrError().fullName)
+            BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
 }
 
 class VariableWithInitialValue(
@@ -101,6 +102,6 @@ class VariableWithInitialValue(
     val initialValue: Expression?
 ) : Variable(name, typeReference) {
     override fun dumpToString() = "var ${BackticksPolitics.forIdentifier(name)}: " +
-            BackticksPolitics.forTypeIdentifier(typeReference.resolveOrError().fullName) +
+            BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL) +
             if (initialValue != null) " = ${initialValue.dumpToString()};" else ";"
 }

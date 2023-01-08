@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Automaton(
@@ -24,7 +25,7 @@ data class Automaton(
         if (constructorVariables.isNotEmpty()) {
             append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
         }
-        appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolveOrError().fullName)} {")
+        appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)} {")
 
         append(withIndent(formatBody()))
         append("}")

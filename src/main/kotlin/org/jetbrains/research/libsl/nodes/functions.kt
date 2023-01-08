@@ -1,8 +1,9 @@
 package org.jetbrains.research.libsl.nodes
 
-import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Function(
@@ -14,7 +15,7 @@ data class Function(
     var statements: MutableList<Statement> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
     var targetAutomatonRef: AutomatonReference? = null,
-    val context: LslContextBase
+    val context: FunctionContext
 ) : Node() {
     val fullName: String
         get() = "${automatonReference.name}.$name"
@@ -29,7 +30,7 @@ data class Function(
 
         if (returnType != null) {
             append(": ")
-            append(returnType.resolveOrError().fullName)
+            append(returnType.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
         }
 
         if (contracts.isNotEmpty()) {
