@@ -11,7 +11,7 @@ allprojects {
     }
 }
 dependencies {
-    implementation 'com.github.vorpal-research:libsl:Tag'
+    implementation 'com.github.vpa-research:libsl-parser:Tag'
 }
 ```
 ### kotlin script gradle
@@ -21,7 +21,7 @@ repositories {
     maven("https://jitpack.io")
 }
 dependencies {
-    implementation("com.github.vorpal-research:libsl:Tag")
+    implementation("com.github.vpa-research:libsl-parser:Tag")
 }
 ```
 
