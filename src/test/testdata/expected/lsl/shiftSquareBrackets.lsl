@@ -8,12 +8,20 @@ automaton a : int {
     state S2;
     state S3;
     shift S1 -> S2(foo);
+    shift S1 -> S2(fix);
+    shift S1 -> S2(fix, foo);
     shift S1 -> S2(foo);
-    shift S1 -> S2(ddd, ddd);
-    shift S1 -> S2(a);
-    shift S1 -> S2(aaa);
-    shift S1 -> S3(dd(int), ddd(int), sfgsf(int));
+    shift S1 -> S2(foo);
+    shift S1 -> S3(sum(int, int), min(int));
     shift S1 -> S3(sum(int, int));
+    shift S1 -> S3(foo);
+    shift S2 -> S3(foo);
+    shift S1 -> S3(sum(int, int), min(int));
+    shift S2 -> S3(sum(int, int), min(int));
+    shift S1 -> S3(fix);
+    shift S2 -> S3(fix);
     fun foo();
     fun sum(i: int, j: int);
+    fun min(i: int);
+    fun fix();
 }
