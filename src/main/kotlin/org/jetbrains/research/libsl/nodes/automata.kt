@@ -6,6 +6,8 @@ import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
+// TODO Annotation!
+
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
