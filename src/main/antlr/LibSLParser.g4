@@ -48,7 +48,7 @@ header:
  * syntax: typealias name = origintlType
  */
 typealiasStatement
-   :   TYPEALIAS left=typeIdentifier EQ right=typeIdentifier SEMICOLON
+   :   TYPEALIAS left=typeIdentifier ASSIGN_OP right=typeIdentifier SEMICOLON
    ;
 
 /* type define block
@@ -70,7 +70,7 @@ enumBlock
    ;
 
 enumBlockStatement
-   :   Identifier EQ integerNumber SEMICOLON
+   :   Identifier ASSIGN_OP integerNumber SEMICOLON
    ;
 
 /* semantic types section
@@ -146,7 +146,7 @@ functionsListPart
  */
 variableDecl
    :   VAR nameWithType SEMICOLON
-   |   VAR nameWithType EQ assignmentRight SEMICOLON
+   |   VAR nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 nameWithType
@@ -161,7 +161,7 @@ typeIdentifier
    ;
 
 variableAssignment
-   :   qualifiedAccess EQ assignmentRight SEMICOLON
+   :   qualifiedAccess ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 assignmentRight
@@ -178,8 +178,8 @@ namedArgs
    ;
 
 argPair
-   :   name=STATE EQ expressionAtomic
-   |   name=Identifier EQ expression
+   :   name=STATE ASSIGN_OP expressionAtomic
+   |   name=Identifier ASSIGN_OP expression
    ;
 
 /*
