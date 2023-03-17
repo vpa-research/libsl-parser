@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnresolvedState
 import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
@@ -22,15 +23,41 @@ class AutomatonResolver(
         val name = ctx.name.asPeriodSeparatedString()
         val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
+        val annotations = makeAutomatonAnnotationsList(ctx.automatonAnnotations())
 
         buildingAutomaton = Automaton(
             name,
             typeReference,
+            annotations,
             context = automatonContext
         )
 
         super.visitAutomatonDecl(ctx)
         context.parentContext!!.storeAutomata(buildingAutomaton)
+    }
+
+    private fun makeAutomatonAnnotationsList(ctx: List<LibSLParser.AutomatonAnnotationsContext>?): MutableList<Annotation>? {
+        val annotationsList = mutableListOf<Annotation>()
+        val annotations = ctx?.mapNotNull { processAutomatonAnnotation(it) }
+        if (annotations != null) {
+            annotationsList.addAll(annotations)
+        }
+        return annotationsList
+    }
+
+    private fun processAutomatonAnnotation(ctx: LibSLParser.AutomatonAnnotationsContext?): Annotation? {
+        ctx ?: return null
+        val name = ctx.Identifier().asPeriodSeparatedString()
+        val expressionVisitor = ExpressionVisitor(automatonContext)
+        val args = ctx.argsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty().toMutableList()
+
+        if (name == "target") {
+            return TargetAnnotation()
+        }
+
+        return Annotation(name, args)
     }
 
     /**

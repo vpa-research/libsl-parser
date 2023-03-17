@@ -11,6 +11,7 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
+    var annotations: MutableList<Annotation>? = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
@@ -23,6 +24,13 @@ data class Automaton(
         get() = localFunctions + extensionFunctions
 
     override fun dumpToString(): String = buildString {
+        annotations?.joinToString() { annotation ->
+            repeat(3) {
+                appendLine()
+            }
+            append(annotation.dumpToString())
+        }
+
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
         if (constructorVariables.isNotEmpty()) {
             append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")

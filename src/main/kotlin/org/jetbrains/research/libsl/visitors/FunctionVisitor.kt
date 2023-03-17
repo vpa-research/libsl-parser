@@ -1,7 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.AnnotationContext
+import org.jetbrains.research.libsl.LibSLParser.FunctionParamAnnotationContext
 import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
 import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
 import org.jetbrains.research.libsl.context.FunctionContext
@@ -72,7 +72,7 @@ class FunctionVisitor(
             ?.parameter()
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
-                val annotation = processAnnotation(parameter.annotation())
+                val annotation = processAnnotation(parameter.functionParamAnnotation())
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotation)
                 if (annotation != null && annotation.name == "target") {
                     val targetAutomatonName = typeRef.name
@@ -85,7 +85,7 @@ class FunctionVisitor(
             }
             .orEmpty()
 
-    private fun processAnnotation(ctx: AnnotationContext?): Annotation? {
+    private fun processAnnotation(ctx: FunctionParamAnnotationContext?): Annotation? {
         ctx ?: return null
 
         val name = ctx.Identifier().asPeriodSeparatedString()

@@ -107,14 +107,14 @@ enumSemanticTypeEntry
  * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   automatonAnnotation*?
+   :   automatonAnnotations*?
    AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
    ;
 
 /* automaton annotation
  * syntax: @annotationName(args)
  */
-automatonAnnotation
+automatonAnnotations
    :  AT Identifier (L_BRACKET argsList R_BRACKET)?
    ;
 
