@@ -1,7 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.FunctionParamAnnotationContext
+import org.jetbrains.research.libsl.LibSLParser.FunctionParamAnnotationsContext
 import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
 import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
 import org.jetbrains.research.libsl.context.FunctionContext
@@ -22,6 +22,7 @@ class FunctionVisitor(
     private lateinit var buildingFunction: Function
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
+
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
         if (automatonName == null && parentAutomaton == null) {
             errorManager(UnspecifiedAutomaton("automaton must be specified for top-level functions", ctx.position()))
@@ -40,6 +41,8 @@ class FunctionVisitor(
 
         val functionName = ctx.functionName.text.extractIdentifier()
 
+        val annotations = makeFunctionAnnotationsList(ctx.functionAnnotations())
+
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
@@ -57,6 +60,7 @@ class FunctionVisitor(
             automatonReference,
             args,
             returnType,
+            annotations,
             hasBody = ctx.functionBody() != null,
             targetAutomatonRef = targetAutomatonRef,
             context = functionContext
@@ -72,9 +76,10 @@ class FunctionVisitor(
             ?.parameter()
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
-                val annotation = processAnnotation(parameter.functionParamAnnotation())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotation)
-                if (annotation != null && annotation.name == "target") {
+                val annotations = makeFunctionParamAnnotationsList(parameter.functionParamAnnotations())
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotations)
+
+                if (annotations != null && annotations.any{it.name == "target"}) {
                     val targetAutomatonName = typeRef.name
                     val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                     arg.targetAutomaton = targetAutomatonReference
@@ -85,7 +90,36 @@ class FunctionVisitor(
             }
             .orEmpty()
 
-    private fun processAnnotation(ctx: FunctionParamAnnotationContext?): Annotation? {
+    private fun makeFunctionAnnotationsList(ctx: List<LibSLParser.FunctionAnnotationsContext>?): MutableList<Annotation>? {
+        val annotationsList = mutableListOf<Annotation>()
+        val annotations = ctx?.mapNotNull { processFunctionAnnotation(it) }
+        if (annotations != null) {
+            annotationsList.addAll(annotations)
+        }
+        return annotationsList
+    }
+
+    private fun processFunctionAnnotation(ctx: LibSLParser.FunctionAnnotationsContext?): Annotation? {
+        ctx ?: return null
+        val name = ctx.Identifier().asPeriodSeparatedString()
+        val expressionVisitor = ExpressionVisitor(functionContext)
+        val args = ctx.argsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty().toMutableList()
+
+        return Annotation(name, args)
+    }
+
+    private fun makeFunctionParamAnnotationsList(ctx: List<FunctionParamAnnotationsContext>?): MutableList<Annotation>? {
+        val annotationsList = mutableListOf<Annotation>()
+        val annotations = ctx?.mapNotNull { processFunctionParamAnnotation(it) }
+        if (annotations != null) {
+            annotationsList.addAll(annotations)
+        }
+        return annotationsList
+    }
+
+    private fun processFunctionParamAnnotation(ctx: FunctionParamAnnotationsContext?): Annotation? {
         ctx ?: return null
 
         val name = ctx.Identifier().asPeriodSeparatedString()
@@ -103,7 +137,7 @@ class FunctionVisitor(
 
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
-            val targetArg = firstOrNull { arg -> arg.annotation?.name == "target" } ?: return null
+            val targetArg = firstOrNull { arg -> arg.annotations?.any{it.name == "target"} ?: false } ?: return null
             val automatonName = targetArg.typeReference.name
             return AutomatonReferenceBuilder.build(automatonName, functionContext)
         }

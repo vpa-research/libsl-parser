@@ -61,6 +61,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testFunctionAnnotationsLsl() {
+        runLslTest("functionAnnotations")
+    }
+
+    @Test
     fun testGlobalVariablesLsl() {
         runLslTest("globalVariables")
     }

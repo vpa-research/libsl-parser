@@ -53,10 +53,6 @@ class AutomatonResolver(
             expressionVisitor.visitExpression(expr)
         }.orEmpty().toMutableList()
 
-        if (name == "target") {
-            return TargetAnnotation()
-        }
-
         return Annotation(name, args)
     }
 

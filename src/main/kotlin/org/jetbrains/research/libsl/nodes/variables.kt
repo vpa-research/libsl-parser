@@ -47,7 +47,7 @@ class FunctionArgument(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotation: Annotation? = null,
+    var annotations: MutableList<Annotation>? = mutableListOf(),
     var targetAutomaton: AutomatonReference? = null
 ) : Variable(name, typeReference) {
     lateinit var function: Function
@@ -56,19 +56,22 @@ class FunctionArgument(
         get() = "${function.name}.$name"
 
     override fun dumpToString(): String = buildString {
-        if (annotation != null) {
-            append("@")
-            append(BackticksPolitics.forIdentifier(annotation!!.name))
+        if (annotations != null) {
 
-            if (annotation!!.values.isNotEmpty()) {
-                append("(")
-                append(annotation!!.values.joinToString(separator = ", ") { v ->
-                    v.dumpToString()
-                })
-                append(")")
+            annotations?.joinToString() { annotation ->
+                append("@")
+                append(BackticksPolitics.forIdentifier(annotation.name))
+
+                if (annotation.values.isNotEmpty()) {
+                    append("(")
+                    append(annotation.values.joinToString(separator = ", ") { v ->
+                        v.dumpToString()
+                    })
+                    append(")")
+                }
+
+                append(IPrinter.SPACE)
             }
-
-            append(IPrinter.SPACE)
         }
         append(BackticksPolitics.forIdentifier(name))
         append(": ")

@@ -11,6 +11,7 @@ data class Function(
     val automatonReference: AutomatonReference,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
+    val annotations: MutableList<Annotation>? = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
@@ -22,6 +23,11 @@ data class Function(
     var resultVariable: Variable? = null
 
     override fun dumpToString(): String = buildString {
+
+        annotations?.joinToString() { annotation ->
+            append(annotation.dumpToString())
+        }
+
         append("fun ${BackticksPolitics.forIdentifier(name)}")
 
         append(

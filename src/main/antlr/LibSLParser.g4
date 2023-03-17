@@ -104,7 +104,8 @@ enumSemanticTypeEntry
    ;
 
 /* automaton declaration
- * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
+ * syntax: @Annotation
+ *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
    :   automatonAnnotations*?
@@ -191,11 +192,13 @@ argPair
    ;
 
 /*
- * syntax: fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
+ * syntax: @Annotation
+ *         fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   :   functionAnnotations*?
+   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
@@ -205,13 +208,18 @@ functionDeclArgList
    ;
 
 parameter
-   :   functionParamAnnotation? name=Identifier COLON type=typeIdentifier
+   :   functionParamAnnotations*? name=Identifier COLON type=typeIdentifier
    ;
 
 /* annotation
  * syntax: @annotationName(args)
  */
-functionParamAnnotation
+
+functionAnnotations
+   :  AT Identifier (L_BRACKET argsList R_BRACKET)?
+   ;
+
+functionParamAnnotations
    :   AT Identifier (L_BRACKET argsList R_BRACKET)?
    ;
 
