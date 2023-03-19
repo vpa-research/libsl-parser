@@ -9,7 +9,7 @@ import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
-import org.jetbrains.research.libsl.type.TypeInferer
+import org.jetbrains.research.libsl.type.TypeInferrer
 
 abstract class LslContextBase {
     abstract val parentContext: LslContextBase?
@@ -20,7 +20,7 @@ abstract class LslContextBase {
     private val variables = mutableListOf<Variable>()
 
     @Suppress("LeakingThis")
-    val typeInferer = TypeInferer(this)
+    val typeInferrer = TypeInferrer(this)
 
     fun storeAutomata(automaton: Automaton) {
         automata.add(automaton)

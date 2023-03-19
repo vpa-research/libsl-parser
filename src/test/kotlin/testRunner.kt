@@ -106,8 +106,8 @@ private fun checkFunctionIsResolved(function: Function) {
         when (statement) {
             is Action -> {}
             is Assignment -> {
-                function.context.typeInferer.getExpressionType(statement.left)
-                function.context.typeInferer.getExpressionType(statement.value)
+                function.context.typeInferrer.getExpressionType(statement.left)
+                function.context.typeInferrer.getExpressionType(statement.value)
             }
         }
     }

@@ -4,7 +4,7 @@ import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 
-class TypeInferer(private val context: LslContextBase) {
+class TypeInferrer(private val context: LslContextBase) {
     private val anyType by lazy { context.resolveType(AnyType.getAnyTypeReference(context))!! }
 
     @Suppress("MemberVisibilityCanBePrivate", "unused")
