@@ -237,7 +237,7 @@ action
    ;
 
 expressionsList
-   :   expression (COMMA expression)*
+   :   expression (COMMA expression)* COMMA?
    ;
 
 /* requires contract
