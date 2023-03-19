@@ -8,7 +8,6 @@ import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
 import org.jetbrains.research.libsl.type.*
-import java.util.Objects
 
 class LslGlobalContext : LslContextBase() {
     @Suppress("MemberVisibilityCanBePrivate")
@@ -40,6 +39,8 @@ class LslGlobalContext : LslContextBase() {
                 add(CharType(this@LslGlobalContext, pointer))
                 add(StringType(this@LslGlobalContext, pointer))
                 add(VoidType(this@LslGlobalContext, pointer))
+
+                add(AnyType(this@LslGlobalContext))
             }
         }
 

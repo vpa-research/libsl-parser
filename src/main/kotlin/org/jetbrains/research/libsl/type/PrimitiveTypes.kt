@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 
 interface PrimitiveType : Type {
     override fun dumpToString(): String {
@@ -78,4 +79,20 @@ data class VoidType(
 ) : PrimitiveType {
     override val name: String = "void"
     override val generic: TypeReference? = null
+}
+
+data class AnyType(
+    override val context: LslContextBase
+) : PrimitiveType {
+    override val name: String = ANY_TYPE_NAME
+    override val isPointer: Boolean = false
+    override val generic: TypeReference? = null
+
+    companion object {
+        const val ANY_TYPE_NAME = "any"
+
+        fun getAnyTypeReference(context: LslContextBase): TypeReference{
+            return TypeReferenceBuilder.build(ANY_TYPE_NAME, genericReference = null, isPointer = false, context)
+        }
+    }
 }
