@@ -164,7 +164,7 @@ class ExpressionVisitor(
 
     override fun visitArrayLiteral(ctx: ArrayLiteralContext): Atomic {
         val arrayValues = mutableListOf<Expression>()
-        for (value in ctx.expressionsList().expression()) {
+        for (value in ctx.expressionsList()?.expression() ?: listOf()) {
             arrayValues.add(visitExpression(value))
         }
 

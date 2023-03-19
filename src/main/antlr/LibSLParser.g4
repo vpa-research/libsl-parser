@@ -306,7 +306,7 @@ identifierList
    ;
 
 arrayLiteral
-   :   L_SQUARE_BRACKET expressionsList R_SQUARE_BRACKET
+   :   L_SQUARE_BRACKET expressionsList? R_SQUARE_BRACKET
    ;
 
 periodSeparatedFullName
