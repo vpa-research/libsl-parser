@@ -281,6 +281,7 @@ expression
 expressionAtomic
    :   qualifiedAccess
    |   primitiveLiteral
+   |   arrayLiteral
    ;
 
 primitiveLiteral
@@ -302,6 +303,10 @@ simpleCall
 
 identifierList
    :   Identifier (COMMA Identifier)*
+   ;
+
+arrayLiteral
+   :   L_SQUARE_BRACKET expressionsList R_SQUARE_BRACKET
    ;
 
 periodSeparatedFullName
