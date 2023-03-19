@@ -204,7 +204,7 @@ parameter
  * syntax: @annotationName(args)
  */
 annotation
-   :   AT Identifier (L_BRACKET argsList R_BRACKET)?
+   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 /*
@@ -233,10 +233,10 @@ functionBodyStatements
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET argsList R_BRACKET SEMICOLON
+   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
    ;
 
-argsList
+expressionsList
    :   expression (COMMA expression)*
    ;
 
