@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 
 class TypeInferer(private val context: LslContextBase) {
     private val anyType by lazy { context.resolveType(AnyType.getAnyTypeReference(context))!! }
@@ -50,9 +51,15 @@ class TypeInferer(private val context: LslContextBase) {
     }
 
     private fun getArrayLiteralType(arrayLiteral: ArrayLiteral): Type {
-        return arrayLiteral.value.fold(anyType) { acc, expression ->
+        val typeOfElements = arrayLiteral.value.fold(anyType) { acc, expression ->
             mergeTypes(acc, getExpressionType(expression))
         }
+
+        return ArrayType(
+            isPointer = false,
+            generic = typeOfElements.getReference(context),
+            context = context
+        )
     }
 
     fun mergeTypesOrNull(typeA: Type, typeB: Type): Type? {
