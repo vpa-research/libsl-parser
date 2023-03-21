@@ -9,7 +9,7 @@ automaton B: Int {
 automaton A : Int {
 
     @Static
-    fun f(@annotation @target obj: B);
+    fun f(@anno @target obj: B);
 
     @Void
     fun g(@anno(1, "12") @something param: Int)

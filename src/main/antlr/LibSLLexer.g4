@@ -110,6 +110,10 @@ ENUM
    :   'enum'
    ;
 
+ANNOTATION
+   :   'annotation'
+   ;
+
 AUTOMATON
    :   'automaton'
    ;

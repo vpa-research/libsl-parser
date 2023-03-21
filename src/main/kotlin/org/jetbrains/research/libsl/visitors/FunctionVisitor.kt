@@ -107,7 +107,10 @@ class FunctionVisitor(
             expressionVisitor.visitExpression(expr)
         }.orEmpty().toMutableList()
 
-        return Annotation(name, args)
+        val annotation = Annotation(name, args)
+        context.storeAnnotation(annotation)
+
+        return annotation
     }
 
     private fun makeFunctionParamAnnotationsList(ctx: List<FunctionParamAnnotationsContext>?): MutableList<Annotation>? {
@@ -132,7 +135,10 @@ class FunctionVisitor(
             return TargetAnnotation()
         }
 
-        return Annotation(name, args)
+        val annotation = Annotation(name, args)
+        context.storeAnnotation(annotation)
+
+        return annotation
     }
 
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?

@@ -100,7 +100,11 @@ enumSemanticType
    ;
 
 enumSemanticTypeEntry
-   :    Identifier COLON expressionAtomic SEMICOLON
+   :   Identifier COLON expressionAtomic SEMICOLON
+   ;
+
+annotationDecl
+   :   ANNOTATION name=Identifier L_BRACKET (VAR nameWithType (EQ assignmentRight)?)? R_BRACKET SEMICOLON
    ;
 
 /* automaton declaration
