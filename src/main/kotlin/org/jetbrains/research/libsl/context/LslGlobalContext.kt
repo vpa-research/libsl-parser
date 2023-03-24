@@ -1,14 +1,11 @@
 package org.jetbrains.research.libsl.context
 
+import org.jetbrains.research.libsl.nodes.ActionDecl
 import org.jetbrains.research.libsl.nodes.Automaton
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.Variable
-import org.jetbrains.research.libsl.nodes.references.AutomatonReference
-import org.jetbrains.research.libsl.nodes.references.FunctionReference
-import org.jetbrains.research.libsl.nodes.references.TypeReference
-import org.jetbrains.research.libsl.nodes.references.VariableReference
+import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.*
-import java.util.Objects
 
 class LslGlobalContext : LslContextBase() {
     @Suppress("MemberVisibilityCanBePrivate")
@@ -67,6 +64,10 @@ class LslGlobalContext : LslContextBase() {
         return resolveFunction(reference, setOf(this))
     }
 
+    override fun resolveDeclaredAction(reference: ActionDeclReference): ActionDecl? {
+        return resolveDeclaredAction(reference, setOf(this))
+    }
+
     private fun resolveVariable(reference: VariableReference, visitedScopes: Set<LslGlobalContext>): Variable? {
         return super.resolveVariable(reference)
             ?: resolveInImportedContexts(visitedScopes) { v -> resolveVariable(reference, v) }
@@ -85,6 +86,11 @@ class LslGlobalContext : LslContextBase() {
     private fun resolveFunction(reference: FunctionReference, visitedScopes: Set<LslGlobalContext>): Function? {
         return super.resolveFunction(reference)
             ?: resolveInImportedContexts(visitedScopes) { v -> resolveFunction(reference, v) }
+    }
+
+    private fun resolveDeclaredAction(reference: ActionDeclReference, visitedScopes: Set<LslGlobalContext>): ActionDecl? {
+        return super.resolveDeclaredAction(reference)
+            ?: resolveInImportedContexts(visitedScopes) { v -> resolveDeclaredAction(reference, v) }
     }
 
     private fun <T> resolveInImportedContexts(

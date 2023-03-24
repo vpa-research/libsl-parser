@@ -1,9 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
-import org.jetbrains.research.libsl.nodes.references.AutomatonReference
-import org.jetbrains.research.libsl.nodes.references.FunctionReference
-import org.jetbrains.research.libsl.nodes.references.TypeReference
-import org.jetbrains.research.libsl.nodes.references.VariableReference
+import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
@@ -15,7 +12,8 @@ data class Library(
     val semanticTypesReferences: MutableList<TypeReference> = mutableListOf(),
     val automataReferences: MutableList<AutomatonReference> = mutableListOf(),
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
-    val globalVariableReferences: MutableList<VariableReference> = mutableListOf()
+    val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
+    val declaredActionReferences: MutableList<ActionDeclReference> = mutableListOf()
 ) : Node() {
     private val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }
@@ -23,6 +21,8 @@ data class Library(
         get() = automataReferences.map { it.resolveOrError() }
     private val globalVariables: List<Variable>
         get() = globalVariableReferences.map { it.resolveOrError() }
+    private val declaredActions: List<ActionDecl>
+        get() = declaredActionReferences.map { it.resolveOrError() }
 
     override fun dumpToString(): String = buildString {
         appendLine(metadata.dumpToString())
@@ -31,6 +31,7 @@ data class Library(
         append(formatTopLevelSemanticTypes())
         append(formatSemanticTypeBlock())
         append(formatGlobalVariables())
+        append(formatActionDeclarations())
         append(formatAutomata())
     }
 
@@ -62,6 +63,15 @@ data class Library(
         appendLine("types {")
         append(withIndent(formatListEmptyLineAtEndIfNeeded(types)))
         appendLine("}")
+    }
+
+    private fun formatActionDeclarations(): String = buildString {
+        if (declaredActions.isEmpty())
+            return@buildString
+
+        declaredActions.joinToString { declaredAction ->
+            append(declaredAction.dumpToString())
+        }
     }
 
     private fun formatAutomata(): String = buildString {

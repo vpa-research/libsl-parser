@@ -1,5 +1,6 @@
 package org.jetbrains.research.libsl.visitors
 
+import getReference
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.FileContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
@@ -38,6 +39,7 @@ class LibrarySpecificationVisitor(
         representAutomataFromContextInLibrary()
         representExtensionFunctionsFromContextInLibrary()
         representVariablesFromContextInLibrary()
+        representDeclaredActionsFromContextInLibrary()
 
         return library
     }
@@ -113,5 +115,10 @@ class LibrarySpecificationVisitor(
     private fun representVariablesFromContextInLibrary() {
         val variables = globalContext.getAllVariables()
         library.globalVariableReferences.addAll(variables.map { variable -> variable.getReference(context) })
+    }
+
+    private fun representDeclaredActionsFromContextInLibrary() {
+        val declaredActions = globalContext.getAllDeclaredActions()
+        library.declaredActionReferences.addAll(declaredActions.map { action -> action.getReference(context) })
     }
 }

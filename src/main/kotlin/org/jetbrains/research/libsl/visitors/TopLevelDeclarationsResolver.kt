@@ -5,10 +5,8 @@ import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.nodes.Automaton
-import org.jetbrains.research.libsl.nodes.VariableWithInitialValue
+import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
-import javax.naming.Context
 
 class TopLevelDeclarationsResolver(
     private val basePath: String,
@@ -41,5 +39,27 @@ class TopLevelDeclarationsResolver(
 
         val variable = VariableWithInitialValue(variableName, typeRef, initialValue)
         globalContext.storeVariable(variable)
+    }
+
+    override fun visitActionDecl(ctx: LibSLParser.ActionDeclContext) {
+
+        val actionName = ctx.actionName.text.extractIdentifier()
+        val actionParams = mutableListOf<DeclaredActionParameter>()
+
+        ctx.actionDeclParamList().actionParameter().forEach { param ->
+            val actionParam = DeclaredActionParameter(param.name.text.extractIdentifier(),
+                processTypeIdentifier(param.type))
+            actionParams.add(actionParam) }
+
+        val returnType = ctx.actionType?.let { processTypeIdentifier(it) }
+
+        if (returnType != null) {
+            val resultVariable = ResultVariable(returnType)
+            context.storeVariable(resultVariable)
+        }
+
+        val declaredAction = ActionDecl(actionName, actionParams, returnType)
+
+        globalContext.storeDeclaredAction(declaredAction)
     }
 }

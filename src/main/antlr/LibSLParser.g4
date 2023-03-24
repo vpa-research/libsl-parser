@@ -22,6 +22,7 @@ globalStatement
    |   typealiasStatement
    |   typeDefBlock
    |   enumBlock
+   |   actionDecl
    |   topLevelDecl
    ;
 
@@ -111,7 +112,7 @@ automatonDecl
    ;
 
 actionDecl
-   :   DEFINE actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   :   DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
    ;
 
 actionDeclParamList
