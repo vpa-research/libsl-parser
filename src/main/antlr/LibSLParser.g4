@@ -131,9 +131,7 @@ automatonStateDecl
 automatonShiftDecl
    :   SHIFT from=Identifier MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
    |   SHIFT from=Identifier MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
-   |   SHIFT from=Identifier MINUS_ARROW to=Identifier L_BRACKET functionsList? R_BRACKET SEMICOLON
    |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier  BY functionsListPart SEMICOLON
-   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier L_BRACKET functionsList? R_BRACKET SEMICOLON
    |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
    ;
 

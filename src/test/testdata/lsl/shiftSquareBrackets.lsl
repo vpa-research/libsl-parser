@@ -12,7 +12,6 @@ automaton a: int {
     state S3;
 
     shift S1 -> S2 by foo;
-    shift S1 -> S2(fix);
     shift S1 -> S2 by [fix, foo,];
     shift S1 -> S2 by [foo];
     shift S1 -> S2 by [foo,];
@@ -20,8 +19,7 @@ automaton a: int {
     shift S1 -> S3 by sum(int, int);
 
     shift (S1, S2) -> S3 by foo;
-    shift (S1, S2) -> S3 by [sum(int, int), min(int),];
-    shift (S1, S2) -> S3(fix);
+    shift (S1, S2) -> S3 by [sum(int, int), min(int)];
 
 
     fun foo();
