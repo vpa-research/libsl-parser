@@ -88,6 +88,64 @@ class FunctionArgument(
     }
 }
 
+@Suppress("unused")
+class ActionParameter(
+    name: String,
+    typeReference: TypeReference,
+    val index: Int,
+    var annotation: Annotation? = null,
+) : Variable(name, typeReference) {
+
+    override fun dumpToString(): String = buildString {
+        if (annotation != null) {
+            append("@")
+            append(BackticksPolitics.forIdentifier(annotation!!.name))
+
+            if (annotation!!.values.isNotEmpty()) {
+                append("(")
+                append(annotation!!.values.joinToString(separator = ", ") { v ->
+                    v.dumpToString()
+                })
+                append(")")
+            }
+
+            append(IPrinter.SPACE)
+        }
+        append(BackticksPolitics.forIdentifier(name))
+        append(": ")
+
+        append(typeReference.name)
+    }
+}
+
+class DeclaredActionParameter(
+    name: String,
+    typeReference: TypeReference,
+    var annotation: Annotation? = null,
+) : Variable(name, typeReference) {
+
+    override fun dumpToString(): String = buildString {
+        if (annotation != null) {
+            append("@")
+            append(BackticksPolitics.forIdentifier(annotation!!.name))
+
+            if (annotation!!.values.isNotEmpty()) {
+                append("(")
+                append(annotation!!.values.joinToString(separator = ", ") { v ->
+                    v.dumpToString()
+                })
+                append(")")
+            }
+
+            append(IPrinter.SPACE)
+        }
+        append(BackticksPolitics.forIdentifier(name))
+        append(": ")
+
+        append(typeReference.name)
+    }
+}
+
 class ConstructorArgument(
     name: String,
     typeReference: TypeReference,

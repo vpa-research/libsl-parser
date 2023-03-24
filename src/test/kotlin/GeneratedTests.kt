@@ -6,6 +6,11 @@ import org.junit.jupiter.api.Test
 
 class GeneratedTests {
     @Test
+    fun testActionDeclarationsLsl() {
+        runLslTest("actionDeclarations")
+    }
+
+    @Test
     fun testActionsLsl() {
         runLslTest("actions")
     }

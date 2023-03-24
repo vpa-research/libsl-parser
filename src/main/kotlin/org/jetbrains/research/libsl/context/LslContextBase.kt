@@ -2,7 +2,11 @@ package org.jetbrains.research.libsl.context
 
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
+import org.jetbrains.research.libsl.nodes.ActionDecl
+import org.jetbrains.research.libsl.nodes.Automaton
 import org.jetbrains.research.libsl.nodes.Function
+import org.jetbrains.research.libsl.nodes.references.*
+import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
@@ -12,6 +16,7 @@ abstract class LslContextBase {
     abstract val parentContext: LslContextBase?
     private val declaredAnnotations = mutableListOf<DeclaredAnnotation>()
     private val annotations = mutableListOf<Annotation>()
+    private val declaredActions = mutableListOf<ActionDecl>()
     private val automata = mutableListOf<Automaton>()
     private val types = mutableListOf<Type>()
     private val functions = mutableListOf<Function>()
@@ -52,6 +57,10 @@ abstract class LslContextBase {
         annotations.add(annotation)
     }
 
+    fun storeDeclaredAction(action: ActionDecl) {
+        declaredActions.add(action)
+    }
+
     open fun resolveAutomaton(reference: AutomatonReference): Automaton? {
         return automata.firstOrNull { automaton -> reference.isReferenceMatchWithNode(automaton) }
             ?: parentContext?.resolveAutomaton(reference)
@@ -82,6 +91,11 @@ abstract class LslContextBase {
             ?: parentContext?.resolveDeclaredAnnotation(reference)
     }
 
+    open fun resolveDeclaredAction(reference: ActionDeclReference): ActionDecl? {
+        return declaredActions.firstOrNull { action -> reference.isReferenceMatchWithNode(action) }
+            ?: parentContext?.resolveDeclaredAction(reference)
+    }
+
     internal fun getAllTypes() = types
 
     internal fun getAllAutomata() = automata
@@ -91,5 +105,8 @@ abstract class LslContextBase {
     internal fun getAllVariables() = variables
 
     internal fun getAllDeclaredAnnotations() = declaredAnnotations
+
     internal fun getAllAnnotations() = annotations
+
+    internal fun getAllDeclaredActions() = declaredActions
 }

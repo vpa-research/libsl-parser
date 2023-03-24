@@ -14,6 +14,7 @@ data class Library(
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
     val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
     val declaredAnnotationReferences: MutableList<DeclaredAnnotationReference> = mutableListOf()
+    val declaredActionReferences: MutableList<ActionDeclReference> = mutableListOf()
 ) : Node() {
     private val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }
@@ -23,6 +24,8 @@ data class Library(
         get() = declaredAnnotationReferences.map { it.resolveOrError() }
     private val globalVariables: List<Variable>
         get() = globalVariableReferences.map { it.resolveOrError() }
+    private val declaredActions: List<ActionDecl>
+        get() = declaredActionReferences.map { it.resolveOrError() }
 
     override fun dumpToString(): String = buildString {
         appendLine(metadata.dumpToString())
@@ -32,6 +35,7 @@ data class Library(
         append(formatSemanticTypeBlock())
         append(formatGlobalVariables())
         append(formatDeclaredAnnotations())
+        append(formatActionDeclarations())
         append(formatAutomata())
     }
 
@@ -73,6 +77,15 @@ data class Library(
 
         declaredAnnotations.joinToString() { annotation ->
             append(annotation.dumpToString())
+        }
+    }
+
+    private fun formatActionDeclarations(): String = buildString {
+        if (declaredActions.isEmpty())
+            return@buildString
+
+        declaredActions.joinToString { declaredAction ->
+            append(declaredAction.dumpToString())
         }
     }
 

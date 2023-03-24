@@ -41,6 +41,7 @@ class LibrarySpecificationVisitor(
         representExtensionFunctionsFromContextInLibrary()
         representVariablesFromContextInLibrary()
         representDeclaredAnnotationsFromContextInLibrary()
+        representDeclaredActionsFromContextInLibrary()
 
         return library
     }
@@ -121,5 +122,10 @@ class LibrarySpecificationVisitor(
     private fun representDeclaredAnnotationsFromContextInLibrary() {
         val annotations = globalContext.getAllDeclaredAnnotations()
         library.declaredAnnotationReferences.addAll(annotations.map { annotation -> annotation.getReference(context)})
+    }
+
+    private fun representDeclaredActionsFromContextInLibrary() {
+        val declaredActions = globalContext.getAllDeclaredActions()
+        library.declaredActionReferences.addAll(declaredActions.map { action -> action.getReference(context) })
     }
 }

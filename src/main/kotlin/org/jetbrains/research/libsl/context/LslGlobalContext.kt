@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.context
 
 import org.jetbrains.research.libsl.nodes.Annotation
+import org.jetbrains.research.libsl.nodes.ActionDecl
 import org.jetbrains.research.libsl.nodes.Automaton
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.Variable
@@ -71,6 +72,10 @@ class LslGlobalContext : LslContextBase() {
         return resolveAnnotation(reference, setOf(this))
     }
 
+    override fun resolveDeclaredAction(reference: ActionDeclReference): ActionDecl? {
+        return resolveDeclaredAction(reference, setOf(this))
+    }
+
     private fun resolveVariable(reference: VariableReference, visitedScopes: Set<LslGlobalContext>): Variable? {
         return super.resolveVariable(reference)
             ?: resolveInImportedContexts(visitedScopes) { v -> resolveVariable(reference, v) }
@@ -94,6 +99,11 @@ class LslGlobalContext : LslContextBase() {
     private fun resolveAnnotation(reference: AnnotationReference, visitedScopes: Set<LslGlobalContext>): Annotation? {
         return super.resolveAnnotation(reference)
             ?: resolveInImportedContexts(visitedScopes) {v -> resolveAnnotation(reference, v)}
+    }
+
+    private fun resolveDeclaredAction(reference: ActionDeclReference, visitedScopes: Set<LslGlobalContext>): ActionDecl? {
+        return super.resolveDeclaredAction(reference)
+            ?: resolveInImportedContexts(visitedScopes) { v -> resolveDeclaredAction(reference, v) }
     }
 
     private fun <T> resolveInImportedContexts(
