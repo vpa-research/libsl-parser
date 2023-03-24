@@ -1,19 +1,17 @@
 package org.jetbrains.research.libsl.context
 
-import org.jetbrains.research.libsl.nodes.Automaton
+import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.Function
-import org.jetbrains.research.libsl.nodes.Variable
-import org.jetbrains.research.libsl.nodes.references.AutomatonReference
-import org.jetbrains.research.libsl.nodes.references.FunctionReference
-import org.jetbrains.research.libsl.nodes.references.TypeReference
-import org.jetbrains.research.libsl.nodes.references.VariableReference
+import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.type.TypeInferrer
 
 abstract class LslContextBase {
     abstract val parentContext: LslContextBase?
-
+    private val declaredAnnotations = mutableListOf<DeclaredAnnotation>()
+    private val annotations = mutableListOf<Annotation>()
     private val automata = mutableListOf<Automaton>()
     private val types = mutableListOf<Type>()
     private val functions = mutableListOf<Function>()
@@ -46,6 +44,14 @@ abstract class LslContextBase {
         variables.add(variable)
     }
 
+    fun storeDeclaredAnnotation(declaredAnnotation: DeclaredAnnotation) {
+        declaredAnnotations.add(declaredAnnotation)
+    }
+
+    fun storeAnnotation(annotation: Annotation) {
+        annotations.add(annotation)
+    }
+
     open fun resolveAutomaton(reference: AutomatonReference): Automaton? {
         return automata.firstOrNull { automaton -> reference.isReferenceMatchWithNode(automaton) }
             ?: parentContext?.resolveAutomaton(reference)
@@ -66,6 +72,16 @@ abstract class LslContextBase {
             ?: parentContext?.resolveVariable(reference)
     }
 
+    open fun resolveAnnotation(reference: AnnotationReference): Annotation? {
+        return annotations.firstOrNull { annotation -> reference.isReferenceMatchWithNode(annotation) }
+            ?: parentContext?.resolveAnnotation(reference)
+    }
+
+    open fun resolveDeclaredAnnotation(reference: DeclaredAnnotationReference): DeclaredAnnotation? {
+        return declaredAnnotations.firstOrNull { annotation -> reference.isReferenceMatchWithNode(annotation) }
+            ?: parentContext?.resolveDeclaredAnnotation(reference)
+    }
+
     internal fun getAllTypes() = types
 
     internal fun getAllAutomata() = automata
@@ -73,4 +89,7 @@ abstract class LslContextBase {
     internal fun getAllFunctions() = functions
 
     internal fun getAllVariables() = variables
+
+    internal fun getAllDeclaredAnnotations() = declaredAnnotations
+    internal fun getAllAnnotations() = annotations
 }
