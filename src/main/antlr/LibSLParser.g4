@@ -141,7 +141,12 @@ automatonAnnotations
    ;
 
 actionDecl
-   :   DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   :   actionAnnotations*?
+   DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   ;
+
+actionAnnotations
+   :  AT Identifier (L_BRACKET argsList R_BRACKET)?
    ;
 
 actionDeclParamList
