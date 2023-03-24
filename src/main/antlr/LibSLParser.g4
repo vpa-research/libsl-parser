@@ -110,6 +110,18 @@ automatonDecl
    :   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
    ;
 
+actionDecl
+   :   DEFINE actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   ;
+
+actionDeclParamList
+   :   actionParameter (COMMA actionParameter)*
+   ;
+
+actionParameter
+   :   annotation? name=Identifier COLON type=typeIdentifier
+   ;
+
 automatonStatement
    :   automatonStateDecl
    |   automatonShiftDecl
