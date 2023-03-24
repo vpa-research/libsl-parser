@@ -5,8 +5,8 @@ import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.nodes.Automaton
-import org.jetbrains.research.libsl.nodes.VariableWithInitialValue
+import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import javax.naming.Context
 
@@ -15,6 +15,27 @@ class TopLevelDeclarationsResolver(
     private val errorManager: ErrorManager,
     private val globalContext: LslGlobalContext
 ) : LibSLParserVisitor<Unit>(globalContext)  {
+
+    //TODO annotations
+    override fun visitAnnotationDecl(ctx: LibSLParser.AnnotationDeclContext) {
+
+        val annotationName = ctx.Identifier().asPeriodSeparatedString()
+        val expressionVisitor = ExpressionVisitor(context)
+        val params = mutableListOf<DeclaredAnnotationParams>()
+
+        // TODO FIX ANNOTATIONS
+        ctx.annotationDeclParams().annotationDeclParamsPart().forEach { parameterCtx ->
+            val param = DeclaredAnnotationParams(parameterCtx.nameWithType().name.text.extractIdentifier(),
+            processTypeIdentifier(parameterCtx.nameWithType().type),
+            parameterCtx.assignmentRight()?.let {
+                expressionVisitor.visitAssignmentRight(it)
+            })
+            params.add(param)
+        }
+
+        val declaredAnnotation = DeclaredAnnotation(annotationName, params)
+        globalContext.storeDeclaredAnnotation(declaredAnnotation)
+    }
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val automatonContext = AutomatonContext(context)
         AutomatonResolver(basePath, errorManager, automatonContext).visitAutomatonDecl(ctx)

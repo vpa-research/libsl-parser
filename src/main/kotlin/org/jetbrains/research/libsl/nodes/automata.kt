@@ -24,7 +24,7 @@ data class Automaton(
 
     override fun dumpToString(): String = buildString {
         annotations?.joinToString() { annotation ->
-            append(annotation.dumpToString())
+            append(annotation.resolveOrError().invocationDumpToString())
         }
 
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")

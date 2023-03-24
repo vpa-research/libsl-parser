@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.FunctionContext
+import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -11,7 +12,7 @@ data class Function(
     val automatonReference: AutomatonReference,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
-    val annotations: MutableList<Annotation>? = mutableListOf(),
+    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
@@ -24,8 +25,8 @@ data class Function(
 
     override fun dumpToString(): String = buildString {
 
-        annotations?.joinToString() { annotation ->
-            append(annotation.dumpToString())
+        annotationReferences?.joinToString() { annotationReference ->
+            append(annotationReference.resolveOrError().invocationDumpToString())
         }
 
         append("fun ${BackticksPolitics.forIdentifier(name)}")

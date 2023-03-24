@@ -22,6 +22,7 @@ globalStatement
    |   typealiasStatement
    |   typeDefBlock
    |   enumBlock
+   |   annotationDecl
    |   topLevelDecl
    ;
 
@@ -103,8 +104,22 @@ enumSemanticTypeEntry
    :   Identifier COLON expressionAtomic SEMICOLON
    ;
 
+/* annotation declaration
+ * syntax: annotation Something(
+ *             variable1: int = 0,
+ *             variable2: int = 1
+ *         );
+ */
 annotationDecl
-   :   ANNOTATION name=Identifier L_BRACKET (VAR nameWithType (EQ assignmentRight)?)? R_BRACKET SEMICOLON
+   :   ANNOTATION name=Identifier L_BRACKET (annotationDeclParams) (COMMA)? R_BRACKET SEMICOLON
+   ;
+
+annotationDeclParams
+   :   (annotationDeclParamsPart (COMMA annotationDeclParamsPart)*)*
+   ;
+
+annotationDeclParamsPart
+   :   nameWithType (EQ assignmentRight)?
    ;
 
 /* automaton declaration
@@ -200,6 +215,10 @@ argPair
  *         fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
+
+ /*
+  *  Annotated function
+  */
 functionDecl
    :   functionAnnotations*?
    FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier

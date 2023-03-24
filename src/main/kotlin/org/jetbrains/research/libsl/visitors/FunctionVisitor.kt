@@ -10,6 +10,7 @@ import org.jetbrains.research.libsl.errors.UnspecifiedAutomaton
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.Function
+import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
@@ -41,7 +42,7 @@ class FunctionVisitor(
 
         val functionName = ctx.functionName.text.extractIdentifier()
 
-        val annotations = makeFunctionAnnotationsList(ctx.functionAnnotations())
+        val annotationReferences = makeFunctionAnnotationReferenceList(ctx.functionAnnotations())
 
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
@@ -60,7 +61,7 @@ class FunctionVisitor(
             automatonReference,
             args,
             returnType,
-            annotations,
+            annotationReferences,
             hasBody = ctx.functionBody() != null,
             targetAutomatonRef = targetAutomatonRef,
             context = functionContext
@@ -76,10 +77,10 @@ class FunctionVisitor(
             ?.parameter()
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
-                val annotations = makeFunctionParamAnnotationsList(parameter.functionParamAnnotations())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotations)
+                val annotationsReferences = makeFunctionParamAnnotationReferenceList(parameter.functionParamAnnotations())
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
 
-                if (annotations != null && annotations.any{it.name == "target"}) {
+                if (annotationsReferences != null && annotationsReferences.any{it.name == "target"}) {
                     val targetAutomatonName = typeRef.name
                     val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                     arg.targetAutomaton = targetAutomatonReference
@@ -90,16 +91,16 @@ class FunctionVisitor(
             }
             .orEmpty()
 
-    private fun makeFunctionAnnotationsList(ctx: List<LibSLParser.FunctionAnnotationsContext>?): MutableList<Annotation>? {
-        val annotationsList = mutableListOf<Annotation>()
-        val annotations = ctx?.mapNotNull { processFunctionAnnotation(it) }
-        if (annotations != null) {
-            annotationsList.addAll(annotations)
+    private fun makeFunctionAnnotationReferenceList(ctx: List<LibSLParser.FunctionAnnotationsContext>?): MutableList<AnnotationReference>? {
+        val annotationReferenceList = mutableListOf<AnnotationReference>()
+        val annotationReferences = ctx?.mapNotNull { processFunctionAnnotation(it) }
+        if (annotationReferences != null) {
+            annotationReferenceList.addAll(annotationReferences)
         }
-        return annotationsList
+        return annotationReferenceList
     }
 
-    private fun processFunctionAnnotation(ctx: LibSLParser.FunctionAnnotationsContext?): Annotation? {
+    private fun processFunctionAnnotation(ctx: LibSLParser.FunctionAnnotationsContext?): AnnotationReference? {
         ctx ?: return null
         val name = ctx.Identifier().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(functionContext)
@@ -107,22 +108,21 @@ class FunctionVisitor(
             expressionVisitor.visitExpression(expr)
         }.orEmpty().toMutableList()
 
-        val annotation = Annotation(name, args)
-        context.storeAnnotation(annotation)
+        context.storeAnnotation(Annotation(name, args))
 
-        return annotation
+        return AnnotationReference(name, context)
     }
 
-    private fun makeFunctionParamAnnotationsList(ctx: List<FunctionParamAnnotationsContext>?): MutableList<Annotation>? {
-        val annotationsList = mutableListOf<Annotation>()
-        val annotations = ctx?.mapNotNull { processFunctionParamAnnotation(it) }
-        if (annotations != null) {
-            annotationsList.addAll(annotations)
+    private fun makeFunctionParamAnnotationReferenceList(ctx: List<FunctionParamAnnotationsContext>?): MutableList<AnnotationReference>? {
+        val annotationReferenceList = mutableListOf<AnnotationReference>()
+        val annotationReferences = ctx?.mapNotNull { processFunctionParamAnnotationReference(it) }
+        if (annotationReferences != null) {
+            annotationReferenceList.addAll(annotationReferences)
         }
-        return annotationsList
+        return annotationReferenceList
     }
 
-    private fun processFunctionParamAnnotation(ctx: FunctionParamAnnotationsContext?): Annotation? {
+    private fun processFunctionParamAnnotationReference(ctx: FunctionParamAnnotationsContext?): AnnotationReference? {
         ctx ?: return null
 
         val name = ctx.Identifier().asPeriodSeparatedString()
@@ -130,20 +130,19 @@ class FunctionVisitor(
         val args = ctx.argsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
         }.orEmpty().toMutableList()
+
+        context.storeAnnotation(Annotation(name, args))
 
         if (name == "target") {
-            return TargetAnnotation()
+            return AnnotationReference("target", context)
         }
-
-        val annotation = Annotation(name, args)
-        context.storeAnnotation(annotation)
-
-        return annotation
+        return AnnotationReference(name, context)
     }
 
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
-            val targetArg = firstOrNull { arg -> arg.annotations?.any{it.name == "target"} ?: false } ?: return null
+            val targetArg = firstOrNull { arg -> arg.annotationsReferences?.any {
+                it.resolveOrError().name == "target"} ?: false } ?: return null
             val automatonName = targetArg.typeReference.name
             return AutomatonReferenceBuilder.build(automatonName, functionContext)
         }

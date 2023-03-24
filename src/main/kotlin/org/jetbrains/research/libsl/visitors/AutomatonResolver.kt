@@ -23,12 +23,12 @@ class AutomatonResolver(
         val name = ctx.name.asPeriodSeparatedString()
         val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
-        val annotationsReferences = makeAutomatonAnnotationsList(ctx.automatonAnnotations())
+        val annotationReferences = makeAutomatonAnnotationList(ctx.automatonAnnotations())
 
         buildingAutomaton = Automaton(
             name,
             typeReference,
-            annotationsReferences,
+            annotationReferences,
             context = automatonContext
         )
 
@@ -36,13 +36,13 @@ class AutomatonResolver(
         context.parentContext!!.storeAutomata(buildingAutomaton)
     }
 
-    private fun makeAutomatonAnnotationsList(ctx: List<LibSLParser.AutomatonAnnotationsContext>?): MutableList<AnnotationReference>? {
-        val annotationsReferencesList = mutableListOf<AnnotationReference>()
-        val annotationsReferences = ctx?.mapNotNull { processAutomatonAnnotation(it) }
-        if (annotationsReferences != null) {
-            annotationsReferencesList.addAll(annotationsReferences)
+    private fun makeAutomatonAnnotationList(ctx: List<LibSLParser.AutomatonAnnotationsContext>?): MutableList<AnnotationReference>? {
+        val annotationReferenceList = mutableListOf<AnnotationReference>()
+        val annotationReferences = ctx?.mapNotNull { processAutomatonAnnotation(it) }
+        if (annotationReferences != null) {
+            annotationReferenceList.addAll(annotationReferences)
         }
-        return annotationsReferencesList
+        return annotationReferenceList
     }
 
     private fun processAutomatonAnnotation(ctx: LibSLParser.AutomatonAnnotationsContext?): AnnotationReference? {
