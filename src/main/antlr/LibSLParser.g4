@@ -271,7 +271,7 @@ expression
    |   expression op=(PLUS | MINUS) expression
    |   op=MINUS expression
    |   op=EXCLAMATION expression
-   |   expression op=(ASSIGN_OP | EQ | NOT_EQ | LESS_EQ | L_ARROW | GREAT_EQ | R_ARROW) expression
+   |   expression op=(EQ | NOT_EQ | LESS_EQ | L_ARROW | GREAT_EQ | R_ARROW) expression
    |   expression op=(AND | OR | XOR) expression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
