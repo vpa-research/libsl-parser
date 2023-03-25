@@ -96,3 +96,19 @@ data class AnyType(
         }
     }
 }
+
+data class NothingType(
+    override val context: LslContextBase
+) : PrimitiveType {
+    override val name: String = Nothing_TYPE_NAME
+    override val isPointer: Boolean = false
+    override val generic: TypeReference? = null
+
+    companion object {
+        const val Nothing_TYPE_NAME = "nothing"
+
+        fun getNothingTypeReference(context: LslContextBase): TypeReference{
+            return TypeReferenceBuilder.build(Nothing_TYPE_NAME, genericReference = null, isPointer = false, context)
+        }
+    }
+}

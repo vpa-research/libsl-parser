@@ -14,7 +14,7 @@ automaton A : Int {
         action TEST_ACTION([((1 + 2) + 3)]);
     }
     fun g() {
-        arrayVariable = [1, "2", "null"];
+        arrayVariable = ["1", "2", "null"];
         arrayVariable = [1, 2, 3];
     }
 }

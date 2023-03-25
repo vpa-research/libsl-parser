@@ -41,6 +41,7 @@ class LslGlobalContext : LslContextBase() {
                 add(VoidType(this@LslGlobalContext, pointer))
 
                 add(AnyType(this@LslGlobalContext))
+                add(NothingType(this@LslGlobalContext))
             }
         }
 

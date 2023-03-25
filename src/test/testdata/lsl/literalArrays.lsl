@@ -18,7 +18,7 @@ automaton A : Int {
     }
 
     fun g() {
-        arrayVariable = [1, "2", "null", ]; // the literal list has an `array<any>` type
+        arrayVariable = ["1", "2", "null", ]; // the literal list has an `array<any>` type
         arrayVariable = [1, 2, 3]; // the literal list has an `array<int>` type
     }
 }

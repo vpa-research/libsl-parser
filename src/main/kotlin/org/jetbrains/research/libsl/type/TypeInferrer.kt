@@ -6,6 +6,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 
 class TypeInferrer(private val context: LslContextBase) {
     private val anyType by lazy { context.resolveType(AnyType.getAnyTypeReference(context))!! }
+    private val nothingType by lazy { context.resolveType(NothingType.getNothingTypeReference(context))!! }
 
     @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun getExpressionTypeOrNull(expression: Expression): Type? {
@@ -51,7 +52,7 @@ class TypeInferrer(private val context: LslContextBase) {
     }
 
     private fun getArrayLiteralType(arrayLiteral: ArrayLiteral): Type {
-        val typeOfElements = arrayLiteral.value.fold(anyType) { acc, expression ->
+        val typeOfElements = arrayLiteral.value.fold(nothingType) { acc, expression ->
             mergeTypes(acc, getExpressionType(expression))
         }
 
@@ -88,6 +89,14 @@ class TypeInferrer(private val context: LslContextBase) {
         }
 
         if (typeA::class == typeB::class) {
+            return typeA
+        }
+
+        if (typeA is NothingType) {
+            return typeB
+        }
+
+        if (typeB is NothingType) {
             return typeA
         }
 
