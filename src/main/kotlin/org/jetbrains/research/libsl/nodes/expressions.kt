@@ -57,6 +57,20 @@ data class CallAutomatonConstructor(
     }
 }
 
+data class ArrayLiteral(
+    override val value: List<Expression>
+) : Atomic() {
+    override fun dumpToString(): String {
+        return buildString {
+            append("[")
+            append(
+                value.joinToString(separator = ", ") { v -> v.dumpToString() }
+            )
+            append("]")
+        }
+    }
+}
+
 sealed class Atomic : Expression() {
     abstract val value: Any?
 

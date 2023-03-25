@@ -2,8 +2,12 @@ package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 
-class TypeInferer(private val context: LslContextBase) {
+class TypeInferrer(private val context: LslContextBase) {
+    private val anyType by lazy { context.resolveType(AnyType.getAnyTypeReference(context))!! }
+    private val nothingType by lazy { context.resolveType(NothingType.getNothingTypeReference(context))!! }
+
     @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun getExpressionTypeOrNull(expression: Expression): Type? {
         return try {
@@ -35,6 +39,7 @@ class TypeInferer(private val context: LslContextBase) {
             is StringLiteral -> StringType(context)
             is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
             is QualifiedAccess -> getQualifiedAccessType(atomic)
+            is ArrayLiteral -> getArrayLiteralType(atomic)
         }
     }
 
@@ -44,6 +49,18 @@ class TypeInferer(private val context: LslContextBase) {
             is AutomatonOfFunctionArgumentInvoke -> access.automatonReference.resolveOrError().typeReference.resolveOrError()
             is VariableAccess -> access.variable.resolveOrError().typeReference.resolveOrError()
         }
+    }
+
+    private fun getArrayLiteralType(arrayLiteral: ArrayLiteral): Type {
+        val typeOfElements = arrayLiteral.value.fold(nothingType) { acc, expression ->
+            mergeTypes(acc, getExpressionType(expression))
+        }
+
+        return ArrayType(
+            isPointer = false,
+            generic = typeOfElements.getReference(context),
+            context = context
+        )
     }
 
     fun mergeTypesOrNull(typeA: Type, typeB: Type): Type? {
@@ -56,8 +73,6 @@ class TypeInferer(private val context: LslContextBase) {
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun mergeTypes(typeA: Type, typeB: Type): Type {
-        check(typeA::class == typeB::class) { "Unsupported merge for types: $typeA & $typeB" }
-
         if (typeA is IntType) {
             typeB as IntType
             check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
@@ -73,6 +88,18 @@ class TypeInferer(private val context: LslContextBase) {
             check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
         }
 
-        return typeA
+        if (typeA::class == typeB::class) {
+            return typeA
+        }
+
+        if (typeA is NothingType) {
+            return typeB
+        }
+
+        if (typeB is NothingType) {
+            return typeA
+        }
+
+        return anyType
     }
 }

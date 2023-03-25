@@ -204,7 +204,7 @@ parameter
  * syntax: @annotationName(args)
  */
 annotation
-   :   AT Identifier (L_BRACKET argsList R_BRACKET)?
+   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 /*
@@ -233,11 +233,11 @@ functionBodyStatements
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET argsList R_BRACKET SEMICOLON
+   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
    ;
 
-argsList
-   :   expression (COMMA expression)*
+expressionsList
+   :   expression (COMMA expression)* COMMA?
    ;
 
 /* requires contract
@@ -281,6 +281,7 @@ expression
 expressionAtomic
    :   qualifiedAccess
    |   primitiveLiteral
+   |   arrayLiteral
    ;
 
 primitiveLiteral
@@ -302,6 +303,10 @@ simpleCall
 
 identifierList
    :   Identifier (COMMA Identifier)*
+   ;
+
+arrayLiteral
+   :   L_SQUARE_BRACKET expressionsList? R_SQUARE_BRACKET
    ;
 
 periodSeparatedFullName

@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.LibSLParser.ArrayLiteralContext
 import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
 import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
 import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
@@ -93,6 +94,10 @@ class ExpressionVisitor(
                 visitQualifiedAccess(ctx.qualifiedAccess())
             }
 
+            ctx.arrayLiteral() != null -> {
+                visitArrayLiteral(ctx.arrayLiteral())
+            }
+
             else -> error("unknown expression kind")
         }
     }
@@ -155,6 +160,17 @@ class ExpressionVisitor(
 
             else -> error("unknown qualified access kind")
         }
+    }
+
+    override fun visitArrayLiteral(ctx: ArrayLiteralContext): Atomic {
+        val arrayValues = mutableListOf<Expression>()
+        for (value in ctx.expressionsList()?.expression() ?: listOf()) {
+            arrayValues.add(visitExpression(value))
+        }
+
+        return ArrayLiteral(
+            value = arrayValues
+        )
     }
 
     private fun processPeriodSeparatedQualifiedAccess(

@@ -66,6 +66,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testLiteralArraysLsl() {
+        runLslTest("literalArrays")
+    }
+
+    @Test
     fun testMultipleFromInShiftLsl() {
         runLslTest("multipleFromInShift")
     }
