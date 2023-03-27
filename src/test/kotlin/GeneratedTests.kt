@@ -51,6 +51,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testEqualsAndAssignLsl() {
+        runLslTest("equalsAndAssign")
+    }
+
+    @Test
     fun testEscapingTestLsl() {
         runLslTest("escapingTest")
     }
