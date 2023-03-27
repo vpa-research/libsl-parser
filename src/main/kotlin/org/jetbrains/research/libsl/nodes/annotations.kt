@@ -31,12 +31,12 @@ data class DeclaredAnnotation(
     override fun toString(): String = dumpToString()
 
     override fun dumpToString(): String = buildString {
-        append("annotation ${BackticksPolitics.forPeriodSeparated(name)}(")
+        append("annotation ${BackticksPolitics.forPeriodSeparated(name)}")
         if(values?.isNotEmpty() == true) {
-            appendLine()
+            appendLine("(")
             appendLine(withIndent(values.joinToString(separator = ",\n" ) { value -> value.dumpToString() }))
+            append(")")
         }
-        append(")")
         appendLine(";")
     }
 }

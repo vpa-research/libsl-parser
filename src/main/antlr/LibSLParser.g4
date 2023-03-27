@@ -111,7 +111,7 @@ enumSemanticTypeEntry
  *         );
  */
 annotationDecl
-   :   ANNOTATION name=Identifier L_BRACKET (annotationDeclParams) (COMMA)? R_BRACKET SEMICOLON
+   :   ANNOTATION name=Identifier (L_BRACKET (annotationDeclParams) (COMMA)? R_BRACKET)? SEMICOLON
    ;
 
 annotationDeclParams

@@ -16,15 +16,13 @@ class TopLevelDeclarationsResolver(
     private val globalContext: LslGlobalContext
 ) : LibSLParserVisitor<Unit>(globalContext)  {
 
-    //TODO annotations
     override fun visitAnnotationDecl(ctx: LibSLParser.AnnotationDeclContext) {
 
         val annotationName = ctx.Identifier().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(context)
         val params = mutableListOf<DeclaredAnnotationParams>()
 
-        // TODO FIX ANNOTATIONS
-        ctx.annotationDeclParams().annotationDeclParamsPart().forEach { parameterCtx ->
+        ctx.annotationDeclParams()?.annotationDeclParamsPart()?.forEach { parameterCtx ->
             val param = DeclaredAnnotationParams(parameterCtx.nameWithType().name.text.extractIdentifier(),
             processTypeIdentifier(parameterCtx.nameWithType().type),
             parameterCtx.assignmentRight()?.let {
