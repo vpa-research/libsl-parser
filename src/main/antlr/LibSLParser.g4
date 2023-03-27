@@ -123,7 +123,7 @@ annotationDeclParamsPart
    ;
 
 /* automaton declaration
- * syntax: @Annotation
+ * syntax: [@Annotations([(param)]: type)]
  *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
@@ -231,7 +231,7 @@ functionDeclArgList
    ;
 
 parameter
-   :   functionParamAnnotations*? name=Identifier COLON type=typeIdentifier
+   :   functionAnnotations*? name=Identifier COLON type=typeIdentifier
    ;
 
 /* annotation
@@ -240,10 +240,6 @@ parameter
 
 functionAnnotations
    :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
-   ;
-
-functionParamAnnotations
-   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 /*
