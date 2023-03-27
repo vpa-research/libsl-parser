@@ -123,7 +123,8 @@ annotationDeclParamsPart
    ;
 
 /* automaton declaration
- * syntax: [@Annotations([(param)]: type)]
+ * syntax: [@Annotation1(param: type)
+ *         @Annotation2(param: type]
  *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
