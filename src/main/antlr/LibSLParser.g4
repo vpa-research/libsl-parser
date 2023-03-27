@@ -119,7 +119,7 @@ annotationDeclParams
    ;
 
 annotationDeclParamsPart
-   :   nameWithType (EQ assignmentRight)?
+   :   nameWithType (ASSIGN_OP assignmentRight)?
    ;
 
 /* automaton declaration

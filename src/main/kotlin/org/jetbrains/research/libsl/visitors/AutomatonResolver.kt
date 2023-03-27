@@ -49,7 +49,7 @@ class AutomatonResolver(
         ctx ?: return null
         val name = ctx.Identifier().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(automatonContext)
-        val args = ctx.argsList()?.expression()?.map { expr ->
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
         }.orEmpty().toMutableList()
 

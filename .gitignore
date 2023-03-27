@@ -6,4 +6,6 @@
 /.idea/misc.xml
 /.idea/vcs.xml
 /.idea/workspace.xml
+/.idea/.name
+/src/main/gen/
 /.gradle/
