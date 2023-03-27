@@ -1,7 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.FunctionParamAnnotationsContext
+import org.jetbrains.research.libsl.LibSLParser.FunctionAnnotationsContext
 import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
 import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
 import org.jetbrains.research.libsl.context.FunctionContext
@@ -77,7 +77,7 @@ class FunctionVisitor(
             ?.parameter()
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = makeFunctionParamAnnotationReferenceList(parameter.functionParamAnnotations())
+                val annotationsReferences = makeFunctionParamAnnotationReferenceList(parameter.functionAnnotations())
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
 
                 if (annotationsReferences != null && annotationsReferences.any{it.name == "target"}) {
@@ -113,7 +113,7 @@ class FunctionVisitor(
         return AnnotationReference(name, context)
     }
 
-    private fun makeFunctionParamAnnotationReferenceList(ctx: List<FunctionParamAnnotationsContext>?): MutableList<AnnotationReference>? {
+    private fun makeFunctionParamAnnotationReferenceList(ctx: List<FunctionAnnotationsContext>?): MutableList<AnnotationReference>? {
         val annotationReferenceList = mutableListOf<AnnotationReference>()
         val annotationReferences = ctx?.mapNotNull { processFunctionParamAnnotationReference(it) }
         if (annotationReferences != null) {
@@ -122,7 +122,7 @@ class FunctionVisitor(
         return annotationReferenceList
     }
 
-    private fun processFunctionParamAnnotationReference(ctx: FunctionParamAnnotationsContext?): AnnotationReference? {
+    private fun processFunctionParamAnnotationReference(ctx: FunctionAnnotationsContext?): AnnotationReference? {
         ctx ?: return null
 
         val name = ctx.Identifier().asPeriodSeparatedString()
