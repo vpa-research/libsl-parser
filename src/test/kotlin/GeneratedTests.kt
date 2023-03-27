@@ -61,6 +61,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testEqualsAndAssignLsl() {
+        runLslTest("equalsAndAssign")
+    }
+
+    @Test
     fun testEscapingTestLsl() {
         runLslTest("escapingTest")
     }
@@ -78,6 +83,11 @@ class GeneratedTests {
     @Test
     fun testInternalVariablesLsl() {
         runLslTest("internalVariables")
+    }
+
+    @Test
+    fun testLiteralArraysLsl() {
+        runLslTest("literalArrays")
     }
 
     @Test

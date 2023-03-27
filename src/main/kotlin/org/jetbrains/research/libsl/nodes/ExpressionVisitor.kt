@@ -18,6 +18,7 @@ abstract class ExpressionVisitor <T> {
             is FunctionArgument -> visitFunctionArgument(node)
             is ResultVariable -> visitResultVariable(node)
             is Variable -> visitVariable(node)
+            is ArrayLiteral -> visitArrayLiteral(node)
         }
     }
 
@@ -50,4 +51,6 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitResultVariable(node: ResultVariable): T
 
     abstract fun visitVariable(node: Variable): T
+
+    abstract fun visitArrayLiteral(node: ArrayLiteral): T
 }

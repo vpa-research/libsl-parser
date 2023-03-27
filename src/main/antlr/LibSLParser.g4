@@ -49,7 +49,7 @@ header:
  * syntax: typealias name = origintlType
  */
 typealiasStatement
-   :   TYPEALIAS left=typeIdentifier EQ right=typeIdentifier SEMICOLON
+   :   TYPEALIAS left=typeIdentifier ASSIGN_OP right=typeIdentifier SEMICOLON
    ;
 
 /* type define block
@@ -71,7 +71,7 @@ enumBlock
    ;
 
 enumBlockStatement
-   :   Identifier EQ integerNumber SEMICOLON
+   :   Identifier ASSIGN_OP integerNumber SEMICOLON
    ;
 
 /* semantic types section
@@ -135,7 +135,7 @@ automatonDecl
  * syntax: @annotationName(args)
  */
 automatonAnnotations
-   :  AT Identifier (L_BRACKET argsList R_BRACKET)?
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 automatonStatement
@@ -174,7 +174,7 @@ functionsListPart
  */
 variableDecl
    :   VAR nameWithType SEMICOLON
-   |   VAR nameWithType EQ assignmentRight SEMICOLON
+   |   VAR nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 nameWithType
@@ -189,7 +189,7 @@ typeIdentifier
    ;
 
 variableAssignment
-   :   qualifiedAccess EQ assignmentRight SEMICOLON
+   :   qualifiedAccess ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 assignmentRight
@@ -206,8 +206,8 @@ namedArgs
    ;
 
 argPair
-   :   name=STATE EQ expressionAtomic
-   |   name=Identifier EQ expression
+   :   name=STATE ASSIGN_OP expressionAtomic
+   |   name=Identifier ASSIGN_OP expression
    ;
 
 /*
@@ -239,11 +239,11 @@ parameter
  */
 
 functionAnnotations
-   :  AT Identifier (L_BRACKET argsList R_BRACKET)?
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 functionParamAnnotations
-   :   AT Identifier (L_BRACKET argsList R_BRACKET)?
+   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 /*
@@ -272,11 +272,11 @@ functionBodyStatements
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET argsList R_BRACKET SEMICOLON
+   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
    ;
 
-argsList
-   :   expression (COMMA expression)*
+expressionsList
+   :   expression (COMMA expression)* COMMA?
    ;
 
 /* requires contract
@@ -320,6 +320,7 @@ expression
 expressionAtomic
    :   qualifiedAccess
    |   primitiveLiteral
+   |   arrayLiteral
    ;
 
 primitiveLiteral
@@ -341,6 +342,10 @@ simpleCall
 
 identifierList
    :   Identifier (COMMA Identifier)*
+   ;
+
+arrayLiteral
+   :   L_SQUARE_BRACKET expressionsList? R_SQUARE_BRACKET
    ;
 
 periodSeparatedFullName

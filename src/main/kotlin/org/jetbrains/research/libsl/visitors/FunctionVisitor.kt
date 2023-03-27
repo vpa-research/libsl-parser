@@ -127,7 +127,7 @@ class FunctionVisitor(
 
         val name = ctx.Identifier().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(functionContext)
-        val args = ctx.argsList()?.expression()?.map { expr ->
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
         }.orEmpty().toMutableList()
 
@@ -179,7 +179,7 @@ class FunctionVisitor(
     override fun visitAction(ctx: LibSLParser.ActionContext) {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(functionContext)
-        val args = ctx.argsList().expression().map { expr ->
+        val args = ctx.expressionsList().expression().map { expr ->
             expressionVisitor.visitExpression(expr)
         }.toMutableList()
 

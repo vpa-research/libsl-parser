@@ -4,7 +4,9 @@ lexer grammar LibSLLexer;
 
 SEMICOLON : ';' ;
 
-EQ : '=' ;
+ASSIGN_OP : '=' ;
+
+EQ : '==' ;
 
 L_BRACE : '{' ;
 

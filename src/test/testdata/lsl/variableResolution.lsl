@@ -9,7 +9,7 @@ automaton A : Int {
     var i: Int;
 
     fun f(param: Int)
-    requires i = 0;
+    requires i == 0;
     {
         i = 1;
     }

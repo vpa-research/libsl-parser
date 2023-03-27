@@ -147,10 +147,10 @@ There are some utilities to improve an expression experience:
 #### 4.1. [ExpressionVisitor](src/main/kotlin/org/jetbrains/research/libsl/nodes/ExpressionVisitor.kt)
 This class could be used to visit expressions.
 
-#### 4.2 [TypeInferer](src/main/kotlin/org/jetbrains/research/libsl/type/TypeInferer.kt)
+#### 4.2 [TypeInferrer](src/main/kotlin/org/jetbrains/research/libsl/type/TypeInferrer.kt)
 This class could be used to simple type resolution. Example:
 ```kotlin
-context.typeInferer.getExpressionTypeOrNull(myExpression)
+context.typeInferrer.getExpressionTypeOrNull(myExpression)
 ```
 
 IMPORTANT: this class does simple type resolution. So, type of `1 + (2*4)` is `IntType`, but type of `1 + 1.0` can't be
