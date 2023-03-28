@@ -6,27 +6,7 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Annotation(
     val name: String,
-    val values: MutableList<Expression> = mutableListOf()
-) : IPrinter {
-    override fun dumpToString(): String {
-        TODO("Not yet implemented")
-    }
-
-    override fun toString(): String = dumpToString()
-
-    fun invocationDumpToString(): String = buildString {
-        append("@${BackticksPolitics.forPeriodSeparated(name)}")
-        if (values.isNotEmpty()) {
-            append(values.joinToString(prefix = "(", postfix = ")", separator = ", ") { v -> v.dumpToString() })
-        }
-
-        appendLine()
-    }
-}
-
-data class DeclaredAnnotation(
-    val name: String,
-    val values: MutableList<DeclaredAnnotationParams>?
+    val values: MutableList<AnnotationParams>?
 ) : IPrinter {
     override fun toString(): String = dumpToString()
 
@@ -41,7 +21,7 @@ data class DeclaredAnnotation(
     }
 }
 
-data class DeclaredAnnotationParams(
+data class AnnotationParams(
     val name: String,
     val typeReference: TypeReference,
     val initialValue: Expression?

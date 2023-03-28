@@ -10,7 +10,7 @@ import org.jetbrains.research.libsl.type.TypeInferrer
 
 abstract class LslContextBase {
     abstract val parentContext: LslContextBase?
-    private val declaredAnnotations = mutableListOf<DeclaredAnnotation>()
+    private val declaredAnnotations = mutableListOf<Annotation>()
     private val annotations = mutableListOf<Annotation>()
     private val automata = mutableListOf<Automaton>()
     private val types = mutableListOf<Type>()
@@ -44,12 +44,8 @@ abstract class LslContextBase {
         variables.add(variable)
     }
 
-    fun storeDeclaredAnnotation(declaredAnnotation: DeclaredAnnotation) {
+    fun storeDeclaredAnnotation(declaredAnnotation: Annotation) {
         declaredAnnotations.add(declaredAnnotation)
-    }
-
-    fun storeAnnotation(annotation: Annotation) {
-        annotations.add(annotation)
     }
 
     open fun resolveAutomaton(reference: AutomatonReference): Automaton? {
@@ -75,11 +71,6 @@ abstract class LslContextBase {
     open fun resolveAnnotation(reference: AnnotationReference): Annotation? {
         return annotations.firstOrNull { annotation -> reference.isReferenceMatchWithNode(annotation) }
             ?: parentContext?.resolveAnnotation(reference)
-    }
-
-    open fun resolveDeclaredAnnotation(reference: DeclaredAnnotationReference): DeclaredAnnotation? {
-        return declaredAnnotations.firstOrNull { annotation -> reference.isReferenceMatchWithNode(annotation) }
-            ?: parentContext?.resolveDeclaredAnnotation(reference)
     }
 
     internal fun getAllTypes() = types

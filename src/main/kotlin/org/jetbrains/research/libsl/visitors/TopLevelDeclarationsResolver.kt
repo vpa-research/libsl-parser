@@ -8,7 +8,6 @@ import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
-import javax.naming.Context
 
 class TopLevelDeclarationsResolver(
     private val basePath: String,
@@ -17,13 +16,12 @@ class TopLevelDeclarationsResolver(
 ) : LibSLParserVisitor<Unit>(globalContext)  {
 
     override fun visitAnnotationDecl(ctx: LibSLParser.AnnotationDeclContext) {
-
         val annotationName = ctx.Identifier().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(context)
-        val params = mutableListOf<DeclaredAnnotationParams>()
+        val params = mutableListOf<AnnotationParams>()
 
         ctx.annotationDeclParams()?.annotationDeclParamsPart()?.forEach { parameterCtx ->
-            val param = DeclaredAnnotationParams(parameterCtx.nameWithType().name.text.extractIdentifier(),
+            val param = AnnotationParams(parameterCtx.nameWithType().name.text.extractIdentifier(),
             processTypeIdentifier(parameterCtx.nameWithType().type),
             parameterCtx.assignmentRight()?.let {
                 expressionVisitor.visitAssignmentRight(it)
@@ -31,7 +29,7 @@ class TopLevelDeclarationsResolver(
             params.add(param)
         }
 
-        val declaredAnnotation = DeclaredAnnotation(annotationName, params)
+        val declaredAnnotation = Annotation(annotationName, params)
         globalContext.storeDeclaredAnnotation(declaredAnnotation)
     }
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {

@@ -13,14 +13,14 @@ data class Library(
     val automataReferences: MutableList<AutomatonReference> = mutableListOf(),
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
     val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
-    val declaredAnnotationReferences: MutableList<DeclaredAnnotationReference> = mutableListOf()
+    val annotationReferences: MutableList<AnnotationReference> = mutableListOf()
 ) : Node() {
     private val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }
     private val automata: List<Automaton>
         get() = automataReferences.map { it.resolveOrError() }
-    private val declaredAnnotations: List<DeclaredAnnotation>
-        get() = declaredAnnotationReferences.map { it.resolveOrError() }
+    private val annotations: List<Annotation>
+        get() = annotationReferences.map { it.resolveOrError() }
     private val globalVariables: List<Variable>
         get() = globalVariableReferences.map { it.resolveOrError() }
 
@@ -31,7 +31,7 @@ data class Library(
         append(formatTopLevelSemanticTypes())
         append(formatSemanticTypeBlock())
         append(formatGlobalVariables())
-        append(formatDeclaredAnnotations())
+        append(formatAnnotations())
         append(formatAutomata())
     }
 
@@ -65,13 +65,13 @@ data class Library(
         appendLine("}")
     }
 
-    private fun formatDeclaredAnnotations(): String = buildString {
-        if(declaredAnnotations.isEmpty()) {
+    private fun formatAnnotations(): String = buildString {
+        if(annotations.isEmpty()) {
             return@buildString
         }
 
 
-        declaredAnnotations.joinToString() { annotation ->
+        annotations.joinToString() { annotation ->
             append(annotation.dumpToString())
         }
     }

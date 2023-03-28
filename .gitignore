@@ -9,3 +9,5 @@
 /.idea/.name
 /src/main/gen/
 /.gradle/
+/.idea/codeStyles/
+/.idea/kotlinc.xml

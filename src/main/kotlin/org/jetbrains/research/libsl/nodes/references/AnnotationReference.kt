@@ -2,10 +2,11 @@ package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Annotation
-import org.jetbrains.research.libsl.nodes.DeclaredAnnotation
+import org.jetbrains.research.libsl.type.Type
 
-data class AnnotationReference (
+data class AnnotationReference(
     val name: String,
+    val params: MutableList<Type>,
     override val context: LslContextBase
 ) : LslReference<Annotation, AnnotationReference> {
     override fun resolve(): Annotation? {
@@ -17,6 +18,7 @@ data class AnnotationReference (
     }
 
     override fun isReferenceMatchWithNode(node: Annotation): Boolean {
+        // TODO
         return this.name == node.name
     }
 
@@ -24,25 +26,3 @@ data class AnnotationReference (
         return "AnnotationReference($name)"
     }
 }
-
-data class DeclaredAnnotationReference (
-    val name: String,
-    override val context: LslContextBase
-) : LslReference<DeclaredAnnotation, DeclaredAnnotationReference> {
-    override fun resolve(): DeclaredAnnotation? {
-        return context.resolveDeclaredAnnotation(this)
-    }
-
-    override fun isSameReference(other: DeclaredAnnotationReference): Boolean {
-        return other.name == name
-    }
-
-    override fun isReferenceMatchWithNode(node: DeclaredAnnotation): Boolean {
-        return this.name == node.name
-    }
-
-    override fun toString(): String {
-        return "DeclaredAnnotationReference($name)"
-    }
-}
-
