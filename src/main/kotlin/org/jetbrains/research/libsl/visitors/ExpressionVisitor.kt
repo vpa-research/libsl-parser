@@ -218,7 +218,7 @@ class ExpressionVisitor(
     ): Expression {
         val automatonName = ctx.name.asPeriodSeparatedString()
         val automatonRef = AutomatonReferenceBuilder.build(automatonName, context)
-        val args = ctx.namedArgs().argPair().mapNotNull { pair ->
+        val args = ctx.namedArgs()?.argPair().orEmpty().mapNotNull { pair ->
             val name = pair.name.text.extractIdentifier()
             val value = when {
                 pair.expression() != null -> visitExpression(pair.expression())
@@ -234,7 +234,7 @@ class ExpressionVisitor(
         }
 
         val stateName =
-            ctx.namedArgs().argPair().firstOrNull { pair -> pair.name.text == "state" }?.expressionAtomic()?.text
+            ctx.namedArgs()?.argPair().orEmpty().firstOrNull { pair -> pair.name.text == "state" }?.expressionAtomic()?.text
         check(stateName != null)
 
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
