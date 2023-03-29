@@ -21,6 +21,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testAutomatonWithInitialValuesLsl() {
+        runLslTest("automatonWithInitialValues")
+    }
+
+    @Test
     fun testBadVariableAccessLsl() {
         runLslTest("badVariableAccess")
     }
