@@ -10,7 +10,7 @@ automaton A : Int {
 
     state s1, s2, s3;
 
-    shift (s1, s2) -> s3 (f);
+    shift (s1, s2) -> s3 by f(Int);
 
     fun f(param: Int);
 }

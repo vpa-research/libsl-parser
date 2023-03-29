@@ -1,4 +1,6 @@
+/src/main/gen/
 /build/
+/.idea/.name
 /.idea/compiler.xml
 /.idea/gradle.xml
 /.idea/jarRepositories.xml

@@ -102,11 +102,11 @@ class AutomatonResolver(
 
     private val LibSLParser.AutomatonShiftDeclContext.functionsRefs: List<FunctionReference>
         get() {
-            this.functionsList() ?: return listOf()
+            this.functionsList() ?: functionsListPart() ?: return listOf()
 
             val result = mutableListOf<FunctionReference>()
 
-            for (functionListPart in this.functionsList().functionsListPart()) {
+            for (functionListPart in this.functionsList()?.functionsListPart() ?: listOf(functionsListPart())) {
                 val ids = functionListPart.Identifier().map { id -> id.asPeriodSeparatedString() }
                 val functionName = ids.first()
 

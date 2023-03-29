@@ -120,5 +120,10 @@ class GeneratedTests {
         runLslTest("variableResolution")
     }
 
+    @Test
+    fun testShiftSquareBrackets() {
+        runLslTest("shiftSquareBrackets")
+    }
+
 }
 
