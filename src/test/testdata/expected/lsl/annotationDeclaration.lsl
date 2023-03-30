@@ -10,6 +10,6 @@ annotation Something(
     variable2: Int = 5
 );
 automaton A : Int {
-    fun f(@anno param: Int);
-    fun g(@anno(1, "12") param: Int);
+    fun f(@Public param: Int);
+    fun g(@Something(1, 12) param: Int);
 }

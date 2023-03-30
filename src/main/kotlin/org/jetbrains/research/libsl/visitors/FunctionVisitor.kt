@@ -41,7 +41,7 @@ class FunctionVisitor(
 
         val functionName = ctx.functionName.text.extractIdentifier()
 
-        val annotationReferences = makeFunctionAnnotationReferenceList(ctx.functionAnnotations())
+        val annotationReferences = getFunctionAnnotationReferenceList(ctx.functionAnnotations())
 
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
@@ -76,10 +76,10 @@ class FunctionVisitor(
             ?.parameter()
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = makeFunctionParamAnnotationReferenceList(parameter.functionAnnotations())
+                val annotationsReferences = getFunctionParamAnnotationReferenceList(parameter.functionAnnotations())
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
 
-                if (annotationsReferences != null && annotationsReferences.any{it.name == "target"}) {
+                if (annotationsReferences.any{it.name == "Target"}) {
                     val targetAutomatonName = typeRef.name
                     val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                     arg.targetAutomaton = targetAutomatonReference
@@ -90,16 +90,14 @@ class FunctionVisitor(
             }
             .orEmpty()
 
-    private fun makeFunctionAnnotationReferenceList(ctx: List<LibSLParser.FunctionAnnotationsContext>?): MutableList<AnnotationReference>? {
+    private fun getFunctionAnnotationReferenceList(ctx: List<FunctionAnnotationsContext>): MutableList<AnnotationReference> {
         val annotationReferenceList = mutableListOf<AnnotationReference>()
-        val annotationReferences = ctx?.mapNotNull { processFunctionAnnotation(it) }
-        if (annotationReferences != null) {
-            annotationReferenceList.addAll(annotationReferences)
-        }
+        val annotationReferences = ctx.mapNotNull { processFunctionAnnotation(it) }
+        annotationReferenceList.addAll(annotationReferences)
         return annotationReferenceList
     }
 
-    private fun processFunctionAnnotation(ctx: LibSLParser.FunctionAnnotationsContext?): AnnotationReference? {
+    private fun processFunctionAnnotation(ctx: FunctionAnnotationsContext?): AnnotationReference? {
         ctx ?: return null
         val name = ctx.Identifier().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(functionContext)
@@ -112,12 +110,10 @@ class FunctionVisitor(
         return AnnotationReference(name, context)
     }
 
-    private fun makeFunctionParamAnnotationReferenceList(ctx: List<FunctionAnnotationsContext>?): MutableList<AnnotationReference>? {
+    private fun getFunctionParamAnnotationReferenceList(ctx: List<FunctionAnnotationsContext>): MutableList<AnnotationReference> {
         val annotationReferenceList = mutableListOf<AnnotationReference>()
-        val annotationReferences = ctx?.mapNotNull { processFunctionParamAnnotationReference(it) }
-        if (annotationReferences != null) {
-            annotationReferenceList.addAll(annotationReferences)
-        }
+        val annotationReferences = ctx.mapNotNull { processFunctionParamAnnotationReference(it) }
+        annotationReferenceList.addAll(annotationReferences)
         return annotationReferenceList
     }
 

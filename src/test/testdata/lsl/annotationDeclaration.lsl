@@ -13,7 +13,7 @@ annotation Something (
 );
 
 automaton A : Int {
-    fun f(@anno param: Int);
+    fun f(@Public param: Int);
 
-    fun g(@anno(1, "12") param: Int);
+    fun g(@Something(1, 12) param: Int);
 }
