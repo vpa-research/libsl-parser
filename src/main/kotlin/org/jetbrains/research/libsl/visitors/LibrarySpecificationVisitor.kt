@@ -1,5 +1,6 @@
 package org.jetbrains.research.libsl.visitors
 
+import getReference
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.FileContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
@@ -126,6 +127,6 @@ class LibrarySpecificationVisitor(
 
     private fun representDeclaredActionsFromContextInLibrary() {
         val declaredActions = globalContext.getAllDeclaredActions()
-        library.declaredActionReferences.addAll(declaredActions.map { action -> action.getReference(context) })
+        library.declaredActionReferences.addAll(declaredActions.map { action -> action.getReference(context)})
     }
 }

@@ -146,7 +146,7 @@ actionDecl
    ;
 
 actionAnnotations
-   :  AT Identifier (L_BRACKET argsList R_BRACKET)?
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 actionDeclParamList

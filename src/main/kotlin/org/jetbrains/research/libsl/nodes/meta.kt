@@ -13,7 +13,7 @@ data class Library(
     val automataReferences: MutableList<AutomatonReference> = mutableListOf(),
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
     val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
-    val declaredAnnotationReferences: MutableList<DeclaredAnnotationReference> = mutableListOf()
+    val declaredAnnotationReferences: MutableList<DeclaredAnnotationReference> = mutableListOf(),
     val declaredActionReferences: MutableList<ActionDeclReference> = mutableListOf()
 ) : Node() {
     private val resolvedTypes: List<Type>
