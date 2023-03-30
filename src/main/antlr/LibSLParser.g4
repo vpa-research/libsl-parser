@@ -113,6 +113,8 @@ automatonDecl
 automatonStatement
    :   automatonStateDecl
    |   automatonShiftDecl
+   |   constructorDecl
+   |   destructorDecl
    |   functionDecl
    |   variableDecl
    ;
@@ -139,6 +141,18 @@ functionsList
 
 functionsListPart
    :   name=Identifier (L_BRACKET Identifier? (COMMA Identifier)* R_BRACKET)?
+   ;
+
+constructorDecl
+   :   CONSTRUCTOR (functionName=Identifier)?
+   L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   ;
+
+destructorDecl
+   :   DESTRUCTOR (functionName=Identifier)?
+   L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 /* variable declaration with optional initializers

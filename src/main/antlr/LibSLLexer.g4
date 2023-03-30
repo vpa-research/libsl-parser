@@ -171,6 +171,14 @@ FALSE
    :   'false'
    ;
 
+CONSTRUCTOR
+   :   'constructor'
+   ;
+
+DESTRUCTOR
+   :   'destructor'
+   ;
+
 Identifier
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
    |   '`' .*? '`'
@@ -205,4 +213,3 @@ COMMENT
 LINE_COMMENT
    :   (' //' ~[\r\n]* | '// ' ~[\r\n]*) -> channel(HIDDEN)
    ;
-
