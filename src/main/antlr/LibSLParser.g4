@@ -22,6 +22,7 @@ globalStatement
    |   typealiasStatement
    |   typeDefBlock
    |   enumBlock
+   |   annotationDecl
    |   topLevelDecl
    ;
 
@@ -100,14 +101,42 @@ enumSemanticType
    ;
 
 enumSemanticTypeEntry
-   :    Identifier COLON expressionAtomic SEMICOLON
+   :   Identifier COLON expressionAtomic SEMICOLON
+   ;
+
+/* annotation declaration
+ * syntax: annotation Something(
+ *             variable1: int = 0,
+ *             variable2: int = 1
+ *         );
+ */
+annotationDecl
+   :   ANNOTATION name=Identifier (L_BRACKET (annotationDeclParams) (COMMA)? R_BRACKET)? SEMICOLON
+   ;
+
+annotationDeclParams
+   :   (annotationDeclParamsPart (COMMA annotationDeclParamsPart)*)*
+   ;
+
+annotationDeclParamsPart
+   :   nameWithType (ASSIGN_OP assignmentRight)?
    ;
 
 /* automaton declaration
- * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
+ * syntax: [@Annotation1(param: type)
+ *         @Annotation2(param: type]
+ *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   :   automatonAnnotations*?
+   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   ;
+
+/* automaton annotation
+ * syntax: @annotationName(args)
+ */
+automatonAnnotations
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 automatonStatement
@@ -197,11 +226,17 @@ argPair
    ;
 
 /*
- * syntax: fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
+ * syntax: @Annotation
+ *         fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
+
+ /*
+  *  Annotated function
+  */
 functionDecl
-   :   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   :   functionAnnotations*?
+   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
@@ -211,14 +246,15 @@ functionDeclArgList
    ;
 
 parameter
-   :   annotation? name=Identifier COLON type=typeIdentifier
+   :   functionAnnotations*? name=Identifier COLON type=typeIdentifier
    ;
 
 /* annotation
  * syntax: @annotationName(args)
  */
-annotation
-   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+
+functionAnnotations
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 /*
