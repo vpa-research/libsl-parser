@@ -1,6 +1,5 @@
 package org.jetbrains.research.libsl.nodes
 
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -48,7 +47,7 @@ class FunctionArgument(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    var annotation: Annotation? = null,
     var targetAutomaton: AutomatonReference? = null
 ) : Variable(name, typeReference) {
     lateinit var function: Function
@@ -57,23 +56,19 @@ class FunctionArgument(
         get() = "${function.name}.$name"
 
     override fun dumpToString(): String = buildString {
-        if (annotationsReferences != null) {
+        if (annotation != null) {
+            append("@")
+            append(BackticksPolitics.forIdentifier(annotation!!.name))
 
-            annotationsReferences?.joinToString() { annotation ->
-                val resolvedAnnotation = annotation.resolveOrError()
-                append("@")
-                append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
-
-                if (resolvedAnnotation.values.isNotEmpty()) {
-                    append("(")
-                    append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
-                        v.dumpToString()
-                    })
-                    append(")")
-                }
-
-                append(IPrinter.SPACE)
+            if (annotation!!.values.isNotEmpty()) {
+                append("(")
+                append(annotation!!.values.joinToString(separator = ", ") { v ->
+                    v.dumpToString()
+                })
+                append(")")
             }
+
+            append(IPrinter.SPACE)
         }
         append(BackticksPolitics.forIdentifier(name))
         append(": ")

@@ -1,7 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.AutomatonContext
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -10,7 +9,6 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
-    val annotations: MutableList<AnnotationReference>? = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
@@ -23,10 +21,6 @@ data class Automaton(
         get() = localFunctions + extensionFunctions
 
     override fun dumpToString(): String = buildString {
-        annotations?.joinToString() { annotation ->
-            append(annotation.resolveOrError().invocationDumpToString())
-        }
-
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
         if (constructorVariables.isNotEmpty()) {
             append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")

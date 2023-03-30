@@ -11,18 +11,8 @@ class GeneratedTests {
     }
 
     @Test
-    fun testAnnotationDeclarationLsl() {
-        runLslTest("annotationDeclaration")
-    }
-
-    @Test
     fun testAnnotationsLsl() {
         runLslTest("annotations")
-    }
-
-    @Test
-    fun testAutomatonAnnotationsLsl() {
-        runLslTest("automatonAnnotations")
     }
 
     @Test

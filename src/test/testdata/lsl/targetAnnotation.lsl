@@ -6,10 +6,8 @@ types {
     A(int16);
 }
 
-annotation Target;
-
 automaton B : Int {}
 
 automaton A : Int {
-    fun foo (@Target self: B);
+    fun foo (@target self: B);
 }
