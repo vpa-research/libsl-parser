@@ -139,6 +139,18 @@ automatonAnnotations
    :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
+actionDecl
+   :   DEFINE actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   ;
+
+actionDeclParamList
+   :   actionParameter (COMMA actionParameter)*
+   ;
+
+actionParameter
+   :   name=Identifier COLON type=typeIdentifier
+   ;
+
 automatonStatement
    :   automatonStateDecl
    |   automatonShiftDecl

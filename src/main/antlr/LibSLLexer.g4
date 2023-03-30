@@ -175,6 +175,10 @@ FALSE
    :   'false'
    ;
 
+DEFINE
+   :   'define'
+   ;
+
 CONSTRUCTOR
    :   'constructor'
    ;
