@@ -46,6 +46,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testConstructorsAndDestructorsLsl() {
+        runLslTest("constructorsAndDestructors")
+    }
+
+    @Test
     fun testContextResolution1Lsl() {
         runLslTest("contextResolution1")
     }
@@ -73,6 +78,11 @@ class GeneratedTests {
     @Test
     fun testEscapingTestLsl() {
         runLslTest("escapingTest")
+    }
+
+    @Test
+    fun testFunctionAnnotationsLsl() {
+        runLslTest("functionAnnotations")
     }
 
     @Test

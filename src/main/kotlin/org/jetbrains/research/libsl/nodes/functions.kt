@@ -8,7 +8,8 @@ import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Function(
-    val name: String,
+    val keyword: String,
+    val name: String?,
     val automatonReference: AutomatonReference,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
@@ -29,7 +30,7 @@ data class Function(
             append(annotationReference.resolveOrError().invocationDumpToString())
         }
 
-        append("fun ${BackticksPolitics.forIdentifier(name)}")
+        append("$keyword ${name?.let { BackticksPolitics.forIdentifier(it) }}")
 
         append(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString()}

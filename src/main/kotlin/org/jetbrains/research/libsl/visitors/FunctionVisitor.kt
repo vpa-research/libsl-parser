@@ -39,7 +39,9 @@ class FunctionVisitor(
             parentAutomaton = automatonReference.resolveOrError()
         }
 
-        val functionName = ctx.functionName.text.extractIdentifier()
+        val keyword = ctx.keyword.text
+
+        val functionName = ctx.functionName?.text?.extractIdentifier()
 
         val annotationReferences = getFunctionAnnotationReferenceList(ctx.functionAnnotations())
 
@@ -56,6 +58,7 @@ class FunctionVisitor(
         }
 
         buildingFunction = Function(
+            keyword,
             functionName,
             automatonReference,
             args,

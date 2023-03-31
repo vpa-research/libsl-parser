@@ -164,8 +164,6 @@ automatonAnnotations
 automatonStatement
    :   automatonStateDecl
    |   automatonShiftDecl
-   |   constructorDecl
-   |   destructorDecl
    |   functionDecl
    |   variableDecl
    ;
@@ -192,18 +190,6 @@ functionsList
 
 functionsListPart
    :   name=Identifier (L_BRACKET Identifier? (COMMA Identifier)* R_BRACKET)?
-   ;
-
-constructorDecl
-   :   CONSTRUCTOR (functionName=Identifier)?
-   L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
-   ;
-
-destructorDecl
-   :   DESTRUCTOR (functionName=Identifier)?
-   L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 /* variable declaration with optional initializers
@@ -252,16 +238,20 @@ argPair
  *         fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
-
- /*
-  *  Annotated function
-  */
 functionDecl
    :   functionAnnotations*?
-   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   keyword=functionKeyword
+   (automatonName=periodSeparatedFullName DOT)?
+   functionName=Identifier?
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
+
+
+functionKeyword
+   :   (FUN | PROC | CONSTRUCTOR | DESTRUCTOR)
+   ;
+
 
 functionDeclArgList
    :   parameter (COMMA parameter)*

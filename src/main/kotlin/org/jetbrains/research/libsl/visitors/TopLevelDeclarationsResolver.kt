@@ -121,7 +121,6 @@ class TopLevelDeclarationsResolver(
     }
 
     private fun processActionParamAnnotationReference(ctx: ActionParameterAnnotationsContext): AnnotationReference? {
-        ctx ?: return null
 
         val name = ctx.Identifier().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(context)

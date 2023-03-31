@@ -143,8 +143,21 @@ SHIFT
 NEW
    :   'new'
    ;
+
 FUN
    :   'fun'
+   ;
+
+CONSTRUCTOR
+   :   'constructor'
+   ;
+
+DESTRUCTOR
+   :   'destructor'
+   ;
+
+PROC
+   :   'proc'
    ;
 
 AT
@@ -177,14 +190,6 @@ FALSE
 
 DEFINE
    :   'define'
-   ;
-
-CONSTRUCTOR
-   :   'constructor'
-   ;
-
-DESTRUCTOR
-   :   'destructor'
    ;
 
 Identifier
