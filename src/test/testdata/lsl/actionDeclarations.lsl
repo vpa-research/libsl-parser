@@ -3,8 +3,13 @@ library simple;
 
 typealias Int=int32;
 
-define action SUM(x: Int, y: Int): Int;
-define action NO_RETURN(x: Int, y: Int);
+annotation Something;
+annotation Ann;
+
+@Something
+define action SUM(@Ann x: Int, y: Int): Int;
+@Something
+define action NO_RETURN(@Ann x: Int, @Ann y: Int);
 
 automaton A : Int {
     var x: Int = 1;

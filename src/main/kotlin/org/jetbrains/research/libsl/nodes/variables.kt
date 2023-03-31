@@ -94,6 +94,7 @@ class ActionParameter(
     typeReference: TypeReference,
     val index: Int,
     var annotation: Annotation? = null,
+
 ) : Variable(name, typeReference) {
 
     override fun dumpToString(): String = buildString {
@@ -121,17 +122,18 @@ class ActionParameter(
 class DeclaredActionParameter(
     name: String,
     typeReference: TypeReference,
-    var annotation: Annotation? = null,
+    private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
 ) : Variable(name, typeReference) {
 
     override fun dumpToString(): String = buildString {
-        if (annotation != null) {
+        annotationsReferences?.joinToString() { annotation ->
+            val resolvedAnnotation = annotation.resolveOrError()
             append("@")
-            append(BackticksPolitics.forIdentifier(annotation!!.name))
+            append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
 
-            if (annotation!!.values.isNotEmpty()) {
+            if (resolvedAnnotation.values.isNotEmpty()) {
                 append("(")
-                append(annotation!!.values.joinToString(separator = ", ") { v ->
+                append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
                     v.dumpToString()
                 })
                 append(")")
@@ -142,7 +144,9 @@ class DeclaredActionParameter(
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
 
-        append(typeReference.name)
+        val typeName = typeReference.name
+
+        append(typeName)
     }
 }
 

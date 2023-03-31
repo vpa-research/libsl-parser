@@ -1,5 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
@@ -7,9 +8,13 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class ActionDecl(
     val name: String,
     val values: MutableList<DeclaredActionParameter> = mutableListOf(),
+    val annotations: MutableList<AnnotationReference>? = mutableListOf(),
     val returnType: TypeReference?
 ) : IPrinter {
     override fun dumpToString(): String = buildString {
+        annotations?.joinToString() { annotation ->
+            append(annotation.resolveOrError().invocationDumpToString())
+        }
         append("define action ${BackticksPolitics.forIdentifier(name)}")
 
         append(
@@ -24,5 +29,4 @@ data class ActionDecl(
             appendLine(";")
         }
     }
-
 }

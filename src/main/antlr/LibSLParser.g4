@@ -123,6 +123,27 @@ annotationDeclParamsPart
    :   nameWithType (ASSIGN_OP assignmentRight)?
    ;
 
+actionDecl
+   :   actionAnnotations*?
+   DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   ;
+
+actionAnnotations
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   ;
+
+actionDeclParamList
+   :   actionParameter (COMMA actionParameter)*
+   ;
+
+actionParameter
+   :   actionParameterAnnotations*? name=Identifier COLON type=typeIdentifier
+   ;
+
+actionParameterAnnotations
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   ;
+
 /* automaton declaration
  * syntax: [@Annotation1(param: type)
  *         @Annotation2(param: type]
@@ -138,23 +159,6 @@ automatonDecl
  */
 automatonAnnotations
    :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
-   ;
-
-actionDecl
-   :   actionAnnotations*?
-   DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
-   ;
-
-actionAnnotations
-   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
-   ;
-
-actionDeclParamList
-   :   actionParameter (COMMA actionParameter)*
-   ;
-
-actionParameter
-   :   name=Identifier COLON type=typeIdentifier
    ;
 
 automatonStatement
