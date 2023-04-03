@@ -266,7 +266,7 @@ functionDecl
    :   functionAnnotations*?
    FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (COLON functionType=typeIdentifier)? (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
    ;
 
 functionDeclArgList
@@ -299,7 +299,8 @@ preamblePart
    ;
 
 functionBody
-   :   functionBodyStatements*
+   :   functionPreamble?
+   functionBodyStatements*
    ;
 
 functionBodyStatements

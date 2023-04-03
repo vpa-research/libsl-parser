@@ -40,18 +40,13 @@ data class Function(
             append(returnType.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
         }
 
-        if (contracts.isNotEmpty()) {
-            appendLine()
-            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
-        }
-
         if (!hasBody && contracts.isEmpty()) {
             appendLine(";")
         } else if (hasBody) {
-            if (contracts.isEmpty()) {
-                append(IPrinter.SPACE)
+            appendLine(" {")
+            if (contracts.isNotEmpty()) {
+                append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
             }
-            appendLine("{")
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
         }
@@ -84,18 +79,13 @@ data class Constructor(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
         )
 
-        if (contracts.isNotEmpty()) {
-            appendLine()
-            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
-        }
-
         if (!hasBody && contracts.isEmpty()) {
             appendLine(";")
         } else if (hasBody) {
-            if (contracts.isEmpty()) {
-                append(IPrinter.SPACE)
+            appendLine(" {")
+            if (contracts.isNotEmpty()) {
+                append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
             }
-            appendLine("{")
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
         }
@@ -129,18 +119,13 @@ data class Destructor(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
         )
 
-        if (contracts.isNotEmpty()) {
-            appendLine()
-            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
-        }
-
         if (!hasBody && contracts.isEmpty()) {
             appendLine(";")
         } else if (hasBody) {
-            if (contracts.isEmpty()) {
-                append(IPrinter.SPACE)
+            appendLine(" {")
+            if (contracts.isNotEmpty()) {
+                append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
             }
-            appendLine("{")
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
         }
@@ -173,18 +158,13 @@ data class Proc (
             append(returnType.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
         }
 
-        if (contracts.isNotEmpty()) {
-            appendLine()
-            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
-        }
-
         if (!hasBody && contracts.isEmpty()) {
             appendLine(";")
         } else if (hasBody) {
-            if (contracts.isEmpty()) {
-                append(IPrinter.SPACE)
+            appendLine(" {")
+            if (contracts.isNotEmpty()) {
+                append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
             }
-            appendLine("{")
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
         }
