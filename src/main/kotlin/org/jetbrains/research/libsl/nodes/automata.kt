@@ -15,6 +15,9 @@ data class Automaton(
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
     val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
+    val constructors: MutableList<Constructor> = mutableListOf(),
+    val destructors: MutableList<Destructor> = mutableListOf(),
+    val procList: MutableList<Proc> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
     val extensionFunctions: MutableList<Function> = mutableListOf(),
     val context: AutomatonContext
@@ -41,6 +44,9 @@ data class Automaton(
         append(formatStates())
         append(formatShifts())
         append(formatInternalVariables())
+        append(formatConstructors())
+        append(formatDestructors())
+        append(formatProcList())
         append(formatFunctions())
     }
 
@@ -49,6 +55,12 @@ data class Automaton(
     private fun formatStates(): String = formatListEmptyLineAtEndIfNeeded(states)
 
     private fun formatShifts(): String = formatListEmptyLineAtEndIfNeeded(shifts)
+
+    private fun formatConstructors(): String = formatListEmptyLineAtEndIfNeeded(constructors)
+
+    private fun formatDestructors(): String = formatListEmptyLineAtEndIfNeeded(destructors)
+
+    private fun formatProcList(): String = formatListEmptyLineAtEndIfNeeded(procList)
 
     private fun formatFunctions(): String = formatListEmptyLineAtEndIfNeeded(functions, appendEndLineAtTheEnd = false)
 

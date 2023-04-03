@@ -5,16 +5,19 @@ typealias Int=int32;
 
 
 automaton B: Int {
-    constructor b();
-    destructor b();
+    constructor B()
+    destructor B()
 }
 
 automaton A : Int {
 
-    constructor a(x: Int, y: Int);
-    destructor a();
-    constructor ();
-    destructor ();
-    fun f();
+    constructor A(x: Int, y: Int) {
+       x = 1;
+       y = 1;
+    }
+    destructor A()
+    constructor()
+    destructor()
+    fun f()
     fun g(param: Int)
 }

@@ -164,6 +164,9 @@ automatonAnnotations
 automatonStatement
    :   automatonStateDecl
    |   automatonShiftDecl
+   |   constructorDecl
+   |   destructorDecl
+   |   procDecl
    |   functionDecl
    |   variableDecl
    ;
@@ -233,6 +236,27 @@ argPair
    |   name=Identifier ASSIGN_OP expression
    ;
 
+constructorDecl
+   :   functionAnnotations*?
+   CONSTRUCTOR functionName=Identifier?
+   L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   ;
+
+destructorDecl
+   :   functionAnnotations*?
+   DESTRUCTOR functionName=Identifier?
+   L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   ;
+
+procDecl
+   :   functionAnnotations*?
+   PROC functionName=Identifier
+   L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   ;
+
 /*
  * syntax: @Annotation
  *         fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
@@ -240,18 +264,10 @@ argPair
  */
 functionDecl
    :   functionAnnotations*?
-   keyword=functionKeyword
-   (automatonName=periodSeparatedFullName DOT)?
-   functionName=Identifier?
+   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
-
-
-functionKeyword
-   :   (FUN | PROC | CONSTRUCTOR | DESTRUCTOR)
-   ;
-
 
 functionDeclArgList
    :   parameter (COMMA parameter)*

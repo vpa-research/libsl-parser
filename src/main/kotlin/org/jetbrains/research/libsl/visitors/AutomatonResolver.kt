@@ -176,4 +176,18 @@ class AutomatonResolver(
         FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitFunctionDecl(ctx)
     }
 
+    override fun visitConstructorDecl(ctx: LibSLParser.ConstructorDeclContext) {
+        val functionContext = FunctionContext(context)
+        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitConstructorDecl(ctx)
+    }
+
+    override fun visitDestructorDecl(ctx: LibSLParser.DestructorDeclContext) {
+        val functionContext = FunctionContext(context)
+        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitDestructorDecl(ctx)
+    }
+
+    override fun visitProcDecl(ctx: LibSLParser.ProcDeclContext) {
+        val functionContext = FunctionContext(context)
+        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitProcDecl(ctx)
+    }
 }

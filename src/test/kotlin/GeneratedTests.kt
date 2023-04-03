@@ -111,6 +111,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testProcLsl() {
+        runLslTest("proc")
+    }
+
+    @Test
     fun testQualifiedAccessesLsl() {
         runLslTest("qualifiedAccesses")
     }

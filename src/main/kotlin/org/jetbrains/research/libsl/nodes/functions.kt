@@ -8,8 +8,7 @@ import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Function(
-    val keyword: String,
-    val name: String?,
+    val name: String,
     val automatonReference: AutomatonReference,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
@@ -30,7 +29,7 @@ data class Function(
             append(annotationReference.resolveOrError().invocationDumpToString())
         }
 
-        append("$keyword ${name?.let { BackticksPolitics.forIdentifier(it) }}")
+        append("fun ${BackticksPolitics.forIdentifier(name)}")
 
         append(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString()}
@@ -59,6 +58,138 @@ data class Function(
     }
 }
 
+data class Constructor(
+    var name: String?,
+    var args: MutableList<FunctionArgument> = mutableListOf(),
+    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    var contracts: MutableList<Contract> = mutableListOf(),
+    var statements: MutableList<Statement> = mutableListOf(),
+    val hasBody: Boolean = statements.isNotEmpty(),
+    val context: FunctionContext
+) : Node() {
+    override fun dumpToString(): String = buildString {
+        annotationReferences?.joinToString() { annotationReference ->
+            append(annotationReference.resolveOrError().invocationDumpToString())
+        }
+
+        name = if(name.isNullOrEmpty()) {
+            ""
+        } else {
+            " " + BackticksPolitics.forIdentifier(name!!)
+        }
+
+        append("constructor$name")
+
+        append(
+            args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
+        )
+
+        if (contracts.isNotEmpty()) {
+            appendLine()
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
+        }
+
+        if (!hasBody && contracts.isEmpty()) {
+            appendLine(";")
+        } else if (hasBody) {
+            if (contracts.isEmpty()) {
+                append(IPrinter.SPACE)
+            }
+            appendLine("{")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
+            appendLine("}")
+        }
+    }
+
+}
+
+data class Destructor(
+    var name: String?,
+    var args: MutableList<FunctionArgument> = mutableListOf(),
+    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    var contracts: MutableList<Contract> = mutableListOf(),
+    var statements: MutableList<Statement> = mutableListOf(),
+    val hasBody: Boolean = statements.isNotEmpty(),
+    val context: FunctionContext
+) : Node() {
+    override fun dumpToString(): String = buildString {
+        annotationReferences?.joinToString() { annotationReference ->
+            append(annotationReference.resolveOrError().invocationDumpToString())
+        }
+
+        name = if(name.isNullOrEmpty()) {
+            ""
+        } else {
+            " " + BackticksPolitics.forIdentifier(name!!)
+        }
+
+        append("destructor$name")
+
+        append(
+            args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
+        )
+
+        if (contracts.isNotEmpty()) {
+            appendLine()
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
+        }
+
+        if (!hasBody && contracts.isEmpty()) {
+            appendLine(";")
+        } else if (hasBody) {
+            if (contracts.isEmpty()) {
+                append(IPrinter.SPACE)
+            }
+            appendLine("{")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
+            appendLine("}")
+        }
+    }
+}
+
+data class Proc (
+    val name: String,
+    var args: MutableList<FunctionArgument> = mutableListOf(),
+    val returnType: TypeReference?,
+    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    var contracts: MutableList<Contract> = mutableListOf(),
+    var statements: MutableList<Statement> = mutableListOf(),
+    val hasBody: Boolean = statements.isNotEmpty(),
+    val context: FunctionContext
+) : Node() {
+    override fun dumpToString(): String = buildString {
+        annotationReferences?.joinToString() { annotationReference ->
+            append(annotationReference.resolveOrError().invocationDumpToString())
+        }
+
+        append("proc ${BackticksPolitics.forIdentifier(name)}")
+
+        append(
+            args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
+        )
+
+        if (returnType != null) {
+            append(": ")
+            append(returnType.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
+        }
+
+        if (contracts.isNotEmpty()) {
+            appendLine()
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
+        }
+
+        if (!hasBody && contracts.isEmpty()) {
+            appendLine(";")
+        } else if (hasBody) {
+            if (contracts.isEmpty()) {
+                append(IPrinter.SPACE)
+            }
+            appendLine("{")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
+            appendLine("}")
+        }
+    }
+}
 data class ArgumentWithValue(
     val name: String,
     val value: Expression

@@ -1,9 +1,12 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.LibSLParser.ConstructorDeclContext
+import org.jetbrains.research.libsl.LibSLParser.DestructorDeclContext
 import org.jetbrains.research.libsl.LibSLParser.FunctionAnnotationsContext
 import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
 import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
+import org.jetbrains.research.libsl.LibSLParser.ProcDeclContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnspecifiedAutomaton
@@ -21,6 +24,9 @@ class FunctionVisitor(
     val errorManager: ErrorManager
 ) : LibSLParserVisitor<Unit>(functionContext) {
     private lateinit var buildingFunction: Function
+    private lateinit var buildingConstructor: Constructor
+    private lateinit var buildingDestructor: Destructor
+    private lateinit var buildingProc: Proc
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
@@ -39,9 +45,7 @@ class FunctionVisitor(
             parentAutomaton = automatonReference.resolveOrError()
         }
 
-        val keyword = ctx.keyword.text
-
-        val functionName = ctx.functionName?.text?.extractIdentifier()
+        val functionName = ctx.functionName.text.extractIdentifier()
 
         val annotationReferences = getFunctionAnnotationReferenceList(ctx.functionAnnotations())
 
@@ -58,7 +62,6 @@ class FunctionVisitor(
         }
 
         buildingFunction = Function(
-            keyword,
             functionName,
             automatonReference,
             args,
@@ -71,6 +74,74 @@ class FunctionVisitor(
 
         super.visitFunctionDecl(ctx)
         parentAutomaton?.localFunctions?.add(buildingFunction)
+    }
+
+    override fun visitConstructorDecl(ctx: ConstructorDeclContext) {
+        val constructorName = ctx.functionName?.text?.extractIdentifier()
+
+        val annotationReferences = getFunctionAnnotationReferenceList(ctx.functionAnnotations())
+
+        val args = ctx.args.toMutableList()
+        args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
+
+        buildingConstructor = Constructor(
+            constructorName,
+            args,
+            annotationReferences,
+            hasBody = ctx.functionBody() != null,
+            context = functionContext
+        )
+
+        super.visitConstructorDecl(ctx)
+        parentAutomaton?.constructors?.add(buildingConstructor)
+    }
+
+    override fun visitDestructorDecl(ctx: DestructorDeclContext) {
+        val destructorName = ctx.functionName?.text?.extractIdentifier()
+
+        val annotationReferences = getFunctionAnnotationReferenceList(ctx.functionAnnotations())
+
+        val args = ctx.args.toMutableList()
+        args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
+
+        buildingDestructor = Destructor(
+            destructorName,
+            args,
+            annotationReferences,
+            hasBody = ctx.functionBody() != null,
+            context = functionContext
+        )
+
+        super.visitDestructorDecl(ctx)
+        parentAutomaton?.destructors?.add(buildingDestructor)
+    }
+
+    override fun visitProcDecl(ctx: ProcDeclContext) {
+        val procName = ctx.functionName.text.extractIdentifier()
+
+        val annotationReferences = getFunctionAnnotationReferenceList(ctx.functionAnnotations())
+
+        val args = ctx.args.toMutableList()
+        args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
+
+        val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
+
+        if (returnType != null) {
+            val resultVariable = ResultVariable(returnType)
+            context.storeVariable(resultVariable)
+        }
+
+        buildingProc = Proc(
+            procName,
+            args,
+            returnType,
+            annotationReferences,
+            hasBody = ctx.functionBody() != null,
+            context = functionContext
+        )
+
+        super.visitProcDecl(ctx)
+        parentAutomaton?.procList?.add(buildingProc)
     }
 
     private val FunctionDeclContext.args: List<FunctionArgument>
@@ -89,6 +160,42 @@ class FunctionVisitor(
                     arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
                 }
 
+                arg
+            }
+            .orEmpty()
+
+    private val ConstructorDeclContext.args: List<FunctionArgument>
+        get() = this
+            .functionDeclArgList()
+            ?.parameter()
+            ?.mapIndexed { i, parameter ->
+                val typeRef = processTypeIdentifier(parameter.type)
+                val annotationsReferences = getFunctionParamAnnotationReferenceList(parameter.functionAnnotations())
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+                arg
+            }
+            .orEmpty()
+
+    private val DestructorDeclContext.args: List<FunctionArgument>
+        get() = this
+            .functionDeclArgList()
+            ?.parameter()
+            ?.mapIndexed { i, parameter ->
+                val typeRef = processTypeIdentifier(parameter.type)
+                val annotationsReferences = getFunctionParamAnnotationReferenceList(parameter.functionAnnotations())
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+                arg
+            }
+            .orEmpty()
+
+    private val ProcDeclContext.args: List<FunctionArgument>
+        get() = this
+            .functionDeclArgList()
+            ?.parameter()
+            ?.mapIndexed { i, parameter ->
+                val typeRef = processTypeIdentifier(parameter.type)
+                val annotationsReferences = getFunctionParamAnnotationReferenceList(parameter.functionAnnotations())
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
                 arg
             }
             .orEmpty()
@@ -162,7 +269,10 @@ class FunctionVisitor(
         val expression = expressionVisitor.visitExpression(expressionContext)
 
         val contract = Contract(name, expression, kind)
-        buildingFunction.contracts.add(contract)
+        if (funInitialized()) buildingFunction.contracts.add(contract)
+        if (constructorInitialized()) buildingConstructor.contracts.add(contract)
+        if (destructorInitialized()) buildingDestructor.contracts.add(contract)
+        if (procInitialized()) buildingProc.contracts.add(contract)
     }
 
     override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext) {
@@ -171,7 +281,10 @@ class FunctionVisitor(
         val value = expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
         val assignment = Assignment(left, value)
 
-        buildingFunction.statements.add(assignment)
+        if (funInitialized()) buildingFunction.statements.add(assignment)
+        if (constructorInitialized()) buildingConstructor.statements.add(assignment)
+        if (destructorInitialized()) buildingDestructor.statements.add(assignment)
+        if (procInitialized()) buildingProc.statements.add(assignment)
     }
 
     override fun visitAction(ctx: LibSLParser.ActionContext) {
@@ -182,6 +295,26 @@ class FunctionVisitor(
         }.toMutableList()
 
         val action = Action(name, args)
-        buildingFunction.statements.add(action)
+
+        if (funInitialized()) buildingFunction.statements.add(action)
+        if (constructorInitialized()) buildingConstructor.statements.add(action)
+        if (destructorInitialized()) buildingDestructor.statements.add(action)
+        if (procInitialized()) buildingProc.statements.add(action)
+    }
+
+    private fun funInitialized(): Boolean {
+        return this::buildingFunction.isInitialized
+    }
+
+    private fun constructorInitialized(): Boolean {
+        return this::buildingConstructor.isInitialized
+    }
+
+    private fun destructorInitialized(): Boolean {
+        return this::buildingDestructor.isInitialized
+    }
+
+    private fun procInitialized(): Boolean {
+        return this::buildingProc.isInitialized
     }
 }
