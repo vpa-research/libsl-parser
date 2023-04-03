@@ -150,5 +150,10 @@ class GeneratedTests {
         runLslTest("variableResolution")
     }
 
+    @Test
+    fun testVoidAndAnyLsl() {
+        runLslTest("voidAndAny")
+    }
+
 }
 

@@ -299,7 +299,7 @@ preamblePart
    ;
 
 functionBody
-   :   functionPreamble?
+   :   functionPreamble
    functionBodyStatements*
    ;
 
