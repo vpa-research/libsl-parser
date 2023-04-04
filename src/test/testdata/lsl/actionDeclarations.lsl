@@ -16,7 +16,7 @@ automaton A : Int {
     var y: Int = 2;
 
     fun f(param: Int): Int {
-      action SUM(x, y);
+      result = action SUM(x, y);
     }
 
     fun v() {

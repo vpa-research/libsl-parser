@@ -76,3 +76,15 @@ sealed class Atomic : Expression() {
 
     override fun dumpToString(): String = value?.toString() ?: ""
 }
+
+data class ActionExpression(
+    val action: Action
+) : Expression() {
+    override fun dumpToString(): String = buildString {
+        append("action ${BackticksPolitics.forIdentifier(action.name)}(")
+        val args = action.arguments.map { it.dumpToString() }.toMutableList()
+        append(args.joinToString(separator = ", "))
+        append(")")
+    }
+
+}

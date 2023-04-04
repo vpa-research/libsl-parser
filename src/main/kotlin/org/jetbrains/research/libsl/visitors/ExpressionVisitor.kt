@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
+import org.jetbrains.research.libsl.LibSLParser.ActionContext
 import org.jetbrains.research.libsl.LibSLParser.ArrayLiteralContext
 import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
 import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
@@ -248,8 +249,21 @@ class ExpressionVisitor(
             ctx.callAutomatonConstructorWithNamedArgs() != null -> {
                 visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
             }
+            ctx.action() != null -> visitAction(ctx.action())
 
             else -> error("unknown assignment right kind")
         }
+    }
+
+    override fun visitAction(ctx: ActionContext): Expression  {
+        val name = ctx.Identifier().text.extractIdentifier()
+        val expressionVisitor = ExpressionVisitor(context)
+        val args = ctx.expressionsList().expression().map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.toMutableList()
+
+        val action = Action(name, args)
+
+        return ActionExpression(action)
     }
 }

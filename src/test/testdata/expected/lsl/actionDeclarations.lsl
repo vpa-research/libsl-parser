@@ -12,7 +12,7 @@ automaton A : Int {
     var x: Int = 1;
     var y: Int = 2;
     fun f(param: Int): Int {
-        action SUM(x, y);
+        result = action SUM(x, y);
     }
     fun v() {
         action NO_RETURN(1, 2);

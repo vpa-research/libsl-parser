@@ -221,6 +221,7 @@ variableAssignment
 assignmentRight
    :   expression
    |   NEW callAutomatonConstructorWithNamedArgs
+   |   action
    ;
 
 callAutomatonConstructorWithNamedArgs
@@ -312,7 +313,7 @@ functionBodyStatements
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
+   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON?
    ;
 
 expressionsList
