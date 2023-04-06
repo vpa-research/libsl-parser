@@ -10,6 +10,34 @@ data class Assignment(
     override fun dumpToString(): String = "${left.dumpToString()} = ${value.dumpToString()};"
 }
 
+data class IfStatement(
+    val value: Expression,
+    val ifStatements: MutableList<Statement> = mutableListOf(),
+    val elseStatements: ElseStatement?
+) : Statement() {
+    override fun dumpToString(): String = buildString {
+        append("if${value.dumpToString()}")
+        appendLine(" {")
+        append(withIndent(formatListEmptyLineAtEndIfNeeded(ifStatements)))
+        appendLine("}")
+        elseStatements?.also {
+            append("else")
+            appendLine(" {")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(it.statements)))
+            appendLine("}")
+        }
+    }
+}
+
+data class ElseStatement(
+    val statements: MutableList<Statement> = mutableListOf()
+) : Statement() {
+    override fun dumpToString(): String = buildString {
+        append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
+    }
+
+}
+
 data class Action(
     val name: String,
     val arguments: MutableList<Expression> = mutableListOf()

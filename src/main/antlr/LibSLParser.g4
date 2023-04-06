@@ -307,6 +307,15 @@ functionBody
 functionBodyStatements
    :   variableAssignment
    |   action
+   |   ifStatement
+   ;
+
+ifStatement
+   :   IF expression L_BRACE functionBodyStatements* R_BRACE (elseStatement)?
+   ;
+
+elseStatement
+   :   ELSE L_BRACE functionBodyStatements* R_BRACE
    ;
 
 /* semantic action

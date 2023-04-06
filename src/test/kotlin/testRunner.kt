@@ -102,18 +102,30 @@ private fun checkAutomatonIsResolved(automaton: Automaton) {
 }
 
 private fun checkFunctionIsResolved(function: Function) {
-    function.statements.forEach { statement ->
+    checkStatementIsResolved(function, function.statements)
+
+    function.returnType?.resolveOrError()
+    function.args.forEach { arg -> arg.typeReference.resolveOrError() }
+}
+
+private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
+    statements.forEach { statement ->
         when (statement) {
             is Action -> {}
             is Assignment -> {
                 function.context.typeInferrer.getExpressionType(statement.left)
                 function.context.typeInferrer.getExpressionType(statement.value)
             }
+
+            is ElseStatement -> checkStatementIsResolved(function, statement.statements)
+            is IfStatement -> {
+                checkStatementIsResolved(function, statement.ifStatements)
+                statement.elseStatements?.let {
+                    checkStatementIsResolved(function, it.statements)
+                }
+            }
         }
     }
-
-    function.returnType?.resolveOrError()
-    function.args.forEach { arg -> arg.typeReference.resolveOrError() }
 }
 
 private fun checkTypeIsResolved(type: Type) {

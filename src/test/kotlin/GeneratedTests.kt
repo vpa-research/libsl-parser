@@ -91,6 +91,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testIfElseLsl() {
+        runLslTest("ifElse")
+    }
+
+    @Test
     fun testInternalVariablesLsl() {
         runLslTest("internalVariables")
     }
