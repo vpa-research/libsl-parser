@@ -166,14 +166,13 @@ class ConstructorArgument(
             append("@")
             append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
 
-            if (resolvedAnnotation.values.isNotEmpty()) {
+            resolvedAnnotation.values.joinToString {
                 append("(")
                 append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
                     v.dumpToString()
                 })
                 append(")")
             }
-
             append(IPrinter.SPACE)
         }
 

@@ -12,8 +12,9 @@ annotation Something;
 var x: Int = 1;
 
 automaton A (
-    var y: Int;
-): Int{
+    @Something
+    var y: Int,
+): Int {
 
     @Something
     var i: Int;

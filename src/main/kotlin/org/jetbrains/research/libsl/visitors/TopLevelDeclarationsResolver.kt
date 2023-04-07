@@ -62,7 +62,7 @@ class TopLevelDeclarationsResolver(
         val expressionVisitor = ExpressionVisitor(context)
         val initialValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
 
-        val variable = VariableWithInitialValue(variableName, typeRef, getVariableAnnotationList(ctx.nameWithType().variableAnnotations()), initialValue)
+        val variable = VariableWithInitialValue(variableName, typeRef, getVariableAnnotationList(ctx.variableAnnotations()), initialValue)
         globalContext.storeVariable(variable)
     }
 

@@ -151,7 +151,11 @@ actionParameterAnnotations
  */
 automatonDecl
    :   automatonAnnotations*?
-   AUTOMATON name=periodSeparatedFullName (L_BRACKET variableAnnotations*? VAR nameWithType (COMMA variableAnnotations*? VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables*? R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   ;
+
+constructorVariables
+   :   variableAnnotations*? VAR nameWithType (COMMA)?
    ;
 
 /* automaton annotation
@@ -199,8 +203,10 @@ functionsListPart
  * syntax: var NAME [= { new AutomatonName(args); atomic }]
  */
 variableDecl
-   :   VAR nameWithType SEMICOLON
-   |   VAR nameWithType ASSIGN_OP assignmentRight SEMICOLON
+   :   variableAnnotations*?
+   VAR nameWithType SEMICOLON
+   |   variableAnnotations*?
+   VAR nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 variableAnnotations
