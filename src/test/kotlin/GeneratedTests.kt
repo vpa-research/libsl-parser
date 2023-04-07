@@ -151,6 +151,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testVariableAnnotationsLsl() {
+        runLslTest("variableAnnotations")
+    }
+
+    @Test
     fun testVariableResolutionLsl() {
         runLslTest("variableResolution")
     }

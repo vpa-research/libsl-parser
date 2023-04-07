@@ -62,8 +62,28 @@ class TopLevelDeclarationsResolver(
         val expressionVisitor = ExpressionVisitor(context)
         val initialValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
 
-        val variable = VariableWithInitialValue(variableName, typeRef, initialValue)
+        val variable = VariableWithInitialValue(variableName, typeRef, getVariableAnnotationList(ctx.nameWithType().variableAnnotations()), initialValue)
         globalContext.storeVariable(variable)
+    }
+
+    private fun getVariableAnnotationList(ctx: List<LibSLParser.VariableAnnotationsContext>): MutableList<AnnotationReference> {
+        val annotationReferenceList = mutableListOf<AnnotationReference>()
+        val annotationReferences = ctx.mapNotNull { processVariableAnnotation(it) }
+        annotationReferenceList.addAll(annotationReferences)
+        return annotationReferenceList
+    }
+
+    private fun processVariableAnnotation(ctx: LibSLParser.VariableAnnotationsContext?): AnnotationReference? {
+        ctx ?: return null
+        val name = ctx.Identifier().asPeriodSeparatedString()
+        val expressionVisitor = ExpressionVisitor(context)
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty().toMutableList()
+
+        context.storeAnnotation(Annotation(name, args))
+
+        return AnnotationReference(name, context)
     }
 
     override fun visitActionDecl(ctx: LibSLParser.ActionDeclContext) {

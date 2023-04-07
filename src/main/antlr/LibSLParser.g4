@@ -151,7 +151,7 @@ actionParameterAnnotations
  */
 automatonDecl
    :   automatonAnnotations*?
-   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   AUTOMATON name=periodSeparatedFullName (L_BRACKET variableAnnotations*? VAR nameWithType (COMMA variableAnnotations*? VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
    ;
 
 /* automaton annotation
@@ -203,8 +203,12 @@ variableDecl
    |   VAR nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
+variableAnnotations
+   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   ;
+
 nameWithType
-   :   name=Identifier COLON type=typeIdentifier
+   :  name=Identifier COLON type=typeIdentifier
    ;
 
 /*

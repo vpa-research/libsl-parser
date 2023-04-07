@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.NameWithTypeContext
+import org.jetbrains.research.libsl.LibSLParser.VariableDeclContext
 import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.errors.ErrorManager
@@ -62,7 +63,7 @@ class AutomatonResolver(
     override fun visitNameWithType(ctx: NameWithTypeContext) {
         val name = ctx.name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.typeIdentifier())
-        val argument = ConstructorArgument(name, typeReference)
+        val argument = ConstructorArgument(name, typeReference, getVariableAnnotationList(ctx. variableAnnotations()))
 
         buildingAutomaton.constructorVariables.add(argument)
     }
@@ -166,9 +167,29 @@ class AutomatonResolver(
             }
         }
 
-        val variable = VariableWithInitialValue(name, typeReference, initValue)
+        val variable = VariableWithInitialValue(name, typeReference, getVariableAnnotationList(ctx.nameWithType().variableAnnotations()),  initValue)
         buildingAutomaton.internalVariables.add(variable)
         context.storeVariable(variable)
+    }
+
+    private fun getVariableAnnotationList(ctx: List<LibSLParser.VariableAnnotationsContext>): MutableList<AnnotationReference> {
+        val annotationReferenceList = mutableListOf<AnnotationReference>()
+        val annotationReferences = ctx.mapNotNull { processVariableAnnotation(it) }
+        annotationReferenceList.addAll(annotationReferences)
+        return annotationReferenceList
+    }
+
+    private fun processVariableAnnotation(ctx: LibSLParser.VariableAnnotationsContext?): AnnotationReference? {
+        ctx ?: return null
+        val name = ctx.Identifier().asPeriodSeparatedString()
+        val expressionVisitor = ExpressionVisitor(context)
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty().toMutableList()
+
+        context.storeAnnotation(Annotation(name, args))
+
+        return AnnotationReference(name, context)
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {

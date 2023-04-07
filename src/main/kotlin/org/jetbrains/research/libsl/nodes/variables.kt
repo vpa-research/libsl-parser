@@ -153,22 +153,64 @@ class DeclaredActionParameter(
 class ConstructorArgument(
     name: String,
     typeReference: TypeReference,
+    private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
 ) : Variable(name, typeReference) {
     lateinit var automaton: Automaton
 
     override val fullName: String
         get() = "${automaton.name}.$name"
 
-    override fun dumpToString(): String = "var ${BackticksPolitics.forIdentifier(name)}: " +
-            BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
+    override fun dumpToString(): String = buildString {
+        annotationsReferences?.joinToString() { annotation ->
+            val resolvedAnnotation = annotation.resolveOrError()
+            append("@")
+            append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
+
+            if (resolvedAnnotation.values.isNotEmpty()) {
+                append("(")
+                append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
+                    v.dumpToString()
+                })
+                append(")")
+            }
+
+            append(IPrinter.SPACE)
+        }
+
+        append("var ${BackticksPolitics.forIdentifier(name)}: ")
+        append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
+    }
 }
 
 class VariableWithInitialValue(
     name: String,
     typeReference: TypeReference,
-    val initialValue: Expression?
+    private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    val initialValue: Expression?,
 ) : Variable(name, typeReference) {
-    override fun dumpToString() = "var ${BackticksPolitics.forIdentifier(name)}: " +
-            BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL) +
-            if (initialValue != null) " = ${initialValue.dumpToString()};" else ";"
+    override fun dumpToString(): String = buildString {
+        annotationsReferences?.joinToString() { annotation ->
+            val resolvedAnnotation = annotation.resolveOrError()
+            append("@")
+            append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
+
+            if (resolvedAnnotation.values.isNotEmpty()) {
+                append("(")
+                append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
+                    v.dumpToString()
+                })
+                append(")")
+            }
+
+            appendLine()
+        }
+
+        append("var ${BackticksPolitics.forIdentifier(name)}: ")
+        append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
+        if (initialValue != null) {
+            append(" = ${initialValue.dumpToString()};")
+        } else {
+            append(";")
+        }
+    }
 }
