@@ -124,6 +124,9 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
                     checkStatementIsResolved(function, it.statements)
                 }
             }
+            is ExpressionStatement -> {
+                statement.expressions.forEach {  function.context.typeInferrer.getExpressionType(it) }
+            }
         }
     }
 }

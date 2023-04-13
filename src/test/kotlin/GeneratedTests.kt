@@ -111,6 +111,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testOperatorsLsl() {
+        runLslTest("operators")
+    }
+
+    @Test
     fun testPrimitiveTypesLsl() {
         runLslTest("primitiveTypes")
     }

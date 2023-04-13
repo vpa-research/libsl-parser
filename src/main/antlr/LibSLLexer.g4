@@ -42,6 +42,20 @@ PLUS : '+' ;
 
 MINUS : '-' ;
 
+INCREMENT : '++' ;
+
+DECREMENT : '--' ;
+
+COMPOUND_ADD : '+=' ;
+
+COMPOUND_SUB : '-=' ;
+
+COMPOUND_MULT : '*=' ;
+
+COMPOUND_DIV : '/=' ;
+
+COMPOUND_MOD : '%=' ;
+
 EXCLAMATION : '!' ;
 
 NOT_EQ : '!=' ;
@@ -50,11 +64,27 @@ LESS_EQ : '<=' ;
 
 GREAT_EQ : '>=' ;
 
-AND : '&' ;
+BIT_AND : '&' ;
 
-OR : '|' ;
+LOGIC_AND : '&&' ;
+
+BIT_OR : '|' ;
+
+LOGIC_OR : '||' ;
 
 XOR : '^' ;
+
+BIT_COMPLEMENT : '~' ;
+
+COMPOUND_AND : '&=' ;
+
+COMPOUND_OR : '|=' ;
+
+COMPOUND_XOR : '^=' ;
+
+COMPOUND_SHIFT_R: '>>=' ;
+
+COMPOUND_SHIFT_L: '<<=' ;
 
 APOSTROPHE : '\'' ;
 

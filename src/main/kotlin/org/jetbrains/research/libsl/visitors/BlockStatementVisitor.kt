@@ -51,6 +51,13 @@ class BlockStatementVisitor(
         statements.add(action)
     }
 
+    override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
+        val expressionVisitor = ExpressionVisitor(functionContext)
+        ctx.expression().forEach { expr ->
+            println(expressionVisitor.visitExpression(expr))
+        }
+    }
+
     override fun visitElseStatement(ctx: LibSLParser.ElseStatementContext) {
         error("Unreachable")
     }

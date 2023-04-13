@@ -1,5 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
+import org.antlr.v4.runtime.tree.TerminalNode
+import org.jetbrains.research.libsl.LibSLLexer
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.EnumSemanticTypeEntryContext
 import org.jetbrains.research.libsl.LibSLParser.TypeDefBlockStatementContext
@@ -108,5 +110,16 @@ class TypeResolver(
         val typeRef = processTypeIdentifier(ctx.nameWithType().type)
 
         return name to typeRef
+    }
+
+    override fun visitBitShiftOp(ctx: LibSLParser.BitShiftOpContext) {
+        val token = (ctx.getChild(0) as TerminalNode).symbol
+        val firstIndex = token.startIndex
+        for(i in 1 until ctx.childCount) {
+            val sibling = (ctx.getChild(i) as TerminalNode).symbol
+            if(sibling.startIndex != firstIndex + i) {
+                error("Invalid symbols inside shift operator")
+            }
+        }
     }
 }

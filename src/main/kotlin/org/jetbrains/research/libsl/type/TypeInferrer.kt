@@ -28,6 +28,8 @@ class TypeInferrer(private val context: LslContextBase) {
             is UnaryOpExpression -> getExpressionType(expression.value)
             is Variable -> expression.typeReference.resolveOrError()
             is OldValue -> getExpressionType(expression.value)
+
+            // TODO("Action type")
             is ActionExpression -> nothingType
         }
     }

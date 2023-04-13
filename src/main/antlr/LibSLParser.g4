@@ -318,6 +318,7 @@ functionBodyStatements
    :   variableAssignment
    |   action
    |   ifStatement
+   |   expression SEMICOLON
    ;
 
 ifStatement
@@ -360,6 +361,12 @@ assignsContract
    :   ASSIGNS (name=Identifier COLON)? expression SEMICOLON
    ;
 
+bitShiftOp
+   :   L_ARROW L_ARROW
+   |   R_ARROW R_ARROW
+   |   R_ARROW R_ARROW R_ARROW
+   ;
+
 /*
  * expression
  */
@@ -368,12 +375,20 @@ expression
    |   expression op=(ASTERISK | SLASH) expression
    |   expression op=PERCENT expression
    |   expression op=(PLUS | MINUS) expression
+   |   expression op=(COMPOUND_ADD | COMPOUND_SUB | COMPOUND_MULT | COMPOUND_DIV | COMPOUND_MOD) expression
    |   op=MINUS expression
    |   op=EXCLAMATION expression
+   |   op=BIT_COMPLEMENT expression
    |   expression op=(EQ | NOT_EQ | LESS_EQ | L_ARROW | GREAT_EQ | R_ARROW) expression
-   |   expression op=(AND | OR | XOR) expression
+   |   expression op=(BIT_AND | BIT_OR | XOR) expression
+   |   expression op=(LOGIC_AND | LOGIC_OR) expression
+   |   expression op=(COMPOUND_AND | COMPOUND_OR | COMPOUND_XOR) expression
+   |   expression bitShiftOp expression
+   |   expression op=(COMPOUND_SHIFT_R | COMPOUND_SHIFT_L) expression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
+   |   (INCREMENT | DECREMENT) qualifiedAccess
+   |   qualifiedAccess (INCREMENT | DECREMENT)
    |   qualifiedAccess
    ;
 

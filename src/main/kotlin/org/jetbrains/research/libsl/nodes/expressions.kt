@@ -14,9 +14,11 @@ data class BinaryOpExpression(
 }
 
 enum class ArithmeticBinaryOps(val string: String) {
-    ADD("+"), SUB("-"), MUL("*"), DIV("/"), AND("&"),
-    OR("|"), XOR("^"), MOD("%"), ASSIGN_OP("="), EQ("=="), NOT_EQ("!="), GT(">"),
-    GT_EQ(">="), LT("<"), LT_EQ("<=");
+    ADD("+"), COMP_ADD("+="), SUB("-"), COMP_SUB("-="), MUL("*"), COMP_MUL("*="),
+    DIV("/"), COMP_DIV("/="), AND("&"), COMP_AND("&="), BIT_OR("|"), COMP_OR("|="),
+    LOG_OR("||"), XOR("^"), COMP_XOR("^="), MOD("%"), COMP_MOD("%="), ASSIGN_OP("="),
+    EQ("=="), NOT_EQ("!="), GT(">"), GT_EQ(">="), LT("<"), LT_EQ("<="), R_SHIFT(">>"),
+    COMP_R_SHIFT(">>="), UNSIGNED_R_SHIFT(">>>"), COMP_UN_R_SHIFT(">>>="), L_SHIFT("<<"), COMP_L_SHIFT("<<=");
     companion object {
         fun fromString(str: String) = ArithmeticBinaryOps.values().first { op -> op.string == str }
     }

@@ -49,3 +49,12 @@ data class Action(
         append(");")
     }
 }
+
+data class ExpressionStatement(
+    val expressions: MutableList<Expression> = mutableListOf()
+) : Statement() {
+    override fun dumpToString(): String = buildString {
+        expressions.forEach { e -> e.dumpToString() }
+    }
+
+}
