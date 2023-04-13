@@ -135,7 +135,7 @@ data class Destructor(
     }
 }
 
-data class Proc (
+data class ProcDecl (
     val name: String,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,

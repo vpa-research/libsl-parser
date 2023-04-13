@@ -53,6 +53,18 @@ class BlockStatementVisitor(
         statements.add(action)
     }
 
+    override fun visitProc(ctx: LibSLParser.ProcContext) {
+        val name = ctx.Identifier().text.extractIdentifier()
+        val expressionVisitor = ExpressionVisitor(functionContext)
+        val args = ctx.expressionsList().expression().map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.toMutableList()
+
+        val proc = Proc(name, args)
+
+        statements.add(proc)
+    }
+
 
     // TODO(Expressions can not be printed out)
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {

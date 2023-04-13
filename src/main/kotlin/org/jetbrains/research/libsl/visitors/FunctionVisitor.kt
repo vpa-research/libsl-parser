@@ -26,7 +26,7 @@ class FunctionVisitor(
     private lateinit var buildingFunction: Function
     private lateinit var buildingConstructor: Constructor
     private lateinit var buildingDestructor: Destructor
-    private lateinit var buildingProc: Proc
+    private lateinit var buildingProcDecl: ProcDecl
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
@@ -131,7 +131,7 @@ class FunctionVisitor(
             context.storeVariable(resultVariable)
         }
 
-        buildingProc = Proc(
+        buildingProcDecl = ProcDecl(
             procName,
             args,
             returnType,
@@ -141,7 +141,7 @@ class FunctionVisitor(
         )
 
         super.visitProcDecl(ctx)
-        parentAutomaton?.procList?.add(buildingProc)
+        parentAutomaton?.procDeclList?.add(buildingProcDecl)
     }
 
 
@@ -151,7 +151,7 @@ class FunctionVisitor(
             funInitialized() -> buildingFunction.statements
             constructorInitialized() -> buildingConstructor.statements
             destructorInitialized() -> buildingDestructor.statements
-            procInitialized() -> buildingProc.statements
+            procInitialized() -> buildingProcDecl.statements
             else -> return
         }
 
@@ -159,7 +159,7 @@ class FunctionVisitor(
             funInitialized() -> buildingFunction.localVariables
             constructorInitialized() -> buildingConstructor.localVariables
             destructorInitialized() -> buildingDestructor.localVariables
-            procInitialized() -> buildingProc.localVariables
+            procInitialized() -> buildingProcDecl.localVariables
             else -> return
         }
 
@@ -294,7 +294,7 @@ class FunctionVisitor(
         if (funInitialized()) buildingFunction.contracts.add(contract)
         if (constructorInitialized()) buildingConstructor.contracts.add(contract)
         if (destructorInitialized()) buildingDestructor.contracts.add(contract)
-        if (procInitialized()) buildingProc.contracts.add(contract)
+        if (procInitialized()) buildingProcDecl.contracts.add(contract)
     }
 
 //    override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext) {
@@ -361,6 +361,6 @@ class FunctionVisitor(
     }
 
     private fun procInitialized(): Boolean {
-        return this::buildingProc.isInitialized
+        return this::buildingProcDecl.isInitialized
     }
 }

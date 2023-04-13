@@ -112,6 +112,7 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
     statements.forEach { statement ->
         when (statement) {
             is Action -> {}
+            is Proc -> {}
             is Assignment -> {
                 function.context.typeInferrer.getExpressionType(statement.left)
                 function.context.typeInferrer.getExpressionType(statement.value)

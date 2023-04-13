@@ -31,6 +31,7 @@ class TypeInferrer(private val context: LslContextBase) {
 
             // TODO("Action type")
             is ActionExpression -> nothingType
+            is ProcExpression -> nothingType
         }
     }
 

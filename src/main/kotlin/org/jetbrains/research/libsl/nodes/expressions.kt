@@ -88,5 +88,15 @@ data class ActionExpression(
         append(args.joinToString(separator = ", "))
         append(")")
     }
+}
 
+data class ProcExpression(
+    val proc: Proc
+) : Expression() {
+    override fun dumpToString(): String = buildString {
+        append("${BackticksPolitics.forIdentifier(proc.name)}(")
+        val args = proc.arguments.map { it.dumpToString() }.toMutableList()
+        append(args.joinToString(separator = ", "))
+        append(")")
+    }
 }

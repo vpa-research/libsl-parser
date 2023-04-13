@@ -232,6 +232,7 @@ assignmentRight
    :   expression
    |   NEW callAutomatonConstructorWithNamedArgs
    |   action
+   |   proc
    ;
 
 callAutomatonConstructorWithNamedArgs
@@ -318,6 +319,7 @@ functionBodyStatements
    :   variableAssignment
    |   variableDecl
    |   action
+   |   proc
    |   ifStatement
    |   expression SEMICOLON
    ;
@@ -335,6 +337,10 @@ elseStatement
  */
 action
    :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON?
+   ;
+
+proc
+   :  Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON?
    ;
 
 expressionsList
