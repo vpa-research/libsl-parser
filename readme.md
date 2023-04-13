@@ -36,7 +36,8 @@ val libSL = LibSL("some/path/to/working/dir")
 val library = libSL.loadFromFile("path/to/lsl/file")
 ```
 
-The constructor of LibSL() sets the path to the working dir. This dir can contain .lsl files to be imported
+The parameters of LibSL(...) constructor are the path to the working dir and the context which, if not specified,
+is set by default. Working dir can contain .lsl files to be imported
 via `import` keyword of LibSL. If this feature isn't needed, an empty string should be passed.
 
 After execution of this code, variable `library` will contain the LSL Tree nodes representing the description structure. 
