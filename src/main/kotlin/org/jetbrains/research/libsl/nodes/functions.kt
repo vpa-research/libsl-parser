@@ -13,6 +13,7 @@ data class Function(
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
     val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    var localVariables: MutableList<Variable> = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
@@ -59,6 +60,7 @@ data class Constructor(
     val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
+    var localVariables: MutableList<Variable> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
     val context: FunctionContext
 ) : Node() {
@@ -99,6 +101,7 @@ data class Destructor(
     val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
+    var localVariables: MutableList<Variable> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
     val context: FunctionContext
 ) : Node() {
@@ -139,6 +142,7 @@ data class Proc (
     val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
+    var localVariables: MutableList<Variable> = mutableListOf(),
     val hasBody: Boolean = statements.isNotEmpty(),
     val context: FunctionContext
 ) : Node() {
@@ -164,6 +168,12 @@ data class Proc (
             appendLine(" {")
             if (contracts.isNotEmpty()) {
                 append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
+            }
+
+            //TODO(Local variables not printing out)
+            if (localVariables.isNotEmpty()) {
+                append(localVariables[0].dumpToString())
+                append(withIndent(formatListEmptyLineAtEndIfNeeded(localVariables)))
             }
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")

@@ -111,6 +111,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testNewVariablesLsl() {
+        runLslTest("newVariables")
+    }
+
+    @Test
     fun testOperatorsLsl() {
         runLslTest("operators")
     }

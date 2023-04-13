@@ -155,7 +155,7 @@ automatonDecl
    ;
 
 constructorVariables
-   :   variableAnnotations*? VAR nameWithType (COMMA)?
+   :   variableAnnotations*? keyword=(VAR|VAL) nameWithType (COMMA)?
    ;
 
 /* automaton annotation
@@ -204,9 +204,9 @@ functionsListPart
  */
 variableDecl
    :   variableAnnotations*?
-   VAR nameWithType SEMICOLON
+   keyword=(VAR|VAL) nameWithType SEMICOLON
    |   variableAnnotations*?
-   VAR nameWithType ASSIGN_OP assignmentRight SEMICOLON
+   keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 variableAnnotations
@@ -316,6 +316,7 @@ functionBody
 
 functionBodyStatements
    :   variableAssignment
+   |   variableDecl
    |   action
    |   ifStatement
    |   expression SEMICOLON

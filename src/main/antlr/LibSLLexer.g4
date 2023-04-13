@@ -154,6 +154,10 @@ VAR
    :   'var'
    ;
 
+VAL
+   :   'val'
+   ;
+
 INITSTATE
    :   'initstate'
    ;

@@ -56,13 +56,14 @@ class TopLevelDeclarationsResolver(
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
+        val keyword = VariableKeyword.fromString(ctx.keyword.text)
         val variableName = ctx.nameWithType().name.text.extractIdentifier()
         val typeRef = processTypeIdentifier(ctx.nameWithType().type)
 
         val expressionVisitor = ExpressionVisitor(context)
         val initialValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
 
-        val variable = VariableWithInitialValue(variableName, typeRef, getVariableAnnotationList(ctx.variableAnnotations()), initialValue)
+        val variable = VariableWithInitialValue(keyword, variableName, typeRef, getVariableAnnotationList(ctx.variableAnnotations()), initialValue)
         globalContext.storeVariable(variable)
     }
 

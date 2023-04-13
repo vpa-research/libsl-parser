@@ -144,6 +144,8 @@ class FunctionVisitor(
         parentAutomaton?.procList?.add(buildingProc)
     }
 
+
+
     override fun visitFunctionBodyStatements(ctx: LibSLParser.FunctionBodyStatementsContext) {
         val statements = when {
             funInitialized() -> buildingFunction.statements
@@ -152,7 +154,16 @@ class FunctionVisitor(
             procInitialized() -> buildingProc.statements
             else -> return
         }
-        BlockStatementVisitor(functionContext, statements).visit(ctx)
+
+        val localVariables = when {
+            funInitialized() -> buildingFunction.localVariables
+            constructorInitialized() -> buildingConstructor.localVariables
+            destructorInitialized() -> buildingDestructor.localVariables
+            procInitialized() -> buildingProc.localVariables
+            else -> return
+        }
+
+        BlockStatementVisitor(functionContext, statements, localVariables).visit(ctx)
     }
 
     private val FunctionDeclContext.args: List<FunctionArgument>

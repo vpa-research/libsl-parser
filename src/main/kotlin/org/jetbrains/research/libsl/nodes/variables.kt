@@ -14,7 +14,16 @@ enum class ArithmeticUnaryOp(val string: String) {
     }
 }
 
+enum class VariableKeyword(val string: String) {
+    VAR("var"), VAL("val"), RESULT(""), ARGUMENT("");
+
+    companion object {
+        fun fromString(str: String) = VariableKeyword.values().first { op -> op.string == str }
+    }
+}
+
 open class Variable(
+    open val keyword: VariableKeyword,
     open var name: String,
     open var typeReference: TypeReference
 ) : Expression() {
@@ -41,7 +50,7 @@ open class Variable(
 
 data class ResultVariable(
     override var typeReference: TypeReference
-) : Variable(name = "result", typeReference)
+) : Variable(keyword = VariableKeyword.RESULT, name = "result", typeReference)
 
 @Suppress("unused")
 class FunctionArgument(
@@ -50,7 +59,7 @@ class FunctionArgument(
     val index: Int,
     var annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
     var targetAutomaton: AutomatonReference? = null
-) : Variable(name, typeReference) {
+) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
     lateinit var function: Function
 
     override val fullName: String
@@ -95,7 +104,7 @@ class ActionParameter(
     val index: Int,
     var annotation: Annotation? = null,
 
-) : Variable(name, typeReference) {
+) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
 
     override fun dumpToString(): String = buildString {
         if (annotation != null) {
@@ -123,7 +132,7 @@ class DeclaredActionParameter(
     name: String,
     typeReference: TypeReference,
     private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
-) : Variable(name, typeReference) {
+) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
 
     override fun dumpToString(): String = buildString {
         annotationsReferences?.joinToString() { annotation ->
@@ -151,10 +160,11 @@ class DeclaredActionParameter(
 }
 
 class ConstructorArgument(
+    keyword: VariableKeyword,
     name: String,
     typeReference: TypeReference,
     private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
-) : Variable(name, typeReference) {
+) : Variable(keyword, name, typeReference) {
     lateinit var automaton: Automaton
 
     override val fullName: String
@@ -176,17 +186,18 @@ class ConstructorArgument(
             append(IPrinter.SPACE)
         }
 
-        append("var ${BackticksPolitics.forIdentifier(name)}: ")
+        append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
     }
 }
 
 class VariableWithInitialValue(
+    keyword: VariableKeyword,
     name: String,
     typeReference: TypeReference,
     private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
     val initialValue: Expression?,
-) : Variable(name, typeReference) {
+) : Variable(keyword, name, typeReference) {
     override fun dumpToString(): String = buildString {
         annotationsReferences?.joinToString() { annotation ->
             val resolvedAnnotation = annotation.resolveOrError()
@@ -204,7 +215,7 @@ class VariableWithInitialValue(
             appendLine()
         }
 
-        append("var ${BackticksPolitics.forIdentifier(name)}: ")
+        append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
         if (initialValue != null) {
             append(" = ${initialValue.dumpToString()};")
