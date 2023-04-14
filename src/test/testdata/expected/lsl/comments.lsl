@@ -15,7 +15,7 @@ types {
 automaton A : Int {
     state S1;
     state S2;
-    shift S1 -> S2(func);
+    shift S1 -> S2 by [func];
     var strVar: String;
     var intVar: Int = 1;
     var b: Int = new B(state = S1);

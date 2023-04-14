@@ -180,5 +180,9 @@ class GeneratedTests {
         runLslTest("voidAndAny")
     }
 
-}
+    @Test
+    fun testShiftSquareBrackets() {
+        runLslTest("shiftSquareBrackets")
+    }
 
+}

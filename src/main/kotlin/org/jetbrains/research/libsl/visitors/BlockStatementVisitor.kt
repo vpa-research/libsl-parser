@@ -70,7 +70,7 @@ class BlockStatementVisitor(
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
         ctx.expression().forEach { expr ->
-            println(expressionVisitor.visitExpression(expr))
+
         }
     }
 

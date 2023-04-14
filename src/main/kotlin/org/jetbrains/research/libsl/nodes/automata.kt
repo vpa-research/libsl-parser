@@ -88,10 +88,20 @@ data class Shift(
         append(BackticksPolitics.forIdentifier(from.name))
         append(" -> ")
         append(BackticksPolitics.forTypeIdentifier(to.name))
+        append(" by ")
 
         if (functions.isNotEmpty()) {
             append(
-                functions.joinToString(separator = ", ", prefix = "(", postfix = ")") { function -> function.name }
+                functions.joinToString(separator = ", ", prefix = "[", postfix = "]") { function ->
+                    val functionName = function.name
+                    if (function.argTypes.isNotEmpty()) {
+                        val argTypeNames =
+                            function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.name }
+                        "$functionName$argTypeNames"
+                    } else {
+                        functionName
+                    }
+                }
             )
         }
 

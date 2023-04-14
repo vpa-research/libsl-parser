@@ -19,7 +19,7 @@ automaton A : Int {
     state S1;
     state S2;
 
-    shift S1->S2(func);
+    shift S1-> S2 by func();
 
     var strVar: String;
     var intVar: Int = 1;
@@ -32,8 +32,8 @@ automaton B : Int {
     state S1, S3, S7;
     state S2;
 
-    shift S1->S2(func(SimpleTypeWithGeneric));
-    shift S2->S1(func(SimpleType));
+    shift S1->S2 by func(SimpleTypeWithGeneric);
+    shift S2->S1 by func(SimpleType);
 
     var v: Int;
 
