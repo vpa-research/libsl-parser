@@ -169,12 +169,6 @@ data class ProcDecl (
             if (contracts.isNotEmpty()) {
                 append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
             }
-
-            //TODO(Local variables not printing out)
-            if (localVariables.isNotEmpty()) {
-                append(localVariables[0].dumpToString())
-                append(withIndent(formatListEmptyLineAtEndIfNeeded(localVariables)))
-            }
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
         }

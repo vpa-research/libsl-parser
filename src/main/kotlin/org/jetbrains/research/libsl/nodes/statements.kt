@@ -69,3 +69,11 @@ data class ExpressionStatement(
         expressions.forEach { e -> e.dumpToString() }
     }
 }
+
+data class VariableStatement(
+    val variable: VariableWithInitialValue
+) : Statement() {
+    override fun dumpToString(): String = buildString {
+        append(variable.dumpToString())
+    }
+}

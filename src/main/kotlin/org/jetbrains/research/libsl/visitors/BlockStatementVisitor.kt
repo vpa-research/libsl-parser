@@ -92,7 +92,9 @@ class BlockStatementVisitor(
         }
 
         val variable = VariableWithInitialValue(keyword, name, typeReference, getVariableAnnotationList(ctx.variableAnnotations()),  initValue)
+        val variableStatement = VariableStatement(variable)
         localVariables.add(variable)
+        statements.add(variableStatement)
         context.storeVariable(variable)
     }
 
