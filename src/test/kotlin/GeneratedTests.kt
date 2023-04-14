@@ -46,6 +46,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testCommentsLsl() {
+        runLslTest("comments")
+    }
+
+    @Test
     fun testConstructorsAndDestructorsLsl() {
         runLslTest("constructorsAndDestructors")
     }
