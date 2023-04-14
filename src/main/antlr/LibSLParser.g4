@@ -318,8 +318,8 @@ functionBody
 functionBodyStatements
    :   variableAssignment
    |   variableDecl
-   |   action
-   |   proc
+   |   action SEMICOLON
+   |   proc SEMICOLON
    |   ifStatement
    |   expression SEMICOLON
    ;
@@ -336,15 +336,15 @@ elseStatement
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
+   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET
    ;
 
 proc
-   :  Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
+   :  Identifier L_BRACKET expressionsList R_BRACKET
    ;
 
 expressionsList
-   :   expression (COMMA expression)* COMMA?
+   :   (expression (COMMA expression)* (COMMA)?)?
    ;
 
 /* requires contract
@@ -427,7 +427,7 @@ identifierList
    ;
 
 arrayLiteral
-   :   L_SQUARE_BRACKET expressionsList? R_SQUARE_BRACKET
+   :   L_SQUARE_BRACKET expressionsList R_SQUARE_BRACKET
    ;
 
 periodSeparatedFullName

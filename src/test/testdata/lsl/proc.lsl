@@ -12,11 +12,10 @@ automaton A : Int {
     }
 
     proc _noReturn() {
-        x = y;
     }
 
     fun useProc(): Int {
-        _noReturn(x, y);
+        _noReturn();
         result = _sum(x, y);
     }
 
