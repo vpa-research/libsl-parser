@@ -336,11 +336,11 @@ elseStatement
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON?
+   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
    ;
 
 proc
-   :  Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON?
+   :  Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
    ;
 
 expressionsList
