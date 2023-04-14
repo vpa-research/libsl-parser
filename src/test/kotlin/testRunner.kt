@@ -130,6 +130,16 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
             is ExpressionStatement -> {
                 statement.expressions.forEach {  function.context.typeInferrer.getExpressionType(it) }
             }
+            is AssignmentWithCompoundOp -> {
+                function.context.typeInferrer.getExpressionType(statement.left)
+                function.context.typeInferrer.getExpressionType(statement.value)
+            }
+            is AssignmentWithLeftUnaryOp -> {
+                function.context.typeInferrer.getExpressionType(statement.value)
+            }
+            is AssignmentWithRightUnaryOp -> {
+                function.context.typeInferrer.getExpressionType(statement.value)
+            }
         }
     }
 }

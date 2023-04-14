@@ -10,6 +10,28 @@ data class Assignment(
     override fun dumpToString(): String = "${left.dumpToString()} = ${value.dumpToString()};"
 }
 
+data class AssignmentWithCompoundOp(
+    val left: QualifiedAccess,
+    val op: CompoundOps,
+    val value: Expression
+) : Statement() {
+    override fun dumpToString(): String = "${left.dumpToString()} ${op.string} ${value.dumpToString()};"
+}
+
+data class AssignmentWithLeftUnaryOp(
+    val op: ArithmeticUnaryOp,
+    val value: Expression
+) : Statement() {
+    override fun dumpToString(): String = "${op.string}${value.dumpToString()};"
+}
+
+data class AssignmentWithRightUnaryOp(
+    val op: ArithmeticUnaryOp,
+    val value: Expression
+) : Statement() {
+    override fun dumpToString(): String = "${value.dumpToString()}${op.string};"
+}
+
 data class IfStatement(
     val value: Expression,
     val ifStatements: MutableList<Statement> = mutableListOf(),

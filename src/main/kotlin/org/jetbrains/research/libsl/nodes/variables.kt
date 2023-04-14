@@ -7,7 +7,7 @@ import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 enum class ArithmeticUnaryOp(val string: String) {
-    MINUS("-"), INVERSION("!");
+    PLUS("+"), MINUS("-"), INVERSION("!"), INCREMENT("++"), DECREMENT("--");
 
     companion object {
         fun fromString(str: String) = ArithmeticUnaryOp.values().first { op -> op.string == str }

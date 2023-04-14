@@ -12,12 +12,37 @@ class BlockStatementVisitor(
 ) : LibSLParserVisitor<Unit>(functionContext) {
 
     override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext) {
-        val expressionVisitor = ExpressionVisitor(functionContext)
-        val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-        val value = expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
-        val assignment = Assignment(left, value)
-
-        statements.add(assignment)
+        when {
+            ctx.assignmentRight() != null -> let{
+                val expressionVisitor = ExpressionVisitor(functionContext)
+                val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
+                val value = expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
+                val assignment = Assignment(left, value)
+                statements.add(assignment)
+            }
+            ctx.expression() != null -> let{
+                val expressionVisitor = ExpressionVisitor(functionContext)
+                val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
+                val op = CompoundOps.fromString(ctx.compoundAssignOp.text)
+                val value = expressionVisitor.visitExpression(ctx.expression())
+                val assignmentWithCompoundOp = AssignmentWithCompoundOp(left, op, value)
+                statements.add(assignmentWithCompoundOp)
+            }
+            ctx.leftUnaryOp != null -> let{
+                val expressionVisitor = ExpressionVisitor(functionContext)
+                val op = ArithmeticUnaryOp.fromString(ctx.leftUnaryOp.text)
+                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
+                val assignmentWithLeftUnaryOp = AssignmentWithLeftUnaryOp(op, value)
+                statements.add(assignmentWithLeftUnaryOp)
+            }
+            ctx.rightUnaryOp != null -> let{
+                val expressionVisitor = ExpressionVisitor(functionContext)
+                val op = ArithmeticUnaryOp.fromString(ctx.rightUnaryOp.text)
+                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
+                val assignmentWithRightUnaryOp = AssignmentWithRightUnaryOp(op, value)
+                statements.add(assignmentWithRightUnaryOp)
+            }
+        }
     }
 
     override fun visitIfStatement(ifCtx: LibSLParser.IfStatementContext) {
@@ -63,15 +88,6 @@ class BlockStatementVisitor(
         val proc = Proc(name, args)
 
         statements.add(proc)
-    }
-
-
-    // TODO(Expressions can not be printed out)
-    override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
-        val expressionVisitor = ExpressionVisitor(functionContext)
-        ctx.expression().forEach { expr ->
-
-        }
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {

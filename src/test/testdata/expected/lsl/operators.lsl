@@ -5,5 +5,23 @@ types {
 }
 automaton A : Int {
     fun f(x: Int, y: Int) {
+        val res: Int;
+        ++x;
+        x++;
+        --x;
+        x--;
+        x = (x && y);
+        x = (x || y);
+        y = !x;
+        x += y;
+        x -= y;
+        x *= y;
+        x /= y;
+        x %= y;
+        x &= y;
+        x |= y;
+        x ^= y;
+        x >>= y;
+        x <<= y;
     }
 }
