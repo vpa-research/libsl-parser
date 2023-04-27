@@ -5,6 +5,19 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Expression: Node()
+
+data class ThisExpression(
+    val thisKeywordUsed: Boolean,
+    val parentKeywordUsed: Boolean
+) : Expression() {
+    override fun dumpToString(): String = buildString {
+        append("this")
+        if(parentKeywordUsed) {
+            append(".parent;")
+        }
+    }
+}
+
 data class BinaryOpExpression(
     val left: Expression,
     val right: Expression,

@@ -50,15 +50,21 @@ data class VariableAccess(
     }
 }
 
-data class ParentAccess(
+/* data class ParentAccess(
+    val thisExpressionIsSet: Boolean?,
     val parent: String = "parent",
     override var childAccess: QualifiedAccess?
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = buildString {
-        append("PARENT USAGE")
+        if(thisExpressionIsSet == true) {
+            append("this.")
+        }
+        append("parent")
+        append(childAccess?.dumpToString())
     }
 }
+
 
 data class ProcAccess(
     val proc: Proc,
@@ -79,6 +85,8 @@ data class ActionAccess(
         append("ACTION USAGE")
     }
 }
+
+ */
 
 data class ArrayAccess(
     var index: Atomic,

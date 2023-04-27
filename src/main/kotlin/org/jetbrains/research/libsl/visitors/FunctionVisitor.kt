@@ -297,57 +297,6 @@ class FunctionVisitor(
         if (procInitialized()) buildingProcDecl.contracts.add(contract)
     }
 
-//    override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext) {
-//        val expressionVisitor = ExpressionVisitor(functionContext)
-//        val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-//        val value = expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
-//        val assignment = Assignment(left, value)
-//
-////        if (funInitialized()) buildingFunction.statements.add(assignment)
-////        if (constructorInitialized()) buildingConstructor.statements.add(assignment)
-////        if (destructorInitialized()) buildingDestructor.statements.add(assignment)
-////        if (procInitialized()) buildingProc.statements.add(assignment)
-//    }
-
-//    override fun visitIfStatement(ifCtx: LibSLParser.IfStatementContext) {
-//        val expressionVisitor = ExpressionVisitor(functionContext)
-//        val value = expressionVisitor.visitExpression(ifCtx.expression())
-//        val ifStatements = mutableListOf<Statement>()
-//        val elseStatementsList = mutableListOf<Statement>()
-//        val elseStatement = ElseStatement(elseStatementsList)
-//        ifCtx.functionBodyStatements().map {
-//            it.accept(this)
-//        }
-////        ifCtx.functionBodyStatements().forEach { s -> ifStatements.add(Statement(s)) }
-////
-////        val ifElseStatement = IfElseStatement(value, ifStatements)
-////        ifCtx.functionBodyStatements().forEach { s -> }
-//
-//        val ifBlock = IfStatement(value, ifStatements, elseStatement)
-//
-//        BlockStatementVisitor(functionContext, ifStatements).visitIfStatement(ifCtx)
-//
-////        if (funInitialized()) buildingFunction.statements.add(ifBlock)
-////        if (constructorInitialized()) buildingConstructor.statements.add(ifBlock)
-////        if (destructorInitialized()) buildingDestructor.statements.add(ifBlock)
-////        if (procInitialized()) buildingProc.statements.add(ifBlock)
-//    }
-
-//    override fun visitAction(ctx: LibSLParser.ActionContext) {
-//        val name = ctx.Identifier().text.extractIdentifier()
-//        val expressionVisitor = ExpressionVisitor(functionContext)
-//        val args = ctx.expressionsList().expression().map { expr ->
-//            expressionVisitor.visitExpression(expr)
-//        }.toMutableList()
-//
-//        val action = Action(name, args)
-//
-////        if (funInitialized()) buildingFunction.statements.add(action)
-////        if (constructorInitialized()) buildingConstructor.statements.add(action)
-////        if (destructorInitialized()) buildingDestructor.statements.add(action)
-////        if (procInitialized()) buildingProc.statements.add(action)
-//    }
-
     private fun funInitialized(): Boolean {
         return this::buildingFunction.isInitialized
     }

@@ -5,7 +5,6 @@ types {
 }
 automaton A : Int {
     fun f(x: Int, y: Int) {
-        val res: Int;
         ++x;
         x++;
         --x;

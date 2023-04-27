@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
 import org.jetbrains.research.libsl.LibSLParser.ProcContext
 import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
 import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
+import org.jetbrains.research.libsl.LibSLParser.ThisExpressionContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
@@ -48,8 +49,20 @@ class ExpressionVisitor(
                 visitQualifiedAccess(ctx.qualifiedAccess())
             }
 
+            ctx.thisExpression() != null -> {
+                processThisExpression(ctx.thisExpression())
+            }
+
             else -> error("unknown expression type")
         }
+    }
+
+    // TODO() refactor
+    private fun processThisExpression(ctx: ThisExpressionContext): ThisExpression {
+        val thisKeywordUsed = ctx.THIS() != null
+        val parentKeywordUsed = ctx.PARENT() != null
+
+        return ThisExpression(thisKeywordUsed, parentKeywordUsed)
     }
 
     private fun processBinaryExpression(ctx: ExpressionContext): BinaryOpExpression {
@@ -160,14 +173,12 @@ class ExpressionVisitor(
                 }
             }
 
-            // TODO()
-
             ctx.THIS() != null -> {
-                if(ctx.PARENT() == null) {
+                //if(ctx.PARENT() == null) {
                     visitQualifiedAccess(ctx.qualifiedAccess(0))
-                } else {
-                    ParentAccess("parent", null)
-                }
+                //} else {
+                //    ParentAccess(true, "parent", null)
+               // }
             }
 
             else -> error("unknown qualified access kind")

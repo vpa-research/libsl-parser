@@ -326,8 +326,8 @@ functionBody
 functionBodyStatements
    :   variableAssignment
    |   variableDecl
-   |   action SEMICOLON
-   |   proc SEMICOLON
+   |   (THIS DOT)? (PARENT DOT)? action SEMICOLON
+   |   (THIS DOT)? (PARENT DOT)? proc SEMICOLON
    |   ifStatement
    |   expression SEMICOLON
    ;
@@ -397,9 +397,15 @@ expression
    |   expression op=(BIT_AND | BIT_OR | XOR) expression
    |   expression op=(LOGIC_AND | LOGIC_OR) expression
    |   expression bitShiftOp expression
+   |   thisExpression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
+   ;
+
+thisExpression
+   :   THIS
+   |   THIS DOT PARENT
    ;
 
 expressionAtomic
@@ -419,10 +425,7 @@ qualifiedAccess
    :   periodSeparatedFullName
    |   qualifiedAccess L_SQUARE_BRACKET expressionAtomic R_SQUARE_BRACKET (DOT qualifiedAccess)?
    |   simpleCall DOT qualifiedAccess
-   |   THIS DOT PARENT
    |   THIS DOT (PARENT DOT)? qualifiedAccess
-   |   proc
-   |   action
    ;
 
 simpleCall
