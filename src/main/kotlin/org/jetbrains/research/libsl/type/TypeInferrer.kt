@@ -52,6 +52,9 @@ class TypeInferrer(private val context: LslContextBase) {
             is ArrayAccess -> TODO()
             is AutomatonOfFunctionArgumentInvoke -> access.automatonReference.resolveOrError().typeReference.resolveOrError()
             is VariableAccess -> access.variable.resolveOrError().typeReference.resolveOrError()
+            is ActionAccess -> TODO()
+            is ParentAccess -> TODO()
+            is ProcAccess -> TODO()
         }
     }
 

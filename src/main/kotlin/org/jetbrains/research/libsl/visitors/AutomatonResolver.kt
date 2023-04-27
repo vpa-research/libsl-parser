@@ -24,11 +24,13 @@ class AutomatonResolver(
         val name = ctx.name.asPeriodSeparatedString()
         val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
+        val parent = null
         val annotationReferences = getAutomatonAnnotationList(ctx.automatonAnnotations())
 
         buildingAutomaton = Automaton(
             name,
             typeReference,
+            parent,
             annotationReferences,
             context = automatonContext
         )
@@ -65,6 +67,7 @@ class AutomatonResolver(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val argument = ConstructorArgument(keyword, name, typeReference, getVariableAnnotationList(ctx.variableAnnotations()))
+        context.storeVariable(argument)
         buildingAutomaton.constructorVariables.add(argument)
     }
 

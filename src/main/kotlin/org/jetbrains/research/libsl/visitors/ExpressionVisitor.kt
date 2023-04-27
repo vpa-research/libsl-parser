@@ -160,6 +160,16 @@ class ExpressionVisitor(
                 }
             }
 
+            // TODO()
+
+            ctx.THIS() != null -> {
+                if(ctx.PARENT() == null) {
+                    visitQualifiedAccess(ctx.qualifiedAccess(0))
+                } else {
+                    ParentAccess("parent", null)
+                }
+            }
+
             else -> error("unknown qualified access kind")
         }
     }
@@ -228,7 +238,7 @@ class ExpressionVisitor(
                 else -> error("unknown kind")
             }
 
-            if (name == "state") {
+            if (name == "state" || name == "parent") {
                 return@mapNotNull null
             }
 
@@ -241,7 +251,13 @@ class ExpressionVisitor(
 
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
 
-        return CallAutomatonConstructor(automatonRef, args, stateRef)
+        //TODO() Parent
+        val parentName =
+            ctx.namedArgs().argPair().firstOrNull { pair -> pair.name.text == "parent" }?.expressionAtomic()?.text
+
+        val parentRef = parentName?.let { AutomatonReferenceBuilder.build(it, context) }
+
+        return CallAutomatonConstructor(automatonRef, args, stateRef, parentRef)
     }
 
     override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Expression {

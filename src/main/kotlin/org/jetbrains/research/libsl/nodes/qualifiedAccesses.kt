@@ -50,6 +50,36 @@ data class VariableAccess(
     }
 }
 
+data class ParentAccess(
+    val parent: String = "parent",
+    override var childAccess: QualifiedAccess?
+) : QualifiedAccess() {
+    override fun toString(): String = dumpToString()
+    override fun dumpToString(): String = buildString {
+        append("PARENT USAGE")
+    }
+}
+
+data class ProcAccess(
+    val proc: Proc,
+    override var childAccess: QualifiedAccess?,
+) : QualifiedAccess() {
+    override fun toString(): String = dumpToString()
+    override fun dumpToString(): String = buildString {
+        append("PROC USAGE")
+    }
+}
+
+data class ActionAccess(
+    val action: Action,
+    override var childAccess: QualifiedAccess?,
+) : QualifiedAccess() {
+    override fun toString(): String = dumpToString()
+    override fun dumpToString(): String = buildString {
+        append("ACTION USAGE")
+    }
+}
+
 data class ArrayAccess(
     var index: Atomic,
 ) : QualifiedAccess() {

@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.nodes.references.AnnotationReference
+import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -10,6 +11,7 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
+    val parent: AutomatonReference?,
     val annotations: MutableList<AnnotationReference>? = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),

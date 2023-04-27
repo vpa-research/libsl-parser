@@ -252,6 +252,7 @@ namedArgs
 
 argPair
    :   name=STATE ASSIGN_OP expressionAtomic
+   |   name=PARENT ASSIGN_OP expressionAtomic
    |   name=Identifier ASSIGN_OP expression
    ;
 
@@ -418,6 +419,10 @@ qualifiedAccess
    :   periodSeparatedFullName
    |   qualifiedAccess L_SQUARE_BRACKET expressionAtomic R_SQUARE_BRACKET (DOT qualifiedAccess)?
    |   simpleCall DOT qualifiedAccess
+   |   THIS DOT PARENT
+   |   THIS DOT (PARENT DOT)? qualifiedAccess
+   |   proc
+   |   action
    ;
 
 simpleCall

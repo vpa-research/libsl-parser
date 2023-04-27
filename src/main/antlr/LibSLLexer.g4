@@ -158,6 +158,14 @@ VAL
    :   'val'
    ;
 
+PARENT
+   :   'parent'
+   ;
+
+THIS
+   :   'this'
+   ;
+
 INITSTATE
    :   'initstate'
    ;
