@@ -252,7 +252,7 @@ namedArgs
 
 argPair
    :   name=STATE ASSIGN_OP expressionAtomic
-   |   name=PARENT ASSIGN_OP expressionAtomic
+   |   name=PARENT ASSIGN_OP expression
    |   name=Identifier ASSIGN_OP expression
    ;
 

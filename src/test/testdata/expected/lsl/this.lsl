@@ -3,7 +3,7 @@ library simple;
 types {
     Int(int32);
 }
-automaton A : Int {
+automaton A (val v: Int) : Int {
     proc smth(): Int {
         result = (1 + 1);
     }
@@ -11,7 +11,8 @@ automaton A : Int {
 automaton B (val x: Int) : Int {
     fun foo(arg: Int): Int {
         assigns this.parent;
-        result = (this.x + arg);
+        val y: Int = this.parent.v;
+        result = (this.x + y);
     }
     fun anotherFoo() {
         this.parent.smth();
