@@ -84,8 +84,10 @@ class BlockStatementVisitor(
         val args = ctx.expressionsList().expression().map { expr ->
             expressionVisitor.visitExpression(expr)
         }.toMutableList()
+        val hasThisExpression = ctx.THIS() != null
+        val hasParentExpression = ctx.PARENT() != null
 
-        val proc = Proc(name, args)
+        val proc = Proc(name, args, hasThisExpression, hasParentExpression)
 
         statements.add(proc)
     }

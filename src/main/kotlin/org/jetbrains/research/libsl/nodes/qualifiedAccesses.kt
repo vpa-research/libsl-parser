@@ -50,43 +50,43 @@ data class VariableAccess(
     }
 }
 
-/* data class ParentAccess(
-    val thisExpressionIsSet: Boolean?,
-    val parent: String = "parent",
+data class ThisAndParentAccess(
+    val hasThisExpression: Boolean,
+    val hasParentExpression: Boolean,
     override var childAccess: QualifiedAccess?
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = buildString {
-        if(thisExpressionIsSet == true) {
+        if(hasThisExpression) {
             append("this.")
         }
-        append("parent")
+        if(hasParentExpression) {
+            append("parent.")
+        }
         append(childAccess?.dumpToString())
     }
-}
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-data class ProcAccess(
-    val proc: Proc,
-    override var childAccess: QualifiedAccess?,
-) : QualifiedAccess() {
-    override fun toString(): String = dumpToString()
-    override fun dumpToString(): String = buildString {
-        append("PROC USAGE")
+        other as ThisAndParentAccess
+
+        if (hasThisExpression != other.hasThisExpression) return false
+        if (hasParentExpression != other.hasParentExpression) return false
+        if (childAccess != other.childAccess) return false
+
+        return true
     }
-}
 
-data class ActionAccess(
-    val action: Action,
-    override var childAccess: QualifiedAccess?,
-) : QualifiedAccess() {
-    override fun toString(): String = dumpToString()
-    override fun dumpToString(): String = buildString {
-        append("ACTION USAGE")
+    override fun hashCode(): Int {
+        var result = hasThisExpression.hashCode()
+        result = 31 * result + hasParentExpression.hashCode()
+        result = 31 * result + (childAccess?.hashCode() ?: 0)
+        return result
     }
-}
 
- */
+}
 
 data class ArrayAccess(
     var index: Atomic,

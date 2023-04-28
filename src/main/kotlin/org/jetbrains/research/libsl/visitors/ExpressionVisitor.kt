@@ -173,12 +173,15 @@ class ExpressionVisitor(
                 }
             }
 
+            // TODO (Refactor)
             ctx.THIS() != null -> {
-                //if(ctx.PARENT() == null) {
-                    visitQualifiedAccess(ctx.qualifiedAccess(0))
-                //} else {
-                //    ParentAccess(true, "parent", null)
-               // }
+                val hasParentExpression = ctx.PARENT() != null
+                ThisAndParentAccess(true, hasParentExpression, visitQualifiedAccess(ctx.qualifiedAccess(0)))
+            }
+
+            ctx.PARENT() != null -> {
+                val hasThisExpression = ctx.THIS() != null
+                ThisAndParentAccess(hasThisExpression, true, visitQualifiedAccess(ctx.qualifiedAccess(0)))
             }
 
             else -> error("unknown qualified access kind")
@@ -302,8 +305,10 @@ class ExpressionVisitor(
         val args = ctx.expressionsList().expression().map { expr ->
             expressionVisitor.visitExpression(expr)
         }.toMutableList()
+        val hasThisExpression = ctx.THIS() != null
+        val hasParentExpression = ctx.PARENT() != null
 
-        val proc = Proc(name, args)
+        val proc = Proc(name, args, hasThisExpression, hasParentExpression)
 
         return ProcExpression(proc)
     }

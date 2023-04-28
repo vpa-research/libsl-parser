@@ -10,10 +10,10 @@ automaton A : Int {
 }
 automaton B (val x: Int) : Int {
     fun foo(arg: Int): Int {
-        assigns this.parent;;
-        result = (x + arg);
+        assigns this.parent;
+        result = (this.x + arg);
     }
     fun anotherFoo() {
-        smth();
+        this.parent.smth();
     }
 }

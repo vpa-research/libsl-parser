@@ -13,7 +13,7 @@ data class ThisExpression(
     override fun dumpToString(): String = buildString {
         append("this")
         if(parentKeywordUsed) {
-            append(".parent;")
+            append(".parent")
         }
     }
 }

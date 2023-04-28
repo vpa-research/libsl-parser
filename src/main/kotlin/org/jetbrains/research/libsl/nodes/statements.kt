@@ -74,9 +74,17 @@ data class Action(
 
 data class Proc(
     val name: String,
-    val arguments: MutableList<Expression> = mutableListOf()
+    val arguments: MutableList<Expression> = mutableListOf(),
+    val hasThisExpression: Boolean,
+    val hasParentExpression: Boolean,
 ) : Statement() {
     override fun dumpToString(): String = buildString {
+        if(hasThisExpression) {
+            append("this.")
+        }
+        if(hasParentExpression) {
+            append("parent.")
+        }
         append("${BackticksPolitics.forIdentifier(name)}(")
         val args = arguments.map { it.dumpToString() }.toMutableList()
         append(args.joinToString(separator = ", "))

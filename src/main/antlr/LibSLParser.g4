@@ -326,8 +326,8 @@ functionBody
 functionBodyStatements
    :   variableAssignment
    |   variableDecl
-   |   (THIS DOT)? (PARENT DOT)? action SEMICOLON
-   |   (THIS DOT)? (PARENT DOT)? proc SEMICOLON
+   |   action SEMICOLON
+   |   proc SEMICOLON
    |   ifStatement
    |   expression SEMICOLON
    ;
@@ -348,7 +348,7 @@ action
    ;
 
 proc
-   :  Identifier L_BRACKET expressionsList R_BRACKET
+   :  (THIS DOT)? (PARENT DOT)? Identifier L_BRACKET expressionsList R_BRACKET
    ;
 
 expressionsList
