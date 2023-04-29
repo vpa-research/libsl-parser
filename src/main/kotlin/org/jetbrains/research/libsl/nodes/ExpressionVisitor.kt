@@ -21,6 +21,8 @@ abstract class ExpressionVisitor <T> {
             is ArrayLiteral -> visitArrayLiteral(node)
             is ActionExpression -> visitActionExpression(node)
             is ProcExpression -> visitProcExpression(node)
+            is ThisAndParentAccess -> TODO()
+            is ThisExpression -> TODO()
         }
     }
 
