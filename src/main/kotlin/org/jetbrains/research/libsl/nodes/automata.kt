@@ -1,7 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.AutomatonContext
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
@@ -12,7 +11,7 @@ data class Automaton(
     val name: String,
     val typeReference: TypeReference,
     val parent: AutomatonReference?,
-    val annotations: MutableList<AnnotationReference>? = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
@@ -28,9 +27,7 @@ data class Automaton(
         get() = localFunctions + extensionFunctions
 
     override fun dumpToString(): String = buildString {
-        annotations?.joinToString() { annotation ->
-            append(annotation.resolveOrError().invocationDumpToString())
-        }
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
 
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
         if (constructorVariables.isNotEmpty()) {

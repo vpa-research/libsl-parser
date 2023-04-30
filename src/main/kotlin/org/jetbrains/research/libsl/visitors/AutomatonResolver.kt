@@ -1,15 +1,11 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.NameWithTypeContext
-import org.jetbrains.research.libsl.LibSLParser.VariableDeclContext
 import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnresolvedState
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.nodes.Annotation
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
@@ -25,7 +21,7 @@ class AutomatonResolver(
         val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
         val parent = null
-        val annotationReferences = getAutomatonAnnotationList(ctx.automatonAnnotations())
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
         buildingAutomaton = Automaton(
             name,
@@ -39,26 +35,6 @@ class AutomatonResolver(
         context.parentContext!!.storeAutomata(buildingAutomaton)
     }
 
-    private fun getAutomatonAnnotationList(ctx: List<LibSLParser.AutomatonAnnotationsContext>): MutableList<AnnotationReference> {
-        val annotationReferenceList = mutableListOf<AnnotationReference>()
-        val annotationReferences = ctx.mapNotNull { processAutomatonAnnotation(it) }
-        annotationReferenceList.addAll(annotationReferences)
-        return annotationReferenceList
-    }
-
-    private fun processAutomatonAnnotation(ctx: LibSLParser.AutomatonAnnotationsContext?): AnnotationReference? {
-        ctx ?: return null
-        val name = ctx.Identifier().asPeriodSeparatedString()
-        val expressionVisitor = ExpressionVisitor(automatonContext)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.orEmpty().toMutableList()
-
-        context.storeAnnotation(Annotation(name, args))
-
-        return AnnotationReference(name, context)
-    }
-
     /**
      * Visit constructor arguments
      */
@@ -66,7 +42,7 @@ class AutomatonResolver(
         val keyword = VariableKeyword.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
-        val argument = ConstructorArgument(keyword, name, typeReference, getVariableAnnotationList(ctx.variableAnnotations()))
+        val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()))
         context.storeVariable(argument)
         buildingAutomaton.constructorVariables.add(argument)
     }
@@ -171,29 +147,15 @@ class AutomatonResolver(
             }
         }
 
-        val variable = VariableWithInitialValue(keyword, name, typeReference, getVariableAnnotationList(ctx.variableAnnotations()),  initValue)
+        val variable = VariableWithInitialValue(
+            keyword,
+            name,
+            typeReference,
+            getAnnotationUsages(ctx.annotationUsage()),
+            initValue
+        )
         buildingAutomaton.internalVariables.add(variable)
         context.storeVariable(variable)
-    }
-
-    private fun getVariableAnnotationList(ctx: List<LibSLParser.VariableAnnotationsContext>): MutableList<AnnotationReference> {
-        val annotationReferenceList = mutableListOf<AnnotationReference>()
-        val annotationReferences = ctx.mapNotNull { processVariableAnnotation(it) }
-        annotationReferenceList.addAll(annotationReferences)
-        return annotationReferenceList
-    }
-
-    private fun processVariableAnnotation(ctx: LibSLParser.VariableAnnotationsContext?): AnnotationReference? {
-        ctx ?: return null
-        val name = ctx.Identifier().asPeriodSeparatedString()
-        val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.orEmpty().toMutableList()
-
-        context.storeAnnotation(Annotation(name, args))
-
-        return AnnotationReference(name, context)
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {

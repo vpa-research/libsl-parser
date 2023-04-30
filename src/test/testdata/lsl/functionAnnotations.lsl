@@ -16,7 +16,6 @@ automaton B: Int {
 }
 
 automaton A : Int {
-
     @Static
     fun f(@Anno(1, 12) @Target obj: B);
 

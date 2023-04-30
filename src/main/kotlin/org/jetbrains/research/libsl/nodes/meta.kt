@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.nodes.references.*
+import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
@@ -13,15 +14,15 @@ data class Library(
     val automataReferences: MutableList<AutomatonReference> = mutableListOf(),
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
     val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
-    val declaredAnnotationReferences: MutableList<DeclaredAnnotationReference> = mutableListOf(),
+    val annotationReferences: MutableList<AnnotationReference> = mutableListOf(),
     val declaredActionReferences: MutableList<ActionDeclReference> = mutableListOf()
 ) : Node() {
     private val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }
     private val automata: List<Automaton>
         get() = automataReferences.map { it.resolveOrError() }
-    private val declaredAnnotations: List<DeclaredAnnotation>
-        get() = declaredAnnotationReferences.map { it.resolveOrError() }
+    private val annotations: List<Annotation>
+        get() = annotationReferences.map { it.resolveOrError() }
     private val globalVariables: List<Variable>
         get() = globalVariableReferences.map { it.resolveOrError() }
     private val declaredActions: List<ActionDecl>
@@ -70,12 +71,12 @@ data class Library(
     }
 
     private fun formatDeclaredAnnotations(): String = buildString {
-        if(declaredAnnotations.isEmpty()) {
+        if(annotations.isEmpty()) {
             return@buildString
         }
 
 
-        declaredAnnotations.joinToString() { annotation ->
+        annotations.joinToString() { annotation ->
             append(annotation.dumpToString())
         }
     }

@@ -5,10 +5,16 @@ interface IPrinter {
 
     fun formatListEmptyLineAtEndIfNeeded(
         printers: List<IPrinter>,
-        appendEndLineAtTheEnd: Boolean = printers.isNotEmpty()
+        onSeparatedLines: Boolean = true,
+        appendEndLineAtTheEnd: Boolean = printers.isNotEmpty() && onSeparatedLines
     ): String = buildString {
         for (printer in printers.dropLast(1)) {
-            appendLine(printer.dumpToString())
+            append(printer.dumpToString())
+            if (onSeparatedLines) {
+                appendLine()
+            } else {
+                append(SPACE)
+            }
         }
         if (printers.isNotEmpty()) {
             append(printers.last().dumpToString())

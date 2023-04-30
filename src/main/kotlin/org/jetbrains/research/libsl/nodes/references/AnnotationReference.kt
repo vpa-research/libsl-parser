@@ -2,47 +2,27 @@ package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Annotation
-import org.jetbrains.research.libsl.nodes.DeclaredAnnotation
 
 data class AnnotationReference (
     val name: String,
+    val argTypes: List<TypeReference>,
     override val context: LslContextBase
 ) : LslReference<Annotation, AnnotationReference> {
     override fun resolve(): Annotation? {
         return context.resolveAnnotation(this)
     }
 
+    // todo: Improve a support for overloading
     override fun isSameReference(other: AnnotationReference): Boolean {
-        return other.name == name
+        return other.name == this.name && other.argTypes.size == this.argTypes.size
     }
 
+    // todo: Improve a support for overloading
     override fun isReferenceMatchWithNode(node: Annotation): Boolean {
-        return this.name == node.name
+        return this.name == node.name && this.argTypes.size == node.argumentDescriptors.size
     }
 
     override fun toString(): String {
         return "AnnotationReference($name)"
     }
 }
-
-data class DeclaredAnnotationReference (
-    val name: String,
-    override val context: LslContextBase
-) : LslReference<DeclaredAnnotation, DeclaredAnnotationReference> {
-    override fun resolve(): DeclaredAnnotation? {
-        return context.resolveDeclaredAnnotation(this)
-    }
-
-    override fun isSameReference(other: DeclaredAnnotationReference): Boolean {
-        return other.name == name
-    }
-
-    override fun isReferenceMatchWithNode(node: DeclaredAnnotation): Boolean {
-        return this.name == node.name
-    }
-
-    override fun toString(): String {
-        return "DeclaredAnnotationReference($name)"
-    }
-}
-

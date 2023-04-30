@@ -16,7 +16,11 @@ data class IntType(
     override val isPointer: Boolean = false
 ) : PrimitiveType {
     override val generic: TypeReference? = null
-    override val name: String = capacity.name.lowercase()
+    override val name: String = if (capacity == IntCapacity.UNKNOWN) {
+        ""
+    } else {
+        capacity.name.lowercase()
+    }
 
     enum class IntCapacity {
         INT8, INT16, INT32, INT64, UNKNOWN
