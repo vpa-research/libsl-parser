@@ -1,36 +1,33 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
-sealed class Expression: Node()
+sealed class Expression: Node() {
+    override fun dumpToString(): String = ExpressionDumper.dump(this)
+}
 
 data class ThisExpression(
     val thisKeywordUsed: Boolean,
     val parentKeywordUsed: Boolean
-) : Expression() {
-    override fun dumpToString(): String = buildString {
-        append("this")
-        if(parentKeywordUsed) {
-            append(".parent")
-        }
-    }
-}
+) : Expression()
 
 data class BinaryOpExpression(
     val left: Expression,
     val right: Expression,
     val op: ArithmeticBinaryOps
-) : Expression() {
-    override fun dumpToString(): String = "(${left.dumpToString()} ${op.string} ${right.dumpToString()})"
-}
+) : Expression()
 
-enum class ArithmeticBinaryOps(val string: String) {
-    ADD("+"), SUB("-"), MUL("*"), DIV("/"), AND("&"), LOG_AND("&&"), BIT_OR("|"),
-    LOG_OR("||"), XOR("^"), MOD("%"), ASSIGN_OP("="), EQ("=="), NOT_EQ("!="),
-    GT(">"), GT_EQ(">="), LT("<"), LT_EQ("<="), R_SHIFT(">>"), UNSIGNED_R_SHIFT(">>>"),
-    L_SHIFT("<<");
+// priorities from https://www.l3harrisgeospatial.com/docs/Operator_Precedence.html
+// additionally >>, <<, >>> (shifts) are 7 priority
+enum class ArithmeticBinaryOps(val string: String, val priority: Int) {
+    ADD("+", 5), SUB("-", 5), MUL("*", 4), DIV("/", 4),
+    AND("&", 7), LOG_AND("&&", 8), BIT_OR("|", 7), LOG_OR("||", 8),
+    XOR("^", 7), MOD("%", 4), EQ("==", 6), NOT_EQ("!=", 6),
+    GT(">", 6), GT_EQ(">=", 6), LT("<", 6), LT_EQ("<=", 6),
+    R_SHIFT(">>", 7), UNSIGNED_R_SHIFT(">>>", 7), L_SHIFT("<<", 7);
     companion object {
         fun fromString(str: String) = ArithmeticBinaryOps.values().first { op -> op.string == str }
     }
@@ -48,15 +45,11 @@ enum class CompoundOps(val string: String) {
 data class UnaryOpExpression(
     val value: Expression,
     val op: ArithmeticUnaryOp
-) : Expression() {
-    override fun dumpToString(): String = "${op.string}${value.dumpToString()}"
-}
+) : Expression()
 
 data class OldValue(
     val value: QualifiedAccess
-) : Expression() {
-    override fun dumpToString(): String = "${value.dumpToString()}'"
-}
+) : Expression()
 
 data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
@@ -67,59 +60,20 @@ data class CallAutomatonConstructor(
     override val value: Any? = null
 
     override fun toString(): String = dumpToString()
-
-    override fun dumpToString(): String = buildString {
-        append("new ${BackticksPolitics.forPeriodSeparated(automatonRef.name)}")
-
-        val formattedArgs = buildList {
-            add("state = ${BackticksPolitics.forIdentifier(stateRef.name)}")
-            // add("parent = ${parentRef?.name?.let { BackticksPolitics.forIdentifier(it) }}")
-            for (arg in args) {
-                add(arg.dumpToString())
-            }
-        }
-        append(formattedArgs.joinToString(separator = ", ", prefix = "(", postfix = ")"))
-    }
 }
 
 data class ArrayLiteral(
     override val value: List<Expression>
-) : Atomic() {
-    override fun dumpToString(): String {
-        return buildString {
-            append("[")
-            append(
-                value.joinToString(separator = ", ") { v -> v.dumpToString() }
-            )
-            append("]")
-        }
-    }
-}
+) : Atomic()
 
 sealed class Atomic : Expression() {
     abstract val value: Any?
-
-    override fun dumpToString(): String = value?.toString() ?: ""
 }
 
 data class ActionExpression(
     val action: Action
-) : Expression() {
-    override fun dumpToString(): String = buildString {
-        append("action ${BackticksPolitics.forIdentifier(action.name)}(")
-        val args = action.arguments.map { it.dumpToString() }.toMutableList()
-        append(args.joinToString(separator = ", "))
-        append(")")
-    }
-}
+) : Expression()
 
 data class ProcExpression(
     val proc: Proc
-) : Expression() {
-    override fun dumpToString(): String = buildString {
-        append("${BackticksPolitics.forIdentifier(proc.name)}(")
-        val args = proc.arguments.map { it.dumpToString() }.toMutableList()
-        append(args.joinToString(separator = ", "))
-        append(")")
-    }
-}
+) : Expression()

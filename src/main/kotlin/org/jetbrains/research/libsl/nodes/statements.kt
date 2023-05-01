@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Statement: Node()
+
 data class Assignment(
     val left: QualifiedAccess,
     val value: Expression
@@ -38,8 +39,8 @@ data class IfStatement(
     val elseStatements: ElseStatement?
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        append("if${value.dumpToString()}")
-        appendLine(" {")
+        append("if (${value.dumpToString()}) ")
+        appendLine("{")
         append(withIndent(formatListEmptyLineAtEndIfNeeded(ifStatements)))
         appendLine("}")
         elseStatements?.also {
@@ -57,7 +58,6 @@ data class ElseStatement(
     override fun dumpToString(): String = buildString {
         append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
     }
-
 }
 
 data class Action(
@@ -100,7 +100,7 @@ data class ExpressionStatement(
     }
 }
 
-data class VariableStatement(
+data class VariableDeclaration(
     val variable: VariableWithInitialValue
 ) : Statement() {
     override fun dumpToString(): String = buildString {
