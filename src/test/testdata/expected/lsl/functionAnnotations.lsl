@@ -4,8 +4,8 @@ typealias Int = int32;
 annotation Static;
 annotation Void;
 annotation Anno(
-    x: Int = null,
-    y: Int = null
+    x: Int,
+    y: Int
 );
 annotation Target;
 annotation Something;
