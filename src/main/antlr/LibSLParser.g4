@@ -228,9 +228,9 @@ typeIdentifier
 
 variableAssignment
    :   qualifiedAccess ASSIGN_OP assignmentRight SEMICOLON
-   |   qualifiedAccess compoundAssignOp=(COMPOUND_ADD | COMPOUND_SUB | COMPOUND_MULT | COMPOUND_DIV | COMPOUND_MOD) expression SEMICOLON
-   |   qualifiedAccess compoundAssignOp=(COMPOUND_AND | COMPOUND_OR | COMPOUND_XOR) expression SEMICOLON
-   |   qualifiedAccess compoundAssignOp=(COMPOUND_SHIFT_R | COMPOUND_SHIFT_L) expression SEMICOLON
+   |   qualifiedAccess compoundAssignOp=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) expression SEMICOLON
+   |   qualifiedAccess compoundAssignOp=(AMPERSAND_EQ | OR_EQ | XOR_EQ) expression SEMICOLON
+   |   qualifiedAccess compoundAssignOp=(R_SHIFT_EQ | L_SHIFT_EQ) expression SEMICOLON
    |   leftUnaryOp=(INCREMENT | DECREMENT) qualifiedAccess SEMICOLON
    |   qualifiedAccess rightUnaryOp=(INCREMENT | DECREMENT) SEMICOLON
    ;
@@ -391,10 +391,10 @@ expression
    |   expression op=(PLUS | MINUS) expression
    |   op=MINUS expression
    |   op=EXCLAMATION expression
-   |   op=BIT_COMPLEMENT expression
-   |   expression op=(EQ | NOT_EQ | LESS_EQ | L_ARROW | GREAT_EQ | R_ARROW) expression
-   |   expression op=(BIT_AND | BIT_OR | XOR) expression
-   |   expression op=(LOGIC_AND | LOGIC_OR) expression
+   |   op=TILDE expression
+   |   expression op=(EQ | EXCLAMATION_EQ | L_ARROW_EQ | L_ARROW | R_ARROW_EQ | R_ARROW) expression
+   |   expression op=(AMPERSAND | BIT_OR | XOR) expression
+   |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
    |   expression bitShiftOp expression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic

@@ -46,27 +46,27 @@ INCREMENT : '++' ;
 
 DECREMENT : '--' ;
 
-COMPOUND_ADD : '+=' ;
+PLUS_EQ : '+=' ;
 
-COMPOUND_SUB : '-=' ;
+MINUS_EQ : '-=' ;
 
-COMPOUND_MULT : '*=' ;
+ASTERISK_EQ : '*=' ;
 
-COMPOUND_DIV : '/=' ;
+SLASH_EQ : '/=' ;
 
-COMPOUND_MOD : '%=' ;
+PERCENT_EQ : '%=' ;
 
 EXCLAMATION : '!' ;
 
-NOT_EQ : '!=' ;
+EXCLAMATION_EQ : '!=' ;
 
-LESS_EQ : '<=' ;
+L_ARROW_EQ : '<=' ;
 
-GREAT_EQ : '>=' ;
+R_ARROW_EQ : '>=' ;
 
-BIT_AND : '&' ;
+AMPERSAND : '&' ;
 
-LOGIC_AND : '&&' ;
+DOUBLE_AMPERSAND : '&&' ;
 
 BIT_OR : '|' ;
 
@@ -74,17 +74,17 @@ LOGIC_OR : '||' ;
 
 XOR : '^' ;
 
-BIT_COMPLEMENT : '~' ;
+TILDE : '~' ;
 
-COMPOUND_AND : '&=' ;
+AMPERSAND_EQ : '&=' ;
 
-COMPOUND_OR : '|=' ;
+OR_EQ : '|=' ;
 
-COMPOUND_XOR : '^=' ;
+XOR_EQ : '^=' ;
 
-COMPOUND_SHIFT_R: '>>=' ;
+R_SHIFT_EQ: '>>=' ;
 
-COMPOUND_SHIFT_L: '<<=' ;
+L_SHIFT_EQ: '<<=' ;
 
 APOSTROPHE : '\'' ;
 
