@@ -52,8 +52,10 @@ object ExpressionDumper {
     private fun dumpActionExpression(expression: ActionExpression): String {
         return buildString {
             append("action ${BackticksPolitics.forIdentifier(expression.action.name)}(")
-            val args = expression.action.arguments.map { dump(it) }.toMutableList()
-            append(args.joinToString(separator = ", "))
+            if(expression.action.arguments?.isNotEmpty() == true) {
+                val args = expression.action.arguments.map { dump(it) }.toMutableList()
+                append(args.joinToString(separator = ", "))
+            }
             append(")")
         }
     }
@@ -159,8 +161,10 @@ object ExpressionDumper {
     private fun dumpProcExpression(expression: ProcExpression): String {
         return buildString {
             append("${BackticksPolitics.forIdentifier(expression.proc.name)}(")
-            val args = expression.proc.arguments.map { dump(it) }.toMutableList()
-            append(args.joinToString(separator = ", "))
+            if(expression.proc.arguments?.isNotEmpty() == true) {
+                val args = expression.proc.arguments.map { dump(it) }.toMutableList()
+                append(args.joinToString(separator = ", "))
+            }
             append(")")
         }
     }

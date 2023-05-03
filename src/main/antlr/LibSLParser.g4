@@ -142,8 +142,8 @@ actionParameter
  *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   annotationUsage*
-   AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables*? R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   :   annotationUsage* AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables*? R_BRACKET)?
+   COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
    ;
 
 constructorVariables
@@ -190,10 +190,8 @@ functionsListPart
  * syntax: var NAME [= { new AutomatonName(args); atomic }]
  */
 variableDecl
-   :   annotationUsage*
-   keyword=(VAR|VAL) nameWithType SEMICOLON
-   |   annotationUsage*
-   keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
+   :   annotationUsage* keyword=(VAR|VAL) nameWithType SEMICOLON
+   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 nameWithType
@@ -238,23 +236,17 @@ argPair
    ;
 
 constructorDecl
-   :   annotationUsage*
-   CONSTRUCTOR functionName=Identifier?
-   L_BRACKET functionDeclArgList? R_BRACKET
+   :   annotationUsage* CONSTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 destructorDecl
-   :   annotationUsage*
-   DESTRUCTOR functionName=Identifier?
-   L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   :   annotationUsage* DESTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
+   (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 procDecl
-   :   annotationUsage*
-   PROC functionName=Identifier
-   L_BRACKET functionDeclArgList? R_BRACKET
+   :   annotationUsage* PROC functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
@@ -264,10 +256,9 @@ procDecl
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   annotationUsage*
-   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
-   L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
+   :   annotationUsage* FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
+   (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
    ;
 
 functionDeclArgList
@@ -281,7 +272,6 @@ parameter
 /* annotation
  * syntax: @annotationName(args)
  */
-
 annotationUsage
    :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
@@ -325,15 +315,15 @@ elseStatement
  * syntax: action ActionName(args)
  */
 action
-   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET
+   :  ACTION Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
 proc
-   :  (THIS DOT)? (PARENT DOT)? Identifier L_BRACKET expressionsList R_BRACKET
+   :  (THIS DOT)? (PARENT DOT)? Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList
-   :   (expression (COMMA expression)* (COMMA)?)?
+   :   expression (COMMA expression)* (COMMA)?
    ;
 
 /* requires contract
@@ -418,7 +408,7 @@ identifierList
    ;
 
 arrayLiteral
-   :   L_SQUARE_BRACKET expressionsList R_SQUARE_BRACKET
+   :   L_SQUARE_BRACKET expressionsList? R_SQUARE_BRACKET
    ;
 
 periodSeparatedFullName

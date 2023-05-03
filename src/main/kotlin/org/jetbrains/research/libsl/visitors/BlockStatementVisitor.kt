@@ -80,9 +80,9 @@ class BlockStatementVisitor(
     override fun visitProc(ctx: LibSLParser.ProcContext) {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(functionContext)
-        val args = ctx.expressionsList().expression().map { expr ->
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
-        }.toMutableList()
+        }?.toMutableList()
         val hasThisExpression = ctx.THIS() != null
         val hasParentExpression = ctx.PARENT() != null
 

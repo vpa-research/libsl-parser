@@ -62,19 +62,21 @@ data class ElseStatement(
 
 data class Action(
     val name: String,
-    val arguments: MutableList<Expression> = mutableListOf()
+    val arguments: MutableList<Expression>? = mutableListOf()
 ) : Statement() {
     override fun dumpToString(): String = buildString {
         append("action ${BackticksPolitics.forIdentifier(name)}(")
-        val args = arguments.map { it.dumpToString() }.toMutableList()
-        append(args.joinToString(separator = ", "))
+        if(arguments != null) {
+            val args = arguments.map { it.dumpToString() }.toMutableList()
+            append(args.joinToString(separator = ", "))
+        }
         append(");")
     }
 }
 
 data class Proc(
     val name: String,
-    val arguments: MutableList<Expression> = mutableListOf(),
+    val arguments: MutableList<Expression>? = mutableListOf(),
     val hasThisExpression: Boolean,
     val hasParentExpression: Boolean,
 ) : Statement() {
@@ -86,8 +88,10 @@ data class Proc(
             append("parent.")
         }
         append("${BackticksPolitics.forIdentifier(name)}(")
-        val args = arguments.map { it.dumpToString() }.toMutableList()
-        append(args.joinToString(separator = ", "))
+        if(arguments != null) {
+            val args = arguments.map { it.dumpToString() }.toMutableList()
+            append(args.joinToString(separator = ", "))
+        }
         append(");")
     }
 }
