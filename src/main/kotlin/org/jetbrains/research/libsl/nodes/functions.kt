@@ -15,7 +15,7 @@ data class Function(
     var localVariables: MutableList<Variable> = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
-    val hasBody: Boolean = statements.isNotEmpty(),
+    var hasBody: Boolean = statements.isNotEmpty(),
     var targetAutomatonRef: AutomatonReference? = null,
     val context: FunctionContext
 ) : Node() {
@@ -25,7 +25,6 @@ data class Function(
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
-
         append("fun ${BackticksPolitics.forIdentifier(name)}")
         append(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
@@ -38,10 +37,16 @@ data class Function(
 
         if (!hasBody && contracts.isEmpty()) {
             appendLine(";")
-        } else if (hasBody) {
+        }
+        if (contracts.isNotEmpty()) {
             appendLine(" {")
-            if (contracts.isNotEmpty()) {
-                append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(contracts)))
+            hasBody = true
+        }
+
+        if (hasBody) {
+            if (contracts.isEmpty()) {
+                appendLine(" {")
             }
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
