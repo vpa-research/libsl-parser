@@ -107,7 +107,7 @@ data class ExpressionStatement(
 data class VariableDeclaration(
     val variable: VariableWithInitialValue
 ) : Statement() {
-    override fun dumpToString(): String = buildString {
-        append(variable.dumpToString())
+    override fun dumpToString(): String {
+        return variable.dumpToString()
     }
 }

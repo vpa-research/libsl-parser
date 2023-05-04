@@ -34,7 +34,6 @@ open class Variable(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Variable) return false
-
         if (name != other.name) return false
         if (typeReference != other.typeReference) return false
 
@@ -84,7 +83,6 @@ class FunctionArgument(
         } else {
             typeReference.name
         }
-
         append(typeName)
     }
 }
@@ -108,7 +106,6 @@ class DeclaredActionParameter(
             append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
             append(IPrinter.SPACE)
         }
-
         append("${BackticksPolitics.forIdentifier(name)}: ${typeReference.name}")
     }
 }
@@ -129,7 +126,6 @@ class ConstructorArgument(
             append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
             append(IPrinter.SPACE)
         }
-
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
     }

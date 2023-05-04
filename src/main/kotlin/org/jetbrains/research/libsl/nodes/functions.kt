@@ -21,7 +21,6 @@ data class Function(
 ) : Node() {
     val fullName: String
         get() = "${automatonReference.name}.$name"
-    var resultVariable: Variable? = null
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
