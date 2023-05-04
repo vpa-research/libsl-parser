@@ -5,6 +5,19 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Expression: Node()
+
+data class ThisExpression(
+    val thisKeywordUsed: Boolean,
+    val parentKeywordUsed: Boolean
+) : Expression() {
+    override fun dumpToString(): String = buildString {
+        append("this")
+        if(parentKeywordUsed) {
+            append(".parent")
+        }
+    }
+}
+
 data class BinaryOpExpression(
     val left: Expression,
     val right: Expression,
@@ -48,7 +61,8 @@ data class OldValue(
 data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
     val args: List<ArgumentWithValue>,
-    val stateRef: AutomatonStateReference
+    val stateRef: AutomatonStateReference,
+    val parentRef: AutomatonReference?
 ) : Atomic() {
     override val value: Any? = null
 
@@ -59,6 +73,7 @@ data class CallAutomatonConstructor(
 
         val formattedArgs = buildList {
             add("state = ${BackticksPolitics.forIdentifier(stateRef.name)}")
+            // add("parent = ${parentRef?.name?.let { BackticksPolitics.forIdentifier(it) }}")
             for (arg in args) {
                 add(arg.dumpToString())
             }

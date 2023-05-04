@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
 import org.jetbrains.research.libsl.LibSLParser.ProcContext
 import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
 import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
+import org.jetbrains.research.libsl.LibSLParser.ThisExpressionContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
@@ -48,8 +49,20 @@ class ExpressionVisitor(
                 visitQualifiedAccess(ctx.qualifiedAccess())
             }
 
+            ctx.thisExpression() != null -> {
+                processThisExpression(ctx.thisExpression())
+            }
+
             else -> error("unknown expression type")
         }
+    }
+
+    // TODO() refactor
+    private fun processThisExpression(ctx: ThisExpressionContext): ThisExpression {
+        val thisKeywordUsed = ctx.THIS() != null
+        val parentKeywordUsed = ctx.PARENT() != null
+
+        return ThisExpression(thisKeywordUsed, parentKeywordUsed)
     }
 
     private fun processBinaryExpression(ctx: ExpressionContext): BinaryOpExpression {
@@ -160,6 +173,17 @@ class ExpressionVisitor(
                 }
             }
 
+            // TODO (Refactor)
+            ctx.THIS() != null -> {
+                val hasParentExpression = ctx.PARENT() != null
+                ThisAndParentAccess(true, hasParentExpression, visitQualifiedAccess(ctx.qualifiedAccess(0)))
+            }
+
+            ctx.PARENT() != null -> {
+                val hasThisExpression = ctx.THIS() != null
+                ThisAndParentAccess(hasThisExpression, true, visitQualifiedAccess(ctx.qualifiedAccess(0)))
+            }
+
             else -> error("unknown qualified access kind")
         }
     }
@@ -228,7 +252,7 @@ class ExpressionVisitor(
                 else -> error("unknown kind")
             }
 
-            if (name == "state") {
+            if (name == "state" || name == "parent") {
                 return@mapNotNull null
             }
 
@@ -241,7 +265,13 @@ class ExpressionVisitor(
 
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
 
-        return CallAutomatonConstructor(automatonRef, args, stateRef)
+        //TODO() Parent
+        val parentName =
+            ctx.namedArgs().argPair().firstOrNull { pair -> pair.name.text == "parent" }?.expressionAtomic()?.text
+
+        val parentRef = parentName?.let { AutomatonReferenceBuilder.build(it, context) }
+
+        return CallAutomatonConstructor(automatonRef, args, stateRef, parentRef)
     }
 
     override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Expression {
@@ -275,8 +305,10 @@ class ExpressionVisitor(
         val args = ctx.expressionsList().expression().map { expr ->
             expressionVisitor.visitExpression(expr)
         }.toMutableList()
+        val hasThisExpression = ctx.THIS() != null
+        val hasParentExpression = ctx.PARENT() != null
 
-        val proc = Proc(name, args)
+        val proc = Proc(name, args, hasThisExpression, hasParentExpression)
 
         return ProcExpression(proc)
     }

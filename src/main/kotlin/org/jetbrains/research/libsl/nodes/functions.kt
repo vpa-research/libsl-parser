@@ -12,7 +12,7 @@ data class Function(
     val automatonReference: AutomatonReference,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
-    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     var localVariables: MutableList<Variable> = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
@@ -25,13 +25,9 @@ data class Function(
     var resultVariable: Variable? = null
 
     override fun dumpToString(): String = buildString {
-
-        annotationReferences?.joinToString() { annotationReference ->
-            append(annotationReference.resolveOrError().invocationDumpToString())
-        }
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
 
         append("fun ${BackticksPolitics.forIdentifier(name)}")
-
         append(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString()}
         )
@@ -57,7 +53,7 @@ data class Function(
 data class Constructor(
     var name: String?,
     var args: MutableList<FunctionArgument> = mutableListOf(),
-    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
     var localVariables: MutableList<Variable> = mutableListOf(),
@@ -65,9 +61,7 @@ data class Constructor(
     val context: FunctionContext
 ) : Node() {
     override fun dumpToString(): String = buildString {
-        annotationReferences?.joinToString() { annotationReference ->
-            append(annotationReference.resolveOrError().invocationDumpToString())
-        }
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
 
         name = if(name.isNullOrEmpty()) {
             ""
@@ -98,7 +92,7 @@ data class Constructor(
 data class Destructor(
     var name: String?,
     var args: MutableList<FunctionArgument> = mutableListOf(),
-    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
     var localVariables: MutableList<Variable> = mutableListOf(),
@@ -106,9 +100,7 @@ data class Destructor(
     val context: FunctionContext
 ) : Node() {
     override fun dumpToString(): String = buildString {
-        annotationReferences?.joinToString() { annotationReference ->
-            append(annotationReference.resolveOrError().invocationDumpToString())
-        }
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
 
         name = if(name.isNullOrEmpty()) {
             ""
@@ -139,7 +131,7 @@ data class ProcDecl (
     val name: String,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
-    val annotationReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
     var localVariables: MutableList<Variable> = mutableListOf(),
@@ -147,12 +139,9 @@ data class ProcDecl (
     val context: FunctionContext
 ) : Node() {
     override fun dumpToString(): String = buildString {
-        annotationReferences?.joinToString() { annotationReference ->
-            append(annotationReference.resolveOrError().invocationDumpToString())
-        }
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
 
         append("proc ${BackticksPolitics.forIdentifier(name)}")
-
         append(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
         )

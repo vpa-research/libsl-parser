@@ -126,6 +126,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testParentAutomatonLsl() {
+        runLslTest("parentAutomaton")
+    }
+
+    @Test
     fun testPrimitiveTypesLsl() {
         runLslTest("primitiveTypes")
     }
@@ -138,6 +143,11 @@ class GeneratedTests {
     @Test
     fun testQualifiedAccessesLsl() {
         runLslTest("qualifiedAccesses")
+    }
+
+    @Test
+    fun testShiftSquareBracketsLsl() {
+        runLslTest("shiftSquareBrackets")
     }
 
     @Test
@@ -161,6 +171,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testThisLsl() {
+        runLslTest("this")
+    }
+
+    @Test
     fun testTypesLsl() {
         runLslTest("types")
     }
@@ -180,9 +195,5 @@ class GeneratedTests {
         runLslTest("voidAndAny")
     }
 
-    @Test
-    fun testShiftSquareBrackets() {
-        runLslTest("shiftSquareBrackets")
-    }
-
 }
+

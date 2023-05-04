@@ -12,7 +12,6 @@ import org.jetbrains.research.libsl.nodes.LslVersion
 import org.jetbrains.research.libsl.nodes.MetaNode
 import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
-import org.jetbrains.research.libsl.nodes.references.builders.DeclaredAnnotationReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceBuilder.getReference
@@ -121,8 +120,8 @@ class LibrarySpecificationVisitor(
     }
 
     private fun representDeclaredAnnotationsFromContextInLibrary() {
-        val annotations = globalContext.getAllDeclaredAnnotations()
-        library.declaredAnnotationReferences.addAll(annotations.map { annotation -> annotation.getReference(context)})
+        val annotations = globalContext.getAllAnnotations()
+        library.annotationReferences.addAll(annotations.map { annotation -> annotation.getReference(context)})
     }
 
     private fun representDeclaredActionsFromContextInLibrary() {

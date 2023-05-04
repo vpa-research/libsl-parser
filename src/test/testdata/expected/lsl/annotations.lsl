@@ -4,8 +4,8 @@ typealias Int = int32;
 annotation Something;
 annotation Public;
 annotation Anno(
-    x: Int = null,
-    y: Int = null
+    x: Int,
+    y: Int
 );
 automaton A : Int {
     @Public

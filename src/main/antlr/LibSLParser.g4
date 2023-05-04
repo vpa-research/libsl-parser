@@ -124,12 +124,8 @@ annotationDeclParamsPart
    ;
 
 actionDecl
-   :   actionAnnotations*?
+   :   annotationUsage*
    DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
-   ;
-
-actionAnnotations
-   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 actionDeclParamList
@@ -137,11 +133,7 @@ actionDeclParamList
    ;
 
 actionParameter
-   :   actionParameterAnnotations*? name=Identifier COLON type=typeIdentifier
-   ;
-
-actionParameterAnnotations
-   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   :   annotationUsage* name=Identifier COLON type=typeIdentifier
    ;
 
 /* automaton declaration
@@ -150,19 +142,12 @@ actionParameterAnnotations
  *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   automatonAnnotations*?
+   :   annotationUsage*
    AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables*? R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
    ;
 
 constructorVariables
-   :   variableAnnotations*? keyword=(VAR|VAL) nameWithType (COMMA)?
-   ;
-
-/* automaton annotation
- * syntax: @annotationName(args)
- */
-automatonAnnotations
-   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   :   annotationUsage* keyword=(VAR|VAL) nameWithType (COMMA)?
    ;
 
 automatonStatement
@@ -205,14 +190,10 @@ functionsListPart
  * syntax: var NAME [= { new AutomatonName(args); atomic }]
  */
 variableDecl
-   :   variableAnnotations*?
+   :   annotationUsage*
    keyword=(VAR|VAL) nameWithType SEMICOLON
-   |   variableAnnotations*?
+   |   annotationUsage*
    keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
-   ;
-
-variableAnnotations
-   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 nameWithType
@@ -252,25 +233,26 @@ namedArgs
 
 argPair
    :   name=STATE ASSIGN_OP expressionAtomic
+   |   name=PARENT ASSIGN_OP expression
    |   name=Identifier ASSIGN_OP expression
    ;
 
 constructorDecl
-   :   functionAnnotations*?
+   :   annotationUsage*
    CONSTRUCTOR functionName=Identifier?
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 destructorDecl
-   :   functionAnnotations*?
+   :   annotationUsage*
    DESTRUCTOR functionName=Identifier?
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
    ;
 
 procDecl
-   :   functionAnnotations*?
+   :   annotationUsage*
    PROC functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
@@ -282,7 +264,7 @@ procDecl
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   functionAnnotations*?
+   :   annotationUsage*
    FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
@@ -293,14 +275,14 @@ functionDeclArgList
    ;
 
 parameter
-   :   functionAnnotations*? name=Identifier COLON type=typeIdentifier
+   :   annotationUsage* name=Identifier COLON type=typeIdentifier
    ;
 
 /* annotation
  * syntax: @annotationName(args)
  */
 
-functionAnnotations
+annotationUsage
    :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
@@ -347,7 +329,7 @@ action
    ;
 
 proc
-   :  Identifier L_BRACKET expressionsList R_BRACKET
+   :  (THIS DOT)? (PARENT DOT)? Identifier L_BRACKET expressionsList R_BRACKET
    ;
 
 expressionsList
@@ -396,9 +378,15 @@ expression
    |   expression op=(AMPERSAND | BIT_OR | XOR) expression
    |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
    |   expression bitShiftOp expression
+   |   thisExpression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
+   ;
+
+thisExpression
+   :   THIS
+   |   THIS DOT PARENT
    ;
 
 expressionAtomic
@@ -418,6 +406,7 @@ qualifiedAccess
    :   periodSeparatedFullName
    |   qualifiedAccess L_SQUARE_BRACKET expressionAtomic R_SQUARE_BRACKET (DOT qualifiedAccess)?
    |   simpleCall DOT qualifiedAccess
+   |   THIS DOT (PARENT DOT)? qualifiedAccess
    ;
 
 simpleCall

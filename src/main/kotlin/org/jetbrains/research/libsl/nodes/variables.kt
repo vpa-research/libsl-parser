@@ -57,7 +57,7 @@ class FunctionArgument(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    var annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     var targetAutomaton: AutomatonReference? = null
 ) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
     lateinit var function: Function
@@ -66,23 +66,15 @@ class FunctionArgument(
         get() = "${function.name}.$name"
 
     override fun dumpToString(): String = buildString {
-        if (annotationsReferences != null) {
-
-            annotationsReferences?.joinToString() { annotation ->
-                val resolvedAnnotation = annotation.resolveOrError()
-                append("@")
-                append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
-
-                if (resolvedAnnotation.values.isNotEmpty()) {
-                    append("(")
-                    append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
-                        v.dumpToString()
-                    })
-                    append(")")
-                }
-
-                append(IPrinter.SPACE)
-            }
+        if (annotationUsages.isNotEmpty()) {
+            append(
+                formatListEmptyLineAtEndIfNeeded(
+                    annotationUsages,
+                    appendEndLineAtTheEnd = false,
+                    onSeparatedLines = false
+                )
+            )
+            append(IPrinter.SPACE)
         }
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
@@ -102,23 +94,13 @@ class ActionParameter(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotation: Annotation? = null,
+    var annotation: AnnotationReference? = null,
 
-) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
+    ) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
 
     override fun dumpToString(): String = buildString {
         if (annotation != null) {
-            append("@")
-            append(BackticksPolitics.forIdentifier(annotation!!.name))
-
-            if (annotation!!.values.isNotEmpty()) {
-                append("(")
-                append(annotation!!.values.joinToString(separator = ", ") { v ->
-                    v.dumpToString()
-                })
-                append(")")
-            }
-
+            append(annotation!!)
             append(IPrinter.SPACE)
         }
         append(BackticksPolitics.forIdentifier(name))
@@ -128,34 +110,19 @@ class ActionParameter(
     }
 }
 
+@Suppress("MemberVisibilityCanBePrivate")
 class DeclaredActionParameter(
     name: String,
     typeReference: TypeReference,
-    private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
 ) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
-
     override fun dumpToString(): String = buildString {
-        annotationsReferences?.joinToString() { annotation ->
-            val resolvedAnnotation = annotation.resolveOrError()
-            append("@")
-            append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
-
-            if (resolvedAnnotation.values.isNotEmpty()) {
-                append("(")
-                append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
-                    v.dumpToString()
-                })
-                append(")")
-            }
-
+        if (annotationUsages.isNotEmpty()) {
+            append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
             append(IPrinter.SPACE)
         }
-        append(BackticksPolitics.forIdentifier(name))
-        append(": ")
 
-        val typeName = typeReference.name
-
-        append(typeName)
+        append("${BackticksPolitics.forIdentifier(name)}: ${typeReference.name}")
     }
 }
 
@@ -163,7 +130,7 @@ class ConstructorArgument(
     keyword: VariableKeyword,
     name: String,
     typeReference: TypeReference,
-    private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    private val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
 ) : Variable(keyword, name, typeReference) {
     lateinit var automaton: Automaton
 
@@ -171,18 +138,8 @@ class ConstructorArgument(
         get() = "${automaton.name}.$name"
 
     override fun dumpToString(): String = buildString {
-        annotationsReferences?.joinToString() { annotation ->
-            val resolvedAnnotation = annotation.resolveOrError()
-            append("@")
-            append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
-
-            resolvedAnnotation.values.joinToString {
-                append("(")
-                append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
-                    v.dumpToString()
-                })
-                append(")")
-            }
+        if (annotationUsages.isNotEmpty()) {
+            append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
             append(IPrinter.SPACE)
         }
 
@@ -191,30 +148,16 @@ class ConstructorArgument(
     }
 }
 
+@Suppress("MemberVisibilityCanBePrivate")
 class VariableWithInitialValue(
     keyword: VariableKeyword,
     name: String,
     typeReference: TypeReference,
-    private val annotationsReferences: MutableList<AnnotationReference>? = mutableListOf(),
+    val annotationUsage: MutableList<AnnotationUsage> = mutableListOf(),
     val initialValue: Expression?,
 ) : Variable(keyword, name, typeReference) {
     override fun dumpToString(): String = buildString {
-        annotationsReferences?.joinToString() { annotation ->
-            val resolvedAnnotation = annotation.resolveOrError()
-            append("@")
-            append(BackticksPolitics.forIdentifier(resolvedAnnotation.name))
-
-            if (resolvedAnnotation.values.isNotEmpty()) {
-                append("(")
-                append(resolvedAnnotation.values.joinToString(separator = ", ") { v ->
-                    v.dumpToString()
-                })
-                append(")")
-            }
-
-            appendLine()
-        }
-
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsage))
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
         if (initialValue != null) {

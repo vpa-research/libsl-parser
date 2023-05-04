@@ -84,8 +84,10 @@ class BlockStatementVisitor(
         val args = ctx.expressionsList().expression().map { expr ->
             expressionVisitor.visitExpression(expr)
         }.toMutableList()
+        val hasThisExpression = ctx.THIS() != null
+        val hasParentExpression = ctx.PARENT() != null
 
-        val proc = Proc(name, args)
+        val proc = Proc(name, args, hasThisExpression, hasParentExpression)
 
         statements.add(proc)
     }
@@ -103,35 +105,27 @@ class BlockStatementVisitor(
                 right.expression() != null -> {
                     expressionVisitor.visitExpression(right.expression())
                 }
+                right.action() != null -> {
+                    expressionVisitor.visitAction(right.action())
+                }
+                right.proc() != null -> {
+                    expressionVisitor.visitProc(right.proc())
+                }
                 else -> error("unknown initializer kind")
             }
         }
 
-        val variable = VariableWithInitialValue(keyword, name, typeReference, getVariableAnnotationList(ctx.variableAnnotations()),  initValue)
+        val variable = VariableWithInitialValue(
+            keyword,
+            name,
+            typeReference,
+            getAnnotationUsages(ctx.annotationUsage()),
+            initValue
+        )
         val variableStatement = VariableStatement(variable)
         localVariables.add(variable)
         statements.add(variableStatement)
         context.storeVariable(variable)
-    }
-
-    private fun getVariableAnnotationList(ctx: List<LibSLParser.VariableAnnotationsContext>): MutableList<AnnotationReference> {
-        val annotationReferenceList = mutableListOf<AnnotationReference>()
-        val annotationReferences = ctx.mapNotNull { processVariableAnnotation(it) }
-        annotationReferenceList.addAll(annotationReferences)
-        return annotationReferenceList
-    }
-
-    private fun processVariableAnnotation(ctx: LibSLParser.VariableAnnotationsContext?): AnnotationReference? {
-        ctx ?: return null
-        val name = ctx.Identifier().asPeriodSeparatedString()
-        val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.orEmpty().toMutableList()
-
-        context.storeAnnotation(Annotation(name, args))
-
-        return AnnotationReference(name, context)
     }
 
     override fun visitElseStatement(ctx: LibSLParser.ElseStatementContext) {

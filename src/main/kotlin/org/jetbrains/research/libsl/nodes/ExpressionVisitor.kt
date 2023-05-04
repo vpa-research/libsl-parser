@@ -21,6 +21,8 @@ abstract class ExpressionVisitor <T> {
             is ArrayLiteral -> visitArrayLiteral(node)
             is ActionExpression -> visitActionExpression(node)
             is ProcExpression -> visitProcExpression(node)
+            is ThisAndParentAccess -> visitThisAndParentAccess(node)
+            is ThisExpression -> visitThisExpression(node)
         }
     }
 
@@ -59,4 +61,8 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitActionExpression(node: ActionExpression): T
 
     abstract fun visitProcExpression(node: ProcExpression): T
+
+    abstract fun visitThisExpression(node: ThisExpression): T
+
+    abstract fun visitThisAndParentAccess(node: ThisAndParentAccess): T
 }
