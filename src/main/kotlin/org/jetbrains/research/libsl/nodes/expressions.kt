@@ -22,10 +22,21 @@ data class BinaryOpExpression(
 // priorities from https://www.l3harrisgeospatial.com/docs/Operator_Precedence.html
 // additionally >>, <<, >>> (shifts) are 7 priority
 enum class ArithmeticBinaryOps(val string: String, val priority: Int) {
+    //Arithmetic
     ADD("+", 5), SUB("-", 5), MUL("*", 4), DIV("/", 4),
-    AND("&", 7), LOG_AND("&&", 8), BIT_OR("|", 7), LOG_OR("||", 8),
-    XOR("^", 7), MOD("%", 4), EQ("==", 6), NOT_EQ("!=", 6),
-    GT(">", 6), GT_EQ(">=", 6), LT("<", 6), LT_EQ("<=", 6),
+    MOD("%", 4),
+
+    //Logic
+    LOG_AND("&&", 8), LOG_OR("||", 8),
+
+    //Bitwise
+    XOR("^", 7), AND("&", 7), BIT_OR("|", 7),
+
+    //Relational
+    EQ("==", 6), NOT_EQ("!=", 6), LT_EQ("<=", 6), GT_EQ(">=", 6),
+    GT(">", 6), LT("<", 6),
+
+    //Shift
     R_SHIFT(">>", 7), UNSIGNED_R_SHIFT(">>>", 7), L_SHIFT("<<", 7);
 
     companion object {
@@ -34,9 +45,14 @@ enum class ArithmeticBinaryOps(val string: String, val priority: Int) {
 }
 
 enum class CompoundOps(val string: String) {
-    COMP_ADD("+="), COMP_SUB("-="), COMP_MUL("*="), COMP_DIV("/="), COMP_AND("&="),
-    COMP_OR("|="), COMP_XOR("^="), COMP_MOD("%="), COMP_R_SHIFT(">>="), COMP_UN_R_SHIFT(">>>="),
-    COMP_L_SHIFT("<<=");
+    //Arithmetic
+    COMP_ADD("+="), COMP_SUB("-="), COMP_MUL("*="), COMP_DIV("/="), COMP_MOD("%="),
+
+    //Bitwise
+    COMP_AND("&="),  COMP_OR("|="), COMP_XOR("^="),
+
+    //Shift
+    COMP_R_SHIFT(">>="), COMP_UN_R_SHIFT(">>>="), COMP_L_SHIFT("<<=");
 
     companion object {
         fun fromString(str: String) = CompoundOps.values().first { op -> op.string == str }
