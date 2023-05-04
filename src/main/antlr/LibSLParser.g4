@@ -372,6 +372,12 @@ expression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
+   |   unaryOp
+   ;
+
+unaryOp
+   :   leftUnaryOp=(INCREMENT | DECREMENT) qualifiedAccess
+   |   qualifiedAccess rightUnaryOp=(INCREMENT | DECREMENT)
    ;
 
 thisExpression

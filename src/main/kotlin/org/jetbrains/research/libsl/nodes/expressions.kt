@@ -77,3 +77,13 @@ data class ActionExpression(
 data class ProcExpression(
     val proc: Proc
 ) : Expression()
+
+data class LeftUnaryOpExpression(
+    val op: ArithmeticUnaryOp,
+    val value: Expression
+) : Expression()
+
+data class RightUnaryOpExpression(
+    val op: ArithmeticUnaryOp,
+    val value: Expression
+) : Expression()

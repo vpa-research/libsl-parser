@@ -25,6 +25,8 @@ object ExpressionDumper {
             is ThisExpression -> dumpThisExpression(expression)
             is UnaryOpExpression -> dumpUnaryOpExpression(expression)
             is Variable -> dumpVariable(expression)
+            is LeftUnaryOpExpression -> dumpLeftUnaryOpExpression(expression)
+            is RightUnaryOpExpression -> dumpRightUnaryOpExpression(expression)
         }
     }
 
@@ -175,5 +177,13 @@ object ExpressionDumper {
 
     private fun dumpVariable(expression: Variable): String {
         return expression.name
+    }
+
+    private fun dumpLeftUnaryOpExpression(expression: LeftUnaryOpExpression): String {
+        return "${expression.op.string}${dump(expression.value)}"
+    }
+
+    private fun dumpRightUnaryOpExpression(expression: RightUnaryOpExpression): String {
+        return "${dump(expression.value)}${expression.op.string}"
     }
 }

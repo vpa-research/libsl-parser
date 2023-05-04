@@ -9,6 +9,13 @@ automaton A : Int {
 
     fun f(x: Int, y: Int) {
 
+        var res: Int;
+
+        res = ++x;
+        res = x++;
+        res = --x;
+        res = x--;
+
         ++x;
         x++;
         --x;

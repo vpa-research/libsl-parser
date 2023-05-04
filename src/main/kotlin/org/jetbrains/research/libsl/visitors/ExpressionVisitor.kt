@@ -53,6 +53,10 @@ class ExpressionVisitor(
                 processThisExpression(ctx.thisExpression())
             }
 
+            ctx.unaryOp() != null -> {
+                visitUnaryOp(ctx.unaryOp())
+            }
+
             else -> error("unknown expression type")
         }
     }
@@ -311,5 +315,23 @@ class ExpressionVisitor(
         val proc = Proc(name, args, hasThisExpression, hasParentExpression)
 
         return ProcExpression(proc)
+    }
+
+    override fun visitUnaryOp(ctx: LibSLParser.UnaryOpContext): Expression {
+        val expressionVisitor = ExpressionVisitor(context)
+        return when {
+            ctx.leftUnaryOp != null -> let {
+                val op = ArithmeticUnaryOp.fromString(ctx.leftUnaryOp.text)
+                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
+                LeftUnaryOpExpression(op, value)
+            }
+            ctx.rightUnaryOp != null -> let {
+                val op = ArithmeticUnaryOp.fromString(ctx.rightUnaryOp.text)
+                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
+                RightUnaryOpExpression(op, value)
+            }
+
+            else -> error("unknown unary op expression")
+        }
     }
 }

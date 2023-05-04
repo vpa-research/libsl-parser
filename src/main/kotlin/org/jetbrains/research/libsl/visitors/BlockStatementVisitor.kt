@@ -27,14 +27,14 @@ class BlockStatementVisitor(
                 val assignmentWithCompoundOp = AssignmentWithCompoundOp(left, op, value)
                 statements.add(assignmentWithCompoundOp)
             }
-            ctx.leftUnaryOp != null -> let{
+            ctx.leftUnaryOp != null -> let {
                 val expressionVisitor = ExpressionVisitor(functionContext)
                 val op = ArithmeticUnaryOp.fromString(ctx.leftUnaryOp.text)
                 val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
                 val assignmentWithLeftUnaryOp = AssignmentWithLeftUnaryOp(op, value)
                 statements.add(assignmentWithLeftUnaryOp)
             }
-            ctx.rightUnaryOp != null -> let{
+            ctx.rightUnaryOp != null -> let {
                 val expressionVisitor = ExpressionVisitor(functionContext)
                 val op = ArithmeticUnaryOp.fromString(ctx.rightUnaryOp.text)
                 val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
