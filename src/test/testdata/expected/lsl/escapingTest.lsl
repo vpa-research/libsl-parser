@@ -12,6 +12,7 @@ automaton A : Int {
     fun `<test>`(): Int {
     }
 }
+
 automaton `123` : Int {
     initstate Init;
 }

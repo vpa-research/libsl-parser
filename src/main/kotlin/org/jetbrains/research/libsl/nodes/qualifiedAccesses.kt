@@ -93,19 +93,6 @@ data class ArrayAccess(
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
 
-    override fun toString(): String = dumpToString()
-
-    override fun dumpToString(): String = buildString {
-        append("[${index.dumpToString()}]")
-        if (childAccess != null) {
-            if (childAccess is VariableAccess) {
-                append(".")
-            }
-
-            append(childAccess!!.dumpToString())
-        }
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ArrayAccess) return false
@@ -128,20 +115,6 @@ data class AutomatonOfFunctionArgumentInvoke(
     val arg: FunctionArgument,
     override var childAccess: QualifiedAccess?,
 ) : QualifiedAccess() {
-    override fun toString(): String = dumpToString()
-
-    override fun dumpToString(): String = buildString {
-        append(BackticksPolitics.forPeriodSeparated(automatonReference.name))
-        append("(")
-        append(BackticksPolitics.forIdentifier(arg.name))
-        append(")")
-
-        if (childAccess != null) {
-            append(".")
-            append(childAccess!!.dumpToString())
-        }
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AutomatonOfFunctionArgumentInvoke) return false

@@ -38,6 +38,7 @@ data class Library(
         append(formatDeclaredAnnotations())
         append(formatActionDeclarations())
         append(formatAutomata())
+        appendLine()
     }
 
     private fun formatImports(): String {

@@ -94,21 +94,8 @@ class ActionParameter(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotation: AnnotationReference? = null,
-
-    ) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
-
-    override fun dumpToString(): String = buildString {
-        if (annotation != null) {
-            append(annotation!!)
-            append(IPrinter.SPACE)
-        }
-        append(BackticksPolitics.forIdentifier(name))
-        append(": ")
-
-        append(typeReference.name)
-    }
-}
+    var annotation: AnnotationReference? = null
+) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class DeclaredActionParameter(

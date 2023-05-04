@@ -3,7 +3,6 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 
 class BlockStatementVisitor(
     private val functionContext: FunctionContext,
@@ -122,9 +121,9 @@ class BlockStatementVisitor(
             getAnnotationUsages(ctx.annotationUsage()),
             initValue
         )
-        val variableStatement = VariableStatement(variable)
+        val variableDeclaration = VariableDeclaration(variable)
         localVariables.add(variable)
-        statements.add(variableStatement)
+        statements.add(variableDeclaration)
         context.storeVariable(variable)
     }
 

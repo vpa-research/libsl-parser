@@ -86,6 +86,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testExpressionsLsl() {
+        runLslTest("expressions")
+    }
+
+    @Test
     fun testFunctionAnnotationsLsl() {
         runLslTest("functionAnnotations")
     }

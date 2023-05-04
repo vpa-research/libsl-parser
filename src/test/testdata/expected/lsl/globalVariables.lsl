@@ -4,6 +4,7 @@ library simple;
 types {
     Int(int32);
 }
+
 var globalInt: Int = new A(state = S);
 
 automaton A : Int {
