@@ -1,17 +1,16 @@
 package org.jetbrains.research.libsl.context
 
-import org.jetbrains.research.libsl.nodes.ActionDecl
-import org.jetbrains.research.libsl.nodes.Automaton
+import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.*
-import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.type.TypeInferrer
-import org.jetbrains.research.libsl.nodes.Annotation
 
 abstract class LslContextBase {
     abstract val parentContext: LslContextBase?
+
     private val annotations = mutableListOf<Annotation>()
     private val declaredActions = mutableListOf<ActionDecl>()
     private val automata = mutableListOf<Automaton>()

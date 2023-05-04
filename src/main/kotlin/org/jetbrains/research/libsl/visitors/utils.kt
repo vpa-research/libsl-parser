@@ -1,7 +1,6 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.RuleContext
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.VocabularyImpl
 import org.antlr.v4.runtime.tree.TerminalNode

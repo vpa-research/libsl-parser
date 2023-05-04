@@ -1,10 +1,8 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.nodes.references.*
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
-
 
 data class Library(
     val metadata: MetaNode,
@@ -42,11 +40,21 @@ data class Library(
     }
 
     private fun formatImports(): String {
-        return simpleCollectionFormatter(imports, prefix = "import${IPrinter.SPACE}", suffix = ";", addEmptyLastLine = true)
+        return simpleCollectionFormatter(
+            imports,
+            prefix = "import${IPrinter.SPACE}",
+            suffix = ";",
+            addEmptyLastLine = true
+        )
     }
 
     private fun formatIncludes(): String {
-        return simpleCollectionFormatter(includes, prefix = "include${IPrinter.SPACE}", suffix = ";", addEmptyLastLine = true)
+        return simpleCollectionFormatter(
+            includes,
+            prefix = "include${IPrinter.SPACE}",
+            suffix = ";",
+            addEmptyLastLine = true
+        )
     }
 
     private fun formatTopLevelSemanticTypes(): String {
@@ -72,7 +80,7 @@ data class Library(
     }
 
     private fun formatDeclaredAnnotations(): String = buildString {
-        if(annotations.isEmpty()) {
+        if (annotations.isEmpty()) {
             return@buildString
         }
 

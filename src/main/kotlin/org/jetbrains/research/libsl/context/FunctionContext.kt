@@ -1,7 +1,6 @@
 package org.jetbrains.research.libsl.context
 
 import org.jetbrains.research.libsl.nodes.FunctionArgument
-import org.jetbrains.research.libsl.nodes.ResultVariable
 import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.VariableReference
 

@@ -13,7 +13,7 @@ class TopLevelDeclarationsResolver(
     private val basePath: String,
     private val errorManager: ErrorManager,
     private val globalContext: LslGlobalContext
-) : LibSLParserVisitor<Unit>(globalContext)  {
+) : LibSLParserVisitor<Unit>(globalContext) {
 
     override fun visitAnnotationDecl(ctx: LibSLParser.AnnotationDeclContext) {
         val annotationName = ctx.Identifier().asPeriodSeparatedString()
@@ -82,7 +82,8 @@ class TopLevelDeclarationsResolver(
                 getAnnotationUsages(param.annotationUsage())
             )
 
-            actionParams.add(actionParam) }
+            actionParams.add(actionParam)
+        }
 
         val returnType = ctx.actionType?.let { processTypeIdentifier(it) }
 
@@ -93,7 +94,7 @@ class TopLevelDeclarationsResolver(
 
         val actionAnnotations = getAnnotationUsages(ctx.annotationUsage())
 
-        val declaredAction = ActionDecl(actionName, actionParams,  actionAnnotations, returnType)
+        val declaredAction = ActionDecl(actionName, actionParams, actionAnnotations, returnType)
 
         globalContext.storeDeclaredAction(declaredAction)
     }

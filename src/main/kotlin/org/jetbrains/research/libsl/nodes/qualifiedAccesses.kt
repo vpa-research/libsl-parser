@@ -1,7 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
-import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
@@ -57,10 +56,10 @@ data class ThisAndParentAccess(
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = buildString {
-        if(hasThisExpression) {
+        if (hasThisExpression) {
             append("this.")
         }
-        if(hasParentExpression) {
+        if (hasParentExpression) {
             append("parent.")
         }
         append(childAccess?.dumpToString())

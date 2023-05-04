@@ -1,7 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.FunctionContext
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -29,7 +28,7 @@ data class Function(
 
         append("fun ${BackticksPolitics.forIdentifier(name)}")
         append(
-            args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString()}
+            args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
         )
 
         if (returnType != null) {
@@ -63,7 +62,7 @@ data class Constructor(
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
 
-        name = if(name.isNullOrEmpty()) {
+        name = if (name.isNullOrEmpty()) {
             ""
         } else {
             " " + BackticksPolitics.forIdentifier(name!!)
@@ -102,7 +101,7 @@ data class Destructor(
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
 
-        name = if(name.isNullOrEmpty()) {
+        name = if (name.isNullOrEmpty()) {
             ""
         } else {
             " " + BackticksPolitics.forIdentifier(name!!)
@@ -127,7 +126,7 @@ data class Destructor(
     }
 }
 
-data class ProcDecl (
+data class ProcDecl(
     val name: String,
     var args: MutableList<FunctionArgument> = mutableListOf(),
     val returnType: TypeReference?,
@@ -163,6 +162,7 @@ data class ProcDecl (
         }
     }
 }
+
 data class ArgumentWithValue(
     val name: String,
     val value: Expression

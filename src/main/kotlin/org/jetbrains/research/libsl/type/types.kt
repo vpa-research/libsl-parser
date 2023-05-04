@@ -2,7 +2,6 @@ package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Atomic
-import org.jetbrains.research.libsl.nodes.Expression
 import org.jetbrains.research.libsl.nodes.IPrinter
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -36,7 +35,7 @@ sealed interface Type : IPrinter {
 }
 
 sealed interface LibslType : Type
-data class RealType (
+data class RealType(
     val nameParts: List<String>,
     override val isPointer: Boolean = false,
     override val generic: TypeReference? = null,
@@ -47,7 +46,7 @@ data class RealType (
 
     override fun toString(): String = dumpToString()
 
-    override fun dumpToString(): String  = fullName
+    override fun dumpToString(): String = fullName
 }
 
 data class SimpleType(
@@ -66,7 +65,7 @@ data class SimpleType(
     override fun toString() = dumpToString()
 }
 
-data class TypeAlias (
+data class TypeAlias(
     override val name: String,
     val originalType: TypeReference,
     override val context: LslContextBase

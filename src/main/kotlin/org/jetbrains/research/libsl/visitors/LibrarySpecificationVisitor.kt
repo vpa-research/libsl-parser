@@ -45,6 +45,7 @@ class LibrarySpecificationVisitor(
 
         return library
     }
+
     private fun processHeader(ctx: LibSLParser.HeaderContext): MetaNode {
         val libraryName = ctx.libraryName.text.extractIdentifier()
         val libraryVersion = ctx.ver?.text?.removeDoubleQuotes()
@@ -121,11 +122,11 @@ class LibrarySpecificationVisitor(
 
     private fun representDeclaredAnnotationsFromContextInLibrary() {
         val annotations = globalContext.getAllAnnotations()
-        library.annotationReferences.addAll(annotations.map { annotation -> annotation.getReference(context)})
+        library.annotationReferences.addAll(annotations.map { annotation -> annotation.getReference(context) })
     }
 
     private fun representDeclaredActionsFromContextInLibrary() {
         val declaredActions = globalContext.getAllDeclaredActions()
-        library.declaredActionReferences.addAll(declaredActions.map { action -> action.getReference(context)})
+        library.declaredActionReferences.addAll(declaredActions.map { action -> action.getReference(context) })
     }
 }

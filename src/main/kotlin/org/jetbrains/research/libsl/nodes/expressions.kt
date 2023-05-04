@@ -3,9 +3,8 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
-import org.jetbrains.research.libsl.utils.BackticksPolitics
 
-sealed class Expression: Node() {
+sealed class Expression : Node() {
     override fun dumpToString(): String = ExpressionDumper.dump(this)
 }
 
@@ -28,6 +27,7 @@ enum class ArithmeticBinaryOps(val string: String, val priority: Int) {
     XOR("^", 7), MOD("%", 4), EQ("==", 6), NOT_EQ("!=", 6),
     GT(">", 6), GT_EQ(">=", 6), LT("<", 6), LT_EQ("<=", 6),
     R_SHIFT(">>", 7), UNSIGNED_R_SHIFT(">>>", 7), L_SHIFT("<<", 7);
+
     companion object {
         fun fromString(str: String) = ArithmeticBinaryOps.values().first { op -> op.string == str }
     }
@@ -37,6 +37,7 @@ enum class CompoundOps(val string: String) {
     COMP_ADD("+="), COMP_SUB("-="), COMP_MUL("*="), COMP_DIV("/="), COMP_AND("&="),
     COMP_OR("|="), COMP_XOR("^="), COMP_MOD("%="), COMP_R_SHIFT(">>="), COMP_UN_R_SHIFT(">>>="),
     COMP_L_SHIFT("<<=");
+
     companion object {
         fun fromString(str: String) = CompoundOps.values().first { op -> op.string == str }
     }
