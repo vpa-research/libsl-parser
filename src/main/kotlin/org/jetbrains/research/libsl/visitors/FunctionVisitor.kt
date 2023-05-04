@@ -134,7 +134,7 @@ class FunctionVisitor(
         )
 
         super.visitProcDecl(ctx)
-        parentAutomaton?.procDeclList?.add(buildingProcDecl)
+        parentAutomaton?.procDeclarations?.add(buildingProcDecl)
     }
 
     override fun visitFunctionBodyStatements(ctx: LibSLParser.FunctionBodyStatementsContext) {

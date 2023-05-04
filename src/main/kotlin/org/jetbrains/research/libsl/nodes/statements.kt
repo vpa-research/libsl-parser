@@ -66,7 +66,7 @@ data class Action(
 ) : Statement() {
     override fun dumpToString(): String = buildString {
         append("action ${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments != null) {
+        if(arguments?.isNotEmpty() == true) {
             val args = arguments.map { it.dumpToString() }.toMutableList()
             append(args.joinToString(separator = ", "))
         }
@@ -88,7 +88,7 @@ data class Proc(
             append("parent.")
         }
         append("${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments != null) {
+        if(arguments?.isNotEmpty() == true) {
             val args = arguments.map { it.dumpToString() }.toMutableList()
             append(args.joinToString(separator = ", "))
         }

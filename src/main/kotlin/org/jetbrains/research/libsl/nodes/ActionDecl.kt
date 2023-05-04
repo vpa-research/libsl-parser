@@ -21,9 +21,8 @@ data class ActionDecl(
         if (returnType != null) {
             append(": ")
             append(returnType.resolve()?.fullName ?: Type.UNRESOLVED_TYPE_SYMBOL)
-            appendLine(";")
-        } else {
-            appendLine(";")
         }
+
+        appendLine(";")
     }
 }

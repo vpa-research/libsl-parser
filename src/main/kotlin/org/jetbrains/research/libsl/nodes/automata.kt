@@ -18,7 +18,7 @@ data class Automaton(
     val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
     val constructors: MutableList<Constructor> = mutableListOf(),
     val destructors: MutableList<Destructor> = mutableListOf(),
-    val procDeclList: MutableList<ProcDecl> = mutableListOf(),
+    val procDeclarations: MutableList<ProcDecl> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
     val extensionFunctions: MutableList<Function> = mutableListOf(),
     val context: AutomatonContext
@@ -45,7 +45,7 @@ data class Automaton(
         append(formatInternalVariables())
         append(formatConstructors())
         append(formatDestructors())
-        append(formatProcList())
+        append(formatProcDeclarations())
         append(formatFunctions())
     }
 
@@ -59,7 +59,7 @@ data class Automaton(
 
     private fun formatDestructors(): String = formatListEmptyLineAtEndIfNeeded(destructors)
 
-    private fun formatProcList(): String = formatListEmptyLineAtEndIfNeeded(procDeclList)
+    private fun formatProcDeclarations(): String = formatListEmptyLineAtEndIfNeeded(procDeclarations)
 
     private fun formatFunctions(): String = formatListEmptyLineAtEndIfNeeded(functions, appendEndLineAtTheEnd = false)
 
