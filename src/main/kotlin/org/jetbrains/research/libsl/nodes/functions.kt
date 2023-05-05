@@ -16,13 +16,15 @@ data class Function(
     var localVariables: MutableList<Variable> = mutableListOf(),
     var contracts: MutableList<Contract> = mutableListOf(),
     var statements: MutableList<Statement> = mutableListOf(),
-    val hasBody: Boolean = statements.isNotEmpty(),
     var targetAutomatonRef: AutomatonReference? = null,
     val context: FunctionContext
 ) : Node() {
     val fullName: String
         get() = "${automatonReference.name}.$name"
     var resultVariable: Variable? = null
+
+    val hasBody: Boolean
+        get() = statements.isNotEmpty() || contracts.isNotEmpty()
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
@@ -34,7 +36,7 @@ data class Function(
 
         if (returnType != null) {
             append(": ")
-            append(returnType.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
+            append(BackticksPolitics.forTypeIdentifier(returnType.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
         }
 
         if (!hasBody && contracts.isEmpty()) {
@@ -46,6 +48,8 @@ data class Function(
             }
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
+        } else {
+            appendLine(";")
         }
     }
 }

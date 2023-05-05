@@ -100,7 +100,7 @@ data class EnumLikeSemanticType(
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String = buildString {
-        appendLine("$name(${type.fullName}) {")
+        appendLine("${BackticksPolitics.forTypeIdentifier(name)}(${BackticksPolitics.forTypeIdentifier(type.fullName)}) {")
         val formattedEntries = entries.map { (k, v) -> "${BackticksPolitics.forIdentifier(k)}: ${v.dumpToString()}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
         append("}")
@@ -119,7 +119,7 @@ data class StructuredType(
     override val generic: TypeReference? = null
 
     override fun dumpToString(): String = buildString {
-        appendLine("type ${name} {")
+        appendLine("type ${BackticksPolitics.forTypeIdentifier(name)} {")
         val formattedEntries = entries.map { (k, v) ->
             "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}"
         }

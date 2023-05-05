@@ -90,14 +90,6 @@ APOSTROPHE : '\'' ;
 
 BACK_QOUTE : '`' ;
 
-ImportStatement
-   :   IMPORT .*? ';'
-   ;
-
-IncludeStatement
-   :   INCLUDE .*? ';'
-   ;
-
 IMPORT
    :   'import'
    ;

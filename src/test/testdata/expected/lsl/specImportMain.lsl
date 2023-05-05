@@ -1,7 +1,7 @@
 libsl "1.0.0";
 library simple;
 
-import specImportSecondary;
+import "specImportSecondary";
 
 typealias Int = int64;
 

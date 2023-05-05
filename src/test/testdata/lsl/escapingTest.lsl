@@ -3,6 +3,10 @@ library simple;
 
 typealias Int = int32;
 
+type `-. 12s` {
+    a: Int;
+}
+
 automaton A : Int {
     var i: Int;
 

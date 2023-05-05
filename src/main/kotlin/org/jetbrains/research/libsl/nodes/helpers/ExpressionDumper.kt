@@ -139,7 +139,7 @@ object ExpressionDumper {
             expression.childAccess != null -> {
                 "${BackticksPolitics.forIdentifier(expression.fieldName)}${dump(expression.childAccess!!)}"
             }
-            else -> expression.fieldName
+            else -> BackticksPolitics.forIdentifier(expression.fieldName)
         }
     }
 
@@ -170,6 +170,6 @@ object ExpressionDumper {
     }
 
     private fun dumpVariable(expression: Variable): String {
-        return expression.name
+        return BackticksPolitics.forIdentifier(expression.name)
     }
 }

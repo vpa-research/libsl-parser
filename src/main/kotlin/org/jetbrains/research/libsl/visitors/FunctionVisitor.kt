@@ -60,7 +60,6 @@ class FunctionVisitor(
             args,
             returnType,
             annotationReferences,
-            hasBody = ctx.functionBody() != null,
             targetAutomatonRef = targetAutomatonRef,
             context = functionContext
         )

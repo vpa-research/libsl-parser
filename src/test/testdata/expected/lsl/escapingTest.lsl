@@ -3,14 +3,16 @@ library simple;
 
 typealias Int = int32;
 
+type `-. 12s` {
+    a: Int;
+}
+
 automaton A : Int {
     var i: Int;
-
     fun f(param: Int): Int {
         result = new `123`(state = Init);
     }
-    fun `<test>`(): Int {
-    }
+    fun `<test>`(): Int;
 }
 
 automaton `123` : Int {

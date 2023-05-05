@@ -6,7 +6,7 @@ library simple version "1.0.0f" language "java" url "https://github.com/vldf/";
 //
 // imports
 //
-include file.to.include;
+include "file.to.include";
 
  //types
 types {

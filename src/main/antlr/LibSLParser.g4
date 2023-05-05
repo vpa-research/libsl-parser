@@ -16,8 +16,8 @@ file
    ;
 
 globalStatement
-   :   ImportStatement
-   |   IncludeStatement
+   :   importStatement
+   |   includeStatement
    |   typesSection
    |   typealiasStatement
    |   typeDefBlock
@@ -25,6 +25,14 @@ globalStatement
    |   annotationDecl
    |   actionDecl
    |   topLevelDecl
+   ;
+
+importStatement
+   :   IMPORT DoubleQuotedString SEMICOLON
+   ;
+
+includeStatement
+   :   INCLUDE DoubleQuotedString SEMICOLON
    ;
 
 topLevelDecl
