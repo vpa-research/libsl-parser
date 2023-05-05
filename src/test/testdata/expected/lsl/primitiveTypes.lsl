@@ -7,6 +7,5 @@ typealias V = *void;
 automaton A : Int {
     var i: V;
 
-    fun f(param: Int): V {
-    }
+    fun f(param: Int): V;
 }

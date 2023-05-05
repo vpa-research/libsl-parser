@@ -1,7 +1,7 @@
 libsl "1.0.0";
 library contextResolution2;
 
-import contextResolution1;
+import "contextResolution1";
 
 typealias TypeFrom2File=int32;
 

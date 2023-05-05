@@ -1,9 +1,7 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
-import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
-import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class QualifiedAccess : Atomic() {
     abstract var childAccess: QualifiedAccess?
@@ -25,11 +23,6 @@ data class VariableAccess(
     val variable: VariableReference
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
-    override fun dumpToString(): String = when {
-        childAccess != null && childAccess is VariableAccess -> "${BackticksPolitics.forIdentifier(fieldName)}.${childAccess?.dumpToString()}"
-        childAccess != null -> "${BackticksPolitics.forIdentifier(fieldName)}${childAccess?.dumpToString()}"
-        else -> fieldName
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -56,15 +49,6 @@ data class ThisAndParentAccess(
     override var childAccess: QualifiedAccess?
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
-    override fun dumpToString(): String = buildString {
-        if(hasThisExpression) {
-            append("this.")
-        }
-        if(hasParentExpression) {
-            append("parent.")
-        }
-        append(childAccess?.dumpToString())
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

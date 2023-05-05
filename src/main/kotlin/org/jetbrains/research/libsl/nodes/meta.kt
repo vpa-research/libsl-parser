@@ -38,15 +38,24 @@ data class Library(
         append(formatDeclaredAnnotations())
         append(formatActionDeclarations())
         append(formatAutomata())
-        appendLine()
     }
 
     private fun formatImports(): String {
-        return simpleCollectionFormatter(imports, prefix = "import${IPrinter.SPACE}", suffix = ";", addEmptyLastLine = true)
+        return simpleCollectionFormatter(
+            imports.map { "\"$it\"" },
+            prefix = "import${IPrinter.SPACE}",
+            suffix = ";",
+            addEmptyLastLine = true
+        )
     }
 
     private fun formatIncludes(): String {
-        return simpleCollectionFormatter(includes, prefix = "include${IPrinter.SPACE}", suffix = ";", addEmptyLastLine = true)
+        return simpleCollectionFormatter(
+            includes.map { "\"$it\"" },
+            prefix = "include${IPrinter.SPACE}",
+            suffix = ";",
+            addEmptyLastLine = true
+        )
     }
 
     private fun formatTopLevelSemanticTypes(): String {

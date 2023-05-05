@@ -30,7 +30,6 @@ open class Variable(
     open val fullName: String
         get() = name
 
-    override fun dumpToString(): String = name
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Variable) return false

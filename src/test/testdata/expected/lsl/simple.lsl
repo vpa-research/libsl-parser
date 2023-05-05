@@ -1,6 +1,8 @@
 libsl "1.0.0";
 library simple version "1.0.0f" language "java" url "https://github.com/vldf/";
-include file.to.include;
+
+include "file.to.include";
+
 types {
     SimpleType(ru.vldf.Type);
     SimpleTypeWithGeneric(ru.vldf.Type<ru.vldf.Generic>);
@@ -12,6 +14,7 @@ types {
     String(java.lang.String);
     Int(int32);
 }
+
 automaton A : Int {
     state S1;
     state S2;
@@ -25,6 +28,7 @@ automaton A : Int {
         b = 1;
     }
 }
+
 automaton B : Int {
     state S1;
     state S3;

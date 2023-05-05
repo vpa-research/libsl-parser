@@ -65,36 +65,25 @@ class LibrarySpecificationVisitor(
 
     override fun visitGlobalStatement(ctx: LibSLParser.GlobalStatementContext) {
         when {
-            ctx.ImportStatement() != null -> processImport(ctx.ImportStatement().text, ctx.position())
-            ctx.IncludeStatement() != null -> processInclude(ctx.IncludeStatement().text, ctx.position())
+            ctx.importStatement() != null -> {
+                val name = ctx.importStatement().DoubleQuotedString().text.removeDoubleQuotes()
+                addImport(name)
+            }
+            ctx.includeStatement() != null -> {
+                val name = ctx.includeStatement().DoubleQuotedString().text.removeDoubleQuotes()
+                addInclude(name)
+            }
         }
 
         super.visitGlobalStatement(ctx)
     }
 
-    private fun processImport(str: String, position: Position) {
-        val importRegex = Regex("^(import)\\s+(.+);")
-        val importName = importRegex.find(str)?.groupValues?.get(2)
-
-        if (importName == null) {
-            errorManager(UnresolvedImportOrInclude(str, position))
-            return
-        }
-
-        library.imports.add(importName)
-
+    private fun addImport(name: String) {
+        library.imports.add(name)
     }
 
-    private fun processInclude(str: String, position: Position) {
-        val includeRegex = Regex("^(include)\\s+(.+);")
-        val includeName = includeRegex.find(str)?.groupValues?.get(2)
-
-        if (includeName == null) {
-            errorManager(UnresolvedImportOrInclude(str, position))
-            return
-        }
-
-        library.includes.add(includeName)
+    private fun addInclude(name: String) {
+        library.includes.add(name)
     }
 
     private fun representTypesFromContextInLibrary() {

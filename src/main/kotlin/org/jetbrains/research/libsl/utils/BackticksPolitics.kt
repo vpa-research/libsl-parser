@@ -26,7 +26,7 @@ object BackticksPolitics {
     fun forTypeIdentifier(str: String): String {
         val parseResult = getLslParser(str).typeIdentifier()
 
-        return if (parseResult?.exception == null) {
+        return if (parseResult?.exception == null && parseResult.text == str) {
             str
         } else {
             "`$str`"
@@ -36,7 +36,7 @@ object BackticksPolitics {
     fun forPeriodSeparated(str: String): String {
         val parseResult = getLslParser(str).periodSeparatedFullName()
 
-        return if (parseResult?.exception == null) {
+        return if (parseResult?.exception == null && parseResult.text == str) {
             str
         } else {
             "`$str`"
