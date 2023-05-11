@@ -16,9 +16,9 @@ data class Automaton(
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
     val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
-    val constructors: MutableList<Constructor> = mutableListOf(),
-    val destructors: MutableList<Destructor> = mutableListOf(),
-    val procDeclarations: MutableList<ProcDecl> = mutableListOf(),
+    val constructors: MutableList<Function> = mutableListOf(),
+    val destructors: MutableList<Function> = mutableListOf(),
+    val procDeclarations: MutableList<Function> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
     val extensionFunctions: MutableList<Function> = mutableListOf(),
     val context: AutomatonContext

@@ -10,9 +10,7 @@ automaton A : Int {
         x = 1;
         y = 1;
     }
-    constructor();
     destructor A();
-    destructor();
     fun f();
     fun g(param: Int);
 }

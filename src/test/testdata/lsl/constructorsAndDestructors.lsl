@@ -16,8 +16,6 @@ automaton A : Int {
        y = 1;
     }
     destructor A()
-    constructor()
-    destructor()
     fun f()
     fun g(param: Int)
 }

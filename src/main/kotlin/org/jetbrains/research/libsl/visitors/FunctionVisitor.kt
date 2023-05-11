@@ -55,6 +55,7 @@ class FunctionVisitor(
         }
 
         buildingFunction = Function(
+            kind = FunctionKind.FUNCTION,
             functionName,
             automatonReference,
             args,
@@ -70,7 +71,7 @@ class FunctionVisitor(
     }
 
     override fun visitConstructorDecl(ctx: ConstructorDeclContext) {
-        val constructorName = ctx.functionName?.text?.extractIdentifier()
+        val constructorName = ctx.functionName.text.extractIdentifier()
 
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
@@ -90,7 +91,7 @@ class FunctionVisitor(
     }
 
     override fun visitDestructorDecl(ctx: DestructorDeclContext) {
-        val destructorName = ctx.functionName?.text?.extractIdentifier()
+        val destructorName = ctx.functionName.text.extractIdentifier()
 
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
@@ -137,7 +138,7 @@ class FunctionVisitor(
         parentAutomaton?.procDeclarations?.add(buildingProcDecl)
     }
 
-    override fun visitFunctionBodyStatements(ctx: LibSLParser.FunctionBodyStatementsContext) {
+    override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
         val statements = when {
             funInitialized() -> buildingFunction.statements
             constructorInitialized() -> buildingConstructor.statements
@@ -242,7 +243,6 @@ class FunctionVisitor(
         if (funInitialized()) buildingFunction.contracts.add(contract)
         if (constructorInitialized()) buildingConstructor.contracts.add(contract)
         if (destructorInitialized()) buildingDestructor.contracts.add(contract)
-        if (procInitialized()) buildingProcDecl.contracts.add(contract)
     }
 
     private fun funInitialized(): Boolean {
