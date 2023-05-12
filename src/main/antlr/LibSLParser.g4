@@ -129,7 +129,7 @@ actionDecl
    ;
 
 actionDeclParamList
-   :   actionParameter (COMMA actionParameter)*
+   :   actionParameter (COMMA actionParameter)* (COMMA)?
    ;
 
 actionParameter
@@ -142,7 +142,7 @@ actionParameter
  *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   annotationUsage* AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables*? R_BRACKET)?
+   :   annotationUsage* AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
    COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
    ;
 
@@ -270,7 +270,7 @@ parameter
  * syntax: @annotationName(args)
  */
 annotationUsage
-   :  AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 /*
@@ -287,8 +287,7 @@ preamblePart
    ;
 
 functionBody
-   :   functionPreamble
-   functionBodyStatements*
+   :   functionPreamble functionBodyStatements*
    ;
 
 functionBodyStatements
