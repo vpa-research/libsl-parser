@@ -80,31 +80,18 @@ data class Library(
     }
 
     private fun formatDeclaredAnnotations(): String = buildString {
-        if (annotations.isEmpty()) {
-            return@buildString
-        }
-
-
-        annotations.joinToString() { annotation ->
+        annotations.forEach { annotation ->
             append(annotation.dumpToString())
         }
     }
 
     private fun formatActionDeclarations(): String = buildString {
-        if (declaredActions.isEmpty())
-            return@buildString
-
-        declaredActions.joinToString { declaredAction ->
+        declaredActions.forEach { declaredAction ->
             append(declaredAction.dumpToString())
         }
     }
 
-    private fun formatAutomata(): String = buildString {
-        if (automata.isEmpty())
-            return@buildString
-
-        append(formatListEmptyLineAtEndIfNeeded(automata))
-    }
+    private fun formatAutomata(): String = formatListEmptyLineAtEndIfNeeded(automata)
 
     private fun formatGlobalVariables(): String = formatListEmptyLineAtEndIfNeeded(globalVariables)
 }
