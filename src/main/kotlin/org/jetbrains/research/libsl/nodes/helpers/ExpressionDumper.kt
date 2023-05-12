@@ -17,7 +17,7 @@ object ExpressionDumper {
             is IntegerLiteral -> dumpLiteral(expression)
             is ArrayAccess -> dumpArrayAccess(expression)
             is AutomatonOfFunctionArgumentInvoke -> dumpAutomatonOfFunctionArgumentInvoke(expression)
-            is ThisAccess -> dumpThisAndParentAccess(expression)
+            is ThisAccess -> dumpThisAccess(expression)
             is VariableAccess -> dumpVariableAccess(expression)
             is StringLiteral -> dumpStringLiteral(expression)
             is OldValue -> dumpOldValue(expression)
@@ -25,8 +25,6 @@ object ExpressionDumper {
             is ThisExpression -> dumpThisExpression(expression)
             is UnaryOpExpression -> dumpUnaryOpExpression(expression)
             is Variable -> dumpVariable(expression)
-            is LeftUnaryOpExpression -> dumpLeftUnaryOpExpression(expression)
-            is RightUnaryOpExpression -> dumpRightUnaryOpExpression(expression)
         }
     }
 
@@ -121,7 +119,7 @@ object ExpressionDumper {
         }
     }
 
-    private fun dumpThisAndParentAccess(expression: ThisAccess): String {
+    private fun dumpThisAccess(expression: ThisAccess): String {
         return buildString {
             if (expression.hasThisExpression) {
                 append("this.")
@@ -171,13 +169,5 @@ object ExpressionDumper {
 
     private fun dumpVariable(expression: Variable): String {
         return expression.name
-    }
-
-    private fun dumpLeftUnaryOpExpression(expression: LeftUnaryOpExpression): String {
-        return "${expression.op.string}${dump(expression.value)}"
-    }
-
-    private fun dumpRightUnaryOpExpression(expression: RightUnaryOpExpression): String {
-        return "${dump(expression.value)}${expression.op.string}"
     }
 }

@@ -1,11 +1,11 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.ActionContext
+import org.jetbrains.research.libsl.LibSLParser.ActionUsageContext
 import org.jetbrains.research.libsl.LibSLParser.ArrayLiteralContext
 import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
 import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
-import org.jetbrains.research.libsl.LibSLParser.ProcContext
+import org.jetbrains.research.libsl.LibSLParser.ProcUsageContext
 import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
 import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
 import org.jetbrains.research.libsl.LibSLParser.ThisExpressionContext
@@ -57,12 +57,12 @@ class ExpressionVisitor(
                 visitUnaryOp(ctx.unaryOp())
             }
 
-            ctx.proc() != null -> {
-                visitProc(ctx.proc())
+            ctx.procUsage() != null -> {
+                visitProcUsage(ctx.procUsage())
             }
 
-            ctx.action() != null -> {
-                visitAction(ctx.action())
+            ctx.actionUsage() != null -> {
+                visitActionUsage(ctx.actionUsage())
             }
 
             else -> error("unknown expression type")
@@ -76,7 +76,22 @@ class ExpressionVisitor(
     }
 
     private fun processBinaryExpression(ctx: ExpressionContext): BinaryOpExpression {
-        val opText = ctx.op.text
+        val opText = when {
+            ctx.op != null -> let {
+                ctx.op.text
+            }
+            ctx.bitShiftOp().lShift() != null -> let {
+                "<<"
+            }
+            ctx.bitShiftOp().rShift() != null -> let {
+                ">>"
+            }
+            ctx.bitShiftOp().uRShift() != null -> let {
+                ">>>"
+            }
+
+            else -> error("unknown binary expression")
+        }
         val op = ArithmeticBinaryOps.fromString(opText)
 
         val left = ctx.expression(0)
@@ -101,7 +116,7 @@ class ExpressionVisitor(
         val op = ArithmeticUnaryOp.fromString(opText)
         val expression = visitExpression(ctx.expression(0))
 
-        return UnaryOpExpression(expression, op)
+        return UnaryOpExpression(op, expression)
     }
 
     private fun processOldValue(ctx: QualifiedAccessContext): OldValue {
@@ -256,7 +271,7 @@ class ExpressionVisitor(
                 else -> error("unknown kind")
             }
 
-            if (name == "state" || name == "parent") {
+            if (name == "state") {
                 return@mapNotNull null
             }
 
@@ -269,13 +284,7 @@ class ExpressionVisitor(
 
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
 
-        //TODO() Parent
-        val parentName =
-            ctx.namedArgs().argPair().firstOrNull { pair -> pair.name.text == "parent" }?.expressionAtomic()?.text
-
-        val parentRef = parentName?.let { AutomatonReferenceBuilder.build(it, context) }
-
-        return CallAutomatonConstructor(automatonRef, args, stateRef, parentRef)
+        return CallAutomatonConstructor(automatonRef, args, stateRef)
     }
 
     override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Expression {
@@ -288,7 +297,7 @@ class ExpressionVisitor(
         }
     }
 
-    override fun visitAction(ctx: ActionContext): Expression  {
+    override fun visitActionUsage(ctx: ActionUsageContext): Expression  {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
@@ -300,7 +309,7 @@ class ExpressionVisitor(
         return ActionExpression(action)
     }
 
-    override fun visitProc(ctx: ProcContext): Expression {
+    override fun visitProcUsage(ctx: ProcUsageContext): Expression {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
@@ -314,20 +323,23 @@ class ExpressionVisitor(
     }
 
     override fun visitUnaryOp(ctx: LibSLParser.UnaryOpContext): Expression {
-        val expressionVisitor = ExpressionVisitor(context)
-        return when {
-            ctx.leftUnaryOp != null -> let {
-                val op = ArithmeticUnaryOp.fromString(ctx.leftUnaryOp.text)
-                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-                LeftUnaryOpExpression(op, value)
+        val op = when {
+            ctx.PLUS() != null -> let {
+                ArithmeticUnaryOp.fromString(ctx.PLUS().text)
             }
-            ctx.rightUnaryOp != null -> let {
-                val op = ArithmeticUnaryOp.fromString(ctx.rightUnaryOp.text)
-                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-                RightUnaryOpExpression(op, value)
+            ctx.EXCLAMATION() != null -> let {
+                ArithmeticUnaryOp.fromString(ctx.EXCLAMATION().text)
             }
-
+            ctx.MINUS() != null -> let {
+                ArithmeticUnaryOp.fromString(ctx.MINUS().text)
+            }
+            ctx.TILDE() != null -> let {
+                ArithmeticUnaryOp.fromString(ctx.TILDE().text)
+            }
             else -> error("unknown unary op expression")
         }
+
+        val value = visitExpression(ctx.expression())
+        return UnaryOpExpression(op, value)
     }
 }

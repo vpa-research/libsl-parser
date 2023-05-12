@@ -110,15 +110,4 @@ class TypeResolver(
 
         return name to typeRef
     }
-
-    override fun visitBitShiftOp(ctx: LibSLParser.BitShiftOpContext) {
-        val token = (ctx.getChild(0) as TerminalNode).symbol
-        val firstIndex = token.startIndex
-        for (i in 1 until ctx.childCount) {
-            val sibling = (ctx.getChild(i) as TerminalNode).symbol
-            if (sibling.startIndex != firstIndex + i) {
-                error("Invalid symbols inside shift operator")
-            }
-        }
-    }
 }

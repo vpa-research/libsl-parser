@@ -134,12 +134,6 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
                 function.context.typeInferrer.getExpressionType(statement.left)
                 function.context.typeInferrer.getExpressionType(statement.value)
             }
-            is AssignmentWithLeftUnaryOp -> {
-                function.context.typeInferrer.getExpressionType(statement.value)
-            }
-            is AssignmentWithRightUnaryOp -> {
-                function.context.typeInferrer.getExpressionType(statement.value)
-            }
         }
     }
 }

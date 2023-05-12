@@ -23,8 +23,6 @@ abstract class ExpressionVisitor <T> {
             is ProcExpression -> visitProcExpression(node)
             is ThisAccess -> visitThisAndParentAccess(node)
             is ThisExpression -> visitThisExpression(node)
-            is LeftUnaryOpExpression -> visitLeftUnaryOpExpression(node)
-            is RightUnaryOpExpression -> visitRightUnaryOpExpression(node)
         }
     }
 
@@ -67,9 +65,4 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitThisExpression(node: ThisExpression): T
 
     abstract fun visitThisAndParentAccess(node: ThisAccess): T
-
-    abstract fun visitLeftUnaryOpExpression(node: LeftUnaryOpExpression): T
-
-    abstract fun visitRightUnaryOpExpression(node: RightUnaryOpExpression): T
-
 }

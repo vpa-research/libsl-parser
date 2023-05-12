@@ -308,11 +308,11 @@ elseStatement
 /* semantic action
  * syntax: action ActionName(args)
  */
-action
+actionUsage
    :  ACTION Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
-proc
+procUsage
    :  (THIS DOT)? Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
@@ -341,12 +341,6 @@ assignsContract
    :   ASSIGNS (name=Identifier COLON)? expression SEMICOLON
    ;
 
-bitShiftOp
-   :   L_ARROW L_ARROW
-   |   R_ARROW R_ARROW
-   |   R_ARROW R_ARROW R_ARROW
-   ;
-
 /*
  * expression
  */
@@ -355,9 +349,6 @@ expression
    |   expression op=(ASTERISK | SLASH) expression
    |   expression op=PERCENT expression
    |   expression op=(PLUS | MINUS) expression
-   |   op=MINUS expression
-   |   op=EXCLAMATION expression
-   |   op=TILDE expression
    |   expression op=(EQ | EXCLAMATION_EQ | L_ARROW_EQ | L_ARROW | R_ARROW_EQ | R_ARROW) expression
    |   expression op=(AMPERSAND | BIT_OR | XOR) expression
    |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
@@ -367,13 +358,33 @@ expression
    |   expressionAtomic
    |   qualifiedAccess
    |   unaryOp
-   |   proc
-   |   action
+   |   procUsage
+   |   actionUsage
+   ;
+
+bitShiftOp
+   :   lShift
+   |   rShift
+   |   uRShift
+   ;
+
+lShift
+   :   L_ARROW L_ARROW
+   ;
+
+rShift
+   :   R_ARROW R_ARROW
+   ;
+
+uRShift
+   :   R_ARROW R_ARROW R_ARROW
    ;
 
 unaryOp
-   :   leftUnaryOp=(INCREMENT | DECREMENT) qualifiedAccess
-   |   qualifiedAccess rightUnaryOp=(INCREMENT | DECREMENT)
+   :   op=PLUS expression
+   |   op=MINUS expression
+   |   op=EXCLAMATION expression
+   |   op=TILDE expression
    ;
 
 thisExpression

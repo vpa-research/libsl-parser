@@ -27,20 +27,6 @@ class BlockStatementVisitor(
                 val assignmentWithCompoundOp = AssignmentWithCompoundOp(left, op, value)
                 statements.add(assignmentWithCompoundOp)
             }
-            ctx.leftUnaryOp != null -> let {
-                val expressionVisitor = ExpressionVisitor(functionContext)
-                val op = ArithmeticUnaryOp.fromString(ctx.leftUnaryOp.text)
-                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-                val assignmentWithLeftUnaryOp = AssignmentWithLeftUnaryOp(op, value)
-                statements.add(assignmentWithLeftUnaryOp)
-            }
-            ctx.rightUnaryOp != null -> let {
-                val expressionVisitor = ExpressionVisitor(functionContext)
-                val op = ArithmeticUnaryOp.fromString(ctx.rightUnaryOp.text)
-                val value = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-                val assignmentWithRightUnaryOp = AssignmentWithRightUnaryOp(op, value)
-                statements.add(assignmentWithRightUnaryOp)
-            }
         }
     }
 
@@ -65,7 +51,7 @@ class BlockStatementVisitor(
         statements.add(ifBlock)
     }
 
-    override fun visitAction(ctx: LibSLParser.ActionContext) {
+    override fun visitActionUsage(ctx: LibSLParser.ActionUsageContext) {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(functionContext)
         val args = ctx.expressionsList().expression().map { expr ->
@@ -77,7 +63,7 @@ class BlockStatementVisitor(
         statements.add(action)
     }
 
-    override fun visitProc(ctx: LibSLParser.ProcContext) {
+    override fun visitProcUsage(ctx: LibSLParser.ProcUsageContext) {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(functionContext)
         val args = ctx.expressionsList()?.expression()?.map { expr ->

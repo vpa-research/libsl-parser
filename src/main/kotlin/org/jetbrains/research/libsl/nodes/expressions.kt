@@ -59,8 +59,8 @@ enum class CompoundOps(val string: String) {
 }
 
 data class UnaryOpExpression(
-    val value: Expression,
-    val op: ArithmeticUnaryOp
+    val op: ArithmeticUnaryOp,
+    val value: Expression
 ) : Expression()
 
 data class OldValue(
@@ -70,8 +70,7 @@ data class OldValue(
 data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
     val args: List<ArgumentWithValue>,
-    val stateRef: AutomatonStateReference,
-    val parentRef: AutomatonReference?
+    val stateRef: AutomatonStateReference
 ) : Atomic() {
     override val value: Any? = null
 
@@ -92,14 +91,4 @@ data class ActionExpression(
 
 data class ProcExpression(
     val procedureCall: ProcedureCall
-) : Expression()
-
-data class LeftUnaryOpExpression(
-    val op: ArithmeticUnaryOp,
-    val value: Expression
-) : Expression()
-
-data class RightUnaryOpExpression(
-    val op: ArithmeticUnaryOp,
-    val value: Expression
 ) : Expression()

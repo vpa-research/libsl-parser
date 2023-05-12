@@ -11,22 +11,19 @@ automaton A : Int {
 
         var res: Int;
 
-        res = ++x;
-        res = x++;
-        res = --x;
-        res = x--;
-
-        ++x;
-        x++;
-        --x;
-        x--;
-
         x = x && y;
         x = x || y;
         y = !x;
+        y = ~x;
+        y = +x;
+        y = -x;
 
+        res = x >> y;
         x >> y;
+        res = x << y;
         x << y;
+        res = x >>> y;
+        x >>> y;
         x += y;
         x -= y;
         x *= y;
