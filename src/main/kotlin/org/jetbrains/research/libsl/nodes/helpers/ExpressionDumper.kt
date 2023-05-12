@@ -151,9 +151,6 @@ object ExpressionDumper {
     private fun dumpThisExpression(expression: ThisExpression): String {
         return buildString {
             append("this")
-            if (expression.parentKeywordUsed) {
-                append(".parent")
-            }
         }
     }
 

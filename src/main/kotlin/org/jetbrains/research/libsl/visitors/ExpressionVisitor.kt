@@ -57,6 +57,14 @@ class ExpressionVisitor(
                 visitUnaryOp(ctx.unaryOp())
             }
 
+            ctx.proc() != null -> {
+                visitProc(ctx.proc())
+            }
+
+            ctx.action() != null -> {
+                visitAction(ctx.action())
+            }
+
             else -> error("unknown expression type")
         }
     }
@@ -276,9 +284,6 @@ class ExpressionVisitor(
             ctx.callAutomatonConstructorWithNamedArgs() != null -> {
                 visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
             }
-            ctx.action() != null -> visitAction(ctx.action())
-            ctx.proc() != null -> visitProc(ctx.proc())
-
             else -> error("unknown assignment right kind")
         }
     }

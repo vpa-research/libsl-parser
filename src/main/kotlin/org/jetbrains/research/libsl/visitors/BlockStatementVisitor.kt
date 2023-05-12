@@ -103,12 +103,6 @@ class BlockStatementVisitor(
                 right.expression() != null -> {
                     expressionVisitor.visitExpression(right.expression())
                 }
-                right.action() != null -> {
-                    expressionVisitor.visitAction(right.action())
-                }
-                right.proc() != null -> {
-                    expressionVisitor.visitProc(right.proc())
-                }
                 else -> error("unknown initializer kind")
             }
         }

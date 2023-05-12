@@ -16,7 +16,7 @@ automaton A : Int {
 
     fun useProc(): Int {
         _noReturn();
-        result = _sum(x, y);
+        result = _sum(x, y) + 1;
     }
 
 }

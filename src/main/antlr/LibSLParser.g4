@@ -217,8 +217,6 @@ variableAssignment
 assignmentRight
    :   expression
    |   NEW callAutomatonConstructorWithNamedArgs
-   |   action
-   |   proc
    ;
 
 callAutomatonConstructorWithNamedArgs
@@ -296,8 +294,6 @@ functionBody
 functionBodyStatements
    :   variableAssignment
    |   variableDecl
-   |   action SEMICOLON
-   |   proc SEMICOLON
    |   ifStatement
    |   expression SEMICOLON
    ;
@@ -372,6 +368,8 @@ expression
    |   expressionAtomic
    |   qualifiedAccess
    |   unaryOp
+   |   proc
+   |   action
    ;
 
 unaryOp
