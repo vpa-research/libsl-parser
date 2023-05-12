@@ -86,9 +86,9 @@ class BlockStatementVisitor(
         val hasThisExpression = ctx.THIS() != null
         val hasParentExpression = ctx.PARENT() != null
 
-        val proc = Proc(name, args, hasThisExpression, hasParentExpression)
+        val procedureCall = ProcedureCall(name, args, hasThisExpression, hasParentExpression)
 
-        statements.add(proc)
+        statements.add(procedureCall)
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {

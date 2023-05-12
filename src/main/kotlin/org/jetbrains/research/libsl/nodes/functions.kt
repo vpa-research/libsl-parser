@@ -89,7 +89,7 @@ class Destructor(
     statements, hasBody, null, context
 )
 
-class ProcDecl(
+class Procedure(
     override val name: String,
     override var args: MutableList<FunctionArgument> = mutableListOf(),
     override val returnType: TypeReference?,

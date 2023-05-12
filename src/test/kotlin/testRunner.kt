@@ -112,7 +112,7 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
     statements.forEach { statement ->
         when (statement) {
             is Action -> {}
-            is Proc -> {}
+            is ProcedureCall -> {}
             // TODO(Variable statement)
             is VariableDeclaration -> {}
             is Assignment -> {
@@ -128,7 +128,7 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
                 }
             }
             is ExpressionStatement -> {
-                statement.expressions.forEach {  function.context.typeInferrer.getExpressionType(it) }
+                function.context.typeInferrer.getExpressionType(statement.expression)
             }
             is AssignmentWithCompoundOp -> {
                 function.context.typeInferrer.getExpressionType(statement.left)

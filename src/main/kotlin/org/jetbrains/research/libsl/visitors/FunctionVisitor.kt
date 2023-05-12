@@ -1,6 +1,5 @@
 package org.jetbrains.research.libsl.visitors
 
-import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.errors.ErrorManager
@@ -19,7 +18,7 @@ class FunctionVisitor(
     private lateinit var buildingFunction: Function
     private lateinit var buildingConstructor: Constructor
     private lateinit var buildingDestructor: Destructor
-    private lateinit var buildingProcDecl: ProcDecl
+    private lateinit var buildingProcedure: Procedure
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
@@ -125,7 +124,7 @@ class FunctionVisitor(
             context.storeVariable(resultVariable)
         }
 
-        buildingProcDecl = ProcDecl(
+        buildingProcedure = Procedure(
             procName,
             args,
             returnType,
@@ -135,7 +134,7 @@ class FunctionVisitor(
         )
 
         super.visitProcDecl(ctx)
-        parentAutomaton?.procDeclarations?.add(buildingProcDecl)
+        parentAutomaton?.procDeclarations?.add(buildingProcedure)
     }
 
     override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
@@ -143,7 +142,7 @@ class FunctionVisitor(
             funInitialized() -> buildingFunction.statements
             constructorInitialized() -> buildingConstructor.statements
             destructorInitialized() -> buildingDestructor.statements
-            procInitialized() -> buildingProcDecl.statements
+            procInitialized() -> buildingProcedure.statements
             else -> return
         }
 
@@ -151,7 +150,7 @@ class FunctionVisitor(
             funInitialized() -> buildingFunction.localVariables
             constructorInitialized() -> buildingConstructor.localVariables
             destructorInitialized() -> buildingDestructor.localVariables
-            procInitialized() -> buildingProcDecl.localVariables
+            procInitialized() -> buildingProcedure.localVariables
             else -> return
         }
 
@@ -258,6 +257,6 @@ class FunctionVisitor(
     }
 
     private fun procInitialized(): Boolean {
-        return this::buildingProcDecl.isInitialized
+        return this::buildingProcedure.isInitialized
     }
 }

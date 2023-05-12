@@ -43,11 +43,8 @@ data class IfStatement(
         appendLine("{")
         append(withIndent(formatListEmptyLineAtEndIfNeeded(ifStatements)))
         appendLine("}")
-        elseStatements?.also {
-            append("else")
-            appendLine(" {")
-            append(withIndent(formatListEmptyLineAtEndIfNeeded(it.statements)))
-            appendLine("}")
+        if(elseStatements?.statements?.isNotEmpty() == true) {
+            append(elseStatements.dumpToString())
         }
     }
 }
@@ -56,7 +53,10 @@ data class ElseStatement(
     val statements: MutableList<Statement> = mutableListOf()
 ) : Statement() {
     override fun dumpToString(): String = buildString {
+        append("else")
+        appendLine(" {")
         append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
+        appendLine("}")
     }
 }
 
@@ -74,7 +74,7 @@ data class Action(
     }
 }
 
-data class Proc(
+data class ProcedureCall(
     val name: String,
     val arguments: MutableList<Expression>? = mutableListOf(),
     val hasThisExpression: Boolean,
@@ -97,10 +97,10 @@ data class Proc(
 }
 
 data class ExpressionStatement(
-    val expressions: MutableList<Expression> = mutableListOf()
+    val expression: Expression
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        expressions.forEach { e -> e.dumpToString() }
+        expression.dumpToString()
     }
 }
 

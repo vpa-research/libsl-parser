@@ -92,7 +92,7 @@ data class ActionExpression(
 ) : Expression()
 
 data class ProcExpression(
-    val proc: Proc
+    val procedureCall: ProcedureCall
 ) : Expression()
 
 data class LeftUnaryOpExpression(

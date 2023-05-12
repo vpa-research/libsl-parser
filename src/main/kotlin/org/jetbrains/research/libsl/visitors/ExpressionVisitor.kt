@@ -312,9 +312,9 @@ class ExpressionVisitor(
         val hasThisExpression = ctx.THIS() != null
         val hasParentExpression = ctx.PARENT() != null
 
-        val proc = Proc(name, args, hasThisExpression, hasParentExpression)
+        val procedureCall = ProcedureCall(name, args, hasThisExpression, hasParentExpression)
 
-        return ProcExpression(proc)
+        return ProcExpression(procedureCall)
     }
 
     override fun visitUnaryOp(ctx: LibSLParser.UnaryOpContext): Expression {
