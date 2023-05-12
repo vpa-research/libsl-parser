@@ -53,7 +53,7 @@ class TopLevelDeclarationsResolver(
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
-        val keyword = VariableKeyword.fromString(ctx.keyword.text)
+        val keyword = VariableKind.fromString(ctx.keyword.text)
         val variableName = ctx.nameWithType().name.text.extractIdentifier()
         val typeRef = processTypeIdentifier(ctx.nameWithType().type)
 
@@ -75,7 +75,7 @@ class TopLevelDeclarationsResolver(
         val actionName = ctx.actionName.text.extractIdentifier()
         val actionParams = mutableListOf<DeclaredActionParameter>()
 
-        ctx.actionDeclParamList().actionParameter().forEach { param ->
+        ctx.actionDeclParamList()?.actionParameter()?.forEach { param ->
             val actionParam = DeclaredActionParameter(
                 param.name.text.extractIdentifier(),
                 processTypeIdentifier(param.type),

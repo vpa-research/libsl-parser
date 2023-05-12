@@ -2,12 +2,14 @@ libsl "1.0.0";
 library simple;
 typealias Int = int32;
 result
+result
 annotation Something;
 annotation Ann;
 @Something
 define action SUM(@Ann x: Int, y: Int): Int;
 @Something
 define action NO_RETURN(@Ann x: Int, @Ann y: Int);
+define action NO_ARGS(): Int;
 automaton A : Int {
     var x: Int = 1;
     var y: Int = 2;
@@ -16,5 +18,8 @@ automaton A : Int {
     }
     fun v() {
         action NO_RETURN(1, 2);
+    }
+    fun c(): Int {
+        result = action NO_ARGS();
     }
 }

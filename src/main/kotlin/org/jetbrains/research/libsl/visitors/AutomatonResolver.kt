@@ -39,7 +39,7 @@ class AutomatonResolver(
      * Visit constructor arguments
      */
     override fun visitConstructorVariables(ctx: LibSLParser.ConstructorVariablesContext) {
-        val keyword = VariableKeyword.fromString(ctx.keyword.text)
+        val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()))
@@ -131,7 +131,7 @@ class AutomatonResolver(
         }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
-        val keyword = VariableKeyword.fromString(ctx.keyword.text)
+        val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)

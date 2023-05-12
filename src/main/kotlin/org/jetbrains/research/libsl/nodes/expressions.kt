@@ -9,8 +9,7 @@ sealed class Expression : Node() {
 }
 
 data class ThisExpression(
-    val thisKeywordUsed: Boolean,
-    val parentKeywordUsed: Boolean
+    val thisKeywordUsed: Boolean
 ) : Expression()
 
 data class BinaryOpExpression(

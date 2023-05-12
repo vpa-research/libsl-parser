@@ -64,9 +64,7 @@ class ExpressionVisitor(
     // TODO() refactor
     private fun processThisExpression(ctx: ThisExpressionContext): ThisExpression {
         val thisKeywordUsed = ctx.THIS() != null
-        val parentKeywordUsed = ctx.PARENT() != null
-
-        return ThisExpression(thisKeywordUsed, parentKeywordUsed)
+        return ThisExpression(thisKeywordUsed)
     }
 
     private fun processBinaryExpression(ctx: ExpressionContext): BinaryOpExpression {
@@ -179,13 +177,7 @@ class ExpressionVisitor(
 
             // TODO (Refactor)
             ctx.THIS() != null -> {
-                val hasParentExpression = ctx.PARENT() != null
-                ThisAndParentAccess(true, hasParentExpression, visitQualifiedAccess(ctx.qualifiedAccess(0)))
-            }
-
-            ctx.PARENT() != null -> {
-                val hasThisExpression = ctx.THIS() != null
-                ThisAndParentAccess(hasThisExpression, true, visitQualifiedAccess(ctx.qualifiedAccess(0)))
+                ThisAccess(true, visitQualifiedAccess(ctx.qualifiedAccess(0)))
             }
 
             else -> error("unknown qualified access kind")
@@ -294,9 +286,9 @@ class ExpressionVisitor(
     override fun visitAction(ctx: ActionContext): Expression  {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList().expression().map { expr ->
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
-        }.toMutableList()
+        }?.toMutableList()
 
         val action = Action(name, args)
 
@@ -306,13 +298,12 @@ class ExpressionVisitor(
     override fun visitProc(ctx: ProcContext): Expression {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList().expression().map { expr ->
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
-        }.toMutableList()
+        }?.toMutableList()
         val hasThisExpression = ctx.THIS() != null
-        val hasParentExpression = ctx.PARENT() != null
 
-        val procedureCall = ProcedureCall(name, args, hasThisExpression, hasParentExpression)
+        val procedureCall = ProcedureCall(name, args, hasThisExpression)
 
         return ProcExpression(procedureCall)
     }

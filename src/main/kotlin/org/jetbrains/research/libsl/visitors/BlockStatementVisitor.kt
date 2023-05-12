@@ -84,15 +84,14 @@ class BlockStatementVisitor(
             expressionVisitor.visitExpression(expr)
         }?.toMutableList()
         val hasThisExpression = ctx.THIS() != null
-        val hasParentExpression = ctx.PARENT() != null
 
-        val procedureCall = ProcedureCall(name, args, hasThisExpression, hasParentExpression)
+        val procedureCall = ProcedureCall(name, args, hasThisExpression)
 
         statements.add(procedureCall)
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
-        val keyword = VariableKeyword.fromString(ctx.keyword.text)
+        val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)

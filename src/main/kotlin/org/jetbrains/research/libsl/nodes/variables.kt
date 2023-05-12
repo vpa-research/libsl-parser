@@ -14,16 +14,15 @@ enum class ArithmeticUnaryOp(val string: String) {
     }
 }
 
-enum class VariableKeyword(val string: String) {
-    VAR("var"), VAL("val"), RESULT(""), ARGUMENT("");
+enum class VariableKind(val string: String) {
+    VAR("var"), VAL("val");
 
     companion object {
-        fun fromString(str: String) = VariableKeyword.values().first { op -> op.string == str }
+        fun fromString(str: String) = VariableKind.values().first { op -> op.string == str }
     }
 }
 
 open class Variable(
-    open val keyword: VariableKeyword,
     open var name: String,
     open var typeReference: TypeReference
 ) : Expression() {
@@ -49,7 +48,7 @@ open class Variable(
 
 data class ResultVariable(
     override var typeReference: TypeReference
-) : Variable(keyword = VariableKeyword.RESULT, name = "result", typeReference)
+) : Variable(name = "result", typeReference)
 
 @Suppress("unused")
 class FunctionArgument(
@@ -58,7 +57,7 @@ class FunctionArgument(
     val index: Int,
     var annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     var targetAutomaton: AutomatonReference? = null
-) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
+) : Variable(name, typeReference) {
     lateinit var function: Function
 
     override val fullName: String
@@ -78,12 +77,7 @@ class FunctionArgument(
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
 
-        val typeName = if (targetAutomaton != null) {
-            targetAutomaton!!.name
-        } else {
-            typeReference.name
-        }
-        append(typeName)
+        append(typeReference.name)
     }
 }
 
@@ -93,14 +87,14 @@ class ActionParameter(
     typeReference: TypeReference,
     val index: Int,
     var annotation: AnnotationReference? = null
-) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference)
+) : Variable(name, typeReference)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class DeclaredActionParameter(
     name: String,
     typeReference: TypeReference,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-) : Variable(keyword = VariableKeyword.ARGUMENT, name, typeReference) {
+) : Variable(name, typeReference) {
     override fun dumpToString(): String = buildString {
         if (annotationUsages.isNotEmpty()) {
             append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
@@ -111,11 +105,11 @@ class DeclaredActionParameter(
 }
 
 class ConstructorArgument(
-    keyword: VariableKeyword,
+    private val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
     private val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-) : Variable(keyword, name, typeReference) {
+) : Variable(name, typeReference) {
     lateinit var automaton: Automaton
 
     override val fullName: String
@@ -133,12 +127,12 @@ class ConstructorArgument(
 
 @Suppress("MemberVisibilityCanBePrivate")
 class VariableWithInitialValue(
-    keyword: VariableKeyword,
+    private val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
     val annotationUsage: MutableList<AnnotationUsage> = mutableListOf(),
     val initialValue: Expression?,
-) : Variable(keyword, name, typeReference) {
+) : Variable(name, typeReference) {
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsage))
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")

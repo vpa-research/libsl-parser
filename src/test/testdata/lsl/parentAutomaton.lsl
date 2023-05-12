@@ -5,7 +5,7 @@ typealias Int = int32;
 automaton A : Int {
 
     fun use(): Int {
-        result = new B(state = Initialized, parent = this.parent);
+        result = new B(state = Initialized);
     }
 
 }

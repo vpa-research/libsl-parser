@@ -17,7 +17,7 @@ object ExpressionDumper {
             is IntegerLiteral -> dumpLiteral(expression)
             is ArrayAccess -> dumpArrayAccess(expression)
             is AutomatonOfFunctionArgumentInvoke -> dumpAutomatonOfFunctionArgumentInvoke(expression)
-            is ThisAndParentAccess -> dumpThisAndParentAccess(expression)
+            is ThisAccess -> dumpThisAndParentAccess(expression)
             is VariableAccess -> dumpVariableAccess(expression)
             is StringLiteral -> dumpStringLiteral(expression)
             is OldValue -> dumpOldValue(expression)
@@ -121,13 +121,10 @@ object ExpressionDumper {
         }
     }
 
-    private fun dumpThisAndParentAccess(expression: ThisAndParentAccess): String {
+    private fun dumpThisAndParentAccess(expression: ThisAccess): String {
         return buildString {
             if (expression.hasThisExpression) {
                 append("this.")
-            }
-            if (expression.hasParentExpression) {
-                append("parent.")
             }
             if (expression.childAccess != null) {
                 append(dump(expression.childAccess!!))

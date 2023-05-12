@@ -56,7 +56,7 @@ class TypeInferrer(private val context: LslContextBase) {
             is AutomatonOfFunctionArgumentInvoke -> access.automatonReference.resolveOrError().typeReference.resolveOrError()
             is VariableAccess -> access.variable.resolveOrError().typeReference.resolveOrError()
             // TODO (Refactor MAYBE?)
-            is ThisAndParentAccess -> getQualifiedAccessType(access.lastChild)
+            is ThisAccess -> getQualifiedAccessType(access.lastChild)
         }
     }
 

@@ -158,10 +158,6 @@ VAL
    :   'val'
    ;
 
-PARENT
-   :   'parent'
-   ;
-
 THIS
    :   'this'
    ;

@@ -231,7 +231,6 @@ namedArgs
 
 argPair
    :   name=STATE ASSIGN_OP expressionAtomic
-   |   name=PARENT ASSIGN_OP expression
    |   name=Identifier ASSIGN_OP expression
    ;
 
@@ -319,7 +318,7 @@ action
    ;
 
 proc
-   :  (THIS DOT)? (PARENT DOT)? Identifier L_BRACKET expressionsList? R_BRACKET
+   :  (THIS DOT)? Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList
@@ -382,7 +381,6 @@ unaryOp
 
 thisExpression
    :   THIS
-   |   THIS DOT PARENT
    ;
 
 expressionAtomic
@@ -402,7 +400,7 @@ qualifiedAccess
    :   periodSeparatedFullName
    |   qualifiedAccess L_SQUARE_BRACKET expressionAtomic R_SQUARE_BRACKET (DOT qualifiedAccess)?
    |   simpleCall DOT qualifiedAccess
-   |   THIS DOT (PARENT DOT)? qualifiedAccess
+   |   THIS DOT qualifiedAccess
    ;
 
 simpleCall
