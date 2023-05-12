@@ -7,13 +7,10 @@ import org.jetbrains.research.libsl.nodes.references.TypeReference
 
 object FunctionReferenceBuilder {
     fun build(
-        name: String?,
+        name: String,
         argTypes: List<TypeReference>,
         context: LslContextBase
     ): FunctionReference {
-        if(name == null) {
-            return FunctionReference("undefined", argTypes, context)
-        }
         return FunctionReference(name, argTypes, context)
     }
 

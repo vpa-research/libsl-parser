@@ -17,7 +17,7 @@ data class ActionDeclReference(
             return false
         }
 
-        if (!areParamsMatch(node.values.map { value -> value.typeReference })) {
+        if (!doParamsMatch(node.values.map { value -> value.typeReference })) {
             return false
         }
 
@@ -25,18 +25,18 @@ data class ActionDeclReference(
     }
 
     override fun isSameReference(other: ActionDeclReference): Boolean {
-        return this.name == other.name && areParamsMatch(other.paramTypes)
+        return this.name == other.name && doParamsMatch(other.paramTypes)
     }
 
-    private fun areParamsMatch(params: List<TypeReference>): Boolean {
+    private fun doParamsMatch(params: List<TypeReference>): Boolean {
         if (params.size != this.paramTypes.size) {
             return false
         }
 
-        return params.withIndex().all { (i, a) -> a.isSameReference(params[i]) }
+        return params.withIndex().all { (index, element) -> element.isSameReference(params[index]) }
     }
 
     override fun toString(): String {
-        return "ActionReference($name)"
+        return "ActionReference(name: $name, paramTypes:$paramTypes)"
     }
 }
