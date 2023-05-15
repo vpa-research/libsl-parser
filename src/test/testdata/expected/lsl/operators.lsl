@@ -6,15 +6,18 @@ types {
 automaton A : Int {
     fun f(x: Int, y: Int) {
         var res: Int;
+        x >> y;
+        x << y;
+        x >>> y;
+        res = x >> y;
+        res = x << y;
+        res = x >>> y;
         x = x && y;
         x = x || y;
         y = !x;
         y = ~x;
         y = +x;
         y = -x;
-        res = x >> y;
-        res = x << y;
-        res = x >>> y;
         x += y;
         x -= y;
         x *= y;

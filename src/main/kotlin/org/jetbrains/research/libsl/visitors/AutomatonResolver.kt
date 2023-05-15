@@ -26,7 +26,6 @@ class AutomatonResolver(
         buildingAutomaton = Automaton(
             name,
             typeReference,
-            parent,
             annotationReferences,
             context = automatonContext
         )

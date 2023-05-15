@@ -11,6 +11,13 @@ automaton A : Int {
 
         var res: Int;
 
+        x >> y;
+        x << y;
+        x >>> y;
+        res = x >> y;
+        res = x << y;
+        res = x >>> y;
+
         x = x && y;
         x = x || y;
         y = !x;
@@ -18,12 +25,6 @@ automaton A : Int {
         y = +x;
         y = -x;
 
-        res = x >> y;
-        x >> y;
-        res = x << y;
-        x << y;
-        res = x >>> y;
-        x >>> y;
         x += y;
         x -= y;
         x *= y;

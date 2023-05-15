@@ -10,7 +10,6 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
-    val parent: AutomatonReference?,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),

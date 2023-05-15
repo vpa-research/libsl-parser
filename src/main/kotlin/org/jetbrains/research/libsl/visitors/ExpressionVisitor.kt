@@ -92,6 +92,7 @@ class ExpressionVisitor(
 
             else -> error("unknown binary expression")
         }
+
         val op = ArithmeticBinaryOps.fromString(opText)
 
         val left = ctx.expression(0)

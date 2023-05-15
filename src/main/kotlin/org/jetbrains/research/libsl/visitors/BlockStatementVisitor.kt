@@ -10,19 +10,26 @@ class BlockStatementVisitor(
     private val localVariables: MutableList<Variable>
 ) : LibSLParserVisitor<Unit>(functionContext) {
 
+    override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
+        val expressionVisitor = ExpressionVisitor(functionContext)
+        val expression = ExpressionStatement(expressionVisitor.visitExpression(ctx))
+        println(expression)
+        statements.add(expression)
+    }
+
     override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext) {
         when {
-            ctx.assignmentRight() != null -> let{
+            ctx.assignmentRight() != null -> let {
                 val expressionVisitor = ExpressionVisitor(functionContext)
                 val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
                 val value = expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
                 val assignment = Assignment(left, value)
                 statements.add(assignment)
             }
-            ctx.expression() != null -> let{
+            ctx.expression() != null -> let {
                 val expressionVisitor = ExpressionVisitor(functionContext)
                 val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-                val op = CompoundOps.fromString(ctx.compoundAssignOp.text)
+                val op = CompoundOps.fromString(ctx.op.text)
                 val value = expressionVisitor.visitExpression(ctx.expression())
                 val assignmentWithCompoundOp = AssignmentWithCompoundOp(left, op, value)
                 statements.add(assignmentWithCompoundOp)
@@ -49,31 +56,6 @@ class BlockStatementVisitor(
         val ifBlock = IfStatement(value, ifStatements, elseStatement)
 
         statements.add(ifBlock)
-    }
-
-    override fun visitActionUsage(ctx: LibSLParser.ActionUsageContext) {
-        val name = ctx.Identifier().text.extractIdentifier()
-        val expressionVisitor = ExpressionVisitor(functionContext)
-        val args = ctx.expressionsList().expression().map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.toMutableList()
-
-        val action = Action(name, args)
-
-        statements.add(action)
-    }
-
-    override fun visitProcUsage(ctx: LibSLParser.ProcUsageContext) {
-        val name = ctx.Identifier().text.extractIdentifier()
-        val expressionVisitor = ExpressionVisitor(functionContext)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }?.toMutableList()
-        val hasThisExpression = ctx.THIS() != null
-
-        val procedureCall = ProcedureCall(name, args, hasThisExpression)
-
-        statements.add(procedureCall)
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
