@@ -312,7 +312,7 @@ actionUsage
    ;
 
 procUsage
-   :  (THIS DOT)? Identifier L_BRACKET expressionsList? R_BRACKET
+   :  periodSeparatedFullName L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList
@@ -352,7 +352,6 @@ expression
    |   expression op=(AMPERSAND | BIT_OR | XOR) expression
    |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
    |   expression bitShiftOp expression
-   |   thisExpression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
@@ -386,10 +385,6 @@ unaryOp
    |   op=TILDE expression
    ;
 
-thisExpression
-   :   THIS
-   ;
-
 expressionAtomic
    :   qualifiedAccess
    |   primitiveLiteral
@@ -407,7 +402,6 @@ qualifiedAccess
    :   periodSeparatedFullName
    |   qualifiedAccess L_SQUARE_BRACKET expressionAtomic R_SQUARE_BRACKET (DOT qualifiedAccess)?
    |   simpleCall DOT qualifiedAccess
-   |   THIS DOT qualifiedAccess
    ;
 
 simpleCall

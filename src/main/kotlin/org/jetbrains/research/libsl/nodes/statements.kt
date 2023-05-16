@@ -63,12 +63,8 @@ data class Action(
 data class ProcedureCall(
     val name: String,
     val arguments: MutableList<Expression>? = mutableListOf(),
-    val hasThisExpression: Boolean
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        if(hasThisExpression) {
-            append("this.")
-        }
         append("${BackticksPolitics.forIdentifier(name)}(")
         if(arguments?.isNotEmpty() == true) {
             val args = arguments.map { it.dumpToString() }.toMutableList()

@@ -8,7 +8,6 @@ import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
 import org.jetbrains.research.libsl.LibSLParser.ProcUsageContext
 import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
 import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
-import org.jetbrains.research.libsl.LibSLParser.ThisExpressionContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
@@ -49,10 +48,6 @@ class ExpressionVisitor(
                 visitQualifiedAccess(ctx.qualifiedAccess())
             }
 
-            ctx.thisExpression() != null -> {
-                processThisExpression(ctx.thisExpression())
-            }
-
             ctx.unaryOp() != null -> {
                 visitUnaryOp(ctx.unaryOp())
             }
@@ -67,12 +62,6 @@ class ExpressionVisitor(
 
             else -> error("unknown expression type")
         }
-    }
-
-    // TODO() refactor
-    private fun processThisExpression(ctx: ThisExpressionContext): ThisExpression {
-        val thisKeywordUsed = ctx.THIS() != null
-        return ThisExpression(thisKeywordUsed)
     }
 
     private fun processBinaryExpression(ctx: ExpressionContext): BinaryOpExpression {
@@ -199,11 +188,6 @@ class ExpressionVisitor(
                 }
             }
 
-            // TODO (Refactor)
-            ctx.THIS() != null -> {
-                ThisAccess(true, visitQualifiedAccess(ctx.qualifiedAccess(0)))
-            }
-
             else -> error("unknown qualified access kind")
         }
     }
@@ -223,19 +207,31 @@ class ExpressionVisitor(
         periodSeparatedFullNameContext: PeriodSeparatedFullNameContext
     ): QualifiedAccess {
         val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
-        val lastFieldName = names.last()
-        val lastVariableReference = VariableReferenceBuilder.build(lastFieldName, context)
 
-        val lastVariableAccess = VariableAccess(
-            lastFieldName,
-            childAccess = null,
-            lastVariableReference
-        )
+        val lastAccess = when(val lastFieldName = names.last()) {
 
-        return names.dropLast(1).foldRight(lastVariableAccess) { name, access ->
-            val childVariableReference = VariableReferenceBuilder.build(name, context)
-            val childAccess = VariableAccess(name, childAccess = null, childVariableReference)
-            childAccess.childAccess = access
+            "this" -> ThisAccess(childAccess = null)
+
+            else -> let {
+                val lastVariableReference = VariableReferenceBuilder.build(lastFieldName, context)
+                VariableAccess(
+                    lastFieldName,
+                    childAccess = null,
+                    lastVariableReference
+                )
+            }
+        }
+
+        return names.dropLast(1).foldRight(lastAccess) { name, access ->
+            val childAccess = when(name) {
+
+                "this" -> ThisAccess(childAccess = access)
+
+                else -> let {
+                    val childVariableReference = VariableReferenceBuilder.build(name, context)
+                    VariableAccess(name, childAccess = access, childVariableReference)
+                }
+            }
 
             childAccess
         }
@@ -311,14 +307,13 @@ class ExpressionVisitor(
     }
 
     override fun visitProcUsage(ctx: ProcUsageContext): Expression {
-        val name = ctx.Identifier().text.extractIdentifier()
+        val name = ctx.periodSeparatedFullName().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
         }?.toMutableList()
-        val hasThisExpression = ctx.THIS() != null
 
-        val procedureCall = ProcedureCall(name, args, hasThisExpression)
+        val procedureCall = ProcedureCall(name, args)
 
         return ProcExpression(procedureCall)
     }

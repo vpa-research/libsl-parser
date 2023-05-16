@@ -22,7 +22,6 @@ object ExpressionDumper {
             is StringLiteral -> dumpStringLiteral(expression)
             is OldValue -> dumpOldValue(expression)
             is ProcExpression -> dumpProcExpression(expression)
-            is ThisExpression -> dumpThisExpression(expression)
             is UnaryOpExpression -> dumpUnaryOpExpression(expression)
             is Variable -> dumpVariable(expression)
         }
@@ -121,9 +120,7 @@ object ExpressionDumper {
 
     private fun dumpThisAccess(expression: ThisAccess): String {
         return buildString {
-            if (expression.hasThisExpression) {
-                append("this.")
-            }
+            append("this.")
             if (expression.childAccess != null) {
                 append(dump(expression.childAccess!!))
             }
@@ -144,12 +141,6 @@ object ExpressionDumper {
 
     private fun dumpOldValue(expression: OldValue): String {
         return "(${dump(expression.value)})'"
-    }
-
-    private fun dumpThisExpression(expression: ThisExpression): String {
-        return buildString {
-            append("this")
-        }
     }
 
     private fun dumpProcExpression(expression: ProcExpression): String {

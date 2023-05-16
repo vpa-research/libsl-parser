@@ -8,10 +8,6 @@ sealed class Expression : Node() {
     override fun dumpToString(): String = ExpressionDumper.dump(this)
 }
 
-data class ThisExpression(
-    val thisKeywordUsed: Boolean
-) : Expression()
-
 data class BinaryOpExpression(
     val left: Expression,
     val right: Expression,

@@ -29,100 +29,30 @@ data class VariableAccess(
         childAccess != null -> "${BackticksPolitics.forIdentifier(fieldName)}${childAccess?.dumpToString()}"
         else -> fieldName
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is VariableAccess) return false
-
-        if (fieldName != other.fieldName) return false
-        if (childAccess != other.childAccess) return false
-        if (variable != other.variable) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = fieldName.hashCode()
-        result = 31 * result + (childAccess?.hashCode() ?: 0)
-        result = 31 * result + variable.hashCode()
-        return result
-    }
 }
 
 data class ThisAccess(
-    val hasThisExpression: Boolean,
+    val fieldName: String = "this",
     override var childAccess: QualifiedAccess?
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = buildString {
-        if (hasThisExpression) {
-            append("this.")
+        append("this")
+        if(childAccess != null) {
+            append(".")
+            append(childAccess!!.dumpToString())
         }
-        append(childAccess?.dumpToString())
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ThisAccess
-
-        if (hasThisExpression != other.hasThisExpression) return false
-        if (childAccess != other.childAccess) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = hasThisExpression.hashCode()
-        result = 31 * result + (childAccess?.hashCode() ?: 0)
-        return result
-    }
-
 }
 
 data class ArrayAccess(
     var index: Atomic,
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is ArrayAccess) return false
-
-        if (index != other.index) return false
-        if (childAccess != other.childAccess) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = index.hashCode()
-        result = 31 * result + (childAccess?.hashCode() ?: 0)
-        return result
-    }
 }
 
 data class AutomatonOfFunctionArgumentInvoke(
     val automatonReference: AutomatonReference,
     val arg: FunctionArgument,
     override var childAccess: QualifiedAccess?,
-) : QualifiedAccess() {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AutomatonOfFunctionArgumentInvoke) return false
-
-        if (automatonReference != other.automatonReference) return false
-        if (arg != other.arg) return false
-        if (childAccess != other.childAccess) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = automatonReference.hashCode()
-        result = 31 * result + arg.hashCode()
-        result = 31 * result + (childAccess?.hashCode() ?: 0)
-        return result
-    }
-}
+) : QualifiedAccess()

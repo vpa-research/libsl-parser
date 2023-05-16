@@ -158,10 +158,6 @@ VAL
    :   'val'
    ;
 
-THIS
-   :   'this'
-   ;
-
 INITSTATE
    :   'initstate'
    ;

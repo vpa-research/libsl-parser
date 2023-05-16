@@ -8,11 +8,11 @@ automaton B (val x: Int) : Int {
         result = 1 + 1;
     }
     fun foo(arg: Int): Int {
-        assigns this.parent;
-        val y: Int = this.parent.v;
+        val y: Int = this.v;
         result = this.x + y;
     }
     fun anotherFoo(): Int {
+        val temp: Int = this;
         result = smth();
     }
 }
