@@ -6,14 +6,7 @@ sealed class Statement: Node()
 
 data class Assignment(
     val left: QualifiedAccess,
-    val value: Expression
-) : Statement() {
-    override fun dumpToString(): String = "${left.dumpToString()} = ${value.dumpToString()};"
-}
-
-data class AssignmentWithCompoundOp(
-    val left: QualifiedAccess,
-    val op: CompoundOps,
+    val op: AssignOps,
     val value: Expression
 ) : Statement() {
     override fun dumpToString(): String = "${left.dumpToString()} ${op.string} ${value.dumpToString()};"
@@ -67,7 +60,7 @@ data class ProcedureCall(
     override fun dumpToString(): String = buildString {
         append("${BackticksPolitics.forIdentifier(name)}(")
         if(arguments?.isNotEmpty() == true) {
-            val args = arguments.map { it.dumpToString() }.toMutableList()
+            val args = arguments.map { it.dumpToString() }
             append(args.joinToString(separator = ", "))
         }
         append(");")

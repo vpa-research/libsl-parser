@@ -134,17 +134,7 @@ class AutomatonResolver(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)
-        val initValue = ctx.assignmentRight()?.let { right ->
-            when {
-                right.callAutomatonConstructorWithNamedArgs() != null -> {
-                    expressionVisitor.visitCallAutomatonConstructorWithNamedArgs(right.callAutomatonConstructorWithNamedArgs())
-                }
-                right.expression() != null -> {
-                    expressionVisitor.visitExpression(right.expression())
-                }
-                else -> error("unknown initializer kind")
-            }
-        }
+        val initValue = ctx.expression()?.let { right -> expressionVisitor.visitExpression(right) }
 
         val variable = VariableWithInitialValue(
             keyword,

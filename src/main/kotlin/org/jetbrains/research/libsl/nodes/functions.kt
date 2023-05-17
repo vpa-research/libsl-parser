@@ -13,7 +13,6 @@ open class Function(
     open var args: MutableList<FunctionArgument> = mutableListOf(),
     open val returnType: TypeReference?,
     open val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-    open var localVariables: MutableList<Variable> = mutableListOf(),
     open var contracts: MutableList<Contract> = mutableListOf(),
     open var statements: MutableList<Statement> = mutableListOf(),
     open var hasBody: Boolean = statements.isNotEmpty(),
@@ -65,12 +64,11 @@ data class Constructor(
     override val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     override var contracts: MutableList<Contract> = mutableListOf(),
     override var statements: MutableList<Statement> = mutableListOf(),
-    override var localVariables: MutableList<Variable> = mutableListOf(),
     override var hasBody: Boolean = statements.isNotEmpty(),
     override val context: FunctionContext
 ) : Function(
     kind = FunctionKind.CONSTRUCTOR, name, null, args, null,
-    annotationUsages, localVariables, contracts,
+    annotationUsages, contracts,
     statements, hasBody, null, context
 )
 
@@ -80,12 +78,11 @@ class Destructor(
     override val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     override var contracts: MutableList<Contract> = mutableListOf(),
     override var statements: MutableList<Statement> = mutableListOf(),
-    override var localVariables: MutableList<Variable> = mutableListOf(),
     override var hasBody: Boolean = statements.isNotEmpty(),
     override val context: FunctionContext
 ) : Function(
     kind = FunctionKind.DESTRUCTOR, name, null, args, null,
-    annotationUsages, localVariables, contracts,
+    annotationUsages, contracts,
     statements, hasBody, null, context
 )
 
@@ -96,12 +93,11 @@ class Procedure(
     override val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     override var contracts: MutableList<Contract> = mutableListOf(),
     override var statements: MutableList<Statement> = mutableListOf(),
-    override var localVariables: MutableList<Variable> = mutableListOf(),
     override var hasBody: Boolean = statements.isNotEmpty(),
     override val context: FunctionContext
 ) : Function(
     kind = FunctionKind.PROC, name, null, args, returnType,
-    annotationUsages, localVariables, contracts,
+    annotationUsages, contracts,
     statements, hasBody, null, context
 )
 

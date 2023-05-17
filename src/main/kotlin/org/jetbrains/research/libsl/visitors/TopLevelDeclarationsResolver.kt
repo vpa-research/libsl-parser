@@ -24,8 +24,8 @@ class TopLevelDeclarationsResolver(
             val param = AnnotationArgumentDescriptor(
                 parameterCtx.nameWithType().name.text.extractIdentifier(),
                 processTypeIdentifier(parameterCtx.nameWithType().type),
-                parameterCtx.assignmentRight()?.let {
-                    expressionVisitor.visitAssignmentRight(it)
+                parameterCtx.expression()?.let {
+                    expressionVisitor.visitExpression(it)
                 }
             )
             params.add(param)
@@ -58,7 +58,7 @@ class TopLevelDeclarationsResolver(
         val typeRef = processTypeIdentifier(ctx.nameWithType().type)
 
         val expressionVisitor = ExpressionVisitor(context)
-        val initialValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
+        val initialValue = ctx.expression()?.let { expressionVisitor.visitExpression(it) }
 
         val annotationUsages = getAnnotationUsages(ctx.annotationUsage())
         val variable = VariableWithInitialValue(

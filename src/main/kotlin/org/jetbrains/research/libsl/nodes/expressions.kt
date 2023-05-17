@@ -39,7 +39,9 @@ enum class ArithmeticBinaryOps(val string: String, val priority: Int) {
     }
 }
 
-enum class CompoundOps(val string: String) {
+enum class AssignOps(val string: String) {
+    ASSIGN("="),
+
     //Arithmetic
     COMP_ADD("+="), COMP_SUB("-="), COMP_MUL("*="), COMP_DIV("/="), COMP_MOD("%="),
 
@@ -50,7 +52,7 @@ enum class CompoundOps(val string: String) {
     COMP_R_SHIFT(">>="), COMP_UN_R_SHIFT(">>>="), COMP_L_SHIFT("<<=");
 
     companion object {
-        fun fromString(str: String) = CompoundOps.values().first { op -> op.string == str }
+        fun fromString(str: String) = AssignOps.values().first { op -> op.string == str }
     }
 }
 

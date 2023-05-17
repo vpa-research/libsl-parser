@@ -6,9 +6,8 @@ import org.jetbrains.research.libsl.nodes.*
 
 class BlockStatementVisitor(
     private val functionContext: FunctionContext,
-    private val statements: MutableList<Statement>,
-    private val localVariables: MutableList<Variable>
-) : LibSLParserVisitor<Unit>(functionContext) {
+    private val statements: MutableList<Statement>
+    ) : LibSLParserVisitor<Unit>(functionContext) {
 
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
@@ -18,23 +17,12 @@ class BlockStatementVisitor(
     }
 
     override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext) {
-        when {
-            ctx.assignmentRight() != null -> let {
-                val expressionVisitor = ExpressionVisitor(functionContext)
-                val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-                val value = expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
-                val assignment = Assignment(left, value)
-                statements.add(assignment)
-            }
-            ctx.expression() != null -> let {
-                val expressionVisitor = ExpressionVisitor(functionContext)
-                val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-                val op = CompoundOps.fromString(ctx.op.text)
-                val value = expressionVisitor.visitExpression(ctx.expression())
-                val assignmentWithCompoundOp = AssignmentWithCompoundOp(left, op, value)
-                statements.add(assignmentWithCompoundOp)
-            }
-        }
+        val expressionVisitor = ExpressionVisitor(functionContext)
+        val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
+        val op = AssignOps.fromString(ctx.op.text)
+        val value = expressionVisitor.visitExpression(ctx.expression())
+        val assignment = Assignment(left, op, value)
+        statements.add(assignment)
     }
 
     override fun visitIfStatement(ifCtx: LibSLParser.IfStatementContext) {
@@ -42,12 +30,12 @@ class BlockStatementVisitor(
         val value = expressionVisitor.visitExpression(ifCtx.expression())
 
         val ifStatements = mutableListOf<Statement>()
-        val ifStatementVisitor = BlockStatementVisitor(functionContext, ifStatements, localVariables)
+        val ifStatementVisitor = BlockStatementVisitor(functionContext, ifStatements)
         ifCtx.functionBodyStatements().forEach { ifStatementVisitor.visit(it) }
 
         val elseStatement = ifCtx.elseStatement()?.let { elseStmt ->
             val elseStatements = mutableListOf<Statement>()
-            val elseStatementsVisitor = BlockStatementVisitor(functionContext, elseStatements, localVariables)
+            val elseStatementsVisitor = BlockStatementVisitor(functionContext, elseStatements)
             elseStmt.functionBodyStatements().forEach { elseStatementsVisitor.visit(it) }
 
             ElseStatement(elseStatements)
@@ -63,17 +51,7 @@ class BlockStatementVisitor(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)
-        val initValue = ctx.assignmentRight()?.let { right ->
-            when {
-                right.callAutomatonConstructorWithNamedArgs() != null -> {
-                    expressionVisitor.visitCallAutomatonConstructorWithNamedArgs(right.callAutomatonConstructorWithNamedArgs())
-                }
-                right.expression() != null -> {
-                    expressionVisitor.visitExpression(right.expression())
-                }
-                else -> error("unknown initializer kind")
-            }
-        }
+        val initValue = ctx.expression()?.let { right -> expressionVisitor.visitExpression(right) }
 
         val variable = VariableWithInitialValue(
             keyword,
@@ -83,7 +61,6 @@ class BlockStatementVisitor(
             initValue
         )
         val variableDeclaration = VariableDeclaration(variable)
-        localVariables.add(variable)
         statements.add(variableDeclaration)
         context.storeVariable(variable)
     }

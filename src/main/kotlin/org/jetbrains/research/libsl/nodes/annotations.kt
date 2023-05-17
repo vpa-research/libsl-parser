@@ -7,7 +7,7 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Annotation(
     val name: String,
-    val argumentDescriptors: MutableList<AnnotationArgumentDescriptor>
+    val argumentDescriptors: MutableList<AnnotationArgumentDescriptor> = mutableListOf()
 ) : IPrinter {
     override fun toString(): String = dumpToString()
 

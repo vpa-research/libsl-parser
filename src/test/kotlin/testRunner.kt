@@ -119,7 +119,6 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
                 function.context.typeInferrer.getExpressionType(statement.left)
                 function.context.typeInferrer.getExpressionType(statement.value)
             }
-
             is ElseStatement -> checkStatementIsResolved(function, statement.statements)
             is IfStatement -> {
                 checkStatementIsResolved(function, statement.ifStatements)
@@ -129,10 +128,6 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
             }
             is ExpressionStatement -> {
                 function.context.typeInferrer.getExpressionType(statement.expression)
-            }
-            is AssignmentWithCompoundOp -> {
-                function.context.typeInferrer.getExpressionType(statement.left)
-                function.context.typeInferrer.getExpressionType(statement.value)
             }
         }
     }

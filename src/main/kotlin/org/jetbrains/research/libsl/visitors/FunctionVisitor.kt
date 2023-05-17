@@ -16,9 +16,6 @@ class FunctionVisitor(
     val errorManager: ErrorManager
 ) : LibSLParserVisitor<Unit>(functionContext) {
     private lateinit var buildingFunction: Function
-    private lateinit var buildingConstructor: Constructor
-    private lateinit var buildingDestructor: Destructor
-    private lateinit var buildingProcedure: Procedure
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
@@ -77,7 +74,7 @@ class FunctionVisitor(
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
-        buildingConstructor = Constructor(
+        buildingFunction = Constructor(
             constructorName,
             args,
             annotationReferences,
@@ -86,7 +83,7 @@ class FunctionVisitor(
         )
 
         super.visitConstructorDecl(ctx)
-        parentAutomaton?.constructors?.add(buildingConstructor)
+        parentAutomaton?.constructors?.add(buildingFunction)
     }
 
     override fun visitDestructorDecl(ctx: DestructorDeclContext) {
@@ -97,7 +94,7 @@ class FunctionVisitor(
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
-        buildingDestructor = Destructor(
+        buildingFunction = Destructor(
             destructorName,
             args,
             annotationReferences,
@@ -106,7 +103,7 @@ class FunctionVisitor(
         )
 
         super.visitDestructorDecl(ctx)
-        parentAutomaton?.destructors?.add(buildingDestructor)
+        parentAutomaton?.destructors?.add(buildingFunction)
     }
 
     override fun visitProcDecl(ctx: ProcDeclContext) {
@@ -124,7 +121,7 @@ class FunctionVisitor(
             context.storeVariable(resultVariable)
         }
 
-        buildingProcedure = Procedure(
+        buildingFunction = Procedure(
             procName,
             args,
             returnType,
@@ -134,27 +131,12 @@ class FunctionVisitor(
         )
 
         super.visitProcDecl(ctx)
-        parentAutomaton?.procDeclarations?.add(buildingProcedure)
+        parentAutomaton?.procDeclarations?.add(buildingFunction)
     }
 
     override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
-        val statements = when {
-            funInitialized() -> buildingFunction.statements
-            constructorInitialized() -> buildingConstructor.statements
-            destructorInitialized() -> buildingDestructor.statements
-            procInitialized() -> buildingProcedure.statements
-            else -> return
-        }
-
-        val localVariables = when {
-            funInitialized() -> buildingFunction.localVariables
-            constructorInitialized() -> buildingConstructor.localVariables
-            destructorInitialized() -> buildingDestructor.localVariables
-            procInitialized() -> buildingProcedure.localVariables
-            else -> return
-        }
-
-        BlockStatementVisitor(functionContext, statements, localVariables).visit(ctx)
+        val statements = buildingFunction.statements
+        BlockStatementVisitor(functionContext, statements).visit(ctx)
     }
 
     private val FunctionDeclContext.args: List<FunctionArgument>
@@ -239,24 +221,6 @@ class FunctionVisitor(
         val expression = expressionVisitor.visitExpression(expressionContext)
 
         val contract = Contract(name, expression, kind)
-        if (funInitialized()) buildingFunction.contracts.add(contract)
-        if (constructorInitialized()) buildingConstructor.contracts.add(contract)
-        if (destructorInitialized()) buildingDestructor.contracts.add(contract)
-    }
-
-    private fun funInitialized(): Boolean {
-        return this::buildingFunction.isInitialized
-    }
-
-    private fun constructorInitialized(): Boolean {
-        return this::buildingConstructor.isInitialized
-    }
-
-    private fun destructorInitialized(): Boolean {
-        return this::buildingDestructor.isInitialized
-    }
-
-    private fun procInitialized(): Boolean {
-        return this::buildingProcedure.isInitialized
+        buildingFunction.contracts.add(contract)
     }
 }

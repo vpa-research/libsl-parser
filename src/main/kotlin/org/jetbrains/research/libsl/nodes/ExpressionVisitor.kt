@@ -22,7 +22,6 @@ abstract class ExpressionVisitor <T> {
             is ActionExpression -> visitActionExpression(node)
             is ProcExpression -> visitProcExpression(node)
             is ThisAccess -> visitThisAndParentAccess(node)
-            is ThisExpression -> visitThisExpression(node)
         }
     }
 
@@ -61,8 +60,6 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitActionExpression(node: ActionExpression): T
 
     abstract fun visitProcExpression(node: ProcExpression): T
-
-    abstract fun visitThisExpression(node: ThisExpression): T
 
     abstract fun visitThisAndParentAccess(node: ThisAccess): T
 }
