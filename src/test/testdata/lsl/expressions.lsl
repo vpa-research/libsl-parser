@@ -13,8 +13,7 @@ automaton A : Int {
       tmp = (2 + 3 + 4) / 5;
       tmp = 10 + 14 * (2 + 1);
       tmp = 10 + 14 / (2 + 1);
-// todo: fix when <<, >> and >>> operations will be fixed
-//      tmp = 10 << 2;
-//      tmp = (10 << 2) + 14;
+      tmp = 10 << 2;
+      tmp = (10 << 2) + 14;
     }
 }

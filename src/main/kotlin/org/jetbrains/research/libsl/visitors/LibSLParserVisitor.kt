@@ -75,7 +75,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
-        }.orEmpty().toMutableList()
+        }.orEmpty()
 
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)

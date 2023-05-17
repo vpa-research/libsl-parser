@@ -109,25 +109,25 @@ private fun checkFunctionIsResolved(function: Function) {
 }
 
 private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
-    statements.forEach { statement ->
-        when (statement) {
+    for(s in statements) {
+        when (s) {
             is Action -> {}
             is ProcedureCall -> {}
             // TODO(Variable statement)
             is VariableDeclaration -> {}
             is Assignment -> {
-                function.context.typeInferrer.getExpressionType(statement.left)
-                function.context.typeInferrer.getExpressionType(statement.value)
+                function.context.typeInferrer.getExpressionType(s.left)
+                function.context.typeInferrer.getExpressionType(s.value)
             }
-            is ElseStatement -> checkStatementIsResolved(function, statement.statements)
+            is ElseStatement -> checkStatementIsResolved(function, s.statements)
             is IfStatement -> {
-                checkStatementIsResolved(function, statement.ifStatements)
-                statement.elseStatements?.let {
+                checkStatementIsResolved(function, s.ifStatements)
+                s.elseStatements?.let {
                     checkStatementIsResolved(function, it.statements)
                 }
             }
             is ExpressionStatement -> {
-                function.context.typeInferrer.getExpressionType(statement.expression)
+                function.context.typeInferrer.getExpressionType(s.expression)
             }
         }
     }
