@@ -22,6 +22,7 @@ abstract class ExpressionVisitor <T> {
             is ActionExpression -> visitActionExpression(node)
             is ProcExpression -> visitProcExpression(node)
             is ThisAccess -> visitThisAndParentAccess(node)
+            is NamedArgumentWithValue -> visitNamedArgumentWithValue(node)
         }
     }
 
@@ -62,4 +63,6 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitProcExpression(node: ProcExpression): T
 
     abstract fun visitThisAndParentAccess(node: ThisAccess): T
+
+    abstract fun visitNamedArgumentWithValue(node: NamedArgumentWithValue): T
 }

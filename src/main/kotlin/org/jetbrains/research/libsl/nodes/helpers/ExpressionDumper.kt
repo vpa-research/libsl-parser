@@ -24,6 +24,7 @@ object ExpressionDumper {
             is ProcExpression -> dumpProcExpression(expression)
             is UnaryOpExpression -> dumpUnaryOpExpression(expression)
             is Variable -> dumpVariable(expression)
+            is NamedArgumentWithValue -> dumpNamedArgumentWithValue(expression)
         }
     }
 
@@ -160,5 +161,13 @@ object ExpressionDumper {
 
     private fun dumpVariable(expression: Variable): String {
         return expression.name
+    }
+
+    private fun dumpNamedArgumentWithValue(expression: NamedArgumentWithValue): String {
+        return if(expression.name != null) {
+            "${expression.name} = ${expression.value.dumpToString()}"
+        } else {
+            expression.value.dumpToString()
+        }
     }
 }

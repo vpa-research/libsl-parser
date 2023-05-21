@@ -276,7 +276,7 @@ class ExpressionVisitor(
                 return@mapNotNull null
             }
 
-            ArgumentWithValue(name, value)
+            NamedArgumentWithValue(name, value)
         }
 
         val stateName =

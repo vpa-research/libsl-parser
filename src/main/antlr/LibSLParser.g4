@@ -217,7 +217,7 @@ callAutomatonConstructorWithNamedArgs
    ;
 
 namedArgs
-   :   argPair (COMMA argPair)*
+   :   argPair (COMMA argPair)* (COMMA)?
    ;
 
 argPair
@@ -263,7 +263,7 @@ parameter
  * syntax: @annotationName(args)
  */
 annotationUsage
-   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   :   AT Identifier (L_BRACKET annotationArgs* R_BRACKET)?
    ;
 
 /*
@@ -311,6 +311,14 @@ procUsage
 
 expressionsList
    :   expression (COMMA expression)* (COMMA)?
+   ;
+
+annotationArgs
+   :   argName? expression (COMMA)?
+   ;
+
+argName
+   :   name=Identifier ASSIGN_OP
    ;
 
 /* requires contract
