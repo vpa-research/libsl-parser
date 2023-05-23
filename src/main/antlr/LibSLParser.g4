@@ -118,7 +118,7 @@ annotationDecl
 annotationDeclParams
    :   L_BRACKET annotationDeclParamsPart (COMMA annotationDeclParamsPart)* (COMMA)? R_BRACKET
    ;
-G
+
 annotationDeclParamsPart
    :   nameWithType (ASSIGN_OP expression)?
    ;
@@ -227,17 +227,17 @@ argPair
 
 constructorDecl
    :   annotationUsage* CONSTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
 destructorDecl
    :   annotationUsage* DESTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (SEMICOLON | L_BRACE functionBody R_BRACE)?
    ;
 
 procDecl
    :   annotationUsage* PROC functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
 /*
@@ -269,18 +269,15 @@ annotationUsage
 /*
  * declarations between function's header and body-block
  */
-functionPreamble
-   :   preamblePart*
-   ;
 
-preamblePart
+functionContracts
    :   requiresContract
    |   ensuresContract
    |   assignsContract
    ;
 
 functionBody
-   :   functionPreamble functionBodyStatements*
+   :   functionContracts* functionBodyStatements*
    ;
 
 functionBodyStatements
