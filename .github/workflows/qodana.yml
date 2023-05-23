@@ -6,12 +6,14 @@ on:
   push:
     branches:
       - main
+      - feature/automaton-concepts
 
 permissions:
   actions: read
   contents: read
   security-events: write
 
+version: 1.0
 jobs:
   qodana:
     runs-on: ubuntu-latest
