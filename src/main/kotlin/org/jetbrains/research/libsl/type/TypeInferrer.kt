@@ -30,6 +30,7 @@ class TypeInferrer(private val context: LslContextBase) {
             is Variable -> expression.typeReference.resolveOrError()
             is OldValue -> getExpressionType(expression.value)
             is HasAutomatonConcept -> BoolType(context)
+            is NamedArgumentWithValue -> getExpressionType(expression.value)
 
             // TODO("Action type")
             is ActionExpression -> anyType

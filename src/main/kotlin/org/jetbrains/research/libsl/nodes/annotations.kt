@@ -45,7 +45,7 @@ data class AnnotationArgumentDescriptor(
 
 data class AnnotationUsage(
     val annotationReference: AnnotationReference,
-    val arguments: List<Expression>
+    val arguments: List<NamedArgumentWithValue>
 ) : IPrinter {
     override fun dumpToString() = buildString {
         append("@${BackticksPolitics.forIdentifier(annotationReference.resolveOrError().name)}")

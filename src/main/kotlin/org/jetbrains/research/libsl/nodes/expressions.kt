@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
+import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Expression : Node() {
     override fun dumpToString(): String = ExpressionDumper.dump(this)
@@ -67,7 +68,7 @@ data class OldValue(
 
 data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
-    val args: List<ArgumentWithValue>,
+    val args: List<NamedArgumentWithValue>,
     val stateRef: AutomatonStateReference
 ) : Atomic() {
     override val value: Any? = null
@@ -94,4 +95,9 @@ data class ProcExpression(
 data class HasAutomatonConcept(
     val variableName: String,
     val automatonReference: AutomatonReference
+) : Expression()
+
+data class NamedArgumentWithValue(
+    val name: String?,
+    val value: Expression
 ) : Expression()

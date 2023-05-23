@@ -100,10 +100,3 @@ class Procedure(
     annotationUsages, contracts,
     statements, hasBody, null, context
 )
-
-data class ArgumentWithValue(
-    val name: String,
-    val value: Expression
-) : IPrinter {
-    override fun dumpToString(): String = "${BackticksPolitics.forIdentifier(name)} = ${value.dumpToString()}"
-}
