@@ -112,13 +112,13 @@ enumSemanticTypeEntry
  *         );
  */
 annotationDecl
-   :   ANNOTATION name=Identifier (L_BRACKET (annotationDeclParams) (COMMA)? R_BRACKET)? SEMICOLON
+   :   ANNOTATION name=Identifier annotationDeclParams? SEMICOLON
    ;
 
 annotationDeclParams
-   :   (annotationDeclParamsPart (COMMA annotationDeclParamsPart)*)*
+   :   L_BRACKET annotationDeclParamsPart (COMMA annotationDeclParamsPart)* (COMMA)? R_BRACKET
    ;
-
+G
 annotationDeclParamsPart
    :   nameWithType (ASSIGN_OP expression)?
    ;
