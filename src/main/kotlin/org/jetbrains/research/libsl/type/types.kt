@@ -2,7 +2,9 @@ package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Atomic
+import org.jetbrains.research.libsl.nodes.Expression
 import org.jetbrains.research.libsl.nodes.IPrinter
+import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
@@ -110,7 +112,9 @@ data class EnumLikeSemanticType(
 
 data class StructuredType(
     override val name: String,
-    var entries: Map<String, TypeReference>,
+    var entries: MutableList<TypeDefBlockStatement> = mutableListOf(),
+    val isTypeIdentifier: String?,
+    val forTypeList: MutableList<String> = mutableListOf(),
     override val context: LslContextBase
 ) : Type {
     override val isPointer: Boolean = false
@@ -118,12 +122,24 @@ data class StructuredType(
     override val generic: TypeReference? = null
 
     override fun dumpToString(): String = buildString {
-        appendLine("type ${name} {")
-        val formattedEntries = entries.map { (k, v) ->
-            "${BackticksPolitics.forIdentifier(k)}: ${BackticksPolitics.forTypeIdentifier(v.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}"
+        append("type $name ")
+        if(isTypeIdentifier != null) {
+            append("is $isTypeIdentifier ")
         }
-        append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
-        append("}")
+        if(forTypeList.isNotEmpty()) {
+            append("for ")
+            append(forTypeList.joinToString(separator = ", "))
+            append(" ")
+        }
+        appendLine("{")
+        entries.forEach { e ->
+            append(withIndent(BackticksPolitics.forIdentifier(e.name)))
+            if(e.fields.isNotEmpty()) {
+                append(e.fields.joinToString(separator = ", ", prefix = "(", postfix = ")", transform = Variable::dumpToString))
+            }
+            appendLine(": ${BackticksPolitics.forTypeIdentifier(e.typeReference.resolveOrError().fullName)};")
+        }
+        appendLine("}")
     }
 
     override fun equals(other: Any?): Boolean {
@@ -149,6 +165,12 @@ data class StructuredType(
 
     override fun toString() = dumpToString()
 }
+
+data class TypeDefBlockStatement(
+    val name: String,
+    val fields: MutableList<Variable> = mutableListOf(),
+    val typeReference: TypeReference
+)
 
 data class EnumType(
     override val name: String,

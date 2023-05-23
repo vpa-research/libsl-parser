@@ -6,23 +6,29 @@ types {
     String(string);
 }
 
-/* type BufferedImage is java.awt.image.BufferedImage for Image, Object {
+type BufferedImage is java.awt.image.BufferedImage for Image, Object {
    width: int;
    content: array<array<int>>;
-   iterator (offset: int): Iterator;
+   iterator(offset: int): any;
 }
 
-
-fun Foo.bar(img: BufferedImage): Object {
-   result = img.iterator(this.offset + 2);
+automaton concept IterableAutomaton {
+   var storage: any;
+   proc _getNext (index: int): any;
+   proc something(): any;
 }
-*/
+
 
 automaton Foo(): Int implements IterableAutomaton, CollectionAutomaton
 {
    fun bar (value: any) {
-      _getNext(5);
+      IterableAutomaton(value)._getNext(5);
    }
 
-   fun something();
+   fun foo(newValue: any) {
+      val x: any;
+      if (newValue has IterableAutomaton) {
+         IterableAutomaton(newValue).something();
+      }
+   }
 }

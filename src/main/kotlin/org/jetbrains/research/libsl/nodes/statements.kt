@@ -71,6 +71,7 @@ data class ExpressionStatement(
     val expression: Expression
 ) : Statement() {
     override fun dumpToString(): String = buildString {
+        println(expression)
         append(expression.dumpToString())
         append(";")
     }

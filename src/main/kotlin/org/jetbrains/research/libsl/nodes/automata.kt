@@ -10,6 +10,7 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
+    val isConcept: Boolean,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     val implementedConcepts: MutableList<ImplementedConcept> = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
@@ -28,18 +29,21 @@ data class Automaton(
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
+        if(isConcept) {
+            append("automaton concept ${BackticksPolitics.forPeriodSeparated(name)}")
+        } else {
+            append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
+            if (constructorVariables.isNotEmpty()) {
+                append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
+            }
+            append(" : ${BackticksPolitics.forPeriodSeparated(typeReference!!.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}")
 
-        append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
-        if (constructorVariables.isNotEmpty()) {
-            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
-        }
-        append(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}")
-
-        if(implementedConcepts.isNotEmpty()) {
-            append(" implements ")
-            append(implementedConcepts.joinToString(separator = ", ") {
-                it.name
-            })
+            if(implementedConcepts.isNotEmpty()) {
+                append(" implements ")
+                append(implementedConcepts.joinToString(separator = ", ") {
+                    it.name
+                })
+            }
         }
 
         appendLine(" {")
@@ -77,12 +81,7 @@ data class Automaton(
 
 data class ImplementedConcept(
     val name: String
-) : Node() {
-    override fun dumpToString(): String {
-        TODO("Not yet implemented")
-    }
-
-}
+)
 
 data class State(
     val name: String,

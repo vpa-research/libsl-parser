@@ -64,6 +64,10 @@ class ExpressionVisitor(
                 visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
             }
 
+            ctx.hasAutomatonConcept() != null -> {
+                visitHasAutomatonConcept(ctx.hasAutomatonConcept())
+            }
+
             else -> error("unknown expression type")
         }
     }
@@ -301,7 +305,11 @@ class ExpressionVisitor(
     }
 
     override fun visitProcUsage(ctx: ProcUsageContext): Expression {
-        val name = ctx.periodSeparatedFullName().text.extractIdentifier()
+        val name = when {
+            ctx.periodSeparatedFullName() != null -> ctx.periodSeparatedFullName().text.extractIdentifier()
+            ctx.simpleCall() != null -> "${ctx.simpleCall().text.extractIdentifier()}.${ctx.Identifier().text}"
+            else -> error("Incorrect proc call name")
+        }
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
@@ -331,5 +339,14 @@ class ExpressionVisitor(
 
         val value = visitExpression(ctx.expression())
         return UnaryOpExpression(op, value)
+    }
+
+    override fun visitHasAutomatonConcept(ctx: LibSLParser.HasAutomatonConceptContext): Expression {
+
+        val variableName = ctx.qualifiedAccess().periodSeparatedFullName().asPeriodSeparatedString()
+        val automatonConceptName = ctx.name.text
+        val automatonReference = AutomatonReferenceBuilder.build(automatonConceptName, context)
+
+        return HasAutomatonConcept(variableName, automatonReference)
     }
 }

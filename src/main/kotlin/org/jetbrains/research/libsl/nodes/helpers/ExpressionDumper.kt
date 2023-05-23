@@ -24,6 +24,7 @@ object ExpressionDumper {
             is ProcExpression -> dumpProcExpression(expression)
             is UnaryOpExpression -> dumpUnaryOpExpression(expression)
             is Variable -> dumpVariable(expression)
+            is HasAutomatonConcept -> dumpHasAutomatonConcept(expression)
         }
     }
 
@@ -160,5 +161,9 @@ object ExpressionDumper {
 
     private fun dumpVariable(expression: Variable): String {
         return expression.name
+    }
+
+    private fun dumpHasAutomatonConcept(expression: HasAutomatonConcept): String {
+        return "${expression.variableName} has ${expression.automatonReference.name}"
     }
 }

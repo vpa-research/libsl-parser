@@ -90,3 +90,8 @@ data class ActionExpression(
 data class ProcExpression(
     val procedureCall: ProcedureCall
 ) : Expression()
+
+data class HasAutomatonConcept(
+    val variableName: String,
+    val automatonReference: AutomatonReference
+) : Expression()

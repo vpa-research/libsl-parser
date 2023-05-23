@@ -94,7 +94,7 @@ private fun checkEverythingIsResolved(library: Library, context: LslContextBase)
 }
 
 private fun checkAutomatonIsResolved(automaton: Automaton) {
-    automaton.typeReference.resolveOrError()
+    automaton.typeReference?.resolveOrError()
     automaton.constructorVariables.forEach { it.typeReference.resolveOrError() }
     automaton.internalVariables.forEach { it.typeReference.resolveOrError() }
 
@@ -143,7 +143,7 @@ private fun checkTypeIsResolved(type: Type) {
         is PrimitiveType -> {}
         is RealType -> {}
         is StructuredType -> {
-            type.entries.forEach{ entryType -> entryType.value.resolveOrError()}
+            type.entries.forEach{ entryType -> entryType.typeReference.resolveOrError()}
         }
     }
 }

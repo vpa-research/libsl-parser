@@ -151,7 +151,7 @@ actionParameter
  */
 automatonDecl
    :   annotationUsage* AUTOMATON CONCEPT? name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
-   COLON type=periodSeparatedFullName implementedConcepts*
+   (COLON type=periodSeparatedFullName)? implementedConcepts*
    L_BRACE automatonStatement* R_BRACE
    ;
 
@@ -212,7 +212,7 @@ variableDecl
    ;
 
 nameWithType
-   :  name=Identifier COLON type=typeIdentifier
+   :  name=Identifier (L_BRACKET nameWithType R_BRACKET)* COLON type=typeIdentifier
    ;
 
 /*
@@ -319,11 +319,12 @@ elseStatement
  * syntax: action ActionName(args)
  */
 actionUsage
-   :  ACTION Identifier L_BRACKET expressionsList? R_BRACKET
+   :   ACTION Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
 procUsage
-   :  periodSeparatedFullName L_BRACKET expressionsList? R_BRACKET
+   :   periodSeparatedFullName L_BRACKET expressionsList? R_BRACKET
+   |   simpleCall DOT Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList
@@ -370,7 +371,11 @@ expression
    |   procUsage
    |   actionUsage
    |   callAutomatonConstructorWithNamedArgs
-   |   expression HAS name=Identifier
+   |   hasAutomatonConcept
+   ;
+
+hasAutomatonConcept
+   :   qualifiedAccess HAS name=Identifier
    ;
 
 bitShiftOp

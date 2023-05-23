@@ -135,8 +135,12 @@ class FunctionVisitor(
     }
 
     override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
-        val statements = buildingFunction.statements
-        BlockStatementVisitor(functionContext, statements).visit(ctx)
+        if(parentAutomaton?.isConcept == true) {
+            error("Function realisation inside automaton concept")
+        } else {
+            val statements = buildingFunction.statements
+            BlockStatementVisitor(functionContext, statements).visit(ctx)
+        }
     }
 
     private val FunctionDeclContext.args: List<FunctionArgument>
@@ -152,7 +156,7 @@ class FunctionVisitor(
                     val targetAutomatonName = typeRef.name
                     val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                     arg.targetAutomaton = targetAutomatonReference
-                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
+                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference!!
                 }
 
                 arg

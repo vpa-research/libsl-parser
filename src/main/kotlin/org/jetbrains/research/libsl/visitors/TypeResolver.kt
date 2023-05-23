@@ -7,6 +7,7 @@ import org.jetbrains.research.libsl.LibSLParser.TypeDefBlockStatementContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.Atomic
+import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.*
 
@@ -97,17 +98,23 @@ class TypeResolver(
 
     override fun visitTypeDefBlock(ctx: LibSLParser.TypeDefBlockContext) {
         val name = ctx.name.asPeriodSeparatedString()
+        val isTypeIdentifier = ctx.targetType()?.typeIdentifier()?.name?.text
+        val forTypeList = mutableListOf<String>()
+        ctx.targetType()?.typeList()?.typeIdentifier()?.forEach { forTypeList.add(it.name.text)}
 
-        val statements = ctx.typeDefBlockStatement().associate { processTypeDefBlockStatement(it) }
+        val statements = mutableListOf<TypeDefBlockStatement>()
+        ctx.typeDefBlockStatement().forEach { statements.add(processTypeDefBlockStatement(it)) }
 
-        val type = StructuredType(name, statements, context)
+        val type = StructuredType(name, statements, isTypeIdentifier, forTypeList, context)
         context.storeType(type)
     }
 
-    private fun processTypeDefBlockStatement(ctx: TypeDefBlockStatementContext): Pair<String, TypeReference> {
+    private fun processTypeDefBlockStatement(ctx: TypeDefBlockStatementContext): TypeDefBlockStatement {
         val name = ctx.nameWithType().name.text.extractIdentifier()
+        val fields = mutableListOf<Variable>()
+        ctx.nameWithType().nameWithType().forEach { fields.add(Variable(it.name.text, processTypeIdentifier(it.type))) }
         val typeRef = processTypeIdentifier(ctx.nameWithType().type)
 
-        return name to typeRef
+        return TypeDefBlockStatement(name, fields, typeRef)
     }
 }

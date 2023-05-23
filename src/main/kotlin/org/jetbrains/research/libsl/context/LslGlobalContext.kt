@@ -41,6 +41,7 @@ class LslGlobalContext : LslContextBase() {
 
                 add(AnyType(this@LslGlobalContext))
                 add(NothingType(this@LslGlobalContext))
+                add(ConceptType(this@LslGlobalContext))
             }
         }
 
