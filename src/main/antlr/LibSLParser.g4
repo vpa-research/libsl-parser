@@ -195,7 +195,7 @@ variableDecl
    ;
 
 nameWithType
-   :  name=Identifier COLON type=typeIdentifier
+   :   name=Identifier COLON type=typeIdentifier
    ;
 
 /*
