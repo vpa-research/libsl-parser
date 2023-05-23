@@ -150,6 +150,26 @@ AUTOMATON
    :   'automaton'
    ;
 
+CONCEPT
+   :   'concept'
+   ;
+
+IMPLEMENTS
+   :   'implements'
+   ;
+
+HAS
+   :   'has'
+   ;
+
+IS
+   :   'is'
+   ;
+
+FOR
+   :   'for'
+   ;
+
 VAR
    :   'var'
    ;

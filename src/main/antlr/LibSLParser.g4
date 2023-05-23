@@ -57,7 +57,15 @@ typealiasStatement
  * syntax: type full.name { field1: Type; field2: Type; ... }
  */
 typeDefBlock
-   :   TYPE name=periodSeparatedFullName (L_BRACE typeDefBlockStatement* R_BRACE)?
+   :   TYPE name=periodSeparatedFullName targetType? (L_BRACE typeDefBlockStatement* R_BRACE)?
+   ;
+
+targetType
+   :   (IS typeIdentifier)? FOR typeList
+   ;
+
+typeList
+   :  typeIdentifier (COMMA typeIdentifier)*
    ;
 
 typeDefBlockStatement
@@ -142,8 +150,9 @@ actionParameter
  *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   annotationUsage* AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
-   COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   :   annotationUsage* AUTOMATON CONCEPT? name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
+   COLON type=periodSeparatedFullName implementedConcepts*
+   L_BRACE automatonStatement* R_BRACE
    ;
 
 constructorVariables
@@ -158,6 +167,14 @@ automatonStatement
    |   procDecl
    |   functionDecl
    |   variableDecl
+   ;
+
+implementedConcepts
+   :   IMPLEMENTS concept (COMMA concept)*
+   ;
+
+concept
+   :   name=Identifier
    ;
 
 /* state declaration
@@ -353,6 +370,7 @@ expression
    |   procUsage
    |   actionUsage
    |   callAutomatonConstructorWithNamedArgs
+   |   expression HAS name=Identifier
    ;
 
 bitShiftOp

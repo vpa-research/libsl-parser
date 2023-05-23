@@ -11,6 +11,7 @@ data class Automaton(
     val name: String,
     val typeReference: TypeReference,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
+    val implementedConcepts: MutableList<ImplementedConcept> = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
@@ -32,7 +33,16 @@ data class Automaton(
         if (constructorVariables.isNotEmpty()) {
             append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
         }
-        appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)} {")
+        append(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}")
+
+        if(implementedConcepts.isNotEmpty()) {
+            append(" implements ")
+            append(implementedConcepts.joinToString(separator = ", ") {
+                it.name
+            })
+        }
+
+        appendLine(" {")
 
         append(withIndent(formatBody()))
         append("}")
@@ -63,6 +73,15 @@ data class Automaton(
     private fun formatFunctions(): String = formatListEmptyLineAtEndIfNeeded(functions, appendEndLineAtTheEnd = false)
 
     override fun toString(): String = dumpToString()
+}
+
+data class ImplementedConcept(
+    val name: String
+) : Node() {
+    override fun dumpToString(): String {
+        TODO("Not yet implemented")
+    }
+
 }
 
 data class State(

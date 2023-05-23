@@ -31,6 +31,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testAutomatonConceptsLsl() {
+        runLslTest("automatonConcepts")
+    }
+
+    @Test
     fun testAutomatonConstructorLsl() {
         runLslTest("automatonConstructor")
     }
