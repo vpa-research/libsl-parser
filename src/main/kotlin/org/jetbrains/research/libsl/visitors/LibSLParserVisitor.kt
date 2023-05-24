@@ -73,17 +73,6 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
 
     private fun processAnnotationUsage(ctx: LibSLParser.AnnotationUsageContext): AnnotationUsage {
         val name = ctx.Identifier().asPeriodSeparatedString()
-        val expressionVisitor = ExpressionVisitor(context)
-        /* val args = when {
-            ctx.expressionsList()?.expression() != null -> ctx.expressionsList().expression()?.map { expr ->
-                expressionVisitor.visitExpression(expr)
-            }.orEmpty()
-
-            ctx.expressionsList()?.namedArgs() != null -> processNamedArgs(ctx.expressionsList().namedArgs())
-            else -> emptyList()
-        }
-         */
-
         val args = if(ctx.annotationArgs() != null) {
             processAnnotationArgs(ctx)
         } else {

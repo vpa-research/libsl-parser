@@ -295,9 +295,10 @@ class ExpressionVisitor(
     override fun visitActionUsage(ctx: ActionUsageContext): Expression  {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }?.toMutableList()
+        val args = mutableListOf<Expression>()
+        if(ctx.expressionsList() != null) {
+            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
+        }
 
         val action = Action(name, args)
 
@@ -311,10 +312,10 @@ class ExpressionVisitor(
             else -> error("Incorrect proc call name")
         }
         val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }?.toMutableList()
-
+        val args = mutableListOf<Expression>()
+        if(ctx.expressionsList() != null) {
+            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
+        }
         val procedureCall = ProcedureCall(name, args)
 
         return ProcExpression(procedureCall)

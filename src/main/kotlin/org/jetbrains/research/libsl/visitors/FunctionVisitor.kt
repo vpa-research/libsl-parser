@@ -156,7 +156,7 @@ class FunctionVisitor(
                     val targetAutomatonName = typeRef.name
                     val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                     arg.targetAutomaton = targetAutomatonReference
-                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference!!
+                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
                 }
 
                 arg

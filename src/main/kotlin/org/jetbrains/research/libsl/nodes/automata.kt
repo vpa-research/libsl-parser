@@ -36,7 +36,7 @@ data class Automaton(
             if (constructorVariables.isNotEmpty()) {
                 append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
             }
-            append(" : ${BackticksPolitics.forPeriodSeparated(typeReference!!.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}")
+            append(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}")
 
             if(implementedConcepts.isNotEmpty()) {
                 append(" implements ")

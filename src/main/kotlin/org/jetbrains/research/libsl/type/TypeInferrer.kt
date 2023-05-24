@@ -7,7 +7,6 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 class TypeInferrer(private val context: LslContextBase) {
     private val anyType by lazy { context.resolveType(AnyType.getAnyTypeReference(context))!! }
     private val nothingType by lazy { context.resolveType(NothingType.getNothingTypeReference(context))!! }
-    private val conceptType by lazy {context.resolveType(ConceptType.getConceptTypeReference(context)!!)}
 
     @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun getExpressionTypeOrNull(expression: Expression): Type? {
@@ -44,7 +43,7 @@ class TypeInferrer(private val context: LslContextBase) {
             is FloatLiteral -> FloatType(context, FloatType.FloatCapacity.UNKNOWN)
             is IntegerLiteral -> IntType(context, IntType.IntCapacity.UNKNOWN)
             is StringLiteral -> StringType(context)
-            is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference!!.resolveOrError()
+            is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
             is QualifiedAccess -> getQualifiedAccessType(atomic)
             is ArrayLiteral -> getArrayLiteralType(atomic)
         }

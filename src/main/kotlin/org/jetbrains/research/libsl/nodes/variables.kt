@@ -105,10 +105,10 @@ class DeclaredActionParameter(
 }
 
 class ConstructorArgument(
-    private val keyword: VariableKind,
+    val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
-    private val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
 ) : Variable(name, typeReference) {
     lateinit var automaton: Automaton
 
@@ -127,7 +127,7 @@ class ConstructorArgument(
 
 @Suppress("MemberVisibilityCanBePrivate")
 class VariableWithInitialValue(
-    private val keyword: VariableKind,
+    val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
     val annotationUsage: MutableList<AnnotationUsage> = mutableListOf(),
