@@ -61,7 +61,7 @@ typeDefBlock
    ;
 
 targetType
-   :   (IS typeIdentifier)? FOR typeList
+   :   (is=Identifier typeIdentifier)? for=Identifier typeList
    ;
 
 typeList
@@ -170,7 +170,7 @@ automatonStatement
    ;
 
 implementedConcepts
-   :   IMPLEMENTS concept (COMMA concept)*
+   :   implements=Identifier concept (COMMA concept)*
    ;
 
 concept
@@ -383,7 +383,7 @@ expression
    ;
 
 hasAutomatonConcept
-   :   qualifiedAccess HAS name=Identifier
+   :   qualifiedAccess has=Identifier name=Identifier
    ;
 
 bitShiftOp
