@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.nodes.AnnotationUsage
 import org.jetbrains.research.libsl.nodes.Atomic
 import org.jetbrains.research.libsl.nodes.Expression
 import org.jetbrains.research.libsl.nodes.IPrinter
@@ -54,6 +55,7 @@ data class RealType(
 data class SimpleType(
     override val name: String,
     val realType: Type,
+    val annotationUsages: MutableList<AnnotationUsage>,
     override val isPointer: Boolean = false,
     override val context: LslContextBase
 ) : LibslType {
@@ -61,7 +63,10 @@ data class SimpleType(
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String {
-        return "${BackticksPolitics.forTypeIdentifier(name)}(${BackticksPolitics.forTypeIdentifier(realType.fullName)});"
+        return buildString {
+            append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
+            append("${BackticksPolitics.forTypeIdentifier(name)}(${BackticksPolitics.forTypeIdentifier(realType.fullName)});")
+        }
     }
 
     override fun toString() = dumpToString()
@@ -70,6 +75,7 @@ data class SimpleType(
 data class TypeAlias(
     override val name: String,
     val originalType: TypeReference,
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     override val context: LslContextBase
 ) : LibslType {
     override val isPointer: Boolean = false
@@ -79,6 +85,7 @@ data class TypeAlias(
 
     override fun dumpToString(): String {
         return buildString {
+            append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
             append("typealias ")
             append(BackticksPolitics.forTypeIdentifier(name))
             append(" = ")
@@ -94,6 +101,7 @@ data class EnumLikeSemanticType(
     override val name: String,
     val type: Type,
     val entries: Map<String, Atomic>,
+    val annotationUsages: MutableList<AnnotationUsage>,
     override val context: LslContextBase
 ) : LibslType {
     override val isPointer: Boolean = false
@@ -101,6 +109,7 @@ data class EnumLikeSemanticType(
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String = buildString {
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
         appendLine("$name(${type.fullName}) {")
         val formattedEntries = entries.map { (k, v) -> "${BackticksPolitics.forIdentifier(k)}: ${v.dumpToString()}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))
@@ -115,6 +124,7 @@ data class StructuredType(
     var entries: MutableList<TypeDefBlockStatement> = mutableListOf(),
     val isTypeIdentifier: String?,
     val forTypeList: MutableList<String> = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage>,
     override val context: LslContextBase
 ) : Type {
     override val isPointer: Boolean = false
@@ -122,6 +132,7 @@ data class StructuredType(
     override val generic: TypeReference? = null
 
     override fun dumpToString(): String = buildString {
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
         append("type $name ")
         if(isTypeIdentifier != null) {
             append("is $isTypeIdentifier ")
@@ -175,6 +186,7 @@ data class TypeDefBlockStatement(
 data class EnumType(
     override val name: String,
     val entries: Map<String, Atomic>,
+    val annotationUsages: MutableList<AnnotationUsage>,
     override val context: LslContextBase
 ) : Type {
     override val isPointer: Boolean = false
@@ -182,6 +194,7 @@ data class EnumType(
     override val isTopLevelType: Boolean = true
 
     override fun dumpToString(): String = buildString {
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
         appendLine("enum $name {")
         val formattedEntries = entries.map { (k, v) -> "${BackticksPolitics.forIdentifier(k)} = ${v.dumpToString()}" }
         append(withIndent(simpleCollectionFormatter(formattedEntries, "", ";", addEmptyLastLine = false)))

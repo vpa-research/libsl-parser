@@ -1,14 +1,17 @@
 libsl "1.0.0";
 library simple;
+@Something
 type BufferedImage is java.awt.image.BufferedImage for Image, Object {
     width: int;
     content: array<array<int>>;
     iterator(offset): any;
 }
 types {
+    @Something
     Int(int32);
     String(string);
 }
+annotation Something;
 automaton concept IterableAutomaton {
     var storage: any;
     proc _getNext(index: int): any;

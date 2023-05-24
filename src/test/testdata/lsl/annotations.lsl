@@ -1,6 +1,7 @@
 libsl "1.0.0";
 library simple;
 
+@Something
 typealias Int=int32;
 
 annotation Something;

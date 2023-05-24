@@ -18,13 +18,14 @@ class TypeResolver(
 ) : LibSLParserVisitor<Unit>(context) {
     override fun visitSimpleSemanticType(ctx: LibSLParser.SimpleSemanticTypeContext) {
         val typeName = ctx.semanticName.name.asPeriodSeparatedString()
-
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
         val realNameCtx = ctx.realName
         val originType = getRealTypeOrArray(realNameCtx)
 
         val type = SimpleType(
             typeName,
             originType,
+            annotationReferences,
             context = context
         )
 
@@ -38,11 +39,13 @@ class TypeResolver(
         val originType = getRealTypeOrArray(realTypeCtx)
         val entriesContexts = ctx.enumSemanticTypeEntry()
         val entries = processBlockTypeStatements(entriesContexts)
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
         val type = EnumLikeSemanticType(
             typeName,
             originType,
             entries,
+            annotationReferences,
             context
         )
 
@@ -66,8 +69,9 @@ class TypeResolver(
     override fun visitTypealiasStatement(ctx: LibSLParser.TypealiasStatementContext) {
         val name = ctx.left.periodSeparatedFullName().asPeriodSeparatedString()
         val originalTypeReference = processTypeIdentifier(ctx.right)
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
-        val type = TypeAlias(name, originalTypeReference, context)
+        val type = TypeAlias(name, originalTypeReference, annotationReferences, context)
 
         context.storeType(type)
     }
@@ -76,8 +80,9 @@ class TypeResolver(
         val name = ctx.typeIdentifier().text.extractIdentifier()
         val statementsContexts = ctx.enumBlockStatement()
         val statements = processEnumStatements(statementsContexts)
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
-        val type = EnumType(name, statements, context)
+        val type = EnumType(name, statements, annotationReferences, context)
 
         context.storeType(type)
     }
@@ -105,7 +110,9 @@ class TypeResolver(
         val statements = mutableListOf<TypeDefBlockStatement>()
         ctx.typeDefBlockStatement().forEach { statements.add(processTypeDefBlockStatement(it)) }
 
-        val type = StructuredType(name, statements, isTypeIdentifier, forTypeList, context)
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+
+        val type = StructuredType(name, statements, isTypeIdentifier, forTypeList, annotationReferences, context)
         context.storeType(type)
     }
 

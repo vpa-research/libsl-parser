@@ -50,14 +50,14 @@ header:
  * syntax: typealias name = origintlType
  */
 typealiasStatement
-   :   TYPEALIAS left=typeIdentifier ASSIGN_OP right=typeIdentifier SEMICOLON
+   :   annotationUsage* TYPEALIAS left=typeIdentifier ASSIGN_OP right=typeIdentifier SEMICOLON
    ;
 
 /* type define block
  * syntax: type full.name { field1: Type; field2: Type; ... }
  */
 typeDefBlock
-   :   TYPE name=periodSeparatedFullName targetType? (L_BRACE typeDefBlockStatement* R_BRACE)?
+   :   annotationUsage* TYPE name=periodSeparatedFullName targetType? (L_BRACE typeDefBlockStatement* R_BRACE)?
    ;
 
 targetType
@@ -76,7 +76,7 @@ typeDefBlockStatement
  * syntax: enum Name { Variant1=0; Variant2=1; ... }
  */
 enumBlock
-   :   ENUM typeIdentifier L_BRACE enumBlockStatement* R_BRACE
+   :   annotationUsage* ENUM typeIdentifier L_BRACE enumBlockStatement* R_BRACE
    ;
 
 enumBlockStatement
@@ -99,14 +99,14 @@ semanticTypeDecl
  * syntax: semanticTypeName (realTypeName);
  */
 simpleSemanticType
-   :   semanticName=typeIdentifier L_BRACKET realName=typeIdentifier R_BRACKET SEMICOLON
+   :   annotationUsage* semanticName=typeIdentifier L_BRACKET realName=typeIdentifier R_BRACKET SEMICOLON
    ;
 
 /* block semantic type
  * syntax: semanticTypeName (realTypeName) {variant1: 0; variant2: 1; ...};
  */
 enumSemanticType
-   :   semanticName=Identifier L_BRACKET realName=typeIdentifier R_BRACKET L_BRACE enumSemanticTypeEntry+ R_BRACE
+   :   annotationUsage* semanticName=Identifier L_BRACKET realName=typeIdentifier R_BRACKET L_BRACE enumSemanticTypeEntry+ R_BRACE
    ;
 
 enumSemanticTypeEntry

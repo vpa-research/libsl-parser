@@ -20,8 +20,8 @@ abstract class ExpressionVisitor <T> {
             is Variable -> visitVariable(node)
             is ArrayLiteral -> visitArrayLiteral(node)
             is ActionExpression -> visitActionExpression(node)
+            is ThisAccess -> visitThisAccess(node)
             is ProcExpression -> visitProcExpression(node)
-            is ThisAccess -> visitThisAndParentAccess(node)
             is HasAutomatonConcept -> visitHasAutomatonConcept(node)
             is NamedArgumentWithValue -> visitNamedArgumentWithValue(node)
         }
@@ -63,7 +63,7 @@ abstract class ExpressionVisitor <T> {
 
     abstract fun visitProcExpression(node: ProcExpression): T
 
-    abstract fun visitThisAndParentAccess(node: ThisAccess): T
+    abstract fun visitThisAccess(node: ThisAccess): T
 
     abstract fun visitNamedArgumentWithValue(node: NamedArgumentWithValue): T
 
