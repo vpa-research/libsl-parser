@@ -9,8 +9,6 @@ data class AnnotationReference (
     override val context: LslContextBase
 ) : LslReference<Annotation, AnnotationReference> {
     override fun resolve(): Annotation? {
-        println(this.name)
-        println(argTypes)
         return context.resolveAnnotation(this)
     }
 

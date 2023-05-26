@@ -12,7 +12,6 @@ class BlockStatementVisitor(
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
         val expression = ExpressionStatement(expressionVisitor.visitExpression(ctx))
-        println(expression)
         statements.add(expression)
     }
 
