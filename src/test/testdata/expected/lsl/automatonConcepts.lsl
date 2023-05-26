@@ -3,9 +3,9 @@ library simple;
 @StructureKind("record")
 @Parametrized("P extends java.img.PixelType")
 type BufferedImage is java.awt.image.BufferedImage for Image, Object {
-    width: int;
-    content: array<array<int>>;
-    iterator(offset): Iterator;
+    var width: int;
+    var content: array<array<int>>;
+    fun iterator(offset: int): Iterator;
 }
 types {
     @implements
@@ -15,6 +15,11 @@ types {
     Image(java.img.Image);
     Iterator(iterator);
 }
+var width: int;
+var content: array<array<int>>;
+result
+var width: int;
+var content: array<array<int>>;
 annotation StructureKind(
     str: string
 );

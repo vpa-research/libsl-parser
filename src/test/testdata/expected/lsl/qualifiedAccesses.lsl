@@ -1,22 +1,23 @@
 libsl "1.0.0";
 library simple;
-
 type Type1 {
-    field: Type2;
+    var field: Type2;
 }
-
 type Type2 {
-    arrayField: array<Type3>;
+    var arrayField: array<Type3>;
 }
-
 type Type3 {
-    field: Int;
+    var field: Int;
 }
-
 types {
     Int(int32);
 }
-
+var field: Type2;
+var arrayField: array<Type3>;
+var field: Type2;
+var field: Type2;
+var arrayField: array<Type3>;
+var field: Type2;
 automaton A : Int {
     fun foo(arg: Type1) {
         arg.field.arrayField[0].field = 1;

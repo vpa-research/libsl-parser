@@ -4,7 +4,7 @@ library simple;
 typealias Int=int32;
 
 type StructureType {
-    field: Int;
+    var field: Int;
 }
 
 automaton A : Int {

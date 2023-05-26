@@ -78,6 +78,7 @@ private fun checkLslContent(testName: String, library: Library, context: LslCont
     }
 
     Assertions.assertEquals(removeBlankLines(expectedFile.readText()), lslContent)
+    println(errorManager.errors)
     Assertions.assertTrue(errorManager.errors.isEmpty())
 }
 
@@ -94,7 +95,7 @@ private fun checkEverythingIsResolved(library: Library, context: LslContextBase)
 }
 
 private fun checkAutomatonIsResolved(automaton: Automaton) {
-    automaton.typeReference?.resolveOrError()
+    automaton.typeReference.resolveOrError()
     automaton.constructorVariables.forEach { it.typeReference.resolveOrError() }
     automaton.internalVariables.forEach { it.typeReference.resolveOrError() }
 
@@ -143,7 +144,7 @@ private fun checkTypeIsResolved(type: Type) {
         is PrimitiveType -> {}
         is RealType -> {}
         is StructuredType -> {
-            type.entries.forEach{ entryType -> entryType.typeReference.resolveOrError()}
+            type.variables.forEach { v -> v.typeReference.resolveOrError()}
         }
     }
 }

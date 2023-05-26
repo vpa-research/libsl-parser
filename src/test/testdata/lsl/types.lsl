@@ -9,14 +9,14 @@ enum foo.vldf.Type { // enum type
 typealias MyType = foo.vldf.Type;
 
 type StructureType {
-    field: Int;
+    var field: Int;
 }
 
 type BlackAndWhiteImage {
-    height: Int;
-    width: Int;
-    tpe: StructureType;
-    content: array<array<Boolean>>;
+    var height: Int;
+    var width: Int;
+    var tpe: StructureType;
+    var content: array<array<Boolean>>;
 }
 
 types {

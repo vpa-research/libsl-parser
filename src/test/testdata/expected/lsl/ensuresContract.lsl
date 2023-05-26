@@ -2,8 +2,10 @@ libsl "1.0.0";
 library simple;
 typealias Int = int32;
 type StructureType {
-    field: Int;
+    var field: Int;
 }
+var field: Int;
+var field: Int;
 automaton A : Int {
     fun foo(param: Int) {
         assigns param;

@@ -69,7 +69,8 @@ typeList
    ;
 
 typeDefBlockStatement
-   :   nameWithType SEMICOLON
+   :   variableDecl
+   |   functionDecl
    ;
 
 /* enum block
@@ -212,7 +213,7 @@ variableDecl
    ;
 
 nameWithType
-   :  name=Identifier (L_BRACKET nameWithType R_BRACKET)* COLON type=typeIdentifier
+   :  name=Identifier COLON type=typeIdentifier
    ;
 
 /*

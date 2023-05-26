@@ -3,7 +3,7 @@ package org.jetbrains.research.libsl.type
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.AnnotationUsage
 import org.jetbrains.research.libsl.nodes.Atomic
-import org.jetbrains.research.libsl.nodes.Expression
+import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.IPrinter
 import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.TypeReference
@@ -121,7 +121,8 @@ data class EnumLikeSemanticType(
 
 data class StructuredType(
     override val name: String,
-    var entries: MutableList<TypeDefBlockStatement> = mutableListOf(),
+    val variables: MutableList<Variable> = mutableListOf(),
+    val functions: MutableList<Function> = mutableListOf(),
     val isTypeIdentifier: String?,
     val forTypeList: MutableList<String> = mutableListOf(),
     val annotationUsages: MutableList<AnnotationUsage>,
@@ -143,12 +144,11 @@ data class StructuredType(
             append(" ")
         }
         appendLine("{")
-        entries.forEach { e ->
-            append(withIndent(BackticksPolitics.forIdentifier(e.name)))
-            if(e.fields.isNotEmpty()) {
-                append(e.fields.joinToString(separator = ", ", prefix = "(", postfix = ")", transform = Variable::dumpToString))
-            }
-            appendLine(": ${BackticksPolitics.forTypeIdentifier(e.typeReference.resolveOrError().fullName)};")
+        variables.forEach { v ->
+            appendLine(withIndent(v.dumpToString()))
+        }
+        functions.forEach { f ->
+            appendLine(withIndent(f.dumpToString()))
         }
         appendLine("}")
     }
@@ -159,7 +159,8 @@ data class StructuredType(
 
         if (name != other.name) return false
         if (generic != other.generic) return false
-        if (entries != other.entries) return false
+        if (variables != other.variables) return false
+        if (functions != other.functions) return false
         if (context != other.context) return false
         if (isPointer != other.isPointer) return false
         if (isTopLevelType != other.isTopLevelType) return false
@@ -176,12 +177,6 @@ data class StructuredType(
 
     override fun toString() = dumpToString()
 }
-
-data class TypeDefBlockStatement(
-    val name: String,
-    val fields: MutableList<Variable> = mutableListOf(),
-    val typeReference: TypeReference
-)
 
 data class EnumType(
     override val name: String,

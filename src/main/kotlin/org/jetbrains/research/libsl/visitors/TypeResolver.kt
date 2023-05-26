@@ -1,14 +1,12 @@
 package org.jetbrains.research.libsl.visitors
 
-import org.antlr.v4.runtime.tree.TerminalNode
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.EnumSemanticTypeEntryContext
-import org.jetbrains.research.libsl.LibSLParser.TypeDefBlockStatementContext
+import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
+import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.nodes.Atomic
-import org.jetbrains.research.libsl.nodes.Variable
-import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.type.*
 
 class TypeResolver(
@@ -107,21 +105,83 @@ class TypeResolver(
         val forTypeList = mutableListOf<String>()
         ctx.targetType()?.typeList()?.typeIdentifier()?.forEach { forTypeList.add(it.name.text)}
 
-        val statements = mutableListOf<TypeDefBlockStatement>()
-        ctx.typeDefBlockStatement().forEach { statements.add(processTypeDefBlockStatement(it)) }
+        val variables = mutableListOf<Variable>()
+        val functions = mutableListOf<org.jetbrains.research.libsl.nodes.Function>()
+        ctx.typeDefBlockStatement().forEach { statement ->
+            when {
+                statement.variableDecl() != null ->
+                    variables.add(processVariableDecl(statement.variableDecl()))
+
+                statement.functionDecl() != null ->
+                    functions.add(processFunctionDecl(statement.functionDecl()))
+            }
+        }
+
 
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
-        val type = StructuredType(name, statements, isTypeIdentifier, forTypeList, annotationReferences, context)
+        val type = StructuredType(name, variables, functions, isTypeIdentifier, forTypeList, annotationReferences, context)
         context.storeType(type)
     }
 
-    private fun processTypeDefBlockStatement(ctx: TypeDefBlockStatementContext): TypeDefBlockStatement {
-        val name = ctx.nameWithType().name.text.extractIdentifier()
-        val fields = mutableListOf<Variable>()
-        ctx.nameWithType().nameWithType().forEach { fields.add(Variable(it.name.text, processTypeIdentifier(it.type))) }
-        val typeRef = processTypeIdentifier(ctx.nameWithType().type)
+    private fun processVariableDecl(ctx: LibSLParser.VariableDeclContext): Variable {
+        val keyword = VariableKind.fromString(ctx.keyword.text)
+        val name = ctx.nameWithType().name.asPeriodSeparatedString()
+        val typeReference = processTypeIdentifier(ctx.nameWithType().type)
+        val expressionVisitor = ExpressionVisitor(context)
+        val initValue = ctx.expression()?.let { right -> expressionVisitor.visitExpression(right) }
 
-        return TypeDefBlockStatement(name, fields, typeRef)
+        val variable = VariableWithInitialValue(
+            keyword,
+            name,
+            typeReference,
+            getAnnotationUsages(ctx.annotationUsage()),
+            initValue
+        )
+
+        context.storeVariable(variable)
+        return variable
     }
+
+    private fun processFunctionDecl(ctx: FunctionDeclContext): org.jetbrains.research.libsl.nodes.Function {
+        val functionContext = FunctionContext(context)
+        val functionName = ctx.functionName.text.extractIdentifier()
+
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+
+        val args = ctx.args.toMutableList()
+        args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
+
+        val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
+
+        if (returnType != null) {
+            val resultVariable = ResultVariable(returnType)
+            context.storeVariable(resultVariable)
+        }
+
+        return Function(
+            kind = FunctionKind.FUNCTION,
+            functionName,
+            automatonReference = null,
+            args,
+            returnType,
+            annotationReferences,
+            hasBody = false,
+            targetAutomatonRef = null,
+            context = functionContext
+        )
+    }
+
+    private val FunctionDeclContext.args: List<FunctionArgument>
+        get() = this
+            .functionDeclArgList()
+            ?.parameter()
+            ?.mapIndexed { i, parameter ->
+                val typeRef = processTypeIdentifier(parameter.type)
+                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+
+                arg
+            }
+            .orEmpty()
 }
