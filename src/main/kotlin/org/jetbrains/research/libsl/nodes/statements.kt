@@ -41,11 +41,11 @@ data class ElseStatement(
 
 data class Action(
     val name: String,
-    val arguments: MutableList<Expression>? = mutableListOf()
+    val arguments: MutableList<Expression> = mutableListOf()
 ) : Statement() {
     override fun dumpToString(): String = buildString {
         append("action ${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments?.isNotEmpty() == true) {
+        if(arguments.isNotEmpty()) {
             val args = arguments.map { it.dumpToString() }.toMutableList()
             append(args.joinToString(separator = ", "))
         }
@@ -55,12 +55,12 @@ data class Action(
 
 data class ProcedureCall(
     val name: String,
-    val arguments: MutableList<Expression>? = mutableListOf(),
+    val arguments: MutableList<Expression> = mutableListOf(),
 ) : Statement() {
     override fun dumpToString(): String = buildString {
         append("${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments?.isNotEmpty() == true) {
-            val args = arguments.map { it.dumpToString() }
+        if(arguments.isNotEmpty()) {
+            val args = arguments.map { it.dumpToString() }.toMutableList()
             append(args.joinToString(separator = ", "))
         }
         append(");")

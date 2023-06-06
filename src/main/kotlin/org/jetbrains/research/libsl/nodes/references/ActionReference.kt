@@ -3,11 +3,11 @@ package org.jetbrains.research.libsl.nodes.references
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.ActionDecl
 
-data class ActionDeclReference(
+data class ActionReference(
     val name: String,
     val paramTypes: List<TypeReference>,
     override val context: LslContextBase
-) : LslReference<ActionDecl, ActionDeclReference> {
+) : LslReference<ActionDecl, ActionReference> {
     override fun resolve(): ActionDecl? {
         return context.resolveDeclaredAction(this)
     }
@@ -24,7 +24,7 @@ data class ActionDeclReference(
         return true
     }
 
-    override fun isSameReference(other: ActionDeclReference): Boolean {
+    override fun isSameReference(other: ActionReference): Boolean {
         return this.name == other.name && doParamsMatch(other.paramTypes)
     }
 

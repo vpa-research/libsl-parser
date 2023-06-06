@@ -67,9 +67,9 @@ data class Constructor(
     override var hasBody: Boolean = statements.isNotEmpty(),
     override val context: FunctionContext
 ) : Function(
-    kind = FunctionKind.CONSTRUCTOR, name, null, args, null,
+    kind = FunctionKind.CONSTRUCTOR, name, automatonReference = null, args, returnType = null,
     annotationUsages, contracts,
-    statements, hasBody, null, context
+    statements, hasBody, targetAutomatonRef = null, context
 )
 
 class Destructor(

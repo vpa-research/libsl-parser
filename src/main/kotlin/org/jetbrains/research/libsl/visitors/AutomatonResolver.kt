@@ -20,7 +20,6 @@ class AutomatonResolver(
         val name = ctx.name.asPeriodSeparatedString()
         val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
-        val parent = null
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
         buildingAutomaton = Automaton(

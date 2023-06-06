@@ -32,7 +32,6 @@ data class VariableAccess(
 }
 
 data class ThisAccess(
-    val fieldName: String = "this",
     override var childAccess: QualifiedAccess?
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()

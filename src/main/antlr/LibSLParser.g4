@@ -270,14 +270,14 @@ annotationUsage
  * declarations between function's header and body-block
  */
 
-functionContracts
+functionContract
    :   requiresContract
    |   ensuresContract
    |   assignsContract
    ;
 
 functionBody
-   :   functionContracts* functionBodyStatements*
+   :   functionContract* functionBodyStatements*
    ;
 
 functionBodyStatements

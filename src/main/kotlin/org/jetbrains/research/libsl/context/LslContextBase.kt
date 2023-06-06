@@ -78,7 +78,7 @@ abstract class LslContextBase {
             ?: parentContext?.resolveAnnotation(reference)
     }
 
-    open fun resolveDeclaredAction(reference: ActionDeclReference): ActionDecl? {
+    open fun resolveDeclaredAction(reference: ActionReference): ActionDecl? {
         return declaredActions.firstOrNull { action -> reference.isReferenceMatchWithNode(action) }
             ?: parentContext?.resolveDeclaredAction(reference)
     }
