@@ -5,7 +5,8 @@ data class IntegerLiteral(
 ) : Atomic()
 
 data class FloatLiteral(
-    override val value: Float
+    override val value: Float,
+    val suffix: String
 ) : Atomic()
 
 data class StringLiteral(

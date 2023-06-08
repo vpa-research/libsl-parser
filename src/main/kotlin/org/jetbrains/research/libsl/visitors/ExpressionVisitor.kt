@@ -165,7 +165,8 @@ class ExpressionVisitor(
     }
 
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
-        return FloatLiteral(ctx.text.toFloat())
+        println(ctx.fSuffix.text)
+        return FloatLiteral(ctx.text.toFloat(), ctx.fSuffix.text)
     }
 
     override fun visitQualifiedAccess(ctx: QualifiedAccessContext): QualifiedAccess {

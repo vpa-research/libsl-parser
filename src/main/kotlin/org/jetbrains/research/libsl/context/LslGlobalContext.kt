@@ -12,7 +12,7 @@ class LslGlobalContext : LslContextBase() {
     @Suppress("MemberVisibilityCanBePrivate")
     var isInitialized: Boolean = false
 
-    private val importedContexts = mutableListOf<LslGlobalContext>()
+    val importedContexts = mutableListOf<LslGlobalContext>()
 
     override val parentContext: LslContextBase? = null
 

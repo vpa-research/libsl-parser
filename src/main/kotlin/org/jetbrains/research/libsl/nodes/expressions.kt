@@ -3,7 +3,6 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
-import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Expression : Node() {
     override fun dumpToString(): String = ExpressionDumper.dump(this)

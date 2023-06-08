@@ -1,12 +1,17 @@
 libsl "1.0.0";
 library simple;
-
 typealias Int = int32;
+typealias Float = float32;
+typealias Double = float64;
 typealias V = *void;
-
 automaton A : Int {
     var i: V;
-
     fun f(param: Int): V {
+    }
+    fun sum(): Float {
+        result = 0.1 + 0.2;
+    }
+    fun sumAgain(): Double {
+        result = 0.1 + 0.2;
     }
 }
