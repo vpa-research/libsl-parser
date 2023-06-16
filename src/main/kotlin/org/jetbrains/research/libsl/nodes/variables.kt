@@ -5,6 +5,7 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.Position
 
 enum class ArithmeticUnaryOp(val string: String) {
     PLUS("+"), MINUS("-"), INVERSION("!"), TILDE("~");
@@ -24,7 +25,8 @@ enum class VariableKind(val string: String) {
 
 open class Variable(
     open var name: String,
-    open var typeReference: TypeReference
+    open var typeReference: TypeReference,
+    open val position: Position
 ) : Expression() {
     open val fullName: String
         get() = name
@@ -47,8 +49,9 @@ open class Variable(
 }
 
 data class ResultVariable(
-    override var typeReference: TypeReference
-) : Variable(name = "result", typeReference)
+    override var typeReference: TypeReference,
+    override val position: Position
+) : Variable(name = "result", typeReference, position)
 
 @Suppress("unused")
 class FunctionArgument(
@@ -56,8 +59,9 @@ class FunctionArgument(
     typeReference: TypeReference,
     val index: Int,
     var annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-    var targetAutomaton: AutomatonReference? = null
-) : Variable(name, typeReference) {
+    var targetAutomaton: AutomatonReference? = null,
+    override val position: Position
+) : Variable(name, typeReference, position) {
     lateinit var function: Function
 
     override val fullName: String
@@ -86,15 +90,17 @@ class ActionParameter(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotation: AnnotationReference? = null
-) : Variable(name, typeReference)
+    var annotation: AnnotationReference? = null,
+    override val position: Position
+) : Variable(name, typeReference, position)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class DeclaredActionParameter(
     name: String,
     typeReference: TypeReference,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-) : Variable(name, typeReference) {
+    override val position: Position
+) : Variable(name, typeReference, position) {
     override fun dumpToString(): String = buildString {
         if (annotationUsages.isNotEmpty()) {
             append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
@@ -109,7 +115,8 @@ class ConstructorArgument(
     name: String,
     typeReference: TypeReference,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-) : Variable(name, typeReference) {
+    override val position: Position
+) : Variable(name, typeReference, position) {
     lateinit var automaton: Automaton
 
     override val fullName: String
@@ -132,7 +139,8 @@ class VariableWithInitialValue(
     typeReference: TypeReference,
     val annotationUsage: MutableList<AnnotationUsage> = mutableListOf(),
     val initialValue: Expression?,
-) : Variable(name, typeReference) {
+    override val position: Position
+) : Variable(name, typeReference, position) {
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsage))
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")

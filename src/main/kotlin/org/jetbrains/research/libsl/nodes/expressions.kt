@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
+import org.jetbrains.research.libsl.utils.Position
 
 sealed class Expression : Node() {
     override fun dumpToString(): String = ExpressionDumper.dump(this)
@@ -11,7 +12,8 @@ sealed class Expression : Node() {
 data class BinaryOpExpression(
     val left: Expression,
     val right: Expression,
-    val op: ArithmeticBinaryOps
+    val op: ArithmeticBinaryOps,
+    val position: Position
 ) : Expression()
 
 // priorities from https://www.l3harrisgeospatial.com/docs/Operator_Precedence.html
@@ -58,17 +60,20 @@ enum class AssignOps(val string: String) {
 
 data class UnaryOpExpression(
     val op: ArithmeticUnaryOp,
-    val value: Expression
+    val value: Expression,
+    val position: Position
 ) : Expression()
 
 data class OldValue(
-    val value: QualifiedAccess
+    val value: QualifiedAccess,
+    val position: Position
 ) : Expression()
 
 data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
     val args: List<NamedArgumentWithValue>,
-    val stateRef: AutomatonStateReference
+    val stateRef: AutomatonStateReference,
+    val position: Position
 ) : Atomic() {
     override val value: Any? = null
 
@@ -76,7 +81,8 @@ data class CallAutomatonConstructor(
 }
 
 data class ArrayLiteral(
-    override val value: List<Expression>
+    override val value: List<Expression>,
+    val position: Position
 ) : Atomic()
 
 sealed class Atomic : Expression() {
@@ -84,19 +90,23 @@ sealed class Atomic : Expression() {
 }
 
 data class ActionExpression(
-    val action: Action
+    val action: Action,
+    val position: Position
 ) : Expression()
 
 data class ProcExpression(
-    val procedureCall: ProcedureCall
+    val procedureCall: ProcedureCall,
+    val position: Position
 ) : Expression()
 
 data class HasAutomatonConcept(
     val variableName: String,
-    val automatonReference: AutomatonReference
+    val automatonReference: AutomatonReference,
+    val position: Position
 ) : Expression()
 
 data class NamedArgumentWithValue(
     val name: String?,
-    val value: Expression
+    val value: Expression,
+    val position: Position
 ) : Expression()

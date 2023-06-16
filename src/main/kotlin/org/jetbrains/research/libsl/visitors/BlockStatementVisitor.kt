@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.utils.Position
 
 class BlockStatementVisitor(
     private val functionContext: FunctionContext,
@@ -11,7 +12,7 @@ class BlockStatementVisitor(
 
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
-        val expression = ExpressionStatement(expressionVisitor.visitExpression(ctx))
+        val expression = ExpressionStatement(expressionVisitor.visitExpression(ctx), Position(context.fileName, ctx.position()))
         statements.add(expression)
     }
 
@@ -20,7 +21,7 @@ class BlockStatementVisitor(
         val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
         val op = AssignOps.fromString(ctx.op.text)
         val value = expressionVisitor.visitExpression(ctx.expression())
-        val assignment = Assignment(left, op, value)
+        val assignment = Assignment(left, op, value, Position(context.fileName, ctx.position()))
         statements.add(assignment)
     }
 
@@ -37,10 +38,10 @@ class BlockStatementVisitor(
             val elseStatementsVisitor = BlockStatementVisitor(functionContext, elseStatements)
             elseStmt.functionBodyStatements().forEach { elseStatementsVisitor.visit(it) }
 
-            ElseStatement(elseStatements)
+            ElseStatement(elseStatements, Position(context.fileName, ifCtx.position()))
         }
 
-        val ifBlock = IfStatement(value, ifStatements, elseStatement)
+        val ifBlock = IfStatement(value, ifStatements, elseStatement, Position(context.fileName, ifCtx.position()))
 
         statements.add(ifBlock)
     }
@@ -57,9 +58,10 @@ class BlockStatementVisitor(
             name,
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
-            initValue
+            initValue,
+            Position(context.fileName, ctx.position())
         )
-        val variableDeclaration = VariableDeclaration(variable)
+        val variableDeclaration = VariableDeclaration(variable, Position(context.fileName, ctx.position()))
         statements.add(variableDeclaration)
         context.storeVariable(variable)
     }

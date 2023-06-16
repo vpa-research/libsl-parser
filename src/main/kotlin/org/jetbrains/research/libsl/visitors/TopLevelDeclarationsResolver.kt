@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
+import org.jetbrains.research.libsl.utils.Position
 
 class TopLevelDeclarationsResolver(
     private val basePath: String,
@@ -31,7 +32,7 @@ class TopLevelDeclarationsResolver(
             params.add(param)
         }
 
-        val annotation = Annotation(annotationName, params)
+        val annotation = Annotation(annotationName, params, Position(context.fileName, ctx.position()))
         globalContext.storeAnnotation(annotation)
     }
 
@@ -66,7 +67,8 @@ class TopLevelDeclarationsResolver(
             variableName,
             typeRef,
             annotationUsages,
-            initialValue
+            initialValue,
+            Position(context.fileName, ctx.position())
         )
         globalContext.storeVariable(variable)
     }
@@ -79,18 +81,16 @@ class TopLevelDeclarationsResolver(
             val actionParam = DeclaredActionParameter(
                 param.name.text.extractIdentifier(),
                 processTypeIdentifier(param.type),
-                getAnnotationUsages(param.annotationUsage())
+                getAnnotationUsages(param.annotationUsage()),
+                Position(context.fileName, ctx.position())
             )
 
             actionParams.add(actionParam)
         }
 
         val returnType = ctx.actionType?.let { processTypeIdentifier(it) }
-
         val actionAnnotations = getAnnotationUsages(ctx.annotationUsage())
-
-        val declaredAction = ActionDecl(actionName, actionParams, actionAnnotations, returnType)
-
+        val declaredAction = ActionDecl(actionName, actionParams, actionAnnotations, returnType, Position(context.fileName, ctx.position()))
         globalContext.storeDeclaredAction(declaredAction)
     }
 }

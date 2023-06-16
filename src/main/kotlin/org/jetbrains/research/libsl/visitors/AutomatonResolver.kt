@@ -10,7 +10,7 @@ import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 import org.jetbrains.research.libsl.type.ConceptType
-import org.jetbrains.research.libsl.type.TypeInferrer
+import org.jetbrains.research.libsl.utils.Position
 
 class AutomatonResolver(
     private val basePath: String,
@@ -34,7 +34,8 @@ class AutomatonResolver(
             typeReference,
             isConcept,
             annotationReferences,
-            context = automatonContext
+            context = automatonContext,
+            position = Position(context.fileName, ctx.position())
         )
 
         super.visitAutomatonDecl(ctx)
@@ -54,7 +55,9 @@ class AutomatonResolver(
         val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
-        val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()))
+        val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()),
+        Position(context.fileName, ctx.position())
+        )
         context.storeVariable(argument)
         buildingAutomaton.constructorVariables.add(argument)
     }
@@ -154,7 +157,8 @@ class AutomatonResolver(
             name,
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
-            initValue
+            initValue,
+            Position(context.fileName, ctx.position())
         )
         buildingAutomaton.internalVariables.add(variable)
         context.storeVariable(variable)

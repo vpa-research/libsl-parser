@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.VariableReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.Position
 
 sealed class QualifiedAccess : Atomic() {
     abstract var childAccess: QualifiedAccess?
@@ -21,7 +22,8 @@ sealed class QualifiedAccess : Atomic() {
 data class VariableAccess(
     val fieldName: String,
     override var childAccess: QualifiedAccess?,
-    val variable: VariableReference
+    val variable: VariableReference,
+    val position: Position
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = when {
@@ -33,7 +35,8 @@ data class VariableAccess(
 
 data class ThisAccess(
     val fieldName: String = "this",
-    override var childAccess: QualifiedAccess?
+    override var childAccess: QualifiedAccess?,
+    val position: Position
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = buildString {
@@ -47,6 +50,7 @@ data class ThisAccess(
 
 data class ArrayAccess(
     var index: Atomic,
+    val position: Position
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null
 }
@@ -55,4 +59,5 @@ data class AutomatonOfFunctionArgumentInvoke(
     val automatonReference: AutomatonReference,
     val arg: FunctionArgument,
     override var childAccess: QualifiedAccess?,
+    val position: Position
 ) : QualifiedAccess()

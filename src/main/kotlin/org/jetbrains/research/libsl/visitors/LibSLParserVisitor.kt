@@ -13,6 +13,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
+import org.jetbrains.research.libsl.utils.Position
 
 abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
     protected fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
@@ -82,7 +83,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument.value).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)
 
-        return AnnotationUsage(annotationRef, args)
+        return AnnotationUsage(annotationRef, args, Position(context.fileName, ctx.position()))
     }
 
     private fun processAnnotationArgs(ctx: LibSLParser.AnnotationUsageContext): List<NamedArgumentWithValue> {
@@ -90,7 +91,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         ctx.annotationArgs().forEach { a ->
             val name = a.argName()?.name?.text
             val value = ExpressionVisitor(context).visitExpression(a.expression())
-            namedArgs.add(NamedArgumentWithValue(name, value))
+            namedArgs.add(NamedArgumentWithValue(name, value, Position(context.fileName, ctx.position())))
         }
 
         return namedArgs

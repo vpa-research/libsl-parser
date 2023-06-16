@@ -5,6 +5,7 @@ import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Library(
+    val fileName: String,
     val metadata: MetaNode,
     val imports: MutableList<String> = mutableListOf(),
     val includes: MutableList<String> = mutableListOf(),

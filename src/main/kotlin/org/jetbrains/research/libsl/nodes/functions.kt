@@ -5,6 +5,7 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.Position
 
 open class Function(
     open val kind: FunctionKind,
@@ -17,7 +18,8 @@ open class Function(
     open var statements: MutableList<Statement> = mutableListOf(),
     open var hasBody: Boolean = statements.isNotEmpty(),
     open var targetAutomatonRef: AutomatonReference? = null,
-    open val context: FunctionContext
+    open val context: FunctionContext,
+    open val position: Position
 ) : Node() {
     val fullName: String
         get() = if(automatonReference?.name?.isEmpty() == true) "${automatonReference!!.name}.$name" else name
@@ -65,11 +67,12 @@ data class Constructor(
     override var contracts: MutableList<Contract> = mutableListOf(),
     override var statements: MutableList<Statement> = mutableListOf(),
     override var hasBody: Boolean = statements.isNotEmpty(),
-    override val context: FunctionContext
+    override val context: FunctionContext,
+    override val position: Position
 ) : Function(
     kind = FunctionKind.CONSTRUCTOR, name, null, args, null,
     annotationUsages, contracts,
-    statements, hasBody, null, context
+    statements, hasBody, null, context, position
 )
 
 class Destructor(
@@ -79,11 +82,12 @@ class Destructor(
     override var contracts: MutableList<Contract> = mutableListOf(),
     override var statements: MutableList<Statement> = mutableListOf(),
     override var hasBody: Boolean = statements.isNotEmpty(),
-    override val context: FunctionContext
+    override val context: FunctionContext,
+    override val position: Position
 ) : Function(
     kind = FunctionKind.DESTRUCTOR, name, null, args, null,
     annotationUsages, contracts,
-    statements, hasBody, null, context
+    statements, hasBody, null, context, position
 )
 
 class Procedure(
@@ -94,9 +98,10 @@ class Procedure(
     override var contracts: MutableList<Contract> = mutableListOf(),
     override var statements: MutableList<Statement> = mutableListOf(),
     override var hasBody: Boolean = statements.isNotEmpty(),
-    override val context: FunctionContext
+    override val context: FunctionContext,
+    override val position: Position
 ) : Function(
     kind = FunctionKind.PROC, name, null, args, returnType,
     annotationUsages, contracts,
-    statements, hasBody, null, context
+    statements, hasBody, null, context, position
 )

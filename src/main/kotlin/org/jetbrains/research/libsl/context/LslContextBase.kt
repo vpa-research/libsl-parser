@@ -8,9 +8,8 @@ import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.type.TypeInferrer
 
-abstract class LslContextBase {
+abstract class LslContextBase(var fileName: String) {
     abstract val parentContext: LslContextBase?
-
     private val annotations = mutableListOf<Annotation>()
     private val declaredActions = mutableListOf<ActionDecl>()
     private val automata = mutableListOf<Automaton>()

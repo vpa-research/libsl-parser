@@ -6,6 +6,7 @@ import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.Position
 
 data class Automaton(
     val name: String,
@@ -22,7 +23,8 @@ data class Automaton(
     val procDeclarations: MutableList<Function> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
     val extensionFunctions: MutableList<Function> = mutableListOf(),
-    val context: AutomatonContext
+    val context: AutomatonContext,
+    val position: Position
 ) : Node() {
     val functions: List<Function>
         get() = localFunctions + extensionFunctions

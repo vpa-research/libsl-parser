@@ -9,6 +9,7 @@ import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
+import org.jetbrains.research.libsl.utils.Position
 
 class FunctionVisitor(
     private val functionContext: FunctionContext,
@@ -18,7 +19,6 @@ class FunctionVisitor(
     private lateinit var buildingFunction: Function
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
-
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
         // TODO
         /* if (automatonName == null && parentAutomaton == null) {
@@ -47,7 +47,7 @@ class FunctionVisitor(
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
-            val resultVariable = ResultVariable(returnType)
+            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position()))
             context.storeVariable(resultVariable)
         }
 
@@ -60,7 +60,8 @@ class FunctionVisitor(
             annotationReferences,
             hasBody = ctx.functionBody() != null,
             targetAutomatonRef = targetAutomatonRef,
-            context = functionContext
+            context = functionContext,
+            position = Position(context.fileName, ctx.position())
         )
 
         super.visitFunctionDecl(ctx)
@@ -80,7 +81,8 @@ class FunctionVisitor(
             args,
             annotationReferences,
             hasBody = ctx.functionBody() != null,
-            context = functionContext
+            context = functionContext,
+            position = Position(context.fileName, ctx.position())
         )
 
         super.visitConstructorDecl(ctx)
@@ -100,7 +102,8 @@ class FunctionVisitor(
             args,
             annotationReferences,
             hasBody = ctx.functionBody() != null,
-            context = functionContext
+            context = functionContext,
+            position = Position(context.fileName, ctx.position())
         )
 
         super.visitDestructorDecl(ctx)
@@ -118,7 +121,7 @@ class FunctionVisitor(
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
-            val resultVariable = ResultVariable(returnType)
+            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position()))
             context.storeVariable(resultVariable)
         }
 
@@ -128,7 +131,8 @@ class FunctionVisitor(
             returnType,
             annotationReferences,
             hasBody = ctx.functionBody() != null,
-            context = functionContext
+            context = functionContext,
+            position = Position(context.fileName, ctx.position())
         )
 
         super.visitProcDecl(ctx)
@@ -151,7 +155,10 @@ class FunctionVisitor(
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
+                    targetAutomaton = null,
+                    Position(context.fileName, parameter.position())
+                )
 
                 if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
                     val targetAutomatonName = typeRef.name
@@ -171,7 +178,9 @@ class FunctionVisitor(
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
+                    targetAutomaton = null, Position(context.fileName, parameter.position())
+                )
                 arg
             }
             .orEmpty()
@@ -183,7 +192,9 @@ class FunctionVisitor(
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
+                    targetAutomaton = null, Position(context.fileName, parameter.position())
+                )
                 arg
             }
             .orEmpty()
@@ -195,7 +206,10 @@ class FunctionVisitor(
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
+                    targetAutomaton = null,
+                    Position(context.fileName, parameter.position())
+                )
                 arg
             }
             .orEmpty()
@@ -225,7 +239,7 @@ class FunctionVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val expression = expressionVisitor.visitExpression(expressionContext)
 
-        val contract = Contract(name, expression, kind)
+        val contract = Contract(name, expression, kind, Position(context.fileName, expressionContext.position()))
         buildingFunction.contracts.add(contract)
     }
 }

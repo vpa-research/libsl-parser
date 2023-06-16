@@ -18,6 +18,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceB
 import org.jetbrains.research.libsl.type.RealType
 
 class LibrarySpecificationVisitor(
+    val fileName: String,
     private val basePath: String,
     private val errorManager: ErrorManager,
     private val globalContext: LslGlobalContext
@@ -31,6 +32,7 @@ class LibrarySpecificationVisitor(
         TopLevelDeclarationsResolver(basePath, errorManager, globalContext).visitFile(file)
 
         library = Library(
+            fileName,
             header
         )
 

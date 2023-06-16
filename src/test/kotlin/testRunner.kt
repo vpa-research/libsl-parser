@@ -22,20 +22,18 @@ fun runJsonTest(testName: String) {
 }
 
 fun runLslTest(testName: String) {
-    val (library, errorManager, context) = getLibraryAndErrorManager(testName)
-    checkLslContent(testName, library, context, errorManager)
+    val (library, errorManager) = getLibraryAndErrorManager(testName)
+    checkLslContent(testName, library, errorManager)
 }
 
-private fun getLibraryAndErrorManager(testName: String): Triple<Library, ErrorManager, LslContextBase> {
-    val (libsl, context) = libslFactory()
-    return Triple(libsl.loadFromFileName("$testName.lsl"), libsl.errorManager, context)
+private fun getLibraryAndErrorManager(testName: String): Pair<Library, ErrorManager> {
+    val libsl = libslFactory()
+    return Pair(libsl.loadFromFileName("$testName.lsl"), libsl.errorManager)
 }
 
-private fun libslFactory(): Pair<LibSL, LslContextBase> {
-    val context = LslGlobalContext()
-    context.init()
+private fun libslFactory(): LibSL {
 
-    val libsl = LibSL(testdataPath + "lsl/", context)
+    val libsl = LibSL(testdataPath + "lsl/")
     libsl.errorListener = object : BaseErrorListener() {
         override fun syntaxError(
             recognizer: Recognizer<*, *>?,
@@ -49,7 +47,7 @@ private fun libslFactory(): Pair<LibSL, LslContextBase> {
         }
     }
 
-    return libsl to context
+    return libsl
 }
 
 //private fun checkJsonContent(testName: String, library: Library, errorManager: ErrorManager) {
@@ -66,10 +64,10 @@ private fun libslFactory(): Pair<LibSL, LslContextBase> {
 //    Assertions.assertTrue(errorManager.errors.isEmpty())
 //}
 
-private fun checkLslContent(testName: String, library: Library, context: LslContextBase, errorManager: ErrorManager) {
+private fun checkLslContent(testName: String, library: Library, errorManager: ErrorManager) {
     val lslContent = removeBlankLines(library.dumpToString())
 
-    checkEverythingIsResolved(library, context)
+    checkEverythingIsResolved(library)
 
     val expectedFile = File("$testdataPath/expected/lsl/$testName.lsl")
     if (!expectedFile.exists()) {
@@ -82,7 +80,7 @@ private fun checkLslContent(testName: String, library: Library, context: LslCont
     Assertions.assertTrue(errorManager.errors.isEmpty())
 }
 
-private fun checkEverythingIsResolved(library: Library, context: LslContextBase) {
+private fun checkEverythingIsResolved(library: Library) {
     library.automataReferences.forEach { ref ->
         val automaton = ref.resolveOrError()
         checkAutomatonIsResolved(automaton)

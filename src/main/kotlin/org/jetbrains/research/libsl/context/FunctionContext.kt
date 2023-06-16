@@ -6,7 +6,7 @@ import org.jetbrains.research.libsl.nodes.references.VariableReference
 
 class FunctionContext(
     override val parentContext: LslContextBase
-) : LslContextBase() {
+) : LslContextBase(parentContext.fileName) {
     private val functionArguments = mutableListOf<FunctionArgument>()
 
     fun resolveFunctionArgumentByName(name: String): FunctionArgument? {

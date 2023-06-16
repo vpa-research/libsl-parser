@@ -8,10 +8,9 @@ import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.*
 
-class LslGlobalContext : LslContextBase() {
+class LslGlobalContext(fileName: String) : LslContextBase(fileName) {
     @Suppress("MemberVisibilityCanBePrivate")
     var isInitialized: Boolean = false
-
     val importedContexts = mutableListOf<LslGlobalContext>()
 
     override val parentContext: LslContextBase? = null

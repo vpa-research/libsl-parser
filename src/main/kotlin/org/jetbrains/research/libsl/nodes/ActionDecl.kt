@@ -3,12 +3,14 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.Position
 
 data class ActionDecl(
     val name: String,
     val values: MutableList<DeclaredActionParameter> = mutableListOf(),
     val annotations: MutableList<AnnotationUsage> = mutableListOf(),
-    val returnType: TypeReference?
+    val returnType: TypeReference?,
+    val position: Position
 ) : IPrinter {
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotations))

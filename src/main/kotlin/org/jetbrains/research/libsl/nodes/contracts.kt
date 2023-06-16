@@ -1,11 +1,13 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.Position
 
 data class Contract(
     val name: String?,
     val expression: Expression,
-    val kind: ContractKind
+    val kind: ContractKind,
+    val position: Position
 ) : Node() {
     override fun dumpToString(): String = buildString {
         append(kind.keyword)

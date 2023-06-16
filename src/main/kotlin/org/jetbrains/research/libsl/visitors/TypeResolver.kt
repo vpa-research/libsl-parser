@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.type.*
+import org.jetbrains.research.libsl.utils.Position
 
 class TypeResolver(
     private val basePath: String,
@@ -136,7 +137,8 @@ class TypeResolver(
             name,
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
-            initValue
+            initValue,
+            Position(context.fileName, ctx.position())
         )
 
         context.storeVariable(variable)
@@ -155,7 +157,7 @@ class TypeResolver(
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
-            val resultVariable = ResultVariable(returnType)
+            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position()))
             context.storeVariable(resultVariable)
         }
 
@@ -168,7 +170,8 @@ class TypeResolver(
             annotationReferences,
             hasBody = false,
             targetAutomatonRef = null,
-            context = functionContext
+            context = functionContext,
+            position = Position(context.fileName, ctx.position())
         )
     }
 
@@ -179,8 +182,11 @@ class TypeResolver(
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
-
+                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i,
+                    annotationsReferences,
+                    targetAutomaton = null,
+                    Position(context.fileName, parameter.position())
+                )
                 arg
             }
             .orEmpty()

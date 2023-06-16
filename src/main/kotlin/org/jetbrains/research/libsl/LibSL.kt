@@ -14,7 +14,7 @@ import java.nio.file.Path
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class LibSL(
     private val basePath: String,
-    val context: LslGlobalContext = LslGlobalContext()
+    val context: LslGlobalContext = LslGlobalContext(File(basePath).name)
 ) {
     val errorManager = ErrorManager()
     lateinit var library: Library
@@ -29,7 +29,7 @@ class LibSL(
 
     fun loadFromFile(file: File): Library {
         processedFiles.add(file.nameWithoutExtension)
-        return loadFromString(file.readText())
+        return loadFromString(file.readText(), file.name)
     }
 
     fun loadByPath(path: Path): Library {
@@ -44,7 +44,7 @@ class LibSL(
         return loadByPath(Path.of(basePath).resolve(name))
     }
 
-    fun loadFromString(string: String): Library {
+    fun loadFromString(string: String, fileName: String): Library {
         val stream = CharStreams.fromString(string)
         val lexer = LibSLLexer(stream)
         val tokenStream = CommonTokenStream(lexer)
@@ -55,7 +55,7 @@ class LibSL(
         }
 
         val file = parser.file()
-        val library = processFileRule(file)
+        val library = processFileRule(file, fileName)
 
         for (importName in library.imports) {
             if (importName in processedFiles)
@@ -67,8 +67,8 @@ class LibSL(
         return library
     }
 
-    private fun processFileRule(file: FileContext): Library {
-        val librarySpecificationVisitor = LibrarySpecificationVisitor(basePath, errorManager, context)
+    private fun processFileRule(file: FileContext, fileName: String): Library {
+        val librarySpecificationVisitor = LibrarySpecificationVisitor(fileName, basePath, errorManager, context)
         return librarySpecificationVisitor.processFile(file)
     }
 }
