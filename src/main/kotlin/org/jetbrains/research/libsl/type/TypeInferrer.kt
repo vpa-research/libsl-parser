@@ -30,7 +30,8 @@ class TypeInferrer(private val context: LslContextBase) {
             is OldValue -> getExpressionType(expression.value)
             is ActionExpression -> expression.actionUsage.actionReference.resolveOrError().returnType?.resolveOrError()
                 ?: VoidType(context)
-            is ProcExpression -> anyType
+            is ProcExpression -> expression.procedureCall.procReference.resolveOrError().returnType?.resolveOrError()
+                ?: VoidType(context)
         }
     }
 

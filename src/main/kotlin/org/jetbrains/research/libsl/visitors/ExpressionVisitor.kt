@@ -305,13 +305,16 @@ class ExpressionVisitor(
     override fun visitProcUsage(ctx: ProcUsageContext): Expression {
         val name = ctx.periodSeparatedFullName().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
-        val args = mutableListOf<Expression>()
-        if (ctx.expressionsList() != null) {
-            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
-        }
-        val procedureCall = ProcedureCall(name, args)
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty()
 
-        return ProcExpression(procedureCall)
+        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+        val procRef = FunctionReferenceBuilder.build(name, argTypes, context)
+
+        val procCall = ProcedureCall(procRef, args)
+
+        return ProcExpression(procCall)
     }
 
     override fun visitUnaryOp(ctx: LibSLParser.UnaryOpContext): Expression {
