@@ -7,7 +7,9 @@ import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
+import org.jetbrains.research.libsl.type.VoidType
 
 class TopLevelDeclarationsResolver(
     private val basePath: String,
@@ -73,23 +75,22 @@ class TopLevelDeclarationsResolver(
 
     override fun visitActionDecl(ctx: LibSLParser.ActionDeclContext) {
         val actionName = ctx.actionName.text.extractIdentifier()
-        val actionParams = mutableListOf<DeclaredActionParameter>()
+        val actionParams = mutableListOf<ActionArgumentDescriptor>()
 
-        ctx.actionDeclParamList()?.actionParameter()?.map { param ->
-            val actionParam = DeclaredActionParameter(
-                param.name.text.extractIdentifier(),
-                processTypeIdentifier(param.type),
-                getAnnotationUsages(param.annotationUsage())
+        ctx.actionDeclParamList()?.actionParameter()?.map { parameterCtx ->
+            val param = ActionArgumentDescriptor(
+                parameterCtx.name.text.extractIdentifier(),
+                processTypeIdentifier(parameterCtx.type)
             )
-
-            actionParams.add(actionParam)
+            actionParams.add(param)
         }
 
         val returnType = ctx.actionType?.let { processTypeIdentifier(it) }
 
         val actionAnnotations = getAnnotationUsages(ctx.annotationUsage())
 
-        val declaredAction = ActionDecl(actionName, actionParams, actionAnnotations, returnType)
+        val declaredAction =
+            Action(actionName, actionParams, actionAnnotations, returnType)
 
         globalContext.storeDeclaredAction(declaredAction)
     }

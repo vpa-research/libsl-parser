@@ -1,5 +1,7 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.ActionReference
+import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 sealed class Statement: Node()
@@ -39,17 +41,22 @@ data class ElseStatement(
     }
 }
 
-data class Action(
-    val name: String,
-    val arguments: MutableList<Expression> = mutableListOf()
+data class ActionUsage(
+    val actionReference: ActionReference,
+    val arguments: List<Expression>
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        append("action ${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments.isNotEmpty()) {
-            val args = arguments.map { it.dumpToString() }.toMutableList()
-            append(args.joinToString(separator = ", "))
+        append(BackticksPolitics.forIdentifier(actionReference.resolveOrError().name))
+        if (arguments.isNotEmpty()) {
+            append(
+                arguments.joinToString(
+                    prefix = "(",
+                    separator = ", ",
+                    postfix = ")",
+                    transform = Expression::dumpToString
+                )
+            )
         }
-        append(");")
     }
 }
 

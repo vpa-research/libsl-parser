@@ -84,7 +84,7 @@ sealed class Atomic : Expression() {
 }
 
 data class ActionExpression(
-    val action: Action
+    val actionUsage: ActionUsage
 ) : Expression()
 
 data class ProcExpression(

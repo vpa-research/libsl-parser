@@ -50,9 +50,9 @@ object ExpressionDumper {
 
     private fun dumpActionExpression(expression: ActionExpression): String {
         return buildString {
-            append("action ${BackticksPolitics.forIdentifier(expression.action.name)}(")
-            if(expression.action.arguments?.isNotEmpty() == true) {
-                val args = expression.action.arguments.map { dump(it) }
+            append("action ${BackticksPolitics.forIdentifier(expression.actionUsage.actionReference.resolveOrError().name)}(")
+            if(expression.actionUsage.arguments.isNotEmpty()) {
+                val args = expression.actionUsage.arguments.map { dump(it) }
                 append(args.joinToString(separator = ", "))
             }
             append(")")

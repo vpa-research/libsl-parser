@@ -12,9 +12,8 @@ import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
-import org.jetbrains.research.libsl.nodes.references.builders.AutomatonStateReferenceBuilder
-import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceBuilder
+import org.jetbrains.research.libsl.nodes.references.builders.*
+import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 
 class ExpressionVisitor(
     val context: LslContextBase
@@ -291,13 +290,16 @@ class ExpressionVisitor(
     override fun visitActionUsage(ctx: ActionUsageContext): Expression  {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
-        val args = mutableListOf<Expression>()
-        if (ctx.expressionsList() != null) {
-            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
-        }
-        val action = Action(name, args)
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty()
 
-        return ActionExpression(action)
+        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+        val actionRef = ActionReferenceBuilder.build(name, argTypes, context)
+
+        val actionUsage = ActionUsage(actionRef, args)
+
+        return ActionExpression(actionUsage)
     }
 
     override fun visitProcUsage(ctx: ProcUsageContext): Expression {

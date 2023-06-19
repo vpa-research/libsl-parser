@@ -12,7 +12,7 @@ abstract class LslContextBase {
     abstract val parentContext: LslContextBase?
 
     private val annotations = mutableListOf<Annotation>()
-    private val declaredActions = mutableListOf<ActionDecl>()
+    private val actions = mutableListOf<Action>()
     private val automata = mutableListOf<Automaton>()
     private val types = mutableListOf<Type>()
     private val functions = mutableListOf<Function>()
@@ -49,8 +49,8 @@ abstract class LslContextBase {
         annotations.add(annotation)
     }
 
-    fun storeDeclaredAction(action: ActionDecl) {
-        declaredActions.add(action)
+    fun storeDeclaredAction(action: Action) {
+        actions.add(action)
     }
 
     open fun resolveAutomaton(reference: AutomatonReference): Automaton? {
@@ -78,9 +78,9 @@ abstract class LslContextBase {
             ?: parentContext?.resolveAnnotation(reference)
     }
 
-    open fun resolveDeclaredAction(reference: ActionReference): ActionDecl? {
-        return declaredActions.firstOrNull { action -> reference.isReferenceMatchWithNode(action) }
-            ?: parentContext?.resolveDeclaredAction(reference)
+    open fun resolveAction(reference: ActionReference): Action? {
+        return actions.firstOrNull { action -> reference.isReferenceMatchWithNode(action) }
+            ?: parentContext?.resolveAction(reference)
     }
 
     internal fun getAllTypes() = types
@@ -93,5 +93,5 @@ abstract class LslContextBase {
 
     internal fun getAllAnnotations() = annotations
 
-    internal fun getAllDeclaredActions() = declaredActions
+    internal fun getAllDeclaredActions() = actions
 }

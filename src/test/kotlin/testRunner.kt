@@ -111,7 +111,7 @@ private fun checkFunctionIsResolved(function: Function) {
 private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
     for(s in statements) {
         when (s) {
-            is Action -> {}
+            is ActionUsage -> {}
             is ProcedureCall -> {}
             // TODO(Variable statement)
             is VariableDeclaration -> {}
