@@ -60,7 +60,17 @@ class TopLevelDeclarationsResolver(
         val typeRef = processTypeIdentifier(ctx.nameWithType().type)
 
         val expressionVisitor = ExpressionVisitor(context)
-        val initialValue = ctx.expression()?.let { expressionVisitor.visitExpression(it) }
+        val initValue = ctx.assignmentRight()?.let { right ->
+            when {
+                right.callAutomatonConstructorWithNamedArgs() != null -> {
+                    expressionVisitor.visitCallAutomatonConstructorWithNamedArgs(right.callAutomatonConstructorWithNamedArgs())
+                }
+                right.expression() != null -> {
+                    expressionVisitor.visitExpression(right.expression())
+                }
+                else -> error("unknown initializer kind")
+            }
+        }
 
         val annotationUsages = getAnnotationUsages(ctx.annotationUsage())
         val variable = VariableWithInitialValue(
@@ -68,7 +78,7 @@ class TopLevelDeclarationsResolver(
             variableName,
             typeRef,
             annotationUsages,
-            initialValue
+            initValue
         )
         globalContext.storeVariable(variable)
     }

@@ -59,10 +59,6 @@ class ExpressionVisitor(
                 visitActionUsage(ctx.actionUsage())
             }
 
-            ctx.callAutomatonConstructorWithNamedArgs() != null -> {
-                visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
-            }
-
             else -> error("unknown expression type")
         }
     }
@@ -285,6 +281,16 @@ class ExpressionVisitor(
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
 
         return CallAutomatonConstructor(automatonRef, args, stateRef)
+    }
+
+    override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Expression {
+        return when {
+            ctx.expression() != null -> visitExpression(ctx.expression())
+            ctx.callAutomatonConstructorWithNamedArgs() != null -> {
+                visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
+            }
+            else -> error("unknown assignment right kind")
+        }
     }
 
     override fun visitActionUsage(ctx: ActionUsageContext): Expression  {

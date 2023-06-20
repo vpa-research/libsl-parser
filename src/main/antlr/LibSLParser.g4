@@ -191,7 +191,7 @@ functionsListPart
  */
 variableDecl
    :   annotationUsage* keyword=(VAR|VAL) nameWithType SEMICOLON
-   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP expression SEMICOLON
+   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 nameWithType
@@ -206,10 +206,15 @@ typeIdentifier
    ;
 
 variableAssignment
-   :   qualifiedAccess op=ASSIGN_OP expression SEMICOLON
+   :   qualifiedAccess op=ASSIGN_OP assignmentRight SEMICOLON
    |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) expression SEMICOLON
    |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) expression SEMICOLON
    |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) expression SEMICOLON
+   ;
+
+assignmentRight
+   :   expression
+   |   callAutomatonConstructorWithNamedArgs
    ;
 
 callAutomatonConstructorWithNamedArgs
@@ -349,7 +354,6 @@ expression
    |   unaryOp
    |   procUsage
    |   actionUsage
-   |   callAutomatonConstructorWithNamedArgs
    ;
 
 bitShiftOp

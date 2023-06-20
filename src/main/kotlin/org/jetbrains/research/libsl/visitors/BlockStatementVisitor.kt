@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.*
+import kotlin.math.exp
 
 class BlockStatementVisitor(
     private val functionContext: FunctionContext,
@@ -19,7 +20,11 @@ class BlockStatementVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
         val op = AssignOps.fromString(ctx.op.text)
-        val value = expressionVisitor.visitExpression(ctx.expression())
+        val value = if(ctx.assignmentRight() != null) {
+            expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
+        } else {
+            expressionVisitor.visitExpression(ctx.expression())
+        }
         val assignment = Assignment(left, op, value)
         statements.add(assignment)
     }
@@ -50,7 +55,17 @@ class BlockStatementVisitor(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)
-        val initValue = ctx.expression()?.let { right -> expressionVisitor.visitExpression(right) }
+        val initValue = ctx.assignmentRight()?.let { right ->
+            when {
+                right.callAutomatonConstructorWithNamedArgs() != null -> {
+                    expressionVisitor.visitCallAutomatonConstructorWithNamedArgs(right.callAutomatonConstructorWithNamedArgs())
+                }
+                right.expression() != null -> {
+                    expressionVisitor.visitExpression(right.expression())
+                }
+                else -> error("unknown initializer kind")
+            }
+        }
 
         val variable = VariableWithInitialValue(
             keyword,
