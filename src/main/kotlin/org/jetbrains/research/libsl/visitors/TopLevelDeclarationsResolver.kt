@@ -39,7 +39,7 @@ class TopLevelDeclarationsResolver(
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val automatonContext = AutomatonContext(context)
-        AutomatonResolver(basePath, errorManager, automatonContext).visitAutomatonDecl(ctx)
+        AutomatonResolver(basePath, errorManager, globalContext, automatonContext).visitAutomatonDecl(ctx)
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
@@ -51,7 +51,7 @@ class TopLevelDeclarationsResolver(
         }
 
         val functionContext = FunctionContext(parentContext)
-        FunctionVisitor(functionContext, parentAutomaton = null, errorManager).visitFunctionDecl(ctx)
+        FunctionVisitor(functionContext, parentAutomaton = null, globalContext, errorManager).visitFunctionDecl(ctx)
     }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {

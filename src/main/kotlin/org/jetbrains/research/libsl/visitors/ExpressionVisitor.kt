@@ -303,7 +303,7 @@ class ExpressionVisitor(
     }
 
     override fun visitProcUsage(ctx: ProcUsageContext): Expression {
-        val name = ctx.periodSeparatedFullName().text.extractIdentifier()
+        val name = visitQualifiedAccess(ctx.qualifiedAccess()).lastChild.toString()
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)

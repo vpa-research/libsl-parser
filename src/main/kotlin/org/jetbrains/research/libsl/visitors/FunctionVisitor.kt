@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.context.FunctionContext
+import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnspecifiedAutomaton
 import org.jetbrains.research.libsl.nodes.*
@@ -13,6 +14,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReference
 class FunctionVisitor(
     private val functionContext: FunctionContext,
     private var parentAutomaton: Automaton?,
+    private val globalContext: LslGlobalContext,
     val errorManager: ErrorManager
 ) : LibSLParserVisitor<Unit>(functionContext) {
     private lateinit var buildingFunction: Function
@@ -68,9 +70,7 @@ class FunctionVisitor(
 
     override fun visitConstructorDecl(ctx: ConstructorDeclContext) {
         val constructorName = ctx.functionName.text.extractIdentifier()
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
-
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
@@ -88,9 +88,7 @@ class FunctionVisitor(
 
     override fun visitDestructorDecl(ctx: DestructorDeclContext) {
         val destructorName = ctx.functionName.text.extractIdentifier()
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
-
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
@@ -108,12 +106,9 @@ class FunctionVisitor(
 
     override fun visitProcDecl(ctx: ProcDeclContext) {
         val procName = ctx.functionName.text.extractIdentifier()
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
-
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
-
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
@@ -131,6 +126,7 @@ class FunctionVisitor(
         )
 
         super.visitProcDecl(ctx)
+        globalContext.storeFunction(buildingFunction)
         parentAutomaton?.procDeclarations?.add(buildingFunction)
     }
 

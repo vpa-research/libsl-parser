@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
+import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnresolvedState
 import org.jetbrains.research.libsl.nodes.*
@@ -13,6 +14,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 class AutomatonResolver(
     private val basePath: String,
     private val errorManager: ErrorManager,
+    private val globalContext: LslGlobalContext,
     private val automatonContext: AutomatonContext
 ) : LibSLParserVisitor<Unit>(automatonContext) {
     private lateinit var buildingAutomaton: Automaton
@@ -148,21 +150,21 @@ class AutomatonResolver(
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
         val functionContext = FunctionContext(context)
-        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitFunctionDecl(ctx)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitFunctionDecl(ctx)
     }
 
     override fun visitConstructorDecl(ctx: LibSLParser.ConstructorDeclContext) {
         val functionContext = FunctionContext(context)
-        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitConstructorDecl(ctx)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitConstructorDecl(ctx)
     }
 
     override fun visitDestructorDecl(ctx: LibSLParser.DestructorDeclContext) {
         val functionContext = FunctionContext(context)
-        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitDestructorDecl(ctx)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitDestructorDecl(ctx)
     }
 
     override fun visitProcDecl(ctx: LibSLParser.ProcDeclContext) {
         val functionContext = FunctionContext(context)
-        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitProcDecl(ctx)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitProcDecl(ctx)
     }
 }

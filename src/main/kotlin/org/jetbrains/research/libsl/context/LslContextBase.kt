@@ -16,6 +16,7 @@ abstract class LslContextBase {
     private val automata = mutableListOf<Automaton>()
     private val types = mutableListOf<Type>()
     private val functions = mutableListOf<Function>()
+    private val procedures = mutableListOf<Procedure>()
     private val variables = mutableListOf<Variable>()
 
     @Suppress("LeakingThis")

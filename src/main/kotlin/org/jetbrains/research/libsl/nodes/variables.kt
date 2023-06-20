@@ -89,21 +89,6 @@ class ActionParameter(
     var annotation: AnnotationReference? = null
 ) : Variable(name, typeReference)
 
-@Suppress("MemberVisibilityCanBePrivate")
-class DeclaredActionParameter(
-    name: String,
-    typeReference: TypeReference,
-    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-) : Variable(name, typeReference) {
-    override fun dumpToString(): String = buildString {
-        if (annotationUsages.isNotEmpty()) {
-            append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
-            append(IPrinter.SPACE)
-        }
-        append("${BackticksPolitics.forIdentifier(name)}: ${typeReference.name}")
-    }
-}
-
 class ConstructorArgument(
     private val keyword: VariableKind,
     name: String,
