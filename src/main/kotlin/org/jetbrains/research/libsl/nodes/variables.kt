@@ -10,7 +10,10 @@ enum class ArithmeticUnaryOp(val string: String) {
     PLUS("+"), MINUS("-"), INVERSION("!"), TILDE("~");
 
     companion object {
-        fun fromString(str: String) = ArithmeticUnaryOp.values().first { op -> op.string == str }
+        fun fromString(str: String) = ArithmeticUnaryOp.values().firstOrNull { op ->
+            op.string == str }
+                ?: throw NoSuchElementException("Unknown operator: $str")
+
     }
 }
 

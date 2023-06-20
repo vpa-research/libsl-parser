@@ -316,21 +316,7 @@ class ExpressionVisitor(
     }
 
     override fun visitUnaryOp(ctx: UnaryOpContext): Expression {
-        val op = when {
-            ctx.PLUS() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.PLUS().text)
-            }
-            ctx.EXCLAMATION() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.EXCLAMATION().text)
-            }
-            ctx.MINUS() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.MINUS().text)
-            }
-            ctx.TILDE() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.TILDE().text)
-            }
-            else -> error("unknown unary op expression")
-        }
+        val op = ArithmeticUnaryOp.fromString(ctx.op.text)
 
         val value = visitExpression(ctx.expression())
         return UnaryOpExpression(op, value)
