@@ -1,13 +1,7 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.ActionUsageContext
-import org.jetbrains.research.libsl.LibSLParser.ArrayLiteralContext
-import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
-import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
-import org.jetbrains.research.libsl.LibSLParser.ProcUsageContext
-import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
-import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
+import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
@@ -207,8 +201,7 @@ class ExpressionVisitor(
     ): QualifiedAccess {
         val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
 
-        val lastAccess = when(val lastFieldName = names.last()) {
-
+        val lastAccess = when (val lastFieldName = names.last()) {
             "this" -> ThisAccess(childAccess = null)
 
             else -> let {
@@ -222,11 +215,10 @@ class ExpressionVisitor(
         }
 
         return names.dropLast(1).foldRight(lastAccess) { name, access ->
-            val childAccess = when(name) {
-
+            val childAccess = when (name) {
                 "this" -> ThisAccess(childAccess = access)
 
-                else -> let {
+                else -> {
                     val childVariableReference = VariableReferenceBuilder.build(name, context)
                     VariableAccess(name, childAccess = access, childVariableReference)
                 }
@@ -283,7 +275,7 @@ class ExpressionVisitor(
         return CallAutomatonConstructor(automatonRef, args, stateRef)
     }
 
-    override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Expression {
+    override fun visitAssignmentRight(ctx: AssignmentRightContext): Expression {
         return when {
             ctx.expression() != null -> visitExpression(ctx.expression())
             ctx.callAutomatonConstructorWithNamedArgs() != null -> {
@@ -293,7 +285,7 @@ class ExpressionVisitor(
         }
     }
 
-    override fun visitActionUsage(ctx: ActionUsageContext): Expression  {
+    override fun visitActionUsage(ctx: ActionUsageContext): Expression {
         val name = ctx.Identifier().text.extractIdentifier()
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
@@ -323,7 +315,7 @@ class ExpressionVisitor(
         return ProcExpression(procCall)
     }
 
-    override fun visitUnaryOp(ctx: LibSLParser.UnaryOpContext): Expression {
+    override fun visitUnaryOp(ctx: UnaryOpContext): Expression {
         val op = when {
             ctx.PLUS() != null -> let {
                 ArithmeticUnaryOp.fromString(ctx.PLUS().text)

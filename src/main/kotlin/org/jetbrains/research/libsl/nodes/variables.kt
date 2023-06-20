@@ -74,9 +74,9 @@ class FunctionArgument(
             )
             append(IPrinter.SPACE)
         }
+
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
-
         append(typeReference.name)
     }
 }
@@ -105,6 +105,7 @@ class ConstructorArgument(
             append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
             append(IPrinter.SPACE)
         }
+
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
     }
@@ -122,6 +123,7 @@ class VariableWithInitialValue(
         append(formatListEmptyLineAtEndIfNeeded(annotationUsage))
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
+
         if (initialValue != null) {
             append(" = ${initialValue.dumpToString()};")
         } else {

@@ -1,6 +1,5 @@
 package org.jetbrains.research.libsl.visitors
 
-import org.antlr.v4.runtime.tree.TerminalNode
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.EnumSemanticTypeEntryContext
 import org.jetbrains.research.libsl.LibSLParser.TypeDefBlockStatementContext

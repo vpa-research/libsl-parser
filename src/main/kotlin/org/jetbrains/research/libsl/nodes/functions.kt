@@ -20,7 +20,7 @@ open class Function(
     open val context: FunctionContext
 ) : Node() {
     val fullName: String
-        get() = if(automatonReference?.name?.isEmpty() == true) "${automatonReference!!.name}.$name" else name
+        get() = if (automatonReference?.name?.isEmpty() == true) "${automatonReference!!.name}.$name" else name
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))

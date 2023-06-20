@@ -1,7 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.AutomatonContext
-import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -27,11 +26,12 @@ data class Automaton(
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
-
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
+
         if (constructorVariables.isNotEmpty()) {
-            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
+            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() }})")
         }
+
         appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)} {")
 
         append(withIndent(formatBody()))

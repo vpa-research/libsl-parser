@@ -1,11 +1,10 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.nodes.references.ActionReference
-import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
-sealed class Statement: Node()
+sealed class Statement : Node()
 
 data class Assignment(
     val left: QualifiedAccess,
@@ -25,7 +24,7 @@ data class IfStatement(
         appendLine("{")
         append(withIndent(formatListEmptyLineAtEndIfNeeded(ifStatements)))
         appendLine("}")
-        if(elseStatements?.statements?.isNotEmpty() == true) {
+        if (elseStatements?.statements?.isNotEmpty() == true) {
             append(elseStatements.dumpToString())
         }
     }

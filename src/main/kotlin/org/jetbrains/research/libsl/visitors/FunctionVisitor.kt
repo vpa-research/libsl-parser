@@ -29,7 +29,8 @@ class FunctionVisitor(
         check((automatonName != null) xor (parentAutomaton != null))
 
 
-        val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) } ?: parentAutomaton?.getReference(functionContext)
+        val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) }
+            ?: parentAutomaton?.getReference(functionContext)
         check(automatonReference != null)
 
         if (automatonName != null) {
@@ -194,7 +195,7 @@ class FunctionVisitor(
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
             val targetArg = firstOrNull { arg ->
-                arg.annotationUsages.any { it.annotationReference.name == "target"}
+                arg.annotationUsages.any { it.annotationReference.name == "target" }
             } ?: return null
             val automatonName = targetArg.typeReference.name
             return AutomatonReferenceBuilder.build(automatonName, functionContext)

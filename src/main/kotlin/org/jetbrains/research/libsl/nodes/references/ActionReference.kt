@@ -2,7 +2,6 @@ package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Action
-import org.jetbrains.research.libsl.nodes.ActionUsage
 
 data class ActionReference(
     val name: String,

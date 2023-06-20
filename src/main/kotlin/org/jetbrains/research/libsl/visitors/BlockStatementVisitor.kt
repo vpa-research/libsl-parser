@@ -3,12 +3,11 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.*
-import kotlin.math.exp
 
 class BlockStatementVisitor(
     private val functionContext: FunctionContext,
     private val statements: MutableList<Statement>
-    ) : LibSLParserVisitor<Unit>(functionContext) {
+) : LibSLParserVisitor<Unit>(functionContext) {
 
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
@@ -20,7 +19,7 @@ class BlockStatementVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
         val op = AssignOps.fromString(ctx.op.text)
-        val value = if(ctx.assignmentRight() != null) {
+        val value = if (ctx.assignmentRight() != null) {
             expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
         } else {
             expressionVisitor.visitExpression(ctx.expression())
@@ -32,7 +31,6 @@ class BlockStatementVisitor(
     override fun visitIfStatement(ifCtx: LibSLParser.IfStatementContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
         val value = expressionVisitor.visitExpression(ifCtx.expression())
-
         val ifStatements = mutableListOf<Statement>()
         val ifStatementVisitor = BlockStatementVisitor(functionContext, ifStatements)
         ifCtx.functionBodyStatements().forEach { ifStatementVisitor.visit(it) }
@@ -41,7 +39,6 @@ class BlockStatementVisitor(
             val elseStatements = mutableListOf<Statement>()
             val elseStatementsVisitor = BlockStatementVisitor(functionContext, elseStatements)
             elseStmt.functionBodyStatements().forEach { elseStatementsVisitor.visit(it) }
-
             ElseStatement(elseStatements)
         }
 

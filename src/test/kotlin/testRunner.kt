@@ -109,7 +109,7 @@ private fun checkFunctionIsResolved(function: Function) {
 }
 
 private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
-    for(s in statements) {
+    for (s in statements) {
         when (s) {
             is ActionUsage -> {}
             is ProcedureCall -> {}
@@ -143,7 +143,7 @@ private fun checkTypeIsResolved(type: Type) {
         is PrimitiveType -> {}
         is RealType -> {}
         is StructuredType -> {
-            type.entries.forEach{ entryType -> entryType.value.resolveOrError()}
+            type.entries.forEach { entryType -> entryType.value.resolveOrError() }
         }
     }
 }

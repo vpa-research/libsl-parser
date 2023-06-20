@@ -46,7 +46,7 @@ enum class AssignOps(val string: String) {
     COMP_ADD("+="), COMP_SUB("-="), COMP_MUL("*="), COMP_DIV("/="), COMP_MOD("%="),
 
     //Bitwise
-    COMP_AND("&="),  COMP_OR("|="), COMP_XOR("^="),
+    COMP_AND("&="), COMP_OR("|="), COMP_XOR("^="),
 
     //Shift
     COMP_R_SHIFT(">>="), COMP_UN_R_SHIFT(">>>="), COMP_L_SHIFT("<<=");

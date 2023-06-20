@@ -18,7 +18,6 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val typeName = ctx.name.asPeriodSeparatedString()
         val isPointer = ctx.asterisk != null
         val genericTypeIdentifierContext = ctx.generic
-
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
         val genericReference = generic?.getReference(context)
 
@@ -29,9 +28,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val typeNameParts = ctx.name.asPeriodSeparatedParts()
         val isPointer = ctx.asterisk != null
         val genericTypeIdentifierContext = ctx.generic
-
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
-
         val realType = RealType(typeNameParts, isPointer, generic?.getReference(context), context)
 
         val previouslyStoredType = context.resolveType(realType.getReference(context))
@@ -46,10 +43,8 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
     private fun getArrayType(ctx: TypeIdentifierContext): ArrayType {
         val typeNameParts = ctx.name.asPeriodSeparatedParts()
         check(typeNameParts[0] == "array" && typeNameParts.size == 1) { "not an array" }
-
         val isPointer = ctx.asterisk != null
         val genericTypeIdentifierContext = ctx.generic
-
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
         check(generic != null)
 
@@ -76,7 +71,6 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
         }.orEmpty()
-
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)
 

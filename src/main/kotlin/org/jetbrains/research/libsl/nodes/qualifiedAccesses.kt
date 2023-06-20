@@ -37,7 +37,7 @@ data class ThisAccess(
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = buildString {
         append("this")
-        if(childAccess != null) {
+        if (childAccess != null) {
             append(".")
             append(childAccess!!.dumpToString())
         }

@@ -7,9 +7,7 @@ import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
-import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
-import org.jetbrains.research.libsl.type.VoidType
 
 class TopLevelDeclarationsResolver(
     private val basePath: String,
