@@ -80,7 +80,11 @@ class FunctionArgument(
 
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
-        append(typeReference.name)
+        if (targetAutomaton != null) {
+            append(targetAutomaton!!.name)
+        } else {
+            append(typeReference.name)
+        }
     }
 }
 

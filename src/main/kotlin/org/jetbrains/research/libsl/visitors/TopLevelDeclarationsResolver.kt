@@ -20,7 +20,7 @@ class TopLevelDeclarationsResolver(
         val expressionVisitor = ExpressionVisitor(context)
         val params = mutableListOf<AnnotationArgumentDescriptor>()
 
-        ctx.annotationDeclParams()?.annotationDeclParamsPart()?.map { parameterCtx ->
+        ctx.annotationDeclParams()?.annotationDeclParamsPart()?.forEach { parameterCtx ->
             val param = AnnotationArgumentDescriptor(
                 parameterCtx.nameWithType().name.text.extractIdentifier(),
                 processTypeIdentifier(parameterCtx.nameWithType().type),
@@ -85,7 +85,7 @@ class TopLevelDeclarationsResolver(
         val actionName = ctx.actionName.text.extractIdentifier()
         val actionParams = mutableListOf<ActionArgumentDescriptor>()
 
-        ctx.actionDeclParamList()?.actionParameter()?.map { parameterCtx ->
+        ctx.actionDeclParamList()?.actionParameter()?.forEach { parameterCtx ->
             val param = ActionArgumentDescriptor(
                 parameterCtx.name.text.extractIdentifier(),
                 processTypeIdentifier(parameterCtx.type)
