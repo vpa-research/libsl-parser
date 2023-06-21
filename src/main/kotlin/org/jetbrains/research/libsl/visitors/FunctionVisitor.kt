@@ -28,7 +28,6 @@ class FunctionVisitor(
 
         check((automatonName != null) xor (parentAutomaton != null))
 
-
         val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) }
             ?: parentAutomaton?.getReference(functionContext)
         check(automatonReference != null)
@@ -38,14 +37,11 @@ class FunctionVisitor(
         }
 
         val functionName = ctx.functionName.text.extractIdentifier()
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
-
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
         val targetAutomatonRef = args.getFunctionTargetByAnnotation ?: automatonReference
-
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
@@ -138,61 +134,33 @@ class FunctionVisitor(
         buildingFunction.statements.addAll(statements)
     }
 
-    private val FunctionDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
-
-                if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
-                    val targetAutomatonName = typeRef.name
-                    val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
-                    arg.targetAutomaton = targetAutomatonReference
-                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
-                }
-
-                arg
+    private fun getDeclArgs(functionDeclArgList: FunctionDeclArgListContext?): List<FunctionArgument> {
+        return functionDeclArgList?.parameter()?.mapIndexed { i, parameter ->
+            val typeRef = processTypeIdentifier(parameter.type)
+            val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
+            val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+            if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
+                val targetAutomatonName = typeRef.name
+                val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
+                arg.targetAutomaton = targetAutomatonReference
+                arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
             }
-            .orEmpty()
+
+            arg
+        }.orEmpty()
+    }
+
+    private val FunctionDeclContext.args: List<FunctionArgument>
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val ConstructorDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
-                arg
-            }
-            .orEmpty()
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val DestructorDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
-                arg
-            }
-            .orEmpty()
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val ProcDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
-                arg
-            }
-            .orEmpty()
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
