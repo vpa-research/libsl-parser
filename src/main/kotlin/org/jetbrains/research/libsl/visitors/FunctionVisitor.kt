@@ -132,8 +132,10 @@ class FunctionVisitor(
     }
 
     override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
-        val statements = buildingFunction.statements
-        BlockStatementVisitor(functionContext, statements).visit(ctx)
+        val visitor = BlockStatementVisitor(functionContext)
+        visitor.visit(ctx)
+        val statements = visitor.statements
+        buildingFunction.statements.addAll(statements)
     }
 
     private val FunctionDeclContext.args: List<FunctionArgument>

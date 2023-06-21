@@ -5,9 +5,9 @@ import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.*
 
 class BlockStatementVisitor(
-    private val functionContext: FunctionContext,
-    private val statements: MutableList<Statement>
+    private val functionContext: FunctionContext
 ) : LibSLParserVisitor<Unit>(functionContext) {
+    val statements: MutableList<Statement> = mutableListOf()
 
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
@@ -31,14 +31,15 @@ class BlockStatementVisitor(
     override fun visitIfStatement(ifCtx: LibSLParser.IfStatementContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
         val value = expressionVisitor.visitExpression(ifCtx.expression())
-        val ifStatements = mutableListOf<Statement>()
-        val ifStatementVisitor = BlockStatementVisitor(functionContext, ifStatements)
+
+        val ifStatementVisitor = BlockStatementVisitor(functionContext)
         ifCtx.functionBodyStatements().forEach { ifStatementVisitor.visit(it) }
+        val ifStatements = ifStatementVisitor.statements
 
         val elseStatement = ifCtx.elseStatement()?.let { elseStmt ->
-            val elseStatements = mutableListOf<Statement>()
-            val elseStatementsVisitor = BlockStatementVisitor(functionContext, elseStatements)
+            val elseStatementsVisitor = BlockStatementVisitor(functionContext)
             elseStmt.functionBodyStatements().forEach { elseStatementsVisitor.visit(it) }
+            val elseStatements = elseStatementsVisitor.statements
             ElseStatement(elseStatements)
         }
 
