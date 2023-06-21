@@ -111,10 +111,9 @@ private fun checkFunctionIsResolved(function: Function) {
 private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
     for (s in statements) {
         when (s) {
-            is ActionUsage -> {}
-            is ProcedureCall -> {}
-            // TODO(Variable statement)
-            is VariableDeclaration -> {}
+            is ActionUsage -> {s.actionReference.resolveOrError()}
+            is ProcedureCall -> {s.procReference.resolveOrError()}
+            is VariableDeclaration -> {s.variable.typeReference.resolveOrError()}
             is Assignment -> {
                 function.context.typeInferrer.getExpressionType(s.left)
                 function.context.typeInferrer.getExpressionType(s.value)
