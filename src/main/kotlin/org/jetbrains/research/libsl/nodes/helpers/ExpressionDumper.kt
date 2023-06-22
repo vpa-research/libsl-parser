@@ -165,7 +165,7 @@ object ExpressionDumper {
     }
 
     private fun dumpHasAutomatonConcept(expression: HasAutomatonConcept): String {
-        return "${expression.variableName} has ${expression.automatonReference.name}"
+        return "${expression.variable.dumpToString()} has ${expression.automatonReference.name}"
     }
 
     private fun dumpNamedArgumentWithValue(expression: NamedArgumentWithValue): String {

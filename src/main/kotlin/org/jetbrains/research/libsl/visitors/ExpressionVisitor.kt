@@ -357,11 +357,10 @@ class ExpressionVisitor(
     }
 
     override fun visitHasAutomatonConcept(ctx: LibSLParser.HasAutomatonConceptContext): Expression {
-
-        val variableName = ctx.qualifiedAccess().periodSeparatedFullName().asPeriodSeparatedString()
+        val variable = visitQualifiedAccess(ctx.qualifiedAccess())
         val automatonConceptName = ctx.name.text
         val automatonReference = AutomatonReferenceBuilder.build(automatonConceptName, context)
 
-        return HasAutomatonConcept(variableName, automatonReference, Position(context.fileName, ctx.position()))
+        return HasAutomatonConcept(variable, automatonReference, Position(context.fileName, ctx.position()))
     }
 }

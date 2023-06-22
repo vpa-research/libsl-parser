@@ -100,7 +100,7 @@ data class ProcExpression(
 ) : Expression()
 
 data class HasAutomatonConcept(
-    val variableName: String,
+    val variable: QualifiedAccess,
     val automatonReference: AutomatonReference,
     val position: Position
 ) : Expression()
