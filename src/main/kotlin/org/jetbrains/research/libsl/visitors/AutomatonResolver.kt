@@ -9,7 +9,6 @@ import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
-import org.jetbrains.research.libsl.type.ConceptType
 import org.jetbrains.research.libsl.utils.Position
 
 class AutomatonResolver(
@@ -21,11 +20,7 @@ class AutomatonResolver(
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.asPeriodSeparatedString()
         val isConcept = ctx.CONCEPT() != null
-        val typeName = if(isConcept) {
-            ConceptType(context).name
-        } else {
-            ctx.type.asPeriodSeparatedString()
-        }
+        val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 

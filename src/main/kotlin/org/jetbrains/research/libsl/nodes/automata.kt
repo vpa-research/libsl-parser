@@ -35,17 +35,18 @@ data class Automaton(
             append("automaton concept ${BackticksPolitics.forPeriodSeparated(name)}")
         } else {
             append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
-            if (constructorVariables.isNotEmpty()) {
-                append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
-            }
-            append(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}")
+        }
 
-            if(implementedConcepts.isNotEmpty()) {
-                append(" implements ")
-                append(implementedConcepts.joinToString(separator = ", ") {
-                    it.name
-                })
-            }
+        if (constructorVariables.isNotEmpty()) {
+            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
+        }
+        append(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)}")
+
+        if(implementedConcepts.isNotEmpty()) {
+            append(" implements ")
+            append(implementedConcepts.joinToString(separator = ", ") {
+                it.name
+            })
         }
 
         appendLine(" {")

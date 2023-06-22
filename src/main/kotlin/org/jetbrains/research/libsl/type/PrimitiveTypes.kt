@@ -116,18 +116,3 @@ data class NothingType(
         }
     }
 }
-
-data class ConceptType(
-    override val context: LslContextBase,
-) : PrimitiveType {
-    override val name: String = Concept_TYPE_NAME
-    override val isPointer: Boolean = false
-    override val generic: TypeReference? = null
-    companion object {
-        const val Concept_TYPE_NAME = "Concept"
-
-        fun getConceptTypeReference(context: LslContextBase): TypeReference{
-            return TypeReferenceBuilder.build(Concept_TYPE_NAME, genericReference = null, isPointer = false, context)
-        }
-    }
-}

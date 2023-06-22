@@ -40,7 +40,6 @@ class LslGlobalContext(fileName: String) : LslContextBase(fileName) {
 
                 add(AnyType(this@LslGlobalContext))
                 add(NothingType(this@LslGlobalContext))
-                add(ConceptType(this@LslGlobalContext))
             }
         }
 

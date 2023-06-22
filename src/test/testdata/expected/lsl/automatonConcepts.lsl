@@ -27,7 +27,7 @@ annotation Parametrized(
     str: string
 );
 annotation implements;
-automaton concept IterableAutomaton {
+automaton concept IterableAutomaton : Int {
     var storage: any;
     proc _getNext(index: int): any;
     proc something(): any;
