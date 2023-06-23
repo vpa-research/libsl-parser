@@ -40,12 +40,20 @@ class TypeInferrer(private val context: LslContextBase) {
     private fun getAtomicType(atomic: Atomic): Type {
         return when (atomic) {
             is BoolLiteral -> BoolType(context)
-            is FloatLiteral -> FloatType(context, FloatType.FloatCapacity.UNKNOWN)
+            is FloatLiteral -> processFloatLiteralType(atomic, context)
             is IntegerLiteral -> IntType(context, IntType.IntCapacity.UNKNOWN)
             is StringLiteral -> StringType(context)
             is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
             is QualifiedAccess -> getQualifiedAccessType(atomic)
             is ArrayLiteral -> getArrayLiteralType(atomic)
+        }
+    }
+
+    private fun processFloatLiteralType(floatLiteral: FloatLiteral, context: LslContextBase): Type {
+        return when(floatLiteral.suffix) {
+            "f" -> Float32Type(context)
+            "d" -> Float64Type(context)
+            else -> throw IllegalArgumentException("Unknown float")
         }
     }
 
@@ -85,10 +93,11 @@ class TypeInferrer(private val context: LslContextBase) {
             check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
         }
 
-        if (typeA is FloatType) {
-            typeB as FloatType
+        /* if (typeA is Float32Type) {
+            typeB as Float32Type
             check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
         }
+         */
 
         if (typeA is UnsignedType) {
             typeB as UnsignedType

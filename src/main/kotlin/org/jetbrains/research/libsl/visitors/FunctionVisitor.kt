@@ -20,12 +20,11 @@ class FunctionVisitor(
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
-        // TODO
+
         /* if (automatonName == null && parentAutomaton == null) {
             errorManager(UnspecifiedAutomaton("automaton must be specified for top-level functions", ctx.position()))
             return
         } */
-
         // check((automatonName != null) xor (parentAutomaton != null))
 
         val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) } ?: parentAutomaton?.getReference(functionContext)

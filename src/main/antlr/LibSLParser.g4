@@ -455,6 +455,5 @@ integerNumber
    ;
 
 floatNumber
-   :  MINUS? Digit+ DOT Digit+ fSuffix=Identifier
-   |  MINUS? Digit+ DOT Digit+ dSuffix=Identifier
+   :  MINUS? Digit+ DOT Digit+ suffix=Identifier
    ;

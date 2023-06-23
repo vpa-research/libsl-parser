@@ -19,4 +19,8 @@ automaton A : Int {
     fun sumAgain(): Double {
         result = 0.1d + 0.2d;
     }
+
+    fun newSum(): Float {
+        result = 0.0f + 0.1f;
+    }
 }

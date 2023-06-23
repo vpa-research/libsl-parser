@@ -9,9 +9,12 @@ automaton A : Int {
     fun f(param: Int): V {
     }
     fun sum(): Float {
-        result = 0.1 + 0.2;
+        result = 0.1f + 0.2f;
     }
     fun sumAgain(): Double {
-        result = 0.1 + 0.2;
+        result = 0.1d + 0.2d;
+    }
+    fun newSum(): Float {
+        result = 0.0f + 0.1f;
     }
 }

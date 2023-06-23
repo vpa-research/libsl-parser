@@ -30,8 +30,8 @@ class LslGlobalContext(fileName: String) : LslContextBase(fileName) {
                 add(UnsignedType(this@LslGlobalContext, UnsignedType.UnsignedCapacity.UNSIGNED32, pointer))
                 add(UnsignedType(this@LslGlobalContext, UnsignedType.UnsignedCapacity.UNSIGNED64, pointer))
 
-                add(FloatType(this@LslGlobalContext, FloatType.FloatCapacity.FLOAT32, pointer))
-                add(FloatType(this@LslGlobalContext, FloatType.FloatCapacity.FLOAT64, pointer))
+                add(Float32Type(this@LslGlobalContext, pointer))
+                add(Float64Type(this@LslGlobalContext, pointer))
 
                 add(BoolType(this@LslGlobalContext, pointer))
                 add(CharType(this@LslGlobalContext, pointer))

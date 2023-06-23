@@ -4,10 +4,20 @@ data class IntegerLiteral(
     override val value: Int
 ) : Atomic()
 
-data class FloatLiteral(
+abstract class FloatLiteral(
     override val value: Float,
-    val suffix: String
+    open val suffix: String
 ) : Atomic()
+
+data class Float32Literal(
+    override val value: Float,
+    override val suffix: String = "f"
+) : FloatLiteral(value, suffix)
+
+data class Float64Literal(
+    override val value: Float,
+    override val suffix: String = "d"
+) : FloatLiteral(value, suffix)
 
 data class StringLiteral(
     override val value: String

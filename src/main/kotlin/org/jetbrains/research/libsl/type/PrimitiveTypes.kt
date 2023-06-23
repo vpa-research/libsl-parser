@@ -40,17 +40,20 @@ data class UnsignedType(
     }
 }
 
-data class FloatType(
+data class Float32Type(
     override val context: LslContextBase,
-    val capacity: FloatCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
     override val generic: TypeReference? = null
-    override val name: String = capacity.name.lowercase()
+    override val name: String = "float32"
+}
 
-    enum class FloatCapacity {
-        FLOAT32, FLOAT64, UNKNOWN
-    }
+data class Float64Type(
+    override val context: LslContextBase,
+    override val isPointer: Boolean = false
+) : PrimitiveType {
+    override val generic: TypeReference? = null
+    override val name: String = "float64"
 }
 
 data class BoolType(
