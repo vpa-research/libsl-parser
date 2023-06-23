@@ -46,7 +46,7 @@ class FunctionVisitor(
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
-            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position()))
+            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position().first, ctx.position().second))
             context.storeVariable(resultVariable)
         }
 
@@ -60,7 +60,7 @@ class FunctionVisitor(
             hasBody = ctx.functionBody() != null,
             targetAutomatonRef = targetAutomatonRef,
             context = functionContext,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
 
         super.visitFunctionDecl(ctx)
@@ -81,7 +81,7 @@ class FunctionVisitor(
             annotationReferences,
             hasBody = ctx.functionBody() != null,
             context = functionContext,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
 
         super.visitConstructorDecl(ctx)
@@ -102,7 +102,7 @@ class FunctionVisitor(
             annotationReferences,
             hasBody = ctx.functionBody() != null,
             context = functionContext,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
 
         super.visitDestructorDecl(ctx)
@@ -120,7 +120,7 @@ class FunctionVisitor(
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
-            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position()))
+            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position().first, ctx.position().second))
             context.storeVariable(resultVariable)
         }
 
@@ -131,7 +131,7 @@ class FunctionVisitor(
             annotationReferences,
             hasBody = ctx.functionBody() != null,
             context = functionContext,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
 
         super.visitProcDecl(ctx)
@@ -156,7 +156,7 @@ class FunctionVisitor(
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
                     targetAutomaton = null,
-                    Position(context.fileName, parameter.position())
+                    Position(context.fileName, parameter.position().first, parameter.position().second)
                 )
 
                 if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
@@ -178,7 +178,7 @@ class FunctionVisitor(
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
-                    targetAutomaton = null, Position(context.fileName, parameter.position())
+                    targetAutomaton = null, Position(context.fileName, parameter.position().first, parameter.position().second)
                 )
                 arg
             }
@@ -192,7 +192,7 @@ class FunctionVisitor(
                 val typeRef = processTypeIdentifier(parameter.type)
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
-                    targetAutomaton = null, Position(context.fileName, parameter.position())
+                    targetAutomaton = null, Position(context.fileName, parameter.position().first, parameter.position().second)
                 )
                 arg
             }
@@ -207,7 +207,7 @@ class FunctionVisitor(
                 val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences,
                     targetAutomaton = null,
-                    Position(context.fileName, parameter.position())
+                    Position(context.fileName, parameter.position().first, parameter.position().second)
                 )
                 arg
             }
@@ -238,7 +238,8 @@ class FunctionVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val expression = expressionVisitor.visitExpression(expressionContext)
 
-        val contract = Contract(name, expression, kind, Position(context.fileName, expressionContext.position()))
+        val contract = Contract(name, expression, kind, Position(context.fileName,
+            expressionContext.position().first, expressionContext.position().second))
         buildingFunction.contracts.add(contract)
     }
 }

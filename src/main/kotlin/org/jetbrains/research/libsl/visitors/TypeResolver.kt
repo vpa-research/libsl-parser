@@ -138,7 +138,7 @@ class TypeResolver(
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
             initValue,
-            Position(context.fileName, ctx.position())
+            Position(context.fileName, ctx.position().first, ctx.position().second)
         )
 
         context.storeVariable(variable)
@@ -157,7 +157,9 @@ class TypeResolver(
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
-            val resultVariable = ResultVariable(returnType, Position(context.fileName, ctx.position()))
+            val resultVariable = ResultVariable(returnType,
+                Position(context.fileName, ctx.position().first, ctx.position().second)
+            )
             context.storeVariable(resultVariable)
         }
 
@@ -171,7 +173,7 @@ class TypeResolver(
             hasBody = false,
             targetAutomatonRef = null,
             context = functionContext,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
     }
 
@@ -185,7 +187,7 @@ class TypeResolver(
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i,
                     annotationsReferences,
                     targetAutomaton = null,
-                    Position(context.fileName, parameter.position())
+                    Position(context.fileName, parameter.position().first, parameter.position().second)
                 )
                 arg
             }

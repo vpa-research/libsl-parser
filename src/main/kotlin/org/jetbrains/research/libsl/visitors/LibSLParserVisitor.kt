@@ -83,7 +83,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument.value).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)
 
-        return AnnotationUsage(annotationRef, args, Position(context.fileName, ctx.position()))
+        return AnnotationUsage(annotationRef, args, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     private fun processAnnotationArgs(ctx: LibSLParser.AnnotationUsageContext): List<NamedArgumentWithValue> {
@@ -91,7 +91,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         ctx.annotationArgs().forEach { a ->
             val name = a.argName()?.name?.text
             val value = ExpressionVisitor(context).visitExpression(a.expression())
-            namedArgs.add(NamedArgumentWithValue(name, value, Position(context.fileName, ctx.position())))
+            namedArgs.add(NamedArgumentWithValue(name, value, Position(context.fileName, ctx.position().first, ctx.position().second)))
         }
 
         return namedArgs

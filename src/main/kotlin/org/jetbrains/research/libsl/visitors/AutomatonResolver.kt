@@ -30,7 +30,7 @@ class AutomatonResolver(
             isConcept,
             annotationReferences,
             context = automatonContext,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
 
         super.visitAutomatonDecl(ctx)
@@ -51,7 +51,7 @@ class AutomatonResolver(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()),
-        Position(context.fileName, ctx.position())
+        Position(context.fileName, ctx.position().first, ctx.position().second)
         )
         context.storeVariable(argument)
         buildingAutomaton.constructorVariables.add(argument)
@@ -153,7 +153,7 @@ class AutomatonResolver(
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
             initValue,
-            Position(context.fileName, ctx.position())
+            Position(context.fileName, ctx.position().first, ctx.position().second)
         )
         buildingAutomaton.internalVariables.add(variable)
         context.storeVariable(variable)

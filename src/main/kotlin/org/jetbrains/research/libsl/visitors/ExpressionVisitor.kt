@@ -108,7 +108,7 @@ class ExpressionVisitor(
         val leftExpression = visitExpression(left)
         val rightExpression = visitExpression(right)
 
-        return BinaryOpExpression(leftExpression, rightExpression, op, Position(context.fileName, ctx.position()))
+        return BinaryOpExpression(leftExpression, rightExpression, op, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     private fun processUnaryExpression(ctx: ExpressionContext): UnaryOpExpression {
@@ -116,12 +116,12 @@ class ExpressionVisitor(
         val op = ArithmeticUnaryOp.fromString(opText)
         val expression = visitExpression(ctx.expression(0))
 
-        return UnaryOpExpression(op, expression, Position(context.fileName, ctx.position()))
+        return UnaryOpExpression(op, expression, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     private fun processOldValue(ctx: QualifiedAccessContext): OldValue {
         val value = visitQualifiedAccess(ctx)
-        return OldValue(value, Position(context.fileName, ctx.position()))
+        return OldValue(value, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     override fun visitExpressionAtomic(ctx: LibSLParser.ExpressionAtomicContext): Atomic {
@@ -193,7 +193,7 @@ class ExpressionVisitor(
                 val parentQualifiedAccess = visitQualifiedAccess(ctx.qualifiedAccess(0))
                 val arrayIndex = visitExpressionAtomic(ctx.expressionAtomic())
 
-                val qualifiedArrayAccess = ArrayAccess(arrayIndex, Position(context.fileName, ctx.position()))
+                val qualifiedArrayAccess = ArrayAccess(arrayIndex, Position(context.fileName, ctx.position().first, ctx.position().second))
                 val afterArrayQualifiedAccess = ctx.qualifiedAccess(1)?.let { visitQualifiedAccess(it) }
                 qualifiedArrayAccess.childAccess = afterArrayQualifiedAccess
 
@@ -214,7 +214,7 @@ class ExpressionVisitor(
 
         return ArrayLiteral(
             value = arrayValues,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
     }
 
@@ -228,7 +228,7 @@ class ExpressionVisitor(
             "this" ->
                 ThisAccess(
                     childAccess = null,
-                    position = Position(context.fileName, periodSeparatedFullNameContext.position())
+                    position = Position(context.fileName, periodSeparatedFullNameContext.position().first, periodSeparatedFullNameContext.position().second)
                 )
 
             else -> let {
@@ -237,7 +237,7 @@ class ExpressionVisitor(
                     lastFieldName,
                     childAccess = null,
                     lastVariableReference,
-                    Position(context.fileName, periodSeparatedFullNameContext.position())
+                    Position(context.fileName, periodSeparatedFullNameContext.position().first, periodSeparatedFullNameContext.position().second)
                 )
             }
         }
@@ -247,13 +247,13 @@ class ExpressionVisitor(
 
                 "this" -> ThisAccess(
                     childAccess = access,
-                    position = Position(context.fileName, periodSeparatedFullNameContext.position())
+                    position = Position(context.fileName, periodSeparatedFullNameContext.position().first, periodSeparatedFullNameContext.position().second)
                 )
 
                 else -> let {
                     val childVariableReference = VariableReferenceBuilder.build(name, context)
                     VariableAccess(name, childAccess = access, childVariableReference,
-                        Position(context.fileName, periodSeparatedFullNameContext.position())
+                        Position(context.fileName, periodSeparatedFullNameContext.position().first, periodSeparatedFullNameContext.position().second)
                     )
                 }
             }
@@ -277,7 +277,7 @@ class ExpressionVisitor(
             automatonReference,
             arg,
             childAccess = null,
-            position = Position(context.fileName, ctx.position())
+            position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
     }
 
@@ -298,7 +298,7 @@ class ExpressionVisitor(
                 return@mapNotNull null
             }
 
-            NamedArgumentWithValue(name, value, Position(context.fileName, ctx.position()))
+            NamedArgumentWithValue(name, value, Position(context.fileName, ctx.position().first, ctx.position().second))
         }
 
         val stateName =
@@ -307,7 +307,7 @@ class ExpressionVisitor(
 
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
 
-        return CallAutomatonConstructor(automatonRef, args, stateRef, Position(context.fileName, ctx.position()))
+        return CallAutomatonConstructor(automatonRef, args, stateRef, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     override fun visitActionUsage(ctx: ActionUsageContext): Expression  {
@@ -318,9 +318,9 @@ class ExpressionVisitor(
             ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
         }
 
-        val action = Action(name, args, Position(context.fileName, ctx.position()))
+        val action = Action(name, args, Position(context.fileName, ctx.position().first, ctx.position().second))
 
-        return ActionExpression(action, Position(context.fileName, ctx.position()))
+        return ActionExpression(action, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     override fun visitProcUsage(ctx: ProcUsageContext): Expression {
@@ -334,9 +334,9 @@ class ExpressionVisitor(
         if(ctx.expressionsList() != null) {
             ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
         }
-        val procedureCall = ProcedureCall(name, args, Position(context.fileName, ctx.position()))
+        val procedureCall = ProcedureCall(name, args, Position(context.fileName, ctx.position().first, ctx.position().second))
 
-        return ProcExpression(procedureCall, Position(context.fileName, ctx.position()))
+        return ProcExpression(procedureCall, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     override fun visitUnaryOp(ctx: LibSLParser.UnaryOpContext): Expression {
@@ -357,7 +357,7 @@ class ExpressionVisitor(
         }
 
         val value = visitExpression(ctx.expression())
-        return UnaryOpExpression(op, value, Position(context.fileName, ctx.position()))
+        return UnaryOpExpression(op, value, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 
     override fun visitHasAutomatonConcept(ctx: LibSLParser.HasAutomatonConceptContext): Expression {
@@ -365,6 +365,6 @@ class ExpressionVisitor(
         val automatonConceptName = ctx.name.text
         val automatonReference = AutomatonReferenceBuilder.build(automatonConceptName, context)
 
-        return HasAutomatonConcept(variable, automatonReference, Position(context.fileName, ctx.position()))
+        return HasAutomatonConcept(variable, automatonReference, Position(context.fileName, ctx.position().first, ctx.position().second))
     }
 }

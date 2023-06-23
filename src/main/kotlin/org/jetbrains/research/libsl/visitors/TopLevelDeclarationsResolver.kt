@@ -32,7 +32,7 @@ class TopLevelDeclarationsResolver(
             params.add(param)
         }
 
-        val annotation = Annotation(annotationName, params, Position(context.fileName, ctx.position()))
+        val annotation = Annotation(annotationName, params, Position(context.fileName, ctx.position().first, ctx.position().second))
         globalContext.storeAnnotation(annotation)
     }
 
@@ -68,7 +68,7 @@ class TopLevelDeclarationsResolver(
             typeRef,
             annotationUsages,
             initialValue,
-            Position(context.fileName, ctx.position())
+            Position(context.fileName, ctx.position().first, ctx.position().second)
         )
         globalContext.storeVariable(variable)
     }
@@ -82,7 +82,7 @@ class TopLevelDeclarationsResolver(
                 param.name.text.extractIdentifier(),
                 processTypeIdentifier(param.type),
                 getAnnotationUsages(param.annotationUsage()),
-                Position(context.fileName, ctx.position())
+                Position(context.fileName, ctx.position().first, ctx.position().second)
             )
 
             actionParams.add(actionParam)
@@ -90,7 +90,9 @@ class TopLevelDeclarationsResolver(
 
         val returnType = ctx.actionType?.let { processTypeIdentifier(it) }
         val actionAnnotations = getAnnotationUsages(ctx.annotationUsage())
-        val declaredAction = ActionDecl(actionName, actionParams, actionAnnotations, returnType, Position(context.fileName, ctx.position()))
+        val declaredAction = ActionDecl(actionName, actionParams, actionAnnotations, returnType,
+            Position(context.fileName, ctx.position().first, ctx.position().second)
+        )
         globalContext.storeDeclaredAction(declaredAction)
     }
 }
