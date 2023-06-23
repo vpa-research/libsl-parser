@@ -312,6 +312,11 @@ class ExpressionVisitor(
 
     override fun visitActionUsage(ctx: ActionUsageContext): Expression  {
         val name = ctx.Identifier().text.extractIdentifier()
+        for (c in name) {
+            if(c.isLowerCase()) {
+                throw IllegalArgumentException("Action names must be in upper case")
+            }
+        }
         val expressionVisitor = ExpressionVisitor(context)
         val args = mutableListOf<Expression>()
         if(ctx.expressionsList() != null) {
