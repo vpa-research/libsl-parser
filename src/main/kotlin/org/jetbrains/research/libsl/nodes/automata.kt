@@ -92,6 +92,7 @@ data class Shift(
             append(
                 functions.joinToString(separator = ", ", prefix = "[", postfix = "]") { function ->
                     val functionName = function.name
+                  
                     if (function.argTypes.isNotEmpty()) {
                         val argTypeNames =
                             function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.name }
