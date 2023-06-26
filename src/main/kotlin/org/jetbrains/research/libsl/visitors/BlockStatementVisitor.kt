@@ -19,11 +19,7 @@ class BlockStatementVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
         val op = AssignOps.fromString(ctx.op.text)
-        val value = if (ctx.assignmentRight() != null) {
-            expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
-        } else {
-            expressionVisitor.visitExpression(ctx.expression())
-        }
+        val value = ctx.assignmentRight().let { expressionVisitor.visitAssignmentRight(it) }
         val assignment = Assignment(left, op, value)
         statements.add(assignment)
     }
@@ -53,19 +49,9 @@ class BlockStatementVisitor(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)
-        val initValue = ctx.assignmentRight()?.let { right ->
-            when {
-                right.callAutomatonConstructorWithNamedArgs() != null -> {
-                    expressionVisitor.visitCallAutomatonConstructorWithNamedArgs(right.callAutomatonConstructorWithNamedArgs())
-                }
-                right.expression() != null -> {
-                    expressionVisitor.visitExpression(right.expression())
-                }
-                else -> error("unknown initializer kind")
-            }
-        }
+        val initValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
 
-        val variable = VariableWithInitialValue(
+            val variable = VariableWithInitialValue(
             keyword,
             name,
             typeReference,

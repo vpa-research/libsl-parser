@@ -207,9 +207,9 @@ typeIdentifier
 
 variableAssignment
    :   qualifiedAccess op=ASSIGN_OP assignmentRight SEMICOLON
-   |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) expression SEMICOLON
-   |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) expression SEMICOLON
-   |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) expression SEMICOLON
+   |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) assignmentRight SEMICOLON
    ;
 
 assignmentRight
