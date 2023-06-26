@@ -33,12 +33,12 @@ type BufferedImage<A, B, C>
 {
    var width: Int;
    var content: array<Something<Int>, String, Object>;
-   static fun iterator(offset: int): Iterator;
+   static fun iterator(offset: Int): Iterator;
 }
 
 annotation StructureKind(str: string);
 annotation Parametrized(str: string);
-annotation implements();
+annotation implements;
 
 automaton concept IterableAutomaton : Int {
    var storage: any;

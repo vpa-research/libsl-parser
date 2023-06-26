@@ -8,7 +8,6 @@ import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
-import org.jetbrains.research.libsl.utils.EntityPosition
 import org.jetbrains.research.libsl.utils.PositionGetter
 
 class TopLevelDeclarationsResolver(
@@ -24,7 +23,7 @@ class TopLevelDeclarationsResolver(
         val expressionVisitor = ExpressionVisitor(context)
         val params = mutableListOf<AnnotationArgumentDescriptor>()
 
-        ctx.annotationDeclParams()?.annotationDeclParamsPart()?.map { parameterCtx ->
+        ctx.annotationDeclParams()?.annotationDeclParamsPart()?.forEach { parameterCtx ->
             val param = AnnotationArgumentDescriptor(
                 parameterCtx.nameWithType().name.text.extractIdentifier(),
                 processTypeIdentifier(parameterCtx.nameWithType().type),
@@ -46,7 +45,7 @@ class TopLevelDeclarationsResolver(
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val automatonContext = AutomatonContext(context)
-        AutomatonResolver(basePath, errorManager, automatonContext).visitAutomatonDecl(ctx)
+        AutomatonResolver(basePath, errorManager, globalContext, automatonContext).visitAutomatonDecl(ctx)
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
@@ -58,7 +57,7 @@ class TopLevelDeclarationsResolver(
         }
 
         val functionContext = FunctionContext(parentContext)
-        FunctionVisitor(functionContext, parentAutomaton = null, errorManager).visitFunctionDecl(ctx)
+        FunctionVisitor(functionContext, parentAutomaton = null, globalContext, errorManager).visitFunctionDecl(ctx)
     }
 
     override fun visitTypeDefBlock(ctx: LibSLParser.TypeDefBlockContext) {
@@ -71,7 +70,17 @@ class TopLevelDeclarationsResolver(
         val typeRef = processTypeIdentifier(ctx.nameWithType().type)
 
         val expressionVisitor = ExpressionVisitor(context)
-        val initialValue = ctx.expression()?.let { expressionVisitor.visitExpression(it) }
+        val initValue = ctx.assignmentRight()?.let { right ->
+            when {
+                right.callAutomatonConstructorWithNamedArgs() != null -> {
+                    expressionVisitor.visitCallAutomatonConstructorWithNamedArgs(right.callAutomatonConstructorWithNamedArgs())
+                }
+                right.expression() != null -> {
+                    expressionVisitor.visitExpression(right.expression())
+                }
+                else -> error("unknown initializer kind")
+            }
+        }
 
         val annotationUsages = getAnnotationUsages(ctx.annotationUsage())
         val variable = VariableWithInitialValue(
@@ -79,37 +88,39 @@ class TopLevelDeclarationsResolver(
             variableName,
             typeRef,
             annotationUsages,
-            initialValue,
+            initValue,
             posGetter.getCtxPosition(fileName, ctx)
         )
-
         globalContext.storeVariable(variable)
     }
 
     override fun visitActionDecl(ctx: LibSLParser.ActionDeclContext) {
         val actionName = ctx.actionName.text.extractIdentifier()
-        val actionParams = mutableListOf<DeclaredActionParameter>()
+        val actionParams = mutableListOf<ActionArgumentDescriptor>()
 
-        ctx.actionDeclParamList()?.actionParameter()?.map { param ->
-            val actionParam = DeclaredActionParameter(
-                param.name.text.extractIdentifier(),
-                processTypeIdentifier(param.type),
-                getAnnotationUsages(param.annotationUsage()),
+        ctx.actionDeclParamList()?.actionParameter()?.forEach { parameterCtx ->
+            // TODO (Action arguments annotations?)
+            val param = ActionArgumentDescriptor(
+                parameterCtx.name.text.extractIdentifier(),
+                processTypeIdentifier(parameterCtx.type),
                 posGetter.getCtxPosition(fileName, ctx)
             )
-
-            actionParams.add(actionParam)
+            actionParams.add(param)
         }
 
         val returnType = ctx.actionType?.let { processTypeIdentifier(it) }
+
         val actionAnnotations = getAnnotationUsages(ctx.annotationUsage())
-        val declaredAction = ActionDecl(
-            actionName,
-            actionParams,
-            actionAnnotations,
-            returnType,
-            posGetter.getCtxPosition(fileName, ctx)
-        )
+
+        val declaredAction =
+            Action(
+                actionName,
+                actionParams,
+                actionAnnotations,
+                returnType,
+                posGetter.getCtxPosition(fileName, ctx)
+            )
+
         globalContext.storeDeclaredAction(declaredAction)
     }
 }

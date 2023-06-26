@@ -16,7 +16,7 @@ type BufferedImage<A, B, C> is java.awt.image.BufferedImage for Image, Object
 {
     var width: Int;
     var content: array<Something<Int>, String, Object>;
-    static fun iterator(offset: int): Iterator;
+    static fun iterator(offset: Int): Iterator;
 }
 types {
     @implements

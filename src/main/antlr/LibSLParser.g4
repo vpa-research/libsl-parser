@@ -125,11 +125,11 @@ enumSemanticTypeEntry
  *         );
  */
 annotationDecl
-   :   ANNOTATION name=Identifier (L_BRACKET (annotationDeclParams) (COMMA)? R_BRACKET)? SEMICOLON
+   :   ANNOTATION name=Identifier annotationDeclParams? SEMICOLON
    ;
 
 annotationDeclParams
-   :   (annotationDeclParamsPart (COMMA annotationDeclParamsPart)*)*
+   :   L_BRACKET annotationDeclParamsPart (COMMA annotationDeclParamsPart)* (COMMA)? R_BRACKET
    ;
 
 annotationDeclParamsPart
@@ -213,7 +213,7 @@ functionsListPart
  */
 variableDecl
    :   annotationUsage* keyword=(VAR|VAL) nameWithType SEMICOLON
-   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP expression SEMICOLON
+   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 nameWithType
@@ -236,10 +236,15 @@ genericPart
    ;
 
 variableAssignment
-   :   qualifiedAccess op=ASSIGN_OP expression SEMICOLON
-   |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) expression SEMICOLON
-   |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) expression SEMICOLON
-   |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) expression SEMICOLON
+   :   qualifiedAccess op=ASSIGN_OP assignmentRight SEMICOLON
+   |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) assignmentRight SEMICOLON
+   ;
+
+assignmentRight
+   :   expression
+   |   callAutomatonConstructorWithNamedArgs
    ;
 
 callAutomatonConstructorWithNamedArgs
@@ -257,17 +262,17 @@ argPair
 
 constructorDecl
    :   annotationUsage* CONSTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
 destructorDecl
    :   annotationUsage* DESTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (SEMICOLON | L_BRACE functionBody R_BRACE)?
    ;
 
 procDecl
    :   annotationUsage* PROC functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
 /*
@@ -296,21 +301,14 @@ annotationUsage
    :   AT Identifier (L_BRACKET annotationArgs* R_BRACKET)?
    ;
 
-/*
- * declarations between function's header and body-block
- */
-functionPreamble
-   :   preamblePart*
-   ;
-
-preamblePart
+functionContract
    :   requiresContract
    |   ensuresContract
    |   assignsContract
    ;
 
 functionBody
-   :   functionPreamble functionBodyStatements*
+   :   functionContract* functionBodyStatements*
    ;
 
 functionBodyStatements

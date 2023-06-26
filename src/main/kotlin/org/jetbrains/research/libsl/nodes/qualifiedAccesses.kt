@@ -34,14 +34,13 @@ data class VariableAccess(
 }
 
 data class ThisAccess(
-    val fieldName: String = "this",
     override var childAccess: QualifiedAccess?,
     val entityPosition: EntityPosition
 ) : QualifiedAccess() {
     override fun toString(): String = dumpToString()
     override fun dumpToString(): String = buildString {
         append("this")
-        if(childAccess != null) {
+        if (childAccess != null) {
             append(".")
             append(childAccess!!.dumpToString())
         }

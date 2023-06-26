@@ -74,7 +74,7 @@ data class Constructor(
     override val context: FunctionContext,
     override val entityPosition: EntityPosition
 ) : Function(
-    kind = FunctionKind.CONSTRUCTOR, name, null, args, null,
+    kind = FunctionKind.CONSTRUCTOR, name, automatonReference = null, args, returnType = null,
     annotationUsages, contracts,
     statements, hasBody, null, context, false, entityPosition
 )

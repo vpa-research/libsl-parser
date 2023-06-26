@@ -2,7 +2,6 @@ package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.helpers.TypeDumper
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -133,7 +132,7 @@ data class TypeGenericDecl(
 data class StructuredType(
     override val name: String,
     val variables: MutableList<Variable> = mutableListOf(),
-    val functions: MutableList<Function> = mutableListOf(),
+    val functions: MutableList<org.jetbrains.research.libsl.nodes.Function> = mutableListOf(),
     val isTypeIdentifier: String?,
     val forTypeList: MutableList<String> = mutableListOf(),
     val genericDeclBlock: MutableList<TypeGenericDecl>,

@@ -1,9 +1,11 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.references.ActionReference
+import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 import org.jetbrains.research.libsl.utils.EntityPosition
 
-sealed class Statement: Node()
+sealed class Statement : Node()
 
 data class Assignment(
     val left: QualifiedAccess,
@@ -43,48 +45,64 @@ data class ElseStatement(
     }
 }
 
-data class Action(
-    val name: String,
-    val arguments: MutableList<Expression> = mutableListOf(),
+data class ActionUsage(
+    val actionReference: ActionReference,
+    val arguments: List<Expression>,
     val entityPosition: EntityPosition
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        append("action ${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments.isNotEmpty()) {
-            val args = arguments.map { it.dumpToString() }.toMutableList()
-            append(args.joinToString(separator = ", "))
+        append(BackticksPolitics.forIdentifier(actionReference.resolveOrError().name))
+        if (arguments.isNotEmpty()) {
+            append(
+                arguments.joinToString(
+                    prefix = "(",
+                    separator = ", ",
+                    postfix = ")",
+                    transform = Expression::dumpToString
+                )
+            )
         }
-        append(");")
     }
 }
 
 data class ProcedureCall(
+    //val procReference: FunctionReference,
     val name: String,
-    val arguments: MutableList<Expression> = mutableListOf(),
+    val arguments: List<Expression>,
     val entityPosition: EntityPosition
 ) : Statement() {
     override fun dumpToString(): String = buildString {
         append("${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments.isNotEmpty()) {
-            val args = arguments.map { it.dumpToString() }
-            append(args.joinToString(separator = ", "))
+        if (arguments.isNotEmpty()) {
+            append(
+                arguments.joinToString(
+                    prefix = "(",
+                    separator = ", ",
+                    postfix = ")",
+                    transform = Expression::dumpToString
+                )
+            )
         }
-        append(");")
     }
 }
 
 data class FunctionUsage(
-    val name: String,
-    val arguments: MutableList<Expression> = mutableListOf(),
+    val functionReference: FunctionReference,
+    val arguments: List<Expression>,
     val entityPosition: EntityPosition
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        append("${BackticksPolitics.forIdentifier(name)}(")
-        if(arguments.isNotEmpty()) {
-            val args = arguments.map { it.dumpToString() }
-            append(args.joinToString(separator = ", "))
+        append("${BackticksPolitics.forIdentifier(functionReference.resolveOrError().name)}(")
+        if (arguments.isNotEmpty()) {
+            append(
+                arguments.joinToString(
+                    prefix = "(",
+                    separator = ", ",
+                    postfix = ")",
+                    transform = Expression::dumpToString
+                )
+            )
         }
-        append(");")
     }
 }
 

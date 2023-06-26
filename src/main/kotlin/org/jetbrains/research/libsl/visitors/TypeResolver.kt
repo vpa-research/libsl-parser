@@ -7,6 +7,7 @@ import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.type.*
 import org.jetbrains.research.libsl.utils.PositionGetter
 
@@ -173,7 +174,7 @@ class TypeResolver(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)
-        val initValue = ctx.expression()?.let { right -> expressionVisitor.visitExpression(right) }
+        val initValue = ctx.assignmentRight()?.let { right -> expressionVisitor.visitAssignmentRight(right) }
 
         // TODO() Type Context
         return VariableWithInitialValue(

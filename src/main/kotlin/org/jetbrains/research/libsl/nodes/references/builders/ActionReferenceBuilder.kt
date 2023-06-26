@@ -1,20 +1,20 @@
 package org.jetbrains.research.libsl.nodes.references.builders
 
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.ActionDecl
+import org.jetbrains.research.libsl.nodes.Action
 import org.jetbrains.research.libsl.nodes.references.ActionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 
 object ActionReferenceBuilder {
     fun build(
         name: String,
-        paramTypes: List<TypeReference>,
+        argTypes: List<TypeReference>,
         context: LslContextBase
     ): ActionReference {
-        return ActionReference(name, paramTypes, context)
+        return ActionReference(name, argTypes, context)
     }
 
-    fun ActionDecl.getReference(context: LslContextBase): ActionReference {
-        return build(this.name, this.values.map { value -> value.typeReference }, context)
+    fun Action.getReference(context: LslContextBase): ActionReference {
+        return build(this.name, this.argumentDescriptors.map { descr -> descr.typeReference }, context)
     }
 }

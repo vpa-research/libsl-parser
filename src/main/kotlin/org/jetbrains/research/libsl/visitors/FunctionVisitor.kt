@@ -2,18 +2,19 @@ package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.context.FunctionContext
+import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
-import org.jetbrains.research.libsl.utils.EntityPosition
 import org.jetbrains.research.libsl.utils.PositionGetter
 
 class FunctionVisitor(
     private val functionContext: FunctionContext,
     private var parentAutomaton: Automaton?,
+    private val globalContext: LslGlobalContext,
     val errorManager: ErrorManager
 ) : LibSLParserVisitor<Unit>(functionContext) {
     private lateinit var buildingFunction: Function
@@ -46,7 +47,6 @@ class FunctionVisitor(
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
         val targetAutomatonRef = args.getFunctionTargetByAnnotation ?: automatonReference
-
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
@@ -77,9 +77,7 @@ class FunctionVisitor(
 
     override fun visitConstructorDecl(ctx: ConstructorDeclContext) {
         val constructorName = ctx.functionName.text.extractIdentifier()
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
-
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
@@ -98,9 +96,7 @@ class FunctionVisitor(
 
     override fun visitDestructorDecl(ctx: DestructorDeclContext) {
         val destructorName = ctx.functionName.text.extractIdentifier()
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
-
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
@@ -119,18 +115,15 @@ class FunctionVisitor(
 
     override fun visitProcDecl(ctx: ProcDeclContext) {
         val procName = ctx.functionName.text.extractIdentifier()
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
-
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
-
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
             val resultVariable = ResultVariable(
                 returnType,
-                posGetter.getCtxPosition(fileName, ctx)
+                entityPosition = posGetter.getCtxPosition(fileName, ctx)
             )
             context.storeVariable(resultVariable)
         }
@@ -146,6 +139,7 @@ class FunctionVisitor(
         )
 
         super.visitProcDecl(ctx)
+        globalContext.storeFunction(buildingFunction)
         parentAutomaton?.procDeclarations?.add(buildingFunction)
     }
 
@@ -153,99 +147,53 @@ class FunctionVisitor(
         if(parentAutomaton is AutomatonConcept) {
             error("Function realisation inside automaton concept")
         } else {
-            val statements = buildingFunction.statements
-            BlockStatementVisitor(functionContext, statements).visit(ctx)
+            val visitor = BlockStatementVisitor(functionContext)
+            visitor.visit(ctx)
+            val statements = visitor.statements
+            buildingFunction.statements.addAll(statements)
         }
     }
 
-    private val FunctionDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(
-                    parameter.name.text.extractIdentifier(),
-                    typeRef,
-                    i,
-                    annotationsReferences,
-                    targetAutomaton = null,
-                    posGetter.getCtxPosition(fileName, parameter)
-                )
+    private fun getDeclArgs(functionDeclArgList: FunctionDeclArgListContext?): List<FunctionArgument> {
+        return functionDeclArgList?.parameter()?.mapIndexed { i, parameter ->
+            val typeRef = processTypeIdentifier(parameter.type)
+            val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
+            val arg = FunctionArgument(
+                parameter.name.text.extractIdentifier(),
+                typeRef,
+                i,
+                annotationsReferences,
+                null,
+                posGetter.getCtxPosition(fileName, parameter)
+            )
 
-                if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
-                    val targetAutomatonName = typeRef.name
-                    val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
-                    arg.targetAutomaton = targetAutomatonReference
-                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
-                }
-
-                arg
+            if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
+                val targetAutomatonName = typeRef.name
+                val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
+                arg.targetAutomaton = targetAutomatonReference
+                arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
             }
-            .orEmpty()
+
+            arg
+        }.orEmpty()
+    }
+
+    private val FunctionDeclContext.args: List<FunctionArgument>
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val ConstructorDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(
-                    parameter.name.text.extractIdentifier(),
-                    typeRef,
-                    i,
-                    annotationsReferences,
-                    targetAutomaton = null,
-                    posGetter.getCtxPosition(fileName, parameter)
-                )
-                arg
-            }
-            .orEmpty()
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val DestructorDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(
-                    parameter.name.text.extractIdentifier(),
-                    typeRef,
-                    i,
-                    annotationsReferences,
-                    targetAutomaton = null,
-                    posGetter.getCtxPosition(fileName, parameter)
-                )
-                arg
-            }
-            .orEmpty()
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val ProcDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
-                val arg = FunctionArgument(
-                    parameter.name.text.extractIdentifier(),
-                    typeRef,
-                    i,
-                    annotationsReferences,
-                    targetAutomaton = null,
-                    posGetter.getCtxPosition(fileName, parameter)
-                )
-                arg
-            }
-            .orEmpty()
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
             val targetArg = firstOrNull { arg ->
-                arg.annotationUsages.any { it.annotationReference.name == "target"}
+                arg.annotationUsages.any { it.annotationReference.name == "target" }
             } ?: return null
             val automatonName = targetArg.typeReference.name
             return AutomatonReferenceBuilder.build(automatonName, functionContext)

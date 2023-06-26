@@ -4,12 +4,17 @@ import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.TypeIdentifierContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.AnnotationUsage
+import org.jetbrains.research.libsl.nodes.Generic
+import org.jetbrains.research.libsl.nodes.GenericModifier
+import org.jetbrains.research.libsl.nodes.NamedArgumentWithValue
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
-import org.jetbrains.research.libsl.type.*
+import org.jetbrains.research.libsl.type.ArrayType
+import org.jetbrains.research.libsl.type.RealType
+import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.PositionGetter
 
 abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
@@ -78,7 +83,6 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
     private fun getArrayType(ctx: TypeIdentifierContext): ArrayType {
         val typeNameParts = ctx.name.asPeriodSeparatedParts()
         check(typeNameParts[0] == "array" && typeNameParts.size == 1) { "not an array" }
-
         val isPointer = ctx.asterisk != null
         val generics = mutableListOf<Generic>()
 

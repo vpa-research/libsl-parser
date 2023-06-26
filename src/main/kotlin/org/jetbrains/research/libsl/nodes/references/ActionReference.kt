@@ -1,42 +1,28 @@
 package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.ActionDecl
+import org.jetbrains.research.libsl.nodes.Action
 
 data class ActionReference(
     val name: String,
-    val paramTypes: List<TypeReference>,
+    val argTypes: List<TypeReference>,
     override val context: LslContextBase
-) : LslReference<ActionDecl, ActionReference> {
-    override fun resolve(): ActionDecl? {
-        return context.resolveDeclaredAction(this)
+) : LslReference<Action, ActionReference> {
+    override fun resolve(): Action? {
+        return context.resolveAction(this)
     }
 
-    override fun isReferenceMatchWithNode(node: ActionDecl): Boolean {
-        if (node.name != this.name) {
-            return false
-        }
-
-        if (!doParamsMatch(node.values.map { value -> value.typeReference })) {
-            return false
-        }
-
-        return true
-    }
-
+    // todo: Improve a support for overloading
     override fun isSameReference(other: ActionReference): Boolean {
-        return this.name == other.name && doParamsMatch(other.paramTypes)
+        return other.name == this.name && other.argTypes.size == this.argTypes.size
     }
 
-    private fun doParamsMatch(params: List<TypeReference>): Boolean {
-        if (params.size != this.paramTypes.size) {
-            return false
-        }
-
-        return params.withIndex().all { (index, element) -> element.isSameReference(params[index]) }
+    // todo: Improve a support for overloading
+    override fun isReferenceMatchWithNode(node: Action): Boolean {
+        return this.name == node.name && this.argTypes.size == node.argumentDescriptors.size
     }
 
     override fun toString(): String {
-        return "ActionReference(name: $name, paramTypes:$paramTypes)"
+        return "ActionReference($name)"
     }
 }

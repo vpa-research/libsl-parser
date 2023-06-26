@@ -11,7 +11,10 @@ enum class ArithmeticUnaryOp(val string: String) {
     PLUS("+"), MINUS("-"), INVERSION("!"), TILDE("~");
 
     companion object {
-        fun fromString(str: String) = ArithmeticUnaryOp.values().first { op -> op.string == str }
+        fun fromString(str: String) = ArithmeticUnaryOp.values().firstOrNull { op ->
+            op.string == str }
+            ?: throw NoSuchElementException("Unknown operator: $str")
+
     }
 }
 
@@ -78,10 +81,14 @@ class FunctionArgument(
             )
             append(IPrinter.SPACE)
         }
+
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
-
-        append(typeReference.name)
+        if (targetAutomaton != null) {
+            append(targetAutomaton!!.name)
+        } else {
+            append(typeReference.name)
+        }
     }
 }
 
@@ -93,22 +100,6 @@ class ActionParameter(
     var annotation: AnnotationReference? = null,
     override val entityPosition: EntityPosition
 ) : Variable(name, typeReference, entityPosition)
-
-@Suppress("MemberVisibilityCanBePrivate")
-class DeclaredActionParameter(
-    name: String,
-    typeReference: TypeReference,
-    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-    override val entityPosition: EntityPosition
-) : Variable(name, typeReference, entityPosition) {
-    override fun dumpToString(): String = buildString {
-        if (annotationUsages.isNotEmpty()) {
-            append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
-            append(IPrinter.SPACE)
-        }
-        append("${BackticksPolitics.forIdentifier(name)}: ${typeReference.name}")
-    }
-}
 
 class ConstructorArgument(
     val keyword: VariableKind,

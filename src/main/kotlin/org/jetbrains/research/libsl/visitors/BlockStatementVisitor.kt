@@ -3,13 +3,12 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.utils.EntityPosition
 import org.jetbrains.research.libsl.utils.PositionGetter
 
 class BlockStatementVisitor(
-    private val functionContext: FunctionContext,
-    private val statements: MutableList<Statement>
-    ) : LibSLParserVisitor<Unit>(functionContext) {
+    private val functionContext: FunctionContext
+) : LibSLParserVisitor<Unit>(functionContext) {
+    val statements: MutableList<Statement> = mutableListOf()
     private val fileName = context.fileName
     private val posGetter = PositionGetter()
 
@@ -26,7 +25,7 @@ class BlockStatementVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
         val op = AssignOps.fromString(ctx.op.text)
-        val value = expressionVisitor.visitExpression(ctx.expression())
+        val value = ctx.assignmentRight().let { expressionVisitor.visitAssignmentRight(it) }
         val assignment = Assignment(
             left,
             op,
@@ -40,15 +39,14 @@ class BlockStatementVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val value = expressionVisitor.visitExpression(ifCtx.expression())
 
-        val ifStatements = mutableListOf<Statement>()
-        val ifStatementVisitor = BlockStatementVisitor(functionContext, ifStatements)
+        val ifStatementVisitor = BlockStatementVisitor(functionContext)
         ifCtx.functionBodyStatements().forEach { ifStatementVisitor.visit(it) }
+        val ifStatements = ifStatementVisitor.statements
 
         val elseStatement = ifCtx.elseStatement()?.let { elseStmt ->
-            val elseStatements = mutableListOf<Statement>()
-            val elseStatementsVisitor = BlockStatementVisitor(functionContext, elseStatements)
+            val elseStatementsVisitor = BlockStatementVisitor(functionContext)
             elseStmt.functionBodyStatements().forEach { elseStatementsVisitor.visit(it) }
-
+            val elseStatements = elseStatementsVisitor.statements
             ElseStatement(
                 elseStatements,
                 posGetter.getCtxPosition(fileName, ifCtx)
@@ -70,9 +68,9 @@ class BlockStatementVisitor(
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)
-        val initValue = ctx.expression()?.let { right -> expressionVisitor.visitExpression(right) }
+        val initValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
 
-        val variable = VariableWithInitialValue(
+            val variable = VariableWithInitialValue(
             keyword,
             name,
             typeReference,

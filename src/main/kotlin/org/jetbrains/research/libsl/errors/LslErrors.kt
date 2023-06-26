@@ -15,7 +15,8 @@ open class UnresolvedReference(
     override val position: Position,
     val kind: ReferenceKind
 ) : LslError {
-    override fun toString(): String = "Unresolved reference of kind $kind with name $text on position ${position.string}"
+    override fun toString(): String =
+        "Unresolved reference of kind $kind with name $text on position ${position.string}"
 }
 
 class UnresolvedVariable(
@@ -73,7 +74,8 @@ class MoreThanOneTypesSection(
     override val position: Position
 ) : LslError {
     override val text: String = ""
-    override fun toString(): String = "Only one `types` section must be provided. Another one provided at ${position.string}"
+    override fun toString(): String =
+        "Only one `types` section must be provided. Another one provided at ${position.string}"
 }
 
 class UnresolvedImportOrInclude(

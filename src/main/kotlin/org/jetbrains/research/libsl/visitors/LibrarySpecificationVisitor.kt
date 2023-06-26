@@ -131,7 +131,7 @@ class LibrarySpecificationVisitor(
     }
 
     private fun representDeclaredActionsFromContextInLibrary() {
-        val declaredActions = globalContext.getAllDeclaredActions()
-        library.declaredActionReferences.addAll(declaredActions.map { action -> action.getReference(context) })
+        val actions = globalContext.getAllDeclaredActions()
+        library.actionReferences.addAll(actions.map { action -> action.getReference(context) })
     }
 }

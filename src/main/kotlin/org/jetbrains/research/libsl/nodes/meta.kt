@@ -15,18 +15,18 @@ data class Library(
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
     val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
     val annotationReferences: MutableList<AnnotationReference> = mutableListOf(),
-    val declaredActionReferences: MutableList<ActionReference> = mutableListOf()
+    val actionReferences: MutableList<ActionReference> = mutableListOf(),
 ) : Node() {
     val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }
     val automata: List<Automaton>
         get() = automataReferences.map { it.resolveOrError() }
-    val annotations: List<Annotation>
+    private val annotations: List<Annotation>
         get() = annotationReferences.map { it.resolveOrError() }
-    val globalVariables: List<Variable>
+    private val globalVariables: List<Variable>
         get() = globalVariableReferences.map { it.resolveOrError() }
-    val declaredActions: List<ActionDecl>
-        get() = declaredActionReferences.map { it.resolveOrError() }
+    private val actions: List<Action>
+        get() = actionReferences.map { it.resolveOrError() }
     val importedAutomataMap: Map<String, List<Automaton>>
         get() = importsMap.mapValues { (_, library) -> library.automata }
     val importedSemanticTypesMap: Map<String, List<Type>>
@@ -93,8 +93,8 @@ data class Library(
     }
 
     private fun formatActionDeclarations(): String = buildString {
-        declaredActions.forEach { declaredAction ->
-            append(declaredAction.dumpToString())
+        actions.forEach { action ->
+            append(action.dumpToString())
         }
     }
 

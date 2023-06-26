@@ -1,20 +1,15 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.ActionUsageContext
-import org.jetbrains.research.libsl.LibSLParser.ArrayLiteralContext
-import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
-import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
-import org.jetbrains.research.libsl.LibSLParser.ProcUsageContext
-import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
-import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
+import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.references.builders.ActionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonStateReferenceBuilder
+import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceBuilder
-import org.jetbrains.research.libsl.utils.EntityPosition
 import org.jetbrains.research.libsl.utils.PositionGetter
 
 class ExpressionVisitor(
@@ -292,8 +287,7 @@ class ExpressionVisitor(
         }
 
         return names.dropLast(1).foldRight(lastAccess) { name, access ->
-            val childAccess = when(name) {
-
+            val childAccess = when (name) {
                 "this" -> ThisAccess(
                     childAccess = access,
                     entityPosition = posGetter.getCtxPosition(fileName, periodSeparatedFullNameContext)
@@ -375,7 +369,17 @@ class ExpressionVisitor(
         )
     }
 
-    override fun visitActionUsage(ctx: ActionUsageContext): Expression  {
+    override fun visitAssignmentRight(ctx: AssignmentRightContext): Expression {
+        return when {
+            ctx.expression() != null -> visitExpression(ctx.expression())
+            ctx.callAutomatonConstructorWithNamedArgs() != null -> {
+                visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
+            }
+            else -> error("unknown assignment right kind")
+        }
+    }
+
+    override fun visitActionUsage(ctx: ActionUsageContext): Expression {
         val name = ctx.Identifier().text.extractIdentifier()
         for (c in name) {
             if(c.isLowerCase()) {
@@ -388,14 +392,17 @@ class ExpressionVisitor(
             ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
         }
 
-        val action = Action(
-            name,
+        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+        val actionRef = ActionReferenceBuilder.build(name, argTypes, context)
+
+        val actionUsage = ActionUsage(
+            actionRef,
             args,
             posGetter.getCtxPosition(fileName, ctx)
         )
 
         return ActionExpression(
-            action,
+            actionUsage,
             posGetter.getCtxPosition(fileName, ctx)
         )
     }
@@ -407,36 +414,24 @@ class ExpressionVisitor(
         if(ctx.expressionsList() != null) {
             ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
         }
-        val procedureCall = ProcedureCall(
+        //val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+        //val procRef = FunctionReferenceBuilder.build(name, argTypes, context)
+
+        val procCall = ProcedureCall(
+            //procRef,
             name,
             args,
             posGetter.getCtxPosition(fileName, ctx)
         )
 
-        println(context.getAllFunctions())
-
         return ProcExpression(
-            procedureCall,
+            procCall,
             posGetter.getCtxPosition(fileName, ctx)
         )
     }
 
-    override fun visitUnaryOp(ctx: LibSLParser.UnaryOpContext): Expression {
-        val op = when {
-            ctx.PLUS() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.PLUS().text)
-            }
-            ctx.EXCLAMATION() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.EXCLAMATION().text)
-            }
-            ctx.MINUS() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.MINUS().text)
-            }
-            ctx.TILDE() != null -> let {
-                ArithmeticUnaryOp.fromString(ctx.TILDE().text)
-            }
-            else -> error("unknown unary op expression")
-        }
+    override fun visitUnaryOp(ctx: UnaryOpContext): Expression {
+        val op = ArithmeticUnaryOp.fromString(ctx.op.text)
 
         val value = visitExpression(ctx.expression())
         return UnaryOpExpression(

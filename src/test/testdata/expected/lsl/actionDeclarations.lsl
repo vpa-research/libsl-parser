@@ -4,10 +4,16 @@ typealias Int = int32;
 annotation Something;
 annotation Ann;
 @Something
-define action SUM(@Ann x: Int, y: Int): Int;
+define action SUM(
+    x: Int,
+    y: Int
+): Int;
 @Something
-define action NO_RETURN(@Ann x: Int, @Ann y: Int);
-define action NO_ARGS(): Int;
+define action NO_RETURN(
+    x: Int,
+    y: Int
+);
+define action NO_ARGS: Int;
 automaton A : Int {
     var x: Int = 1;
     var y: Int = 2;

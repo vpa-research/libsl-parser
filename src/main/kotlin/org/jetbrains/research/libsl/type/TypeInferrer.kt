@@ -34,11 +34,13 @@ class TypeInferrer(private val context: LslContextBase) {
             is HasAutomatonConcept -> BoolType(context)
             is NamedArgumentWithValue -> getExpressionType(expression.value)
             is TypeOperationExpression -> getExpressionType(expression.expression)
-
-            // TODO("Action type")
-            is ActionExpression -> anyType
-            is ProcExpression -> anyType
-            is FunctionUsageExpression -> anyType
+            is ActionExpression -> expression.actionUsage.actionReference.resolveOrError().returnType?.resolveOrError()
+                ?: VoidType(context)
+            // is ProcExpression -> expression.procedureCall.procReference.resolveOrError().returnType?.resolveOrError()
+            // ?: VoidType(context)
+            is ProcExpression -> VoidType(context)
+            is FunctionUsageExpression -> expression.functionUsage.functionReference.resolveOrError().returnType?.resolveOrError()
+                ?: VoidType(context)
         }
     }
 

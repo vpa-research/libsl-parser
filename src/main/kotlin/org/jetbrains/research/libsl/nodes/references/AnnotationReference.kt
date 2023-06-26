@@ -3,7 +3,7 @@ package org.jetbrains.research.libsl.nodes.references
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.Annotation
 
-data class AnnotationReference (
+data class AnnotationReference(
     val name: String,
     val argTypes: List<TypeReference>,
     override val context: LslContextBase
