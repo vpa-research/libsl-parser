@@ -3,8 +3,18 @@ library simple;
 
 typealias Int=int32;
 
-automaton A : Int {
-    fun f(@annotation param: Int);
+annotation Something;
+annotation Public;
+annotation Anno(
+    x: Int,
+    y: Int,
+);
 
-    fun g(@anno(1, "12") param: Int)
+automaton A : Int {
+
+    @Public
+    fun f(@Anno(1, 12) param: Int);
+
+    @Public
+    fun g(@Anno(1, 12) param: Int, @Something value: Int);
 }

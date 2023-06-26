@@ -1,8 +1,8 @@
 package org.jetbrains.research.libsl.nodes
 
-abstract class ExpressionVisitor <T> {
+abstract class ExpressionVisitor<T> {
     open fun visit(node: Expression): T {
-        return when(node) {
+        return when (node) {
             is BoolLiteral -> visitBool(node)
             is CallAutomatonConstructor -> visitCallAutomatonConstructor(node)
             is FloatLiteral -> visitFloatNumber(node)
@@ -19,6 +19,9 @@ abstract class ExpressionVisitor <T> {
             is ResultVariable -> visitResultVariable(node)
             is Variable -> visitVariable(node)
             is ArrayLiteral -> visitArrayLiteral(node)
+            is ActionExpression -> visitActionExpression(node)
+            is ProcExpression -> visitProcExpression(node)
+            is ThisAccess -> visitThisAccess(node)
         }
     }
 
@@ -53,4 +56,10 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitVariable(node: Variable): T
 
     abstract fun visitArrayLiteral(node: ArrayLiteral): T
+
+    abstract fun visitActionExpression(node: ActionExpression): T
+
+    abstract fun visitProcExpression(node: ProcExpression): T
+
+    abstract fun visitThisAccess(node: ThisAccess): T
 }

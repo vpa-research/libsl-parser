@@ -3,6 +3,7 @@ library simple;
 types {
     Int(int32);
 }
+
 automaton A : Int {
     state s1;
     state s2;

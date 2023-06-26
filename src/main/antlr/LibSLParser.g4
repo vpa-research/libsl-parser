@@ -22,6 +22,8 @@ globalStatement
    |   typealiasStatement
    |   typeDefBlock
    |   enumBlock
+   |   annotationDecl
+   |   actionDecl
    |   topLevelDecl
    ;
 
@@ -100,19 +102,60 @@ enumSemanticType
    ;
 
 enumSemanticTypeEntry
-   :    Identifier COLON expressionAtomic SEMICOLON
+   :   Identifier COLON expressionAtomic SEMICOLON
+   ;
+
+/* annotation declaration
+ * syntax: annotation Something(
+ *             variable1: int = 0,
+ *             variable2: int = 1
+ *         );
+ */
+annotationDecl
+   :   ANNOTATION name=Identifier annotationDeclParams? SEMICOLON
+   ;
+
+annotationDeclParams
+   :   L_BRACKET annotationDeclParamsPart (COMMA annotationDeclParamsPart)* (COMMA)? R_BRACKET
+   ;
+
+annotationDeclParamsPart
+   :   nameWithType (ASSIGN_OP expression)?
+   ;
+
+actionDecl
+   :   annotationUsage*
+   DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   ;
+
+actionDeclParamList
+   :   actionParameter (COMMA actionParameter)* (COMMA)?
+   ;
+
+actionParameter
+   :   annotationUsage* name=Identifier COLON type=typeIdentifier
    ;
 
 /* automaton declaration
- * syntax: automaton Name [(constructor vars)] : type { statement1; statement2; ... }
+ * syntax: [@Annotation1(param: type)
+ *         @Annotation2(param: type]
+ *         automaton Name [(constructor vars)] : type { statement1; statement2; ... }
  */
 automatonDecl
-   :   AUTOMATON name=periodSeparatedFullName (L_BRACKET VAR nameWithType (COMMA VAR nameWithType)* R_BRACKET)? COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   :   annotationUsage* AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
+   COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   ;
+
+constructorVariables
+   :   annotationUsage* keyword=(VAR|VAL) nameWithType (COMMA)?
    ;
 
 automatonStatement
    :   automatonStateDecl
    |   automatonShiftDecl
+   |   constructorDecl
+   |   destructorDecl
+   |   procDecl
    |   functionDecl
    |   variableDecl
    ;
@@ -147,8 +190,8 @@ functionsListPart
  * syntax: var NAME [= { new AutomatonName(args); atomic }]
  */
 variableDecl
-   :   VAR nameWithType SEMICOLON
-   |   VAR nameWithType ASSIGN_OP assignmentRight SEMICOLON
+   :   annotationUsage* keyword=(VAR|VAL) nameWithType SEMICOLON
+   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 nameWithType
@@ -163,16 +206,19 @@ typeIdentifier
    ;
 
 variableAssignment
-   :   qualifiedAccess ASSIGN_OP assignmentRight SEMICOLON
+   :   qualifiedAccess op=ASSIGN_OP assignmentRight SEMICOLON
+   |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) assignmentRight SEMICOLON
    ;
 
 assignmentRight
    :   expression
-   |   NEW callAutomatonConstructorWithNamedArgs
+   |   callAutomatonConstructorWithNamedArgs
    ;
 
 callAutomatonConstructorWithNamedArgs
-   :   name=periodSeparatedFullName L_BRACKET (namedArgs)? R_BRACKET
+   :   NEW name=periodSeparatedFullName L_BRACKET (namedArgs)? R_BRACKET
    ;
 
 namedArgs
@@ -184,14 +230,30 @@ argPair
    |   name=Identifier ASSIGN_OP expression
    ;
 
+constructorDecl
+   :   annotationUsage* CONSTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
+   ;
+
+destructorDecl
+   :   annotationUsage* DESTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
+   (SEMICOLON | L_BRACE functionBody R_BRACE)?
+   ;
+
+procDecl
+   :   annotationUsage* PROC functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
+   ;
+
 /*
- * syntax: fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
+ * syntax: @Annotation
+ *         fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
-   L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   :   annotationUsage* FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
+   (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
    ;
 
 functionDeclArgList
@@ -199,47 +261,58 @@ functionDeclArgList
    ;
 
 parameter
-   :   annotation? name=Identifier COLON type=typeIdentifier
+   :   annotationUsage* name=Identifier COLON type=typeIdentifier
    ;
 
 /* annotation
  * syntax: @annotationName(args)
  */
-annotation
+annotationUsage
    :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
    ;
 
 /*
  * declarations between function's header and body-block
  */
-functionPreamble
-   :   preamblePart*
-   ;
 
-preamblePart
+functionContract
    :   requiresContract
    |   ensuresContract
    |   assignsContract
    ;
 
 functionBody
-   :   functionBodyStatements*
+   :   functionContract* functionBodyStatements*
    ;
 
 functionBodyStatements
    :   variableAssignment
-   |   action
+   |   variableDecl
+   |   ifStatement
+   |   expression SEMICOLON
+   ;
+
+ifStatement
+   :   IF expression L_BRACE functionBodyStatements* R_BRACE (elseStatement)?
+   ;
+
+elseStatement
+   :   ELSE L_BRACE functionBodyStatements* R_BRACE
    ;
 
 /* semantic action
  * syntax: action ActionName(args)
  */
-action
-   :  ACTION Identifier L_BRACKET expressionsList R_BRACKET SEMICOLON
+actionUsage
+   :  ACTION Identifier L_BRACKET expressionsList? R_BRACKET
+   ;
+
+procUsage
+   :  qualifiedAccess L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList
-   :   expression (COMMA expression)* COMMA?
+   :   expression (COMMA expression)* (COMMA)?
    ;
 
 /* requires contract
@@ -271,13 +344,41 @@ expression
    |   expression op=(ASTERISK | SLASH) expression
    |   expression op=PERCENT expression
    |   expression op=(PLUS | MINUS) expression
-   |   op=MINUS expression
-   |   op=EXCLAMATION expression
-   |   expression op=(EQ | NOT_EQ | LESS_EQ | L_ARROW | GREAT_EQ | R_ARROW) expression
-   |   expression op=(AND | OR | XOR) expression
+   |   expression op=(EQ | EXCLAMATION_EQ | L_ARROW_EQ | L_ARROW | R_ARROW_EQ | R_ARROW) expression
+   |   expression op=(AMPERSAND | BIT_OR | XOR) expression
+   |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
+   |   expression bitShiftOp expression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
+   |   unaryOp
+   |   procUsage
+   |   actionUsage
+   ;
+
+bitShiftOp
+   :   lShift
+   |   rShift
+   |   uRShift
+   ;
+
+lShift
+   :   L_ARROW L_ARROW
+   ;
+
+rShift
+   :   R_ARROW R_ARROW
+   ;
+
+uRShift
+   :   R_ARROW R_ARROW R_ARROW
+   ;
+
+unaryOp
+   :   op=PLUS expression
+   |   op=MINUS expression
+   |   op=EXCLAMATION expression
+   |   op=TILDE expression
    ;
 
 expressionAtomic

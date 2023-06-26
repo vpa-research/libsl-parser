@@ -6,13 +6,28 @@ import org.junit.jupiter.api.Test
 
 class GeneratedTests {
     @Test
+    fun testActionDeclarationsLsl() {
+        runLslTest("actionDeclarations")
+    }
+
+    @Test
     fun testActionsLsl() {
         runLslTest("actions")
     }
 
     @Test
+    fun testAnnotationDeclarationLsl() {
+        runLslTest("annotationDeclaration")
+    }
+
+    @Test
     fun testAnnotationsLsl() {
         runLslTest("annotations")
+    }
+
+    @Test
+    fun testAutomatonAnnotationsLsl() {
+        runLslTest("automatonAnnotations")
     }
 
     @Test
@@ -28,6 +43,16 @@ class GeneratedTests {
     @Test
     fun testCastAutomatonLsl() {
         runLslTest("castAutomaton")
+    }
+
+    @Test
+    fun testCommentsLsl() {
+        runLslTest("comments")
+    }
+
+    @Test
+    fun testConstructorsAndDestructorsLsl() {
+        runLslTest("constructorsAndDestructors")
     }
 
     @Test
@@ -61,8 +86,23 @@ class GeneratedTests {
     }
 
     @Test
+    fun testExpressionsLsl() {
+        runLslTest("expressions")
+    }
+
+    @Test
+    fun testFunctionAnnotationsLsl() {
+        runLslTest("functionAnnotations")
+    }
+
+    @Test
     fun testGlobalVariablesLsl() {
         runLslTest("globalVariables")
+    }
+
+    @Test
+    fun testIfElseLsl() {
+        runLslTest("ifElse")
     }
 
     @Test
@@ -81,13 +121,38 @@ class GeneratedTests {
     }
 
     @Test
+    fun testNewVariablesLsl() {
+        runLslTest("newVariables")
+    }
+
+    @Test
+    fun testOperatorsLsl() {
+        runLslTest("operators")
+    }
+
+    @Test
+    fun testParentAutomatonLsl() {
+        runLslTest("parentAutomaton")
+    }
+
+    @Test
     fun testPrimitiveTypesLsl() {
         runLslTest("primitiveTypes")
     }
 
     @Test
+    fun testProcLsl() {
+        runLslTest("proc")
+    }
+
+    @Test
     fun testQualifiedAccessesLsl() {
         runLslTest("qualifiedAccesses")
+    }
+
+    @Test
+    fun testShiftSquareBracketsLsl() {
+        runLslTest("shiftSquareBrackets")
     }
 
     @Test
@@ -111,8 +176,18 @@ class GeneratedTests {
     }
 
     @Test
+    fun testThisLsl() {
+        runLslTest("this")
+    }
+
+    @Test
     fun testTypesLsl() {
         runLslTest("types")
+    }
+
+    @Test
+    fun testVariableAnnotationsLsl() {
+        runLslTest("variableAnnotations")
     }
 
     @Test
@@ -121,9 +196,7 @@ class GeneratedTests {
     }
 
     @Test
-    fun testShiftSquareBrackets() {
-        runLslTest("shiftSquareBrackets")
+    fun testVoidAndAnyLsl() {
+        runLslTest("voidAndAny")
     }
-
 }
-

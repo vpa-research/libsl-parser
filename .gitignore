@@ -9,3 +9,5 @@
 /.idea/vcs.xml
 /.idea/workspace.xml
 /.gradle/
+/.idea/codeStyles/
+/.idea/kotlinc.xml

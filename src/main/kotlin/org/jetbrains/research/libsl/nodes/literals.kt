@@ -10,9 +10,7 @@ data class FloatLiteral(
 
 data class StringLiteral(
     override val value: String
-) : Atomic() {
-    override fun dumpToString(): String = "\"$value\""
-}
+) : Atomic()
 
 data class BoolLiteral(
     override val value: Boolean

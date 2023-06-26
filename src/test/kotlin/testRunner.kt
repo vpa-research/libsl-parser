@@ -102,18 +102,34 @@ private fun checkAutomatonIsResolved(automaton: Automaton) {
 }
 
 private fun checkFunctionIsResolved(function: Function) {
-    function.statements.forEach { statement ->
-        when (statement) {
-            is Action -> {}
-            is Assignment -> {
-                function.context.typeInferrer.getExpressionType(statement.left)
-                function.context.typeInferrer.getExpressionType(statement.value)
-            }
-        }
-    }
+    checkStatementIsResolved(function, function.statements)
 
     function.returnType?.resolveOrError()
     function.args.forEach { arg -> arg.typeReference.resolveOrError() }
+}
+
+private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
+    for (s in statements) {
+        when (s) {
+            is ActionUsage -> {s.actionReference.resolveOrError()}
+            is ProcedureCall -> {s.procReference.resolveOrError()}
+            is VariableDeclaration -> {s.variable.typeReference.resolveOrError()}
+            is Assignment -> {
+                function.context.typeInferrer.getExpressionType(s.left)
+                function.context.typeInferrer.getExpressionType(s.value)
+            }
+            is ElseStatement -> checkStatementIsResolved(function, s.statements)
+            is IfStatement -> {
+                checkStatementIsResolved(function, s.ifStatements)
+                s.elseStatements?.let {
+                    checkStatementIsResolved(function, it.statements)
+                }
+            }
+            is ExpressionStatement -> {
+                function.context.typeInferrer.getExpressionType(s.expression)
+            }
+        }
+    }
 }
 
 private fun checkTypeIsResolved(type: Type) {
@@ -126,7 +142,7 @@ private fun checkTypeIsResolved(type: Type) {
         is PrimitiveType -> {}
         is RealType -> {}
         is StructuredType -> {
-            type.entries.forEach{ entryType -> entryType.value.resolveOrError()}
+            type.entries.forEach { entryType -> entryType.value.resolveOrError() }
         }
     }
 }

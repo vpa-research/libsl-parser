@@ -1,14 +1,11 @@
 package org.jetbrains.research.libsl.visitors
 
-import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.AnnotationContext
-import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
-import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
+import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.context.FunctionContext
+import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnspecifiedAutomaton
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
@@ -17,6 +14,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReference
 class FunctionVisitor(
     private val functionContext: FunctionContext,
     private var parentAutomaton: Automaton?,
+    private val globalContext: LslGlobalContext,
     val errorManager: ErrorManager
 ) : LibSLParserVisitor<Unit>(functionContext) {
     private lateinit var buildingFunction: Function
@@ -30,8 +28,8 @@ class FunctionVisitor(
 
         check((automatonName != null) xor (parentAutomaton != null))
 
-
-        val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) } ?: parentAutomaton?.getReference(functionContext)
+        val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) }
+            ?: parentAutomaton?.getReference(functionContext)
         check(automatonReference != null)
 
         if (automatonName != null) {
@@ -39,12 +37,11 @@ class FunctionVisitor(
         }
 
         val functionName = ctx.functionName.text.extractIdentifier()
-
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
         val targetAutomatonRef = args.getFunctionTargetByAnnotation ?: automatonReference
-
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
 
         if (returnType != null) {
@@ -53,10 +50,12 @@ class FunctionVisitor(
         }
 
         buildingFunction = Function(
+            kind = FunctionKind.FUNCTION,
             functionName,
             automatonReference,
             args,
             returnType,
+            annotationReferences,
             hasBody = ctx.functionBody() != null,
             targetAutomatonRef = targetAutomatonRef,
             context = functionContext
@@ -66,57 +65,121 @@ class FunctionVisitor(
         parentAutomaton?.localFunctions?.add(buildingFunction)
     }
 
-    private val FunctionDeclContext.args: List<FunctionArgument>
-        get() = this
-            .functionDeclArgList()
-            ?.parameter()
-            ?.mapIndexed { i, parameter ->
-                val typeRef = processTypeIdentifier(parameter.type)
-                val annotation = processAnnotation(parameter.annotation())
-                val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotation)
-                if (annotation != null && annotation.name == "target") {
-                    val targetAutomatonName = typeRef.name
-                    val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
-                    arg.targetAutomaton = targetAutomatonReference
-                    arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
-                }
+    override fun visitConstructorDecl(ctx: ConstructorDeclContext) {
+        val constructorName = ctx.functionName.text.extractIdentifier()
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+        val args = ctx.args.toMutableList()
+        args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
-                arg
-            }
-            .orEmpty()
+        buildingFunction = Constructor(
+            constructorName,
+            args,
+            annotationReferences,
+            hasBody = ctx.functionBody() != null,
+            context = functionContext
+        )
 
-    private fun processAnnotation(ctx: AnnotationContext?): Annotation? {
-        ctx ?: return null
+        super.visitConstructorDecl(ctx)
+        parentAutomaton?.constructors?.add(buildingFunction)
+    }
 
-        val name = ctx.Identifier().asPeriodSeparatedString()
-        val expressionVisitor = ExpressionVisitor(functionContext)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.orEmpty().toMutableList()
+    override fun visitDestructorDecl(ctx: DestructorDeclContext) {
+        val destructorName = ctx.functionName.text.extractIdentifier()
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+        val args = ctx.args.toMutableList()
+        args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
-        if (name == "target") {
-            return TargetAnnotation()
+        buildingFunction = Destructor(
+            destructorName,
+            args,
+            annotationReferences,
+            hasBody = ctx.functionBody() != null,
+            context = functionContext
+        )
+
+        super.visitDestructorDecl(ctx)
+        parentAutomaton?.destructors?.add(buildingFunction)
+    }
+
+    override fun visitProcDecl(ctx: ProcDeclContext) {
+        val procName = ctx.functionName.text.extractIdentifier()
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+        val args = ctx.args.toMutableList()
+        args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
+        val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
+
+        if (returnType != null) {
+            val resultVariable = ResultVariable(returnType)
+            context.storeVariable(resultVariable)
         }
 
-        return Annotation(name, args)
+        buildingFunction = Procedure(
+            procName,
+            args,
+            returnType,
+            annotationReferences,
+            hasBody = ctx.functionBody() != null,
+            context = functionContext
+        )
+
+        super.visitProcDecl(ctx)
+        globalContext.storeFunction(buildingFunction)
+        parentAutomaton?.procDeclarations?.add(buildingFunction)
     }
+
+    override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
+        val visitor = BlockStatementVisitor(functionContext)
+        visitor.visit(ctx)
+        val statements = visitor.statements
+        buildingFunction.statements.addAll(statements)
+    }
+
+    private fun getDeclArgs(functionDeclArgList: FunctionDeclArgListContext?): List<FunctionArgument> {
+        return functionDeclArgList?.parameter()?.mapIndexed { i, parameter ->
+            val typeRef = processTypeIdentifier(parameter.type)
+            val annotationsReferences = getAnnotationUsages(parameter.annotationUsage())
+            val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i, annotationsReferences)
+            if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
+                val targetAutomatonName = typeRef.name
+                val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
+                arg.targetAutomaton = targetAutomatonReference
+                arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
+            }
+
+            arg
+        }.orEmpty()
+    }
+
+    private val FunctionDeclContext.args: List<FunctionArgument>
+        get() = getDeclArgs(this.functionDeclArgList())
+
+    private val ConstructorDeclContext.args: List<FunctionArgument>
+        get() = getDeclArgs(this.functionDeclArgList())
+
+    private val DestructorDeclContext.args: List<FunctionArgument>
+        get() = getDeclArgs(this.functionDeclArgList())
+
+    private val ProcDeclContext.args: List<FunctionArgument>
+        get() = getDeclArgs(this.functionDeclArgList())
 
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
-            val targetArg = firstOrNull { arg -> arg.annotation?.name == "target" } ?: return null
+            val targetArg = firstOrNull { arg ->
+                arg.annotationUsages.any { it.annotationReference.name == "target" }
+            } ?: return null
             val automatonName = targetArg.typeReference.name
             return AutomatonReferenceBuilder.build(automatonName, functionContext)
         }
 
-    override fun visitEnsuresContract(ctx: LibSLParser.EnsuresContractContext) {
+    override fun visitEnsuresContract(ctx: EnsuresContractContext) {
         processContract(ctx.name?.text?.extractIdentifier(), ContractKind.ENSURES, ctx.expression())
     }
 
-    override fun visitRequiresContract(ctx: LibSLParser.RequiresContractContext) {
+    override fun visitRequiresContract(ctx: RequiresContractContext) {
         processContract(ctx.name?.text?.extractIdentifier(), ContractKind.REQUIRES, ctx.expression())
     }
 
-    override fun visitAssignsContract(ctx: LibSLParser.AssignsContractContext) {
+    override fun visitAssignsContract(ctx: AssignsContractContext) {
         processContract(ctx.name?.text?.extractIdentifier(), ContractKind.ASSIGNS, ctx.expression())
     }
 
@@ -126,25 +189,5 @@ class FunctionVisitor(
 
         val contract = Contract(name, expression, kind)
         buildingFunction.contracts.add(contract)
-    }
-
-    override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext) {
-        val expressionVisitor = ExpressionVisitor(functionContext)
-        val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
-        val value = expressionVisitor.visitAssignmentRight(ctx.assignmentRight())
-        val assignment = Assignment(left, value)
-
-        buildingFunction.statements.add(assignment)
-    }
-
-    override fun visitAction(ctx: LibSLParser.ActionContext) {
-        val name = ctx.Identifier().text.extractIdentifier()
-        val expressionVisitor = ExpressionVisitor(functionContext)
-        val args = ctx.expressionsList().expression().map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.toMutableList()
-
-        val action = Action(name, args)
-        buildingFunction.statements.add(action)
     }
 }

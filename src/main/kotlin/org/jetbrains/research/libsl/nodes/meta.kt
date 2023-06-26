@@ -1,12 +1,8 @@
 package org.jetbrains.research.libsl.nodes
 
-import org.jetbrains.research.libsl.nodes.references.AutomatonReference
-import org.jetbrains.research.libsl.nodes.references.FunctionReference
-import org.jetbrains.research.libsl.nodes.references.TypeReference
-import org.jetbrains.research.libsl.nodes.references.VariableReference
+import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
-
 
 data class Library(
     val metadata: MetaNode,
@@ -15,14 +11,20 @@ data class Library(
     val semanticTypesReferences: MutableList<TypeReference> = mutableListOf(),
     val automataReferences: MutableList<AutomatonReference> = mutableListOf(),
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
-    val globalVariableReferences: MutableList<VariableReference> = mutableListOf()
+    val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
+    val annotationReferences: MutableList<AnnotationReference> = mutableListOf(),
+    val actionReferences: MutableList<ActionReference> = mutableListOf(),
 ) : Node() {
     private val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }
     private val automata: List<Automaton>
         get() = automataReferences.map { it.resolveOrError() }
+    private val annotations: List<Annotation>
+        get() = annotationReferences.map { it.resolveOrError() }
     private val globalVariables: List<Variable>
         get() = globalVariableReferences.map { it.resolveOrError() }
+    private val actions: List<Action>
+        get() = actionReferences.map { it.resolveOrError() }
 
     override fun dumpToString(): String = buildString {
         appendLine(metadata.dumpToString())
@@ -31,15 +33,28 @@ data class Library(
         append(formatTopLevelSemanticTypes())
         append(formatSemanticTypeBlock())
         append(formatGlobalVariables())
+        append(formatDeclaredAnnotations())
+        append(formatActionDeclarations())
         append(formatAutomata())
+        appendLine()
     }
 
     private fun formatImports(): String {
-        return simpleCollectionFormatter(imports, prefix = "import${IPrinter.SPACE}", suffix = ";", addEmptyLastLine = true)
+        return simpleCollectionFormatter(
+            imports,
+            prefix = "import${IPrinter.SPACE}",
+            suffix = ";",
+            addEmptyLastLine = true
+        )
     }
 
     private fun formatIncludes(): String {
-        return simpleCollectionFormatter(includes, prefix = "include${IPrinter.SPACE}", suffix = ";", addEmptyLastLine = true)
+        return simpleCollectionFormatter(
+            includes,
+            prefix = "include${IPrinter.SPACE}",
+            suffix = ";",
+            addEmptyLastLine = true
+        )
     }
 
     private fun formatTopLevelSemanticTypes(): String {
@@ -64,12 +79,19 @@ data class Library(
         appendLine("}")
     }
 
-    private fun formatAutomata(): String = buildString {
-        if (automata.isEmpty())
-            return@buildString
-
-        append(formatListEmptyLineAtEndIfNeeded(automata))
+    private fun formatDeclaredAnnotations(): String = buildString {
+        annotations.forEach { annotation ->
+            append(annotation.dumpToString())
+        }
     }
+
+    private fun formatActionDeclarations(): String = buildString {
+        actions.forEach { action ->
+            append(action.dumpToString())
+        }
+    }
+
+    private fun formatAutomata(): String = formatListEmptyLineAtEndIfNeeded(automata)
 
     private fun formatGlobalVariables(): String = formatListEmptyLineAtEndIfNeeded(globalVariables)
 }

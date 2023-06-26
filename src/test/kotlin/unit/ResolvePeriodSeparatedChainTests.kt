@@ -23,7 +23,7 @@ class ResolvePeriodSeparatedChainTests {
 
         val result1 = QualifiedAccessUtils.resolveFieldType(parentType, "field")
         Assertions.assertEquals("Type2", result1?.fullName)
-        
+
         val result2 = QualifiedAccessUtils.resolveFieldType(result1!!, "arrayField")
         Assertions.assertEquals("array<Type3>", result2?.fullName)
         Assertions.assertTrue(result2 is ArrayType)

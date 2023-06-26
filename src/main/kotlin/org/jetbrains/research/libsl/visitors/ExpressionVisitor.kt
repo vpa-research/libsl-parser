@@ -1,18 +1,13 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.ArrayLiteralContext
-import org.jetbrains.research.libsl.LibSLParser.ExpressionContext
-import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
-import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
-import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
+import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
-import org.jetbrains.research.libsl.nodes.references.builders.AutomatonStateReferenceBuilder
-import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceBuilder
+import org.jetbrains.research.libsl.nodes.references.builders.*
+import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 
 class ExpressionVisitor(
     val context: LslContextBase
@@ -46,12 +41,40 @@ class ExpressionVisitor(
                 visitQualifiedAccess(ctx.qualifiedAccess())
             }
 
+            ctx.unaryOp() != null -> {
+                visitUnaryOp(ctx.unaryOp())
+            }
+
+            ctx.procUsage() != null -> {
+                visitProcUsage(ctx.procUsage())
+            }
+
+            ctx.actionUsage() != null -> {
+                visitActionUsage(ctx.actionUsage())
+            }
+
             else -> error("unknown expression type")
         }
     }
 
     private fun processBinaryExpression(ctx: ExpressionContext): BinaryOpExpression {
-        val opText = ctx.op.text
+        val opText = when {
+            ctx.op != null -> let {
+                ctx.op.text
+            }
+            ctx.bitShiftOp().lShift() != null -> let {
+                "<<"
+            }
+            ctx.bitShiftOp().rShift() != null -> let {
+                ">>"
+            }
+            ctx.bitShiftOp().uRShift() != null -> let {
+                ">>>"
+            }
+
+            else -> error("unknown binary expression")
+        }
+
         val op = ArithmeticBinaryOps.fromString(opText)
 
         val left = ctx.expression(0)
@@ -76,7 +99,7 @@ class ExpressionVisitor(
         val op = ArithmeticUnaryOp.fromString(opText)
         val expression = visitExpression(ctx.expression(0))
 
-        return UnaryOpExpression(expression, op)
+        return UnaryOpExpression(op, expression)
     }
 
     private fun processOldValue(ctx: QualifiedAccessContext): OldValue {
@@ -177,19 +200,29 @@ class ExpressionVisitor(
         periodSeparatedFullNameContext: PeriodSeparatedFullNameContext
     ): QualifiedAccess {
         val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
-        val lastFieldName = names.last()
-        val lastVariableReference = VariableReferenceBuilder.build(lastFieldName, context)
 
-        val lastVariableAccess = VariableAccess(
-            lastFieldName,
-            childAccess = null,
-            lastVariableReference
-        )
+        val lastAccess = when (val lastFieldName = names.last()) {
+            "this" -> ThisAccess(childAccess = null)
 
-        return names.dropLast(1).foldRight(lastVariableAccess) { name, access ->
-            val childVariableReference = VariableReferenceBuilder.build(name, context)
-            val childAccess = VariableAccess(name, childAccess = null, childVariableReference)
-            childAccess.childAccess = access
+            else -> let {
+                val lastVariableReference = VariableReferenceBuilder.build(lastFieldName, context)
+                VariableAccess(
+                    lastFieldName,
+                    childAccess = null,
+                    lastVariableReference
+                )
+            }
+        }
+
+        return names.dropLast(1).foldRight(lastAccess) { name, access ->
+            val childAccess = when (name) {
+                "this" -> ThisAccess(childAccess = access)
+
+                else -> {
+                    val childVariableReference = VariableReferenceBuilder.build(name, context)
+                    VariableAccess(name, childAccess = access, childVariableReference)
+                }
+            }
 
             childAccess
         }
@@ -242,14 +275,50 @@ class ExpressionVisitor(
         return CallAutomatonConstructor(automatonRef, args, stateRef)
     }
 
-    override fun visitAssignmentRight(ctx: LibSLParser.AssignmentRightContext): Expression {
+    override fun visitAssignmentRight(ctx: AssignmentRightContext): Expression {
         return when {
             ctx.expression() != null -> visitExpression(ctx.expression())
             ctx.callAutomatonConstructorWithNamedArgs() != null -> {
                 visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
             }
-
             else -> error("unknown assignment right kind")
         }
+    }
+
+    override fun visitActionUsage(ctx: ActionUsageContext): Expression {
+        val name = ctx.Identifier().text.extractIdentifier()
+        val expressionVisitor = ExpressionVisitor(context)
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty()
+
+        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+        val actionRef = ActionReferenceBuilder.build(name, argTypes, context)
+
+        val actionUsage = ActionUsage(actionRef, args)
+
+        return ActionExpression(actionUsage)
+    }
+
+    override fun visitProcUsage(ctx: ProcUsageContext): Expression {
+        val name = visitQualifiedAccess(ctx.qualifiedAccess()).lastChild.toString()
+        val expressionVisitor = ExpressionVisitor(context)
+        val args = ctx.expressionsList()?.expression()?.map { expr ->
+            expressionVisitor.visitExpression(expr)
+        }.orEmpty()
+
+        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+        val procRef = FunctionReferenceBuilder.build(name, argTypes, context)
+
+        val procCall = ProcedureCall(procRef, args)
+
+        return ProcExpression(procCall)
+    }
+
+    override fun visitUnaryOp(ctx: UnaryOpContext): Expression {
+        val op = ArithmeticUnaryOp.fromString(ctx.op.text)
+
+        val value = visitExpression(ctx.expression())
+        return UnaryOpExpression(op, value)
     }
 }

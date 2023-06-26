@@ -1,15 +1,13 @@
 package org.jetbrains.research.libsl
 
-import org.antlr.v4.runtime.*
-import org.antlr.v4.runtime.tree.ParseTreeListener
-import org.jetbrains.annotations.TestOnly
+import org.antlr.v4.runtime.BaseErrorListener
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import org.jetbrains.research.libsl.LibSLParser.FileContext
-import org.jetbrains.research.libsl.nodes.Library
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
+import org.jetbrains.research.libsl.nodes.Library
 import org.jetbrains.research.libsl.visitors.LibrarySpecificationVisitor
-import org.jetbrains.research.libsl.visitors.TopLevelDeclarationsResolver
-import org.jetbrains.research.libsl.visitors.TypeResolver
 import java.io.File
 import java.nio.file.Path
 

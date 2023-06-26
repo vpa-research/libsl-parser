@@ -28,6 +28,10 @@ class TypeInferrer(private val context: LslContextBase) {
             is UnaryOpExpression -> getExpressionType(expression.value)
             is Variable -> expression.typeReference.resolveOrError()
             is OldValue -> getExpressionType(expression.value)
+            is ActionExpression -> expression.actionUsage.actionReference.resolveOrError().returnType?.resolveOrError()
+                ?: VoidType(context)
+            is ProcExpression -> expression.procedureCall.procReference.resolveOrError().returnType?.resolveOrError()
+                ?: VoidType(context)
         }
     }
 
@@ -48,6 +52,7 @@ class TypeInferrer(private val context: LslContextBase) {
             is ArrayAccess -> TODO()
             is AutomatonOfFunctionArgumentInvoke -> access.automatonReference.resolveOrError().typeReference.resolveOrError()
             is VariableAccess -> access.variable.resolveOrError().typeReference.resolveOrError()
+            is ThisAccess -> getQualifiedAccessType(access.lastChild)
         }
     }
 

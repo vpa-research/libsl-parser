@@ -1,39 +1,69 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
-import org.jetbrains.research.libsl.utils.BackticksPolitics
 
-sealed class Expression: Node()
+sealed class Expression : Node() {
+    override fun dumpToString(): String = ExpressionDumper.dump(this)
+}
+
 data class BinaryOpExpression(
     val left: Expression,
     val right: Expression,
     val op: ArithmeticBinaryOps
-) : Expression() {
-    override fun dumpToString(): String = "(${left.dumpToString()} ${op.string} ${right.dumpToString()})"
-}
+) : Expression()
 
-enum class ArithmeticBinaryOps(val string: String) {
-    ADD("+"), SUB("-"), MUL("*"), DIV("/"), AND("&"),
-    OR("|"), XOR("^"), MOD("%"), ASSIGN_OP("="), EQ("=="), NOT_EQ("!="), GT(">"),
-    GT_EQ(">="), LT("<"), LT_EQ("<=");
+// priorities from https://www.l3harrisgeospatial.com/docs/Operator_Precedence.html
+// additionally >>, <<, >>> (shifts) are 7 priority
+enum class ArithmeticBinaryOps(val string: String, val priority: Int) {
+    //Arithmetic
+    ADD("+", 5), SUB("-", 5), MUL("*", 4), DIV("/", 4),
+    MOD("%", 4),
+
+    //Logic
+    LOG_AND("&&", 8), LOG_OR("||", 8),
+
+    //Bitwise
+    XOR("^", 7), AND("&", 7), BIT_OR("|", 7),
+
+    //Relational
+    EQ("==", 6), NOT_EQ("!=", 6), LT_EQ("<=", 6), GT_EQ(">=", 6),
+    GT(">", 6), LT("<", 6),
+
+    //Shift
+    R_SHIFT(">>", 7), UNSIGNED_R_SHIFT(">>>", 7), L_SHIFT("<<", 7);
+
     companion object {
         fun fromString(str: String) = ArithmeticBinaryOps.values().first { op -> op.string == str }
     }
 }
 
-data class UnaryOpExpression(
-    val value: Expression,
-    val op: ArithmeticUnaryOp
-) : Expression() {
-    override fun dumpToString(): String = "${op.string}${value.dumpToString()}"
+enum class AssignOps(val string: String) {
+    ASSIGN("="),
+
+    //Arithmetic
+    COMP_ADD("+="), COMP_SUB("-="), COMP_MUL("*="), COMP_DIV("/="), COMP_MOD("%="),
+
+    //Bitwise
+    COMP_AND("&="), COMP_OR("|="), COMP_XOR("^="),
+
+    //Shift
+    COMP_R_SHIFT(">>="), COMP_UN_R_SHIFT(">>>="), COMP_L_SHIFT("<<=");
+
+    companion object {
+        fun fromString(str: String) = AssignOps.values().first { op -> op.string == str }
+    }
 }
+
+data class UnaryOpExpression(
+    val op: ArithmeticUnaryOp,
+    val value: Expression
+) : Expression()
 
 data class OldValue(
     val value: QualifiedAccess
-) : Expression() {
-    override fun dumpToString(): String = "${value.dumpToString()}'"
-}
+) : Expression()
 
 data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
@@ -43,36 +73,20 @@ data class CallAutomatonConstructor(
     override val value: Any? = null
 
     override fun toString(): String = dumpToString()
-
-    override fun dumpToString(): String = buildString {
-        append("new ${BackticksPolitics.forPeriodSeparated(automatonRef.name)}")
-
-        val formattedArgs = buildList {
-            add("state = ${BackticksPolitics.forIdentifier(stateRef.name)}")
-            for (arg in args) {
-                add(arg.dumpToString())
-            }
-        }
-        append(formattedArgs.joinToString(separator = ", ", prefix = "(", postfix = ")"))
-    }
 }
 
 data class ArrayLiteral(
     override val value: List<Expression>
-) : Atomic() {
-    override fun dumpToString(): String {
-        return buildString {
-            append("[")
-            append(
-                value.joinToString(separator = ", ") { v -> v.dumpToString() }
-            )
-            append("]")
-        }
-    }
-}
+) : Atomic()
 
 sealed class Atomic : Expression() {
     abstract val value: Any?
-
-    override fun dumpToString(): String = value?.toString() ?: ""
 }
+
+data class ActionExpression(
+    val actionUsage: ActionUsage
+) : Expression()
+
+data class ProcExpression(
+    val procedureCall: ProcedureCall
+) : Expression()

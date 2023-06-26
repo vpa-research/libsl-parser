@@ -1,12 +1,9 @@
 package org.jetbrains.research.libsl.context
 
-import org.jetbrains.research.libsl.nodes.Automaton
+import org.jetbrains.research.libsl.nodes.*
+import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.Function
-import org.jetbrains.research.libsl.nodes.Variable
-import org.jetbrains.research.libsl.nodes.references.AutomatonReference
-import org.jetbrains.research.libsl.nodes.references.FunctionReference
-import org.jetbrains.research.libsl.nodes.references.TypeReference
-import org.jetbrains.research.libsl.nodes.references.VariableReference
+import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.*
 
 class LslGlobalContext : LslContextBase() {
@@ -69,6 +66,14 @@ class LslGlobalContext : LslContextBase() {
         return resolveFunction(reference, setOf(this))
     }
 
+    override fun resolveAnnotation(reference: AnnotationReference): Annotation? {
+        return resolveAnnotation(reference, setOf(this))
+    }
+
+    override fun resolveAction(reference: ActionReference): Action? {
+        return resolveAction(reference, setOf(this))
+    }
+
     private fun resolveVariable(reference: VariableReference, visitedScopes: Set<LslGlobalContext>): Variable? {
         return super.resolveVariable(reference)
             ?: resolveInImportedContexts(visitedScopes) { v -> resolveVariable(reference, v) }
@@ -87,6 +92,16 @@ class LslGlobalContext : LslContextBase() {
     private fun resolveFunction(reference: FunctionReference, visitedScopes: Set<LslGlobalContext>): Function? {
         return super.resolveFunction(reference)
             ?: resolveInImportedContexts(visitedScopes) { v -> resolveFunction(reference, v) }
+    }
+
+    private fun resolveAnnotation(reference: AnnotationReference, visitedScopes: Set<LslGlobalContext>): Annotation? {
+        return super.resolveAnnotation(reference)
+            ?: resolveInImportedContexts(visitedScopes) {v -> resolveAnnotation(reference, v)}
+    }
+
+    private fun resolveAction(reference: ActionReference, visitedScopes: Set<LslGlobalContext>): Action? {
+        return super.resolveAction(reference)
+            ?: resolveInImportedContexts(visitedScopes) { v -> resolveAction(reference, v) }
     }
 
     private fun <T> resolveInImportedContexts(

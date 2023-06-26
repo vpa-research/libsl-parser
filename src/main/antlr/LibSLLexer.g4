@@ -42,19 +42,49 @@ PLUS : '+' ;
 
 MINUS : '-' ;
 
+INCREMENT : '++' ;
+
+DECREMENT : '--' ;
+
+PLUS_EQ : '+=' ;
+
+MINUS_EQ : '-=' ;
+
+ASTERISK_EQ : '*=' ;
+
+SLASH_EQ : '/=' ;
+
+PERCENT_EQ : '%=' ;
+
 EXCLAMATION : '!' ;
 
-NOT_EQ : '!=' ;
+EXCLAMATION_EQ : '!=' ;
 
-LESS_EQ : '<=' ;
+L_ARROW_EQ : '<=' ;
 
-GREAT_EQ : '>=' ;
+R_ARROW_EQ : '>=' ;
 
-AND : '&' ;
+AMPERSAND : '&' ;
 
-OR : '|' ;
+DOUBLE_AMPERSAND : '&&' ;
+
+BIT_OR : '|' ;
+
+LOGIC_OR : '||' ;
 
 XOR : '^' ;
+
+TILDE : '~' ;
+
+AMPERSAND_EQ : '&=' ;
+
+OR_EQ : '|=' ;
+
+XOR_EQ : '^=' ;
+
+R_SHIFT_EQ: '>>=' ;
+
+L_SHIFT_EQ: '<<=' ;
 
 APOSTROPHE : '\'' ;
 
@@ -112,12 +142,20 @@ ENUM
    :   'enum'
    ;
 
+ANNOTATION
+   :   'annotation'
+   ;
+
 AUTOMATON
    :   'automaton'
    ;
 
 VAR
    :   'var'
+   ;
+
+VAL
+   :   'val'
    ;
 
 INITSTATE
@@ -139,8 +177,21 @@ SHIFT
 NEW
    :   'new'
    ;
+
 FUN
    :   'fun'
+   ;
+
+CONSTRUCTOR
+   :   'constructor'
+   ;
+
+DESTRUCTOR
+   :   'destructor'
+   ;
+
+PROC
+   :   'proc'
    ;
 
 AT
@@ -169,6 +220,18 @@ TRUE
 
 FALSE
    :   'false'
+   ;
+
+DEFINE
+   :   'define'
+   ;
+
+IF
+   :   'if'
+   ;
+
+ELSE
+   :   'else'
    ;
 
 BY
@@ -207,6 +270,5 @@ COMMENT
    ;
 
 LINE_COMMENT
-   :   (' //' ~[\r\n]* | '// ' ~[\r\n]*) -> channel(HIDDEN)
+   :   ('//' ~[\r\n]*) -> channel(HIDDEN)
    ;
-

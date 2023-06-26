@@ -1,10 +1,9 @@
 package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
-import org.jetbrains.research.libsl.LibSLParser.NameWithTypeContext
 import org.jetbrains.research.libsl.context.AutomatonContext
 import org.jetbrains.research.libsl.context.FunctionContext
-import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnresolvedState
 import org.jetbrains.research.libsl.nodes.*
@@ -15,6 +14,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 class AutomatonResolver(
     private val basePath: String,
     private val errorManager: ErrorManager,
+    private val globalContext: LslGlobalContext,
     private val automatonContext: AutomatonContext
 ) : LibSLParserVisitor<Unit>(automatonContext) {
     private lateinit var buildingAutomaton: Automaton
@@ -22,10 +22,12 @@ class AutomatonResolver(
         val name = ctx.name.asPeriodSeparatedString()
         val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
+        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
         buildingAutomaton = Automaton(
             name,
             typeReference,
+            annotationReferences,
             context = automatonContext
         )
 
@@ -36,11 +38,12 @@ class AutomatonResolver(
     /**
      * Visit constructor arguments
      */
-    override fun visitNameWithType(ctx: NameWithTypeContext) {
-        val name = ctx.name.asPeriodSeparatedString()
-        val typeReference = processTypeIdentifier(ctx.typeIdentifier())
-        val argument = ConstructorArgument(name, typeReference)
-
+    override fun visitConstructorVariables(ctx: LibSLParser.ConstructorVariablesContext) {
+        val keyword = VariableKind.fromString(ctx.keyword.text)
+        val name = ctx.nameWithType().name.asPeriodSeparatedString()
+        val typeReference = processTypeIdentifier(ctx.nameWithType().type)
+        val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()))
+        context.storeVariable(argument)
         buildingAutomaton.constructorVariables.add(argument)
     }
 
@@ -128,29 +131,40 @@ class AutomatonResolver(
         }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
+        val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
         val expressionVisitor = ExpressionVisitor(context)
-        val initValue = ctx.assignmentRight()?.let { right ->
-            when {
-                right.callAutomatonConstructorWithNamedArgs() != null -> {
-                    expressionVisitor.visitCallAutomatonConstructorWithNamedArgs(right.callAutomatonConstructorWithNamedArgs())
-                }
-                right.expression() != null -> {
-                    expressionVisitor.visitExpression(right.expression())
-                }
-                else -> error("unknown initializer kind")
-            }
-        }
+        val initValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
 
-        val variable = VariableWithInitialValue(name, typeReference, initValue)
+            val variable = VariableWithInitialValue(
+            keyword,
+            name,
+            typeReference,
+            getAnnotationUsages(ctx.annotationUsage()),
+            initValue
+        )
         buildingAutomaton.internalVariables.add(variable)
         context.storeVariable(variable)
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
         val functionContext = FunctionContext(context)
-        FunctionVisitor(functionContext, buildingAutomaton, errorManager).visitFunctionDecl(ctx)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitFunctionDecl(ctx)
     }
 
+    override fun visitConstructorDecl(ctx: LibSLParser.ConstructorDeclContext) {
+        val functionContext = FunctionContext(context)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitConstructorDecl(ctx)
+    }
+
+    override fun visitDestructorDecl(ctx: LibSLParser.DestructorDeclContext) {
+        val functionContext = FunctionContext(context)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitDestructorDecl(ctx)
+    }
+
+    override fun visitProcDecl(ctx: LibSLParser.ProcDeclContext) {
+        val functionContext = FunctionContext(context)
+        FunctionVisitor(functionContext, buildingAutomaton, globalContext, errorManager).visitProcDecl(ctx)
+    }
 }

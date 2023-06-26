@@ -9,10 +9,14 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
     val constructorVariables: MutableList<ConstructorArgument> = mutableListOf(),
+    val constructors: MutableList<Function> = mutableListOf(),
+    val destructors: MutableList<Function> = mutableListOf(),
+    val procDeclarations: MutableList<Function> = mutableListOf(),
     val localFunctions: MutableList<Function> = mutableListOf(),
     val extensionFunctions: MutableList<Function> = mutableListOf(),
     val context: AutomatonContext
@@ -21,10 +25,13 @@ data class Automaton(
         get() = localFunctions + extensionFunctions
 
     override fun dumpToString(): String = buildString {
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
+
         if (constructorVariables.isNotEmpty()) {
-            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
+            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() }})")
         }
+
         appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)} {")
 
         append(withIndent(formatBody()))
@@ -35,6 +42,9 @@ data class Automaton(
         append(formatStates())
         append(formatShifts())
         append(formatInternalVariables())
+        append(formatConstructors())
+        append(formatDestructors())
+        append(formatProcDeclarations())
         append(formatFunctions())
     }
 
@@ -43,6 +53,12 @@ data class Automaton(
     private fun formatStates(): String = formatListEmptyLineAtEndIfNeeded(states)
 
     private fun formatShifts(): String = formatListEmptyLineAtEndIfNeeded(shifts)
+
+    private fun formatConstructors(): String = formatListEmptyLineAtEndIfNeeded(constructors)
+
+    private fun formatDestructors(): String = formatListEmptyLineAtEndIfNeeded(destructors)
+
+    private fun formatProcDeclarations(): String = formatListEmptyLineAtEndIfNeeded(procDeclarations)
 
     private fun formatFunctions(): String = formatListEmptyLineAtEndIfNeeded(functions, appendEndLineAtTheEnd = false)
 
@@ -75,7 +91,8 @@ data class Shift(
         if (functions.isNotEmpty()) {
             append(
                 functions.joinToString(separator = ", ", prefix = "[", postfix = "]") { function ->
-                    val functionName = function.name;
+                    val functionName = function.name
+                  
                     if (function.argTypes.isNotEmpty()) {
                         val argTypeNames =
                             function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.name }

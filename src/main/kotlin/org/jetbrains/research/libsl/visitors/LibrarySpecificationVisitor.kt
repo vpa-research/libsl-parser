@@ -9,6 +9,8 @@ import org.jetbrains.research.libsl.errors.UnresolvedImportOrInclude
 import org.jetbrains.research.libsl.nodes.Library
 import org.jetbrains.research.libsl.nodes.LslVersion
 import org.jetbrains.research.libsl.nodes.MetaNode
+import org.jetbrains.research.libsl.nodes.references.builders.ActionReferenceBuilder.getReference
+import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
@@ -38,9 +40,12 @@ class LibrarySpecificationVisitor(
         representAutomataFromContextInLibrary()
         representExtensionFunctionsFromContextInLibrary()
         representVariablesFromContextInLibrary()
+        representDeclaredAnnotationsFromContextInLibrary()
+        representDeclaredActionsFromContextInLibrary()
 
         return library
     }
+
     private fun processHeader(ctx: LibSLParser.HeaderContext): MetaNode {
         val libraryName = ctx.libraryName.text.extractIdentifier()
         val libraryVersion = ctx.ver?.text?.removeDoubleQuotes()
@@ -113,5 +118,15 @@ class LibrarySpecificationVisitor(
     private fun representVariablesFromContextInLibrary() {
         val variables = globalContext.getAllVariables()
         library.globalVariableReferences.addAll(variables.map { variable -> variable.getReference(context) })
+    }
+
+    private fun representDeclaredAnnotationsFromContextInLibrary() {
+        val annotations = globalContext.getAllAnnotations()
+        library.annotationReferences.addAll(annotations.map { annotation -> annotation.getReference(context) })
+    }
+
+    private fun representDeclaredActionsFromContextInLibrary() {
+        val actions = globalContext.getAllDeclaredActions()
+        library.actionReferences.addAll(actions.map { action -> action.getReference(context) })
     }
 }
