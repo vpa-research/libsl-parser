@@ -5,7 +5,7 @@ data class IntegerLiteral(
 ) : Atomic()
 
 abstract class FloatLiteral(
-    override val value: Float,
+    override val value: Any,
     open val suffix: String
 ) : Atomic()
 
@@ -15,7 +15,7 @@ data class Float32Literal(
 ) : FloatLiteral(value, suffix)
 
 data class Float64Literal(
-    override val value: Float,
+    override val value: Double,
     override val suffix: String = "d"
 ) : FloatLiteral(value, suffix)
 

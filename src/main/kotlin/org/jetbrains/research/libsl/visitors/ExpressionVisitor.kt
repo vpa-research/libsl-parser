@@ -169,7 +169,7 @@ class ExpressionVisitor(
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
         return when(ctx.suffix.text) {
             "f" -> Float32Literal(ctx.text.toFloat())
-            "d" -> Float64Literal(ctx.text.toFloat())
+            "d" -> Float64Literal(ctx.text.toDouble())
             else -> throw IllegalArgumentException("Incorrect float suffix")
         }
     }
