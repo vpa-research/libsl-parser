@@ -13,6 +13,7 @@ abstract class LslContextBase(var fileName: String) {
     private val annotations = mutableListOf<Annotation>()
     private val declaredActions = mutableListOf<ActionDecl>()
     private val automata = mutableListOf<Automaton>()
+    private val automataConcepts = mutableListOf<AutomatonConcept>()
     private val types = mutableListOf<Type>()
     private val functions = mutableListOf<Function>()
     private val variables = mutableListOf<Variable>()
@@ -22,6 +23,10 @@ abstract class LslContextBase(var fileName: String) {
 
     fun storeAutomata(automaton: Automaton) {
         automata.add(automaton)
+    }
+
+    fun storeAutomataConcepts(automatonConcept: AutomatonConcept) {
+        automataConcepts.add(automatonConcept)
     }
 
     fun storeType(type: Type) {

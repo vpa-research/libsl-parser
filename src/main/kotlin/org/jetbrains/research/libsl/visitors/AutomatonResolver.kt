@@ -17,21 +17,32 @@ class AutomatonResolver(
     private val automatonContext: AutomatonContext
 ) : LibSLParserVisitor<Unit>(automatonContext) {
     private lateinit var buildingAutomaton: Automaton
+
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.asPeriodSeparatedString()
-        val isConcept = ctx.CONCEPT() != null
         val typeName = ctx.type.asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, context = context)
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
-        buildingAutomaton = Automaton(
-            name,
-            typeReference,
-            isConcept,
-            annotationReferences,
-            context = automatonContext,
-            position = Position(context.fileName, ctx.position().first, ctx.position().second)
-        )
+        if (ctx.CONCEPT() == null) {
+            buildingAutomaton = Automaton(
+                isConcept = false,
+                name,
+                typeReference,
+                annotationReferences,
+                context = automatonContext,
+                position = Position(context.fileName, ctx.position().first, ctx.position().second)
+            )
+        } else {
+            buildingAutomaton = AutomatonConcept(
+                isConcept = true,
+                name,
+                typeReference,
+                annotationReferences,
+                context = automatonContext,
+                position = Position(context.fileName, ctx.position().first, ctx.position().second)
+            )
+        }
 
         super.visitAutomatonDecl(ctx)
         context.parentContext!!.storeAutomata(buildingAutomaton)

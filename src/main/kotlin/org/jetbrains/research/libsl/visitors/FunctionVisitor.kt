@@ -139,7 +139,7 @@ class FunctionVisitor(
     }
 
     override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
-        if(parentAutomaton?.isConcept == true) {
+        if(parentAutomaton is AutomatonConcept) {
             error("Function realisation inside automaton concept")
         } else {
             val statements = buildingFunction.statements
