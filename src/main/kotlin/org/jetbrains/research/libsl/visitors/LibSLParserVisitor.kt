@@ -19,7 +19,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
     protected fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
         val typeName = ctx.name.asPeriodSeparatedString()
         val isPointer = ctx.asterisk != null
-        val genericTypeIdentifierContext = ctx.generic
+        val genericTypeIdentifierContext = ctx.generic()?.typeIdentifier()
 
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
         val genericReference = generic?.getReference(context)
@@ -30,7 +30,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
     private fun getRealType(ctx: TypeIdentifierContext): RealType {
         val typeNameParts = ctx.name.asPeriodSeparatedParts()
         val isPointer = ctx.asterisk != null
-        val genericTypeIdentifierContext = ctx.generic
+        val genericTypeIdentifierContext = ctx.generic()?.typeIdentifier()
 
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
 
@@ -50,7 +50,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         check(typeNameParts[0] == "array" && typeNameParts.size == 1) { "not an array" }
 
         val isPointer = ctx.asterisk != null
-        val genericTypeIdentifierContext = ctx.generic
+        val genericTypeIdentifierContext = ctx.generic()?.typeIdentifier()
 
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
         check(generic != null)

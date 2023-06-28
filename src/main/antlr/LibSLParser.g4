@@ -220,7 +220,11 @@ nameWithType
  * syntax: one.two.three<T>
  */
 typeIdentifier
-   :   (asterisk=ASTERISK)? name=periodSeparatedFullName (L_ARROW generic=typeIdentifier R_ARROW)?
+   :   (asterisk=ASTERISK)? name=periodSeparatedFullName generic?
+   ;
+
+generic
+   :   (L_ARROW typeIdentifier R_ARROW)
    ;
 
 variableAssignment
