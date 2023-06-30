@@ -118,10 +118,20 @@ class TypeResolver(
             }
         }
 
-
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+        val typeGenericDeclBlock = mutableListOf<TypeGenericDecl>()
+        if(ctx.typeDefGenericDeclBlock() != null) {
+            ctx.typeDefGenericDeclBlock().nameWithType().forEach {
+                typeGenericDeclBlock.add(TypeGenericDecl(it.name.text, processTypeIdentifier(it.type),
+                    Position(context.fileName, ctx.position().first, ctx.position().second))
+                )
+            }
+        }
 
-        val type = StructuredType(name, variables, functions, isTypeIdentifier, forTypeList, annotationReferences, context)
+        val type = StructuredType(name, variables, functions, isTypeIdentifier, forTypeList, typeGenericDeclBlock, annotationReferences, context)
+        if(ctx.generic() != null) {
+            type.generics.addAll(processGenerics(ctx.generic().typeIdentifier()))
+        }
         context.storeType(type)
     }
 

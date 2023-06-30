@@ -8,13 +8,22 @@ types {
     Object(java.lang.Object);
     Image(java.img.Image);
     Iterator(iterator);
+    Something(Something);
+    SomethingElse(SomethingElse);
 }
 
 @StructureKind("record")
 @Parametrized("P extends java.img.PixelType")
-type BufferedImage is java.awt.image.BufferedImage for Image, Object {
-   var width: int;
-   var content: array<array<int>>;
+type BufferedImage<A, B, C>
+    is java.awt.image.BufferedImage
+    for Image, Object
+    where
+        A: Something,
+        B: SomethingElse,
+        C: Int
+{
+   var width: Int;
+   var content: array<Something<Int>, String, Object>;
    fun iterator(offset: int): Iterator;
 }
 
@@ -30,7 +39,7 @@ automaton concept IterableAutomaton : Int {
 
 automaton Foo(): Int implements IterableAutomaton, CollectionAutomaton
 {
-   fun bar (img: BufferedImage): Object {
+   fun bar (img: BufferedImage<A, B, C>): Object {
       result = img.iterator(this.offset + 2);
    }
 

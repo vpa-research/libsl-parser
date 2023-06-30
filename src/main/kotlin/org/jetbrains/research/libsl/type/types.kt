@@ -1,26 +1,30 @@
 package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.AnnotationUsage
-import org.jetbrains.research.libsl.nodes.Atomic
+import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Function
-import org.jetbrains.research.libsl.nodes.IPrinter
-import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.Position
 
 sealed interface Type : IPrinter {
     val name: String
     val isPointer: Boolean
     val context: LslContextBase
-    val generic: TypeReference?
+    val generics: MutableList<TypeReference>
 
     val fullName: String
         get() = buildString {
             append(if (isPointer) "*" else "")
             append(name)
-            append(if (generic != null) "<${generic!!.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL}>" else "")
+            if(generics.isNotEmpty()) {
+                append("<")
+                append(generics.joinToString(separator = ", ") {
+                    it.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL
+                })
+                append(">")
+            }
         }
 
     val isArray: Boolean
@@ -41,7 +45,7 @@ sealed interface LibslType : Type
 data class RealType(
     val nameParts: List<String>,
     override val isPointer: Boolean = false,
-    override val generic: TypeReference? = null,
+    override val generics: MutableList<TypeReference>,
     override val context: LslContextBase
 ) : Type {
     override val name: String
@@ -59,7 +63,7 @@ data class SimpleType(
     override val isPointer: Boolean = false,
     override val context: LslContextBase
 ) : LibslType {
-    override val generic: TypeReference? = null
+    override val generics: MutableList<TypeReference> = mutableListOf()
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String {
@@ -79,7 +83,7 @@ data class TypeAlias(
     override val context: LslContextBase
 ) : LibslType {
     override val isPointer: Boolean = false
-    override val generic: TypeReference? = null
+    override val generics: MutableList<TypeReference> = mutableListOf()
 
     override val isTopLevelType: Boolean = true
 
@@ -105,7 +109,7 @@ data class EnumLikeSemanticType(
     override val context: LslContextBase
 ) : LibslType {
     override val isPointer: Boolean = false
-    override val generic: TypeReference? = null
+    override val generics: MutableList<TypeReference> = mutableListOf()
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String = buildString {
@@ -119,36 +123,68 @@ data class EnumLikeSemanticType(
     override fun toString() = dumpToString()
 }
 
+data class TypeGenericDecl(
+    override var name: String,
+    override var typeReference: TypeReference,
+    override var position: Position
+) : Variable(name, typeReference, position) {
+    override fun dumpToString(): String = buildString {
+        append(BackticksPolitics.forIdentifier(name))
+        append(": ")
+        append(typeReference.name)
+    }
+}
+
 data class StructuredType(
     override val name: String,
     val variables: MutableList<Variable> = mutableListOf(),
     val functions: MutableList<Function> = mutableListOf(),
     val isTypeIdentifier: String?,
     val forTypeList: MutableList<String> = mutableListOf(),
+    val genericDeclBlock: MutableList<TypeGenericDecl>,
     val annotationUsages: MutableList<AnnotationUsage>,
     override val context: LslContextBase
 ) : Type {
     override val isPointer: Boolean = false
     override val isTopLevelType: Boolean = true
-    override val generic: TypeReference? = null
+    override val generics: MutableList<TypeReference> = mutableListOf()
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
         append("type $name ")
+        if(generics.isNotEmpty()) {
+            append("<")
+            append(generics.joinToString(separator = ", ") {
+                it.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL
+            })
+            append(">")
+        }
         if(isTypeIdentifier != null) {
-            append("is $isTypeIdentifier ")
+            append(" is $isTypeIdentifier ")
         }
         if(forTypeList.isNotEmpty()) {
             append("for ")
             append(forTypeList.joinToString(separator = ", "))
             append(" ")
         }
-        appendLine("{")
-        variables.forEach { v ->
-            appendLine(withIndent(v.dumpToString()))
+        if(genericDeclBlock.isNotEmpty()) {
+            appendLine()
+            appendLine(withIndent("where"))
+            appendLine(
+                withIndent(
+                    genericDeclBlock.joinToString(
+                    separator = ",\n",
+                    transform = TypeGenericDecl::dumpToString
+                    )
+                )
+            )
         }
-        functions.forEach { f ->
-            appendLine(withIndent(f.dumpToString()))
+        appendLine("{")
+        variables.forEach {
+            appendLine(withIndent(it.dumpToString()))
+        }
+        functions.forEach {
+            appendLine(withIndent(it.dumpToString()))
         }
         appendLine("}")
     }
@@ -158,7 +194,7 @@ data class StructuredType(
         if (other !is StructuredType) return false
 
         if (name != other.name) return false
-        if (generic != other.generic) return false
+        if (generics != other.generics) return false
         if (variables != other.variables) return false
         if (functions != other.functions) return false
         if (context != other.context) return false
@@ -185,7 +221,7 @@ data class EnumType(
     override val context: LslContextBase
 ) : Type {
     override val isPointer: Boolean = false
-    override val generic: TypeReference? = null
+    override val generics: MutableList<TypeReference> = mutableListOf()
     override val isTopLevelType: Boolean = true
 
     override fun dumpToString(): String = buildString {
@@ -201,7 +237,7 @@ data class EnumType(
 
 data class ArrayType(
     override val isPointer: Boolean = false,
-    override val generic: TypeReference,
+    override val generics: MutableList<TypeReference>,
     override val context: LslContextBase
 ) : Type {
     override val name: String = "array"

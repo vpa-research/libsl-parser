@@ -57,11 +57,15 @@ typealiasStatement
  * syntax: type full.name { field1: Type; field2: Type; ... }
  */
 typeDefBlock
-   :   annotationUsage* TYPE name=periodSeparatedFullName targetType? (L_BRACE typeDefBlockStatement* R_BRACE)?
+   :   annotationUsage* TYPE name=periodSeparatedFullName generic? targetType? typeDefGenericDeclBlock? (L_BRACE typeDefBlockStatement* R_BRACE)?
    ;
 
 targetType
    :   (is=Identifier typeIdentifier)? for=Identifier typeList
+   ;
+
+typeDefGenericDeclBlock
+   :   where=Identifier nameWithType (COMMA nameWithType)*
    ;
 
 typeList
@@ -152,7 +156,7 @@ actionParameter
  */
 automatonDecl
    :   annotationUsage* AUTOMATON CONCEPT? name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
-   COLON type=periodSeparatedFullName implementedConcepts*
+   COLON type=typeIdentifier implementedConcepts*
    L_BRACE automatonStatement* R_BRACE
    ;
 
@@ -224,7 +228,7 @@ typeIdentifier
    ;
 
 generic
-   :   (L_ARROW typeIdentifier R_ARROW)
+   :   (L_ARROW typeIdentifier (COMMA typeIdentifier)* R_ARROW)
    ;
 
 variableAssignment

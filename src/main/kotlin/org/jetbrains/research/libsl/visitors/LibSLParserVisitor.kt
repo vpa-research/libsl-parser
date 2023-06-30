@@ -19,22 +19,38 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
     protected fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
         val typeName = ctx.name.asPeriodSeparatedString()
         val isPointer = ctx.asterisk != null
-        val genericTypeIdentifierContext = ctx.generic()?.typeIdentifier()
+        var genericReferences = mutableListOf<TypeReference>()
 
-        val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
-        val genericReference = generic?.getReference(context)
+        if(ctx.generic() != null) {
+            val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
+            genericReferences = processGenerics(genericTypeIdentifierContext)
+        }
 
-        return TypeReferenceBuilder.build(typeName, genericReference, isPointer, context)
+        return TypeReferenceBuilder.build(typeName, genericReferences, isPointer, context)
+    }
+
+    fun processGenerics(ctx: MutableList<TypeIdentifierContext>): MutableList<TypeReference> {
+        val genericReferences = mutableListOf<TypeReference>()
+        ctx.forEach {
+            val generic = getRealType(it)
+            val genericRef = generic.getReference(context)
+            genericReferences.add(genericRef)
+        }
+        return genericReferences
     }
 
     private fun getRealType(ctx: TypeIdentifierContext): RealType {
         val typeNameParts = ctx.name.asPeriodSeparatedParts()
         val isPointer = ctx.asterisk != null
-        val genericTypeIdentifierContext = ctx.generic()?.typeIdentifier()
 
-        val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
+        var genericReferences = mutableListOf<TypeReference>()
 
-        val realType = RealType(typeNameParts, isPointer, generic?.getReference(context), context)
+        if(ctx.generic() != null) {
+            val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
+            genericReferences = processGenerics(genericTypeIdentifierContext)
+        }
+
+        val realType = RealType(typeNameParts, isPointer, genericReferences, context)
 
         val previouslyStoredType = context.resolveType(realType.getReference(context))
         if (previouslyStoredType != null && previouslyStoredType is RealType) {
@@ -50,12 +66,13 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         check(typeNameParts[0] == "array" && typeNameParts.size == 1) { "not an array" }
 
         val isPointer = ctx.asterisk != null
-        val genericTypeIdentifierContext = ctx.generic()?.typeIdentifier()
+        var genericReferences = mutableListOf<TypeReference>()
 
-        val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
-        check(generic != null)
-
-        return ArrayType(isPointer, generic.getReference(context), context)
+        if(ctx.generic() != null) {
+            val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
+            genericReferences = processGenerics(genericTypeIdentifierContext)
+        }
+        return ArrayType(isPointer, genericReferences, context)
     }
 
     fun getRealTypeOrArray(ctx: TypeIdentifierContext): Type {
