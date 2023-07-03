@@ -19,6 +19,7 @@ open class Function(
     open var hasBody: Boolean = statements.isNotEmpty(),
     open var targetAutomatonRef: AutomatonReference? = null,
     open val context: FunctionContext,
+    val isStatic: Boolean,
     open val position: Position
 ) : Node() {
     val fullName: String
@@ -26,6 +27,9 @@ open class Function(
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
+        if(isStatic) {
+            append("static ")
+        }
         append("${kind.value} ${BackticksPolitics.forIdentifier(name)}")
         append(
             args.joinToString(separator = ", ", prefix = "(", postfix = ")") { arg -> arg.dumpToString() }
@@ -72,7 +76,7 @@ data class Constructor(
 ) : Function(
     kind = FunctionKind.CONSTRUCTOR, name, null, args, null,
     annotationUsages, contracts,
-    statements, hasBody, null, context, position
+    statements, hasBody, null, context, false, position
 )
 
 class Destructor(
@@ -87,7 +91,7 @@ class Destructor(
 ) : Function(
     kind = FunctionKind.DESTRUCTOR, name, null, args, null,
     annotationUsages, contracts,
-    statements, hasBody, null, context, position
+    statements, hasBody, null, context, false, position
 )
 
 class Procedure(
@@ -103,5 +107,5 @@ class Procedure(
 ) : Function(
     kind = FunctionKind.PROC, name, null, args, returnType,
     annotationUsages, contracts,
-    statements, hasBody, null, context, position
+    statements, hasBody, null, context, false, position
 )

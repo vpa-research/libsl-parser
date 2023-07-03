@@ -34,6 +34,8 @@ class FunctionVisitor(
             parentAutomaton = automatonReference?.resolveOrError()
         }
 
+        val isStatic = ctx.STATIC() != null
+
         val functionName = ctx.functionName.text.extractIdentifier()
 
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
@@ -60,6 +62,7 @@ class FunctionVisitor(
             hasBody = ctx.functionBody() != null,
             targetAutomatonRef = targetAutomatonRef,
             context = functionContext,
+            isStatic = isStatic,
             position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
 

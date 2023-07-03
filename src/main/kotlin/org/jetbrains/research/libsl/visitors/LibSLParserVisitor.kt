@@ -15,8 +15,8 @@ import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.Position
 
-abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
-    protected fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
+abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
+    internal fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
         val typeName = ctx.name.asPeriodSeparatedString()
         val isPointer = ctx.asterisk != null
         var genericReferences = mutableListOf<TypeReference>()

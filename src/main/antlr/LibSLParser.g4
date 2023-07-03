@@ -61,7 +61,7 @@ typeDefBlock
    ;
 
 targetType
-   :   (is=Identifier typeIdentifier)? for=Identifier typeList
+   :   (IS typeIdentifier)? for=Identifier typeList
    ;
 
 typeDefGenericDeclBlock
@@ -272,7 +272,7 @@ procDecl
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   annotationUsage* FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   :   annotationUsage* STATIC? FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
    (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
    ;
@@ -381,6 +381,7 @@ expression
    |   expression op=(AMPERSAND | BIT_OR | XOR) expression
    |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
    |   expression bitShiftOp expression
+   |   expression typeOp=(IS | AS) typeIdentifier
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess

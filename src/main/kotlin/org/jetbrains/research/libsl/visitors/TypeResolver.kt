@@ -157,6 +157,7 @@ class TypeResolver(
 
     private fun processFunctionDecl(ctx: FunctionDeclContext): org.jetbrains.research.libsl.nodes.Function {
         val functionContext = FunctionContext(context)
+        val isStatic = ctx.STATIC() != null
         val functionName = ctx.functionName.text.extractIdentifier()
 
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
@@ -183,6 +184,7 @@ class TypeResolver(
             hasBody = false,
             targetAutomatonRef = null,
             context = functionContext,
+            isStatic = isStatic,
             position = Position(context.fileName, ctx.position().first, ctx.position().second)
         )
     }

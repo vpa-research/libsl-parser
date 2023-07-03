@@ -9,7 +9,8 @@ types {
     Image(java.img.Image);
     Iterator(iterator);
     Something(Something);
-    SomethingElse(SomethingElse);
+    List<Any>(List);
+    Collection(Collection);
 }
 
 @StructureKind("record")
@@ -19,12 +20,12 @@ type BufferedImage<A, B, C>
     for Image, Object
     where
         A: Something,
-        B: SomethingElse,
+        B: SomethingElse<B>,
         C: Int
 {
    var width: Int;
    var content: array<Something<Int>, String, Object>;
-   fun iterator(offset: int): Iterator;
+   static fun iterator(offset: int): Iterator;
 }
 
 annotation StructureKind(str: string);
@@ -40,6 +41,8 @@ automaton concept IterableAutomaton : Int {
 automaton Foo(): Int implements IterableAutomaton, CollectionAutomaton
 {
    fun bar (img: BufferedImage<A, B, C>): Object {
+      var b: bool = arg0 is List<any>;
+      var x: Collection<any> = arg0 as List<any>;
       result = img.iterator(this.offset + 2);
    }
 

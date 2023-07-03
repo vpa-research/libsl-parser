@@ -8,7 +8,6 @@ import org.jetbrains.research.libsl.LibSLParser.PeriodSeparatedFullNameContext
 import org.jetbrains.research.libsl.LibSLParser.ProcUsageContext
 import org.jetbrains.research.libsl.LibSLParser.QualifiedAccessContext
 import org.jetbrains.research.libsl.LibSLParser.SimpleCallContext
-import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
@@ -18,10 +17,14 @@ import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceB
 import org.jetbrains.research.libsl.utils.Position
 
 class ExpressionVisitor(
-    val context: LslContextBase
-) : LibSLParserBaseVisitor<Expression>() {
+    override val context: LslContextBase
+) : LibSLParserVisitor<Expression>(context) {
     override fun visitExpression(ctx: ExpressionContext): Expression {
         return when {
+            ctx.typeOp != null -> {
+                processTypeOperationExpression(ctx)
+            }
+
             ctx.expression().size == 1 && ctx.op == null -> {
                 // brackets expression
                 visitExpression(ctx.expression()!![0])
@@ -71,6 +74,12 @@ class ExpressionVisitor(
 
             else -> error("unknown expression type")
         }
+    }
+
+    private fun processTypeOperationExpression(ctx: ExpressionContext): TypeOperationExpression {
+        // TODO()
+        println(visitExpression(ctx.expression(0)))
+        return TypeOperationExpression(ctx.typeOp.text, visitExpression(ctx.expression(0)), processTypeIdentifier(ctx.typeIdentifier()))
     }
 
     private fun processBinaryExpression(ctx: ExpressionContext): BinaryOpExpression {

@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.utils.Position
 
 sealed class Expression : Node() {
@@ -109,4 +110,10 @@ data class NamedArgumentWithValue(
     val name: String?,
     val value: Expression,
     val position: Position
+) : Expression()
+
+data class TypeOperationExpression(
+    val opName: String,
+    val expression: Expression,
+    val typeIdentifier: TypeReference
 ) : Expression()

@@ -10,7 +10,7 @@ type BufferedImage <A, B, C> is java.awt.image.BufferedImage for Image, Object
 {
     var width: Int;
     var content: array<Something<Int>, String, Object>;
-    fun iterator(offset: int): Iterator;
+    static fun iterator(offset: int): Iterator;
 }
 types {
     @implements
@@ -20,7 +20,8 @@ types {
     Image(java.img.Image);
     Iterator(iterator);
     Something(Something);
-    SomethingElse(SomethingElse);
+    List(List);
+    Collection(Collection);
 }
 var width: Int;
 var content: array<Something<Int>, String, Object>;
@@ -41,6 +42,8 @@ automaton concept IterableAutomaton : Int {
 }
 automaton Foo : Int implements IterableAutomaton, CollectionAutomaton {
     fun bar(img: BufferedImage): Object {
+        var b: bool = arg0 is List;
+        var x: `<UNRESOLVED_TYPE>` = arg0 as List;
         result = `img.iterator`(this.offset + 2);
     }
     fun foo(newValue: any) {
