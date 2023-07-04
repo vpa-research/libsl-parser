@@ -4,8 +4,6 @@ typealias Int = int32;
 type StructureType {
     var field: Int;
 }
-var field: Int;
-var field: Int;
 automaton A : Int {
     fun foo(param: Int) {
         assigns param;

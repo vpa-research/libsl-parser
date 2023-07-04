@@ -9,7 +9,7 @@ import org.jetbrains.research.libsl.errors.UnresolvedImportOrInclude
 import org.jetbrains.research.libsl.nodes.Library
 import org.jetbrains.research.libsl.nodes.LslVersion
 import org.jetbrains.research.libsl.nodes.MetaNode
-import org.jetbrains.research.libsl.nodes.references.builders.ActionDeclReferenceBuilder.getReference
+import org.jetbrains.research.libsl.nodes.references.builders.ActionReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder.getReference

@@ -4,6 +4,7 @@ import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.EnumSemanticTypeEntryContext
 import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
 import org.jetbrains.research.libsl.context.FunctionContext
+import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
@@ -13,7 +14,7 @@ import org.jetbrains.research.libsl.utils.Position
 class TypeResolver(
     private val basePath: String,
     private val errorManager: ErrorManager,
-    context: LslGlobalContext
+    context: LslContextBase
 ) : LibSLParserVisitor<Unit>(context) {
     override fun visitSimpleSemanticType(ctx: LibSLParser.SimpleSemanticTypeContext) {
         val typeName = ctx.semanticName.name.asPeriodSeparatedString()
@@ -142,7 +143,8 @@ class TypeResolver(
         val expressionVisitor = ExpressionVisitor(context)
         val initValue = ctx.expression()?.let { right -> expressionVisitor.visitExpression(right) }
 
-        val variable = VariableWithInitialValue(
+        // TODO() Type Context
+        return VariableWithInitialValue(
             keyword,
             name,
             typeReference,
@@ -150,9 +152,6 @@ class TypeResolver(
             initValue,
             Position(context.fileName, ctx.position().first, ctx.position().second)
         )
-
-        context.storeVariable(variable)
-        return variable
     }
 
     private fun processFunctionDecl(ctx: FunctionDeclContext): org.jetbrains.research.libsl.nodes.Function {
@@ -166,13 +165,6 @@ class TypeResolver(
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
         val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
-
-        if (returnType != null) {
-            val resultVariable = ResultVariable(returnType,
-                Position(context.fileName, ctx.position().first, ctx.position().second)
-            )
-            context.storeVariable(resultVariable)
-        }
 
         return Function(
             kind = FunctionKind.FUNCTION,

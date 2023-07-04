@@ -115,5 +115,5 @@ data class NamedArgumentWithValue(
 data class TypeOperationExpression(
     val opName: String,
     val expression: Expression,
-    val typeIdentifier: TypeReference
+    val typeReference: TypeReference
 ) : Expression()

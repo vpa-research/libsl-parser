@@ -101,6 +101,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testGenericsLsl() {
+        runLslTest("generics")
+    }
+
+    @Test
     fun testGlobalVariablesLsl() {
         runLslTest("globalVariables")
     }
@@ -206,3 +211,4 @@ class GeneratedTests {
     }
 
 }
+

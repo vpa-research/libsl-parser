@@ -53,6 +53,10 @@ class TopLevelDeclarationsResolver(
         FunctionVisitor(functionContext, parentAutomaton = null, errorManager).visitFunctionDecl(ctx)
     }
 
+    override fun visitTypeDefBlock(ctx: LibSLParser.TypeDefBlockContext) {
+        //TODO ()
+    }
+
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
         val keyword = VariableKind.fromString(ctx.keyword.text)
         val variableName = ctx.nameWithType().name.text.extractIdentifier()
@@ -70,6 +74,7 @@ class TopLevelDeclarationsResolver(
             initialValue,
             Position(context.fileName, ctx.position().first, ctx.position().second)
         )
+
         globalContext.storeVariable(variable)
     }
 

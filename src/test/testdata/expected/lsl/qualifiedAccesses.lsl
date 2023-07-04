@@ -12,12 +12,6 @@ type Type3 {
 types {
     Int(int32);
 }
-var field: Type2;
-var arrayField: array<Type3>;
-var field: Type2;
-var field: Type2;
-var arrayField: array<Type3>;
-var field: Type2;
 automaton A : Int {
     fun foo(arg: Type1) {
         arg.field.arrayField[0].field = 1;

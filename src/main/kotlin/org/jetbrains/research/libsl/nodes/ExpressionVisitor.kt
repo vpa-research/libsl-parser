@@ -24,6 +24,7 @@ abstract class ExpressionVisitor <T> {
             is ProcExpression -> visitProcExpression(node)
             is HasAutomatonConcept -> visitHasAutomatonConcept(node)
             is NamedArgumentWithValue -> visitNamedArgumentWithValue(node)
+            is TypeOperationExpression -> visitTypeOperationExpression(node)
         }
     }
 
@@ -68,4 +69,6 @@ abstract class ExpressionVisitor <T> {
     abstract fun visitNamedArgumentWithValue(node: NamedArgumentWithValue): T
 
     abstract fun visitHasAutomatonConcept(node: HasAutomatonConcept): T
+
+    abstract fun visitTypeOperationExpression(node: TypeOperationExpression): T
 }

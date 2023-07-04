@@ -3,6 +3,8 @@ package org.jetbrains.research.libsl.type
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Function
+import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
+import org.jetbrains.research.libsl.nodes.helpers.TypeDumper
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
@@ -15,17 +17,7 @@ sealed interface Type : IPrinter {
     val generics: MutableList<TypeReference>
 
     val fullName: String
-        get() = buildString {
-            append(if (isPointer) "*" else "")
-            append(name)
-            if(generics.isNotEmpty()) {
-                append("<")
-                append(generics.joinToString(separator = ", ") {
-                    it.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL
-                })
-                append(">")
-            }
-        }
+        get() = TypeDumper.dumpResolvedType(this)
 
     val isArray: Boolean
         get() = (this as? TypeAlias)?.originalType?.resolve()?.isArray == true || this is ArrayType
@@ -131,7 +123,7 @@ data class TypeGenericDecl(
     override fun dumpToString(): String = buildString {
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
-        append(typeReference.name)
+        append(TypeDumper.dumpResolvedType(typeReference.resolveOrError()))
     }
 }
 
@@ -151,7 +143,7 @@ data class StructuredType(
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
-        append("type $name ")
+        append("type $name")
         if(generics.isNotEmpty()) {
             append("<")
             append(generics.joinToString(separator = ", ") {
@@ -178,8 +170,10 @@ data class StructuredType(
                     )
                 )
             )
+            appendLine("{")
+        } else {
+            appendLine(" {")
         }
-        appendLine("{")
         variables.forEach {
             appendLine(withIndent(it.dumpToString()))
         }

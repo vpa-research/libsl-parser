@@ -77,8 +77,6 @@ class ExpressionVisitor(
     }
 
     private fun processTypeOperationExpression(ctx: ExpressionContext): TypeOperationExpression {
-        // TODO()
-        println(visitExpression(ctx.expression(0)))
         return TypeOperationExpression(ctx.typeOp.text, visitExpression(ctx.expression(0)), processTypeIdentifier(ctx.typeIdentifier()))
     }
 
@@ -338,11 +336,7 @@ class ExpressionVisitor(
     }
 
     override fun visitProcUsage(ctx: ProcUsageContext): Expression {
-        val name = when {
-            ctx.periodSeparatedFullName() != null -> ctx.periodSeparatedFullName().text.extractIdentifier()
-            ctx.simpleCall() != null -> "${ctx.simpleCall().text.extractIdentifier()}.${ctx.Identifier().text}"
-            else -> error("Incorrect proc call name")
-        }
+        val name = visitQualifiedAccess(ctx.qualifiedAccess()).lastChild.toString()
         val expressionVisitor = ExpressionVisitor(context)
         val args = mutableListOf<Expression>()
         if(ctx.expressionsList() != null) {

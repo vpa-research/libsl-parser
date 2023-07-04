@@ -9,8 +9,16 @@ types {
     Image(java.img.Image);
     Iterator(iterator);
     Something(Something);
-    List<Any>(List);
     Collection(Collection);
+}
+
+type List<Int> {
+}
+
+type SomethingElse<B> {
+}
+
+type Collection<Int> {
 }
 
 @StructureKind("record")
@@ -41,8 +49,8 @@ automaton concept IterableAutomaton : Int {
 automaton Foo(): Int implements IterableAutomaton, CollectionAutomaton
 {
    fun bar (img: BufferedImage<A, B, C>): Object {
-      var b: bool = arg0 is List<any>;
-      var x: Collection<any> = arg0 as List<any>;
+      var b: bool = arg0 is List<Int>;
+      var x: Collection<Int> = arg0 as List<Int>;
       result = img.iterator(this.offset + 2);
    }
 

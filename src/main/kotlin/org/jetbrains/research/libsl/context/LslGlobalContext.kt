@@ -71,7 +71,7 @@ class LslGlobalContext(fileName: String) : LslContextBase(fileName) {
         return resolveAnnotation(reference, setOf(this))
     }
 
-    override fun resolveDeclaredAction(reference: ActionDeclReference): ActionDecl? {
+    override fun resolveDeclaredAction(reference: ActionReference): ActionDecl? {
         return resolveDeclaredAction(reference, setOf(this))
     }
 
@@ -100,7 +100,7 @@ class LslGlobalContext(fileName: String) : LslContextBase(fileName) {
             ?: resolveInImportedContexts(visitedScopes) {v -> resolveAnnotation(reference, v)}
     }
 
-    private fun resolveDeclaredAction(reference: ActionDeclReference, visitedScopes: Set<LslGlobalContext>): ActionDecl? {
+    private fun resolveDeclaredAction(reference: ActionReference, visitedScopes: Set<LslGlobalContext>): ActionDecl? {
         return super.resolveDeclaredAction(reference)
             ?: resolveInImportedContexts(visitedScopes) { v -> resolveDeclaredAction(reference, v) }
     }

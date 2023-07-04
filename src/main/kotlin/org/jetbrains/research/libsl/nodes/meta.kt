@@ -14,7 +14,7 @@ data class Library(
     val extensionFunctionsReferences: MutableList<FunctionReference> = mutableListOf(),
     val globalVariableReferences: MutableList<VariableReference> = mutableListOf(),
     val annotationReferences: MutableList<AnnotationReference> = mutableListOf(),
-    val declaredActionReferences: MutableList<ActionDeclReference> = mutableListOf()
+    val declaredActionReferences: MutableList<ActionReference> = mutableListOf()
 ) : Node() {
     private val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }

@@ -332,8 +332,7 @@ actionUsage
    ;
 
 procUsage
-   :   periodSeparatedFullName L_BRACKET expressionsList? R_BRACKET
-   |   simpleCall DOT Identifier L_BRACKET expressionsList? R_BRACKET
+   :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList

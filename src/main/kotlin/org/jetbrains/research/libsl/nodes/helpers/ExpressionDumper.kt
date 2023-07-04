@@ -2,7 +2,6 @@ package org.jetbrains.research.libsl.nodes.helpers
 
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.utils.BackticksPolitics
-import kotlin.math.exp
 
 object ExpressionDumper {
     fun dump(expression: Expression): String = dump(expression, priority = Int.MAX_VALUE)
@@ -183,7 +182,10 @@ object ExpressionDumper {
     }
 
     private fun dumpTypeOperationExpression(expression: TypeOperationExpression): String {
-        // TODO()
-        return "${expression.expression.dumpToString()} ${expression.opName} ${expression.typeIdentifier.name}"
+        val left = expression.expression.dumpToString()
+        val resolvedType = expression.typeReference.resolveOrError()
+        return buildString {
+            append("$left ${expression.opName} ${TypeDumper.dumpResolvedType(resolvedType)}")
+        }
     }
 }

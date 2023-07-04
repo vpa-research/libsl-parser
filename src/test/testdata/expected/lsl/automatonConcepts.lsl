@@ -1,11 +1,17 @@
 libsl "1.0.0";
 library simple;
+type List<Int> {
+}
+type SomethingElse<B> {
+}
+type Collection<Int> {
+}
 @StructureKind("record")
 @Parametrized("P extends java.img.PixelType")
-type BufferedImage <A, B, C> is java.awt.image.BufferedImage for Image, Object 
+type BufferedImage<A, B, C> is java.awt.image.BufferedImage for Image, Object 
     where
     A: Something,
-    B: SomethingElse,
+    B: SomethingElse<B>,
     C: Int
 {
     var width: Int;
@@ -20,14 +26,8 @@ types {
     Image(java.img.Image);
     Iterator(iterator);
     Something(Something);
-    List(List);
     Collection(Collection);
 }
-var width: Int;
-var content: array<Something<Int>, String, Object>;
-result
-var width: Int;
-var content: array<Something<Int>, String, Object>;
 annotation StructureKind(
     str: string
 );
@@ -42,14 +42,14 @@ automaton concept IterableAutomaton : Int {
 }
 automaton Foo : Int implements IterableAutomaton, CollectionAutomaton {
     fun bar(img: BufferedImage): Object {
-        var b: bool = arg0 is List;
-        var x: `<UNRESOLVED_TYPE>` = arg0 as List;
-        result = `img.iterator`(this.offset + 2);
+        var b: bool = arg0 is List<Int>;
+        var x: Collection<Int> = arg0 as List<Int>;
+        result = iterator(this.offset + 2);
     }
     fun foo(newValue: any) {
         val x: any;
         if (this.newValue has IterableAutomaton) {
-            `IterableAutomaton(newValue).something`();
+            something();
         }
     }
 }
