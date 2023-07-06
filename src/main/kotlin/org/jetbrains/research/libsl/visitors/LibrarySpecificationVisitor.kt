@@ -84,7 +84,7 @@ class LibrarySpecificationVisitor(
             return
         }
 
-        library.imports.add(importName)
+        library.importNames.add(importName)
 
     }
 

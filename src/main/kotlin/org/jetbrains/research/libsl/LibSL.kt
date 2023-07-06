@@ -57,12 +57,14 @@ class LibSL(
         val file = parser.file()
         val library = processFileRule(file, fileName)
 
-        for (importName in library.imports) {
+        for (importName in library.importNames) {
             if (importName in processedFiles)
                 continue
 
-            loadFromFileName("$importName.lsl")
+            library.importsMap["$importName.lsl"] = loadFromFileName("$importName.lsl")
         }
+
+        println(library.importedSemanticTypesMap)
 
         return library
     }
