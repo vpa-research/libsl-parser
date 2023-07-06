@@ -10,6 +10,7 @@ import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class AutomatonResolver(
     private val basePath: String,
@@ -23,6 +24,9 @@ class AutomatonResolver(
         val typeName = ctx.type.periodSeparatedFullName().asPeriodSeparatedString()
         val typeReference = TypeReferenceBuilder.build(typeName, mutableListOf(), context = context)
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+        // TODO()
+        println(ctx.start.position())
+        println(ctx.stop.position())
 
         if (ctx.CONCEPT() == null) {
             buildingAutomaton = Automaton(
@@ -31,7 +35,7 @@ class AutomatonResolver(
                 typeReference,
                 annotationReferences,
                 context = automatonContext,
-                position = Position(context.fileName, ctx.position().first, ctx.position().second)
+                position = PositionGetter().getCtxPosition(context.fileName, ctx)
             )
         } else {
             buildingAutomaton = AutomatonConcept(
