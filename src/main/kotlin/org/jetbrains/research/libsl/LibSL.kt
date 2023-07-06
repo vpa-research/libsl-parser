@@ -64,8 +64,6 @@ class LibSL(
             library.importsMap["$importName.lsl"] = loadFromFileName("$importName.lsl")
         }
 
-        println(library.importedSemanticTypesMap)
-
         return library
     }
 
