@@ -3,10 +3,13 @@ package org.jetbrains.research.libsl.type
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class TypeInferrer(private val context: LslContextBase) {
     private val anyType by lazy { context.resolveType(AnyType.getAnyTypeReference(context))!! }
     private val nothingType by lazy { context.resolveType(NothingType.getNothingTypeReference(context))!! }
+    private val fileName = context.fileName
+    private val posGetter = PositionGetter()
 
     @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun getExpressionTypeOrNull(expression: Expression): Type? {
@@ -75,7 +78,7 @@ class TypeInferrer(private val context: LslContextBase) {
         return ArrayType(
             isPointer = false,
             generics = mutableListOf(typeOfElements.getReference(context)),
-            context = context
+            context = context,
         )
     }
 

@@ -13,9 +13,13 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
+
+    private val posGetter = PositionGetter()
+
     internal fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
         val typeName = ctx.name.asPeriodSeparatedString()
         val isPointer = ctx.asterisk != null
@@ -50,7 +54,13 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
             genericReferences = processGenerics(genericTypeIdentifierContext)
         }
 
-        val realType = RealType(typeNameParts, isPointer, genericReferences, context)
+        val realType = RealType(
+            typeNameParts,
+            isPointer,
+            genericReferences,
+            context,
+            posGetter.getCtxPosition(context.fileName, ctx)
+        )
 
         val previouslyStoredType = context.resolveType(realType.getReference(context))
         if (previouslyStoredType != null && previouslyStoredType is RealType) {
@@ -72,7 +82,11 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
             val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
             genericReferences = processGenerics(genericTypeIdentifierContext)
         }
-        return ArrayType(isPointer, genericReferences, context)
+        return ArrayType(
+            isPointer,
+            genericReferences,
+            context
+        )
     }
 
     fun getRealTypeOrArray(ctx: TypeIdentifierContext): Type {
@@ -100,7 +114,11 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument.value).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)
 
-        return AnnotationUsage(annotationRef, args, Position(context.fileName, ctx.position().first, ctx.position().second))
+        return AnnotationUsage(
+            annotationRef,
+            args,
+            posGetter.getCtxPosition(context.fileName, ctx)
+        )
     }
 
     private fun processAnnotationArgs(ctx: LibSLParser.AnnotationUsageContext): List<NamedArgumentWithValue> {
@@ -108,7 +126,13 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
         ctx.annotationArgs().forEach { a ->
             val name = a.argName()?.name?.text
             val value = ExpressionVisitor(context).visitExpression(a.expression())
-            namedArgs.add(NamedArgumentWithValue(name, value, Position(context.fileName, ctx.position().first, ctx.position().second)))
+            namedArgs.add(
+                NamedArgumentWithValue(
+                    name,
+                    value,
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+            )
         }
 
         return namedArgs

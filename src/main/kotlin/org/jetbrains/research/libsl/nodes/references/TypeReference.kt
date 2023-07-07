@@ -3,6 +3,7 @@ package org.jetbrains.research.libsl.nodes.references
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.Type
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 open class TypeReference(
     val name: String,

@@ -3,16 +3,22 @@ package org.jetbrains.research.libsl.visitors
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.nodes.*
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class BlockStatementVisitor(
     private val functionContext: FunctionContext,
     private val statements: MutableList<Statement>
     ) : LibSLParserVisitor<Unit>(functionContext) {
+    private val fileName = context.fileName
+    private val posGetter = PositionGetter()
 
     override fun visitExpression(ctx: LibSLParser.ExpressionContext) {
         val expressionVisitor = ExpressionVisitor(functionContext)
-        val expression = ExpressionStatement(expressionVisitor.visitExpression(ctx), Position(context.fileName, ctx.position().first, ctx.position().second))
+        val expression = ExpressionStatement(
+            expressionVisitor.visitExpression(ctx),
+            posGetter.getCtxPosition(fileName, ctx)
+        )
         statements.add(expression)
     }
 
@@ -21,7 +27,12 @@ class BlockStatementVisitor(
         val left = expressionVisitor.visitQualifiedAccess(ctx.qualifiedAccess())
         val op = AssignOps.fromString(ctx.op.text)
         val value = expressionVisitor.visitExpression(ctx.expression())
-        val assignment = Assignment(left, op, value, Position(context.fileName, ctx.position().first, ctx.position().second))
+        val assignment = Assignment(
+            left,
+            op,
+            value,
+            posGetter.getCtxPosition(fileName, ctx)
+        )
         statements.add(assignment)
     }
 
@@ -38,10 +49,18 @@ class BlockStatementVisitor(
             val elseStatementsVisitor = BlockStatementVisitor(functionContext, elseStatements)
             elseStmt.functionBodyStatements().forEach { elseStatementsVisitor.visit(it) }
 
-            ElseStatement(elseStatements, Position(context.fileName, ifCtx.position().first, ifCtx.position().second))
+            ElseStatement(
+                elseStatements,
+                posGetter.getCtxPosition(fileName, ifCtx)
+            )
         }
 
-        val ifBlock = IfStatement(value, ifStatements, elseStatement, Position(context.fileName, ifCtx.position().first, ifCtx.position().second))
+        val ifBlock = IfStatement(
+            value,
+            ifStatements,
+            elseStatement,
+            posGetter.getCtxPosition(fileName, ifCtx)
+        )
 
         statements.add(ifBlock)
     }
@@ -59,9 +78,12 @@ class BlockStatementVisitor(
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
             initValue,
-            Position(context.fileName, ctx.position().first, ctx.position().second)
+            posGetter.getCtxPosition(fileName, ctx)
         )
-        val variableDeclaration = VariableDeclaration(variable, Position(context.fileName, ctx.position().first, ctx.position().second))
+        val variableDeclaration = VariableDeclaration(
+            variable,
+            posGetter.getCtxPosition(fileName, ctx)
+        )
         statements.add(variableDeclaration)
         context.storeVariable(variable)
     }

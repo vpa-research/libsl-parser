@@ -5,17 +5,20 @@ import org.jetbrains.research.libsl.LibSLParser.EnumSemanticTypeEntryContext
 import org.jetbrains.research.libsl.LibSLParser.FunctionDeclContext
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.type.*
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class TypeResolver(
     private val basePath: String,
     private val errorManager: ErrorManager,
     context: LslContextBase
 ) : LibSLParserVisitor<Unit>(context) {
+    private val fileName = context.fileName
+    private val posGetter = PositionGetter()
+
     override fun visitSimpleSemanticType(ctx: LibSLParser.SimpleSemanticTypeContext) {
         val typeName = ctx.semanticName.name.asPeriodSeparatedString()
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
@@ -26,7 +29,8 @@ class TypeResolver(
             typeName,
             originType,
             annotationReferences,
-            context = context
+            context = context,
+            entityPosition = posGetter.getCtxPosition(fileName, ctx)
         )
 
         context.storeType(originType)
@@ -46,7 +50,8 @@ class TypeResolver(
             originType,
             entries,
             annotationReferences,
-            context
+            context,
+            posGetter.getCtxPosition(fileName, ctx)
         )
 
         context.storeType(originType)
@@ -71,7 +76,13 @@ class TypeResolver(
         val originalTypeReference = processTypeIdentifier(ctx.right)
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
-        val type = TypeAlias(name, originalTypeReference, annotationReferences, context)
+        val type = TypeAlias(
+            name,
+            originalTypeReference,
+            annotationReferences,
+            context,
+            posGetter.getCtxPosition(fileName, ctx)
+        )
 
         context.storeType(type)
     }
@@ -82,7 +93,13 @@ class TypeResolver(
         val statements = processEnumStatements(statementsContexts)
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
-        val type = EnumType(name, statements, annotationReferences, context)
+        val type = EnumType(
+            name,
+            statements,
+            annotationReferences,
+            context,
+            posGetter.getCtxPosition(fileName, ctx)
+        )
 
         context.storeType(type)
     }
@@ -123,13 +140,28 @@ class TypeResolver(
         val typeGenericDeclBlock = mutableListOf<TypeGenericDecl>()
         if(ctx.typeDefGenericDeclBlock() != null) {
             ctx.typeDefGenericDeclBlock().nameWithType().forEach {
-                typeGenericDeclBlock.add(TypeGenericDecl(it.name.text, processTypeIdentifier(it.type),
-                    Position(context.fileName, ctx.position().first, ctx.position().second))
+                typeGenericDeclBlock.add(
+                    TypeGenericDecl(
+                        it.name.text,
+                        processTypeIdentifier(it.type),
+                        posGetter.getCtxPosition(fileName, ctx)
+                    )
                 )
             }
         }
 
-        val type = StructuredType(name, variables, functions, isTypeIdentifier, forTypeList, typeGenericDeclBlock, annotationReferences, context)
+        val type = StructuredType(
+            name,
+            variables,
+            functions,
+            isTypeIdentifier,
+            forTypeList,
+            typeGenericDeclBlock,
+            annotationReferences,
+            context,
+            posGetter.getCtxPosition(fileName, ctx)
+        )
+
         if(ctx.generic() != null) {
             type.generics.addAll(processGenerics(ctx.generic().typeIdentifier()))
         }
@@ -150,7 +182,7 @@ class TypeResolver(
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
             initValue,
-            Position(context.fileName, ctx.position().first, ctx.position().second)
+            posGetter.getCtxPosition(fileName, ctx)
         )
     }
 
@@ -177,7 +209,7 @@ class TypeResolver(
             targetAutomatonRef = null,
             context = functionContext,
             isStatic = isStatic,
-            position = Position(context.fileName, ctx.position().first, ctx.position().second)
+            entityPosition = posGetter.getCtxPosition(fileName, ctx)
         )
     }
 
@@ -191,7 +223,7 @@ class TypeResolver(
                 val arg = FunctionArgument(parameter.name.text.extractIdentifier(), typeRef, i,
                     annotationsReferences,
                     targetAutomaton = null,
-                    Position(context.fileName, parameter.position().first, parameter.position().second)
+                    entityPosition = posGetter.getCtxPosition(fileName, parameter)
                 )
                 arg
             }

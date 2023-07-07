@@ -1,12 +1,11 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.AutomatonContext
-import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
 
 open class Automaton(
     open val isConcept: Boolean,
@@ -24,7 +23,7 @@ open class Automaton(
     open val localFunctions: MutableList<Function> = mutableListOf(),
     open val extensionFunctions: MutableList<Function> = mutableListOf(),
     open val context: AutomatonContext,
-    open val position: Position
+    open val entityPosition: EntityPosition
 ) : Node() {
     open val functions: List<Function>
         get() = localFunctions + extensionFunctions
@@ -94,12 +93,12 @@ data class AutomatonConcept(
     override val localFunctions: MutableList<Function> = mutableListOf(),
     override val extensionFunctions: MutableList<Function> = mutableListOf(),
     override val context: AutomatonContext,
-    override val position: Position
+    override val entityPosition: EntityPosition
 ) : Automaton(
     isConcept, name, typeReference, annotationUsages,
     implementedConcepts, states, shifts, internalVariables,
     constructorVariables, constructors, destructors, procDeclarations,
-    localFunctions, extensionFunctions, context, position
+    localFunctions, extensionFunctions, context, entityPosition
 ) {
     override val functions: List<Function>
         get() = localFunctions + extensionFunctions
@@ -154,7 +153,8 @@ data class AutomatonConcept(
 }
 
 data class ImplementedConcept(
-    val name: String
+    val name: String,
+    val entityPosition: EntityPosition
 )
 
 data class State(
@@ -162,6 +162,7 @@ data class State(
     val kind: StateKind,
     val isSelf: Boolean = false,
     val isAny: Boolean = false,
+    val entityPosition: EntityPosition
 ) : Node() {
     lateinit var automaton: Automaton
 
@@ -171,7 +172,8 @@ data class State(
 data class Shift(
     val from: State,
     val to: State,
-    val functions: MutableList<FunctionReference> = mutableListOf()
+    val functions: MutableList<FunctionReference> = mutableListOf(),
+    val entityPosition: EntityPosition
 ) : Node() {
     override fun dumpToString(): String = buildString {
         append("shift ")

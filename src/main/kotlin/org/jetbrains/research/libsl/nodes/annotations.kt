@@ -4,12 +4,12 @@ import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
 
 data class Annotation(
     val name: String,
     val argumentDescriptors: MutableList<AnnotationArgumentDescriptor> = mutableListOf(),
-    val position: Position
+    val entityPosition: EntityPosition
 ) : IPrinter {
     override fun toString(): String = dumpToString()
 
@@ -34,7 +34,8 @@ data class Annotation(
 data class AnnotationArgumentDescriptor(
     val name: String,
     val typeReference: TypeReference,
-    val initialValue: Expression?
+    val initialValue: Expression?,
+    val entityPosition: EntityPosition
 ) : IPrinter {
     override fun dumpToString(): String = buildString {
         val type = BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: Type.UNRESOLVED_TYPE_SYMBOL)
@@ -48,7 +49,7 @@ data class AnnotationArgumentDescriptor(
 data class AnnotationUsage(
     val annotationReference: AnnotationReference,
     val arguments: List<NamedArgumentWithValue>,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : IPrinter {
     override fun dumpToString() = buildString {
         append("@${BackticksPolitics.forIdentifier(annotationReference.resolveOrError().name)}")

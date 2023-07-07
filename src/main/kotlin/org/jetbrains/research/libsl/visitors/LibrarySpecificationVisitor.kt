@@ -16,6 +16,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceB
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceBuilder.getReference
 import org.jetbrains.research.libsl.type.RealType
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class LibrarySpecificationVisitor(
     val fileName: String,
@@ -24,6 +25,7 @@ class LibrarySpecificationVisitor(
     private val globalContext: LslGlobalContext
 ) : LibSLParserVisitor<Unit>(globalContext) {
     private lateinit var library: Library
+    private val posGetter = PositionGetter()
 
     fun processFile(file: FileContext): Library {
         val header = processHeader(file.header())
@@ -75,6 +77,7 @@ class LibrarySpecificationVisitor(
         super.visitGlobalStatement(ctx)
     }
 
+    // TODO() Replace Position with EntityPosition
     private fun processImport(str: String, position: Position) {
         val importRegex = Regex("^(import)\\s+(.+);")
         val importName = importRegex.find(str)?.groupValues?.get(2)

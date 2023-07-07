@@ -8,13 +8,16 @@ import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class TopLevelDeclarationsResolver(
     private val basePath: String,
     private val errorManager: ErrorManager,
     private val globalContext: LslGlobalContext
 ) : LibSLParserVisitor<Unit>(globalContext) {
+    private val fileName = context.fileName
+    private val posGetter = PositionGetter()
 
     override fun visitAnnotationDecl(ctx: LibSLParser.AnnotationDeclContext) {
         val annotationName = ctx.Identifier().asPeriodSeparatedString()
@@ -27,12 +30,17 @@ class TopLevelDeclarationsResolver(
                 processTypeIdentifier(parameterCtx.nameWithType().type),
                 parameterCtx.expression()?.let {
                     expressionVisitor.visitExpression(it)
-                }
+                },
+                posGetter.getCtxPosition(fileName, ctx)
             )
             params.add(param)
         }
 
-        val annotation = Annotation(annotationName, params, Position(context.fileName, ctx.position().first, ctx.position().second))
+        val annotation = Annotation(
+            annotationName,
+            params,
+            posGetter.getCtxPosition(fileName, ctx)
+        )
         globalContext.storeAnnotation(annotation)
     }
 
@@ -72,7 +80,7 @@ class TopLevelDeclarationsResolver(
             typeRef,
             annotationUsages,
             initialValue,
-            Position(context.fileName, ctx.position().first, ctx.position().second)
+            posGetter.getCtxPosition(fileName, ctx)
         )
 
         globalContext.storeVariable(variable)
@@ -87,7 +95,7 @@ class TopLevelDeclarationsResolver(
                 param.name.text.extractIdentifier(),
                 processTypeIdentifier(param.type),
                 getAnnotationUsages(param.annotationUsage()),
-                Position(context.fileName, ctx.position().first, ctx.position().second)
+                posGetter.getCtxPosition(fileName, ctx)
             )
 
             actionParams.add(actionParam)
@@ -95,8 +103,12 @@ class TopLevelDeclarationsResolver(
 
         val returnType = ctx.actionType?.let { processTypeIdentifier(it) }
         val actionAnnotations = getAnnotationUsages(ctx.annotationUsage())
-        val declaredAction = ActionDecl(actionName, actionParams, actionAnnotations, returnType,
-            Position(context.fileName, ctx.position().first, ctx.position().second)
+        val declaredAction = ActionDecl(
+            actionName,
+            actionParams,
+            actionAnnotations,
+            returnType,
+            posGetter.getCtxPosition(fileName, ctx)
         )
         globalContext.storeDeclaredAction(declaredAction)
     }
