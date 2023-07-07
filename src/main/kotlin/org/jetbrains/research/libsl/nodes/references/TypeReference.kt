@@ -1,14 +1,15 @@
 package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.nodes.Generic
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.PositionGetter
 
-open class TypeReference(
+data class TypeReference(
     val name: String,
     val isPointer: Boolean,
-    val genericReferences: MutableList<TypeReference>,
+    val generics: MutableList<Generic>,
     override val context: LslContextBase
 ) : LslReference<Type, TypeReference> {
     override fun resolve(): Type? {
@@ -18,8 +19,8 @@ open class TypeReference(
     private fun resolveArrayType(): ArrayType? {
         if (name != "array")
             return null
-        genericReferences.forEach { it.resolve() }
-        return ArrayType(isPointer, genericReferences, context)
+        generics.forEach { it.typeReference.resolve() }
+        return ArrayType(isPointer, generics, context)
     }
 
     override fun isReferenceMatchWithNode(node: Type): Boolean {
@@ -38,12 +39,12 @@ open class TypeReference(
         return true
     }
 
-    private fun areGenericsMatch(generics: MutableList<TypeReference>): Boolean {
-        if (this.genericReferences.isEmpty() && generics.isEmpty()) {
+    private fun areGenericsMatch(generics: MutableList<Generic>): Boolean {
+        if (this.generics.isEmpty() && generics.isEmpty()) {
             return true
         }
 
-        if (this.genericReferences.isEmpty() || generics.isEmpty()) {
+        if (this.generics.isEmpty() || generics.isEmpty()) {
             return false
         }
 
@@ -51,12 +52,16 @@ open class TypeReference(
     }
 
     override fun isSameReference(other: TypeReference): Boolean {
+        val thisGenRefs = this.generics.map { generic -> generic.typeReference }
+        val otherGenRefs = other.generics.map { generic -> generic.typeReference }
+
+
         return this.name == other.name
                 && this.isPointer == other.isPointer
-                && (other.genericReferences.isEmpty() || this.genericReferences.isSameReference(other.genericReferences))
+                && (thisGenRefs.isEmpty() || thisGenRefs.isSameReference(otherGenRefs))
     }
 
-    private fun MutableList<TypeReference>.isSameReference(other: MutableList<TypeReference>): Boolean {
+    private fun List<TypeReference>.isSameReference(other: List<TypeReference>): Boolean {
         if (this.size != other.size) {
             return false
         }
@@ -71,26 +76,6 @@ open class TypeReference(
     }
 
     override fun toString(): String {
-        return "TypeReference(name=$name, isPointer=$isPointer, genericReferences=$genericReferences)"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TypeReference) return false
-
-        if (name != other.name) return false
-        if (isPointer != other.isPointer) return false
-        if (genericReferences != other.genericReferences) return false
-        if (context != other.context) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + isPointer.hashCode()
-        result = 31 * result + (genericReferences.hashCode() ?: 0)
-        result = 31 * result + context.hashCode()
-        return result
+        return "TypeReference(name=$name, isPointer=$isPointer, genericReferences=$generics)"
     }
 }

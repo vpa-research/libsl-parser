@@ -4,16 +4,12 @@ import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.TypeIdentifierContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.AnnotationUsage
-import org.jetbrains.research.libsl.nodes.NamedArgumentWithValue
+import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
-import org.jetbrains.research.libsl.type.ArrayType
-import org.jetbrains.research.libsl.type.RealType
-import org.jetbrains.research.libsl.type.Type
-import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.type.*
 import org.jetbrains.research.libsl.utils.PositionGetter
 
 abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
@@ -23,22 +19,31 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
     internal fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
         val typeName = ctx.name.asPeriodSeparatedString()
         val isPointer = ctx.asterisk != null
-        var genericReferences = mutableListOf<TypeReference>()
+        val generics = mutableListOf<Generic>()
 
         if(ctx.generic() != null) {
-            val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
-            genericReferences = processGenerics(genericTypeIdentifierContext)
+            generics.addAll(processGenerics(ctx.generic()))
         }
 
-        return TypeReferenceBuilder.build(typeName, genericReferences, isPointer, context)
+        return TypeReferenceBuilder.build(typeName, generics, isPointer, context)
     }
 
-    fun processGenerics(ctx: MutableList<TypeIdentifierContext>): MutableList<TypeReference> {
-        val genericReferences = mutableListOf<TypeReference>()
-        ctx.forEach {
-            val generic = getRealType(it)
+    fun processGenerics(ctx: LibSLParser.GenericContext): MutableList<Generic> {
+        val genericReferences = mutableListOf<Generic>()
+        ctx.genericPart().forEach {
+            val genericModifier = if(it.genericModifier == null) {
+                ""
+            } else {
+                GenericModifier.fromString(it.genericModifier.text).string
+            }
+            val generic = getRealType(it.typeIdentifier())
             val genericRef = generic.getReference(context)
-            genericReferences.add(genericRef)
+            genericReferences.add(
+                Generic(
+                    genericModifier,
+                    genericRef
+                )
+            )
         }
         return genericReferences
     }
@@ -47,17 +52,16 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
         val typeNameParts = ctx.name.asPeriodSeparatedParts()
         val isPointer = ctx.asterisk != null
 
-        var genericReferences = mutableListOf<TypeReference>()
+        val generics = mutableListOf<Generic>()
 
         if(ctx.generic() != null) {
-            val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
-            genericReferences = processGenerics(genericTypeIdentifierContext)
+            generics.addAll(processGenerics(ctx.generic()))
         }
 
         val realType = RealType(
             typeNameParts,
             isPointer,
-            genericReferences,
+            generics,
             context,
             posGetter.getCtxPosition(context.fileName, ctx)
         )
@@ -76,15 +80,15 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
         check(typeNameParts[0] == "array" && typeNameParts.size == 1) { "not an array" }
 
         val isPointer = ctx.asterisk != null
-        var genericReferences = mutableListOf<TypeReference>()
+        val generics = mutableListOf<Generic>()
 
         if(ctx.generic() != null) {
-            val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
-            genericReferences = processGenerics(genericTypeIdentifierContext)
+            generics.addAll(processGenerics(ctx.generic()))
         }
+
         return ArrayType(
             isPointer,
-            genericReferences,
+            generics,
             context
         )
     }

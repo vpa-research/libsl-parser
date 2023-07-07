@@ -11,7 +11,7 @@ object TypeDumper {
             if(type.generics.isNotEmpty()) {
                 append("<")
                 append(type.generics.joinToString(separator = ", ") {
-                    dumpResolvedType(it.resolveOrError())
+                    it.dumpToString()
                 })
                 append(">")
             }

@@ -13,7 +13,7 @@ sealed interface Type : IPrinter {
     val name: String
     val isPointer: Boolean
     val context: LslContextBase
-    val generics: MutableList<TypeReference>
+    val generics: MutableList<Generic>
 
     val fullName: String
         get() = TypeDumper.dumpResolvedType(this)
@@ -36,7 +36,7 @@ sealed interface LibslType : Type
 data class RealType(
     val nameParts: List<String>,
     override val isPointer: Boolean = false,
-    override val generics: MutableList<TypeReference>,
+    override val generics: MutableList<Generic>,
     override val context: LslContextBase,
     val entityPosition: EntityPosition
 ) : Type {
@@ -56,7 +56,7 @@ data class SimpleType(
     override val context: LslContextBase,
     val entityPosition: EntityPosition
 ) : LibslType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String {
@@ -77,7 +77,7 @@ data class TypeAlias(
     val entityPosition: EntityPosition
 ) : LibslType {
     override val isPointer: Boolean = false
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
 
     override val isTopLevelType: Boolean = true
 
@@ -104,7 +104,7 @@ data class EnumLikeSemanticType(
     val entityPosition: EntityPosition
 ) : LibslType {
     override val isPointer: Boolean = false
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val isTypeBlockType: Boolean = true
 
     override fun dumpToString(): String = buildString {
@@ -143,7 +143,7 @@ data class StructuredType(
 ) : Type {
     override val isPointer: Boolean = false
     override val isTopLevelType: Boolean = true
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
@@ -151,7 +151,7 @@ data class StructuredType(
         if(generics.isNotEmpty()) {
             append("<")
             append(generics.joinToString(separator = ", ") {
-                it.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL
+                it.dumpToString()
             })
             append(">")
         }
@@ -220,7 +220,7 @@ data class EnumType(
     val entityPosition: EntityPosition
 ) : Type {
     override val isPointer: Boolean = false
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val isTopLevelType: Boolean = true
 
     override fun dumpToString(): String = buildString {
@@ -236,7 +236,7 @@ data class EnumType(
 
 data class ArrayType(
     override val isPointer: Boolean = false,
-    override val generics: MutableList<TypeReference>,
+    override val generics: MutableList<Generic>,
     override val context: LslContextBase
 ) : Type {
     override val name: String = "array"

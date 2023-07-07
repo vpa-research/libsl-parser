@@ -228,7 +228,11 @@ typeIdentifier
    ;
 
 generic
-   :   (L_ARROW typeIdentifier (COMMA typeIdentifier)* R_ARROW)
+   :   L_ARROW genericPart (COMMA genericPart)* R_ARROW
+   ;
+
+genericPart
+   :   genericModifier=Identifier? typeIdentifier
    ;
 
 variableAssignment

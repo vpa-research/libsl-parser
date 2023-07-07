@@ -5,7 +5,7 @@ types {
     Int(int32);
 }
 
-type List<Int, Collection<Int>> {
+type List<in Int, out Collection<Int>> {
 }
 
 type Collection<Int> {

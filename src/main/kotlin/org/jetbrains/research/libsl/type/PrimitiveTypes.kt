@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.nodes.Generic
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 
@@ -15,7 +16,7 @@ data class IntType(
     val capacity: IntCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val name: String = if (capacity == IntCapacity.UNKNOWN) {
         ""
     } else {
@@ -32,7 +33,7 @@ data class UnsignedType(
     val capacity: UnsignedCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val name: String = capacity.name.lowercase()
 
     enum class UnsignedCapacity {
@@ -44,7 +45,7 @@ data class Float32Type(
     override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val name: String = "float32"
 }
 
@@ -52,7 +53,7 @@ data class Float64Type(
     override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val name: String = "float64"
 }
 
@@ -60,7 +61,7 @@ data class BoolType(
     override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val name: String = "bool"
 }
 
@@ -68,7 +69,7 @@ data class CharType(
     override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val name: String = "char"
 }
 
@@ -76,7 +77,7 @@ data class StringType(
     override val context: LslContextBase,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     override val name: String = "string"
 }
 
@@ -85,7 +86,7 @@ data class VoidType(
     override val isPointer: Boolean = false
 ) : PrimitiveType {
     override val name: String = "void"
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
 }
 
 data class AnyType(
@@ -93,13 +94,13 @@ data class AnyType(
 ) : PrimitiveType {
     override val name: String = ANY_TYPE_NAME
     override val isPointer: Boolean = false
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
 
     companion object {
         const val ANY_TYPE_NAME = "any"
 
         fun getAnyTypeReference(context: LslContextBase): TypeReference{
-            return TypeReferenceBuilder.build(ANY_TYPE_NAME, genericReferences = mutableListOf(), isPointer = false, context)
+            return TypeReferenceBuilder.build(ANY_TYPE_NAME, generics = mutableListOf(), isPointer = false, context)
         }
     }
 }
@@ -109,12 +110,12 @@ data class NothingType(
 ) : PrimitiveType {
     override val name: String = Nothing_TYPE_NAME
     override val isPointer: Boolean = false
-    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val generics: MutableList<Generic> = mutableListOf()
     companion object {
         const val Nothing_TYPE_NAME = "nothing"
 
         fun getNothingTypeReference(context: LslContextBase): TypeReference{
-            return TypeReferenceBuilder.build(Nothing_TYPE_NAME, genericReferences = mutableListOf(), isPointer = false, context)
+            return TypeReferenceBuilder.build(Nothing_TYPE_NAME, generics = mutableListOf(), isPointer = false, context)
         }
     }
 }

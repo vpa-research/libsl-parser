@@ -8,7 +8,6 @@ import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.type.*
-import org.jetbrains.research.libsl.utils.EntityPosition
 import org.jetbrains.research.libsl.utils.PositionGetter
 
 class TypeResolver(
@@ -163,8 +162,9 @@ class TypeResolver(
         )
 
         if(ctx.generic() != null) {
-            type.generics.addAll(processGenerics(ctx.generic().typeIdentifier()))
+            type.generics.addAll(processGenerics(ctx.generic()))
         }
+
         context.storeType(type)
     }
 
