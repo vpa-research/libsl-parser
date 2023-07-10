@@ -128,6 +128,7 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
             is ExpressionStatement -> {
                 function.context.typeInferrer.getExpressionType(s.expression)
             }
+            is FunctionUsage -> {}
         }
     }
 }

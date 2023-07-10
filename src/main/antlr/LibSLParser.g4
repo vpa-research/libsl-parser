@@ -339,6 +339,10 @@ procUsage
    :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
    ;
 
+funUsage
+   :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
+   ;
+
 expressionsList
    :   expression (COMMA expression)* (COMMA)?
    ;
@@ -391,6 +395,7 @@ expression
    |   unaryOp
    |   procUsage
    |   actionUsage
+   |   funUsage
    |   callAutomatonConstructorWithNamedArgs
    |   hasAutomatonConcept
    ;

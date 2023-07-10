@@ -27,6 +27,7 @@ object ExpressionDumper {
             is HasAutomatonConcept -> dumpHasAutomatonConcept(expression)
             is NamedArgumentWithValue -> dumpNamedArgumentWithValue(expression)
             is TypeOperationExpression -> dumpTypeOperationExpression(expression)
+            is FunctionUsageExpression -> dumpFunctionUsageExpression(expression)
         }
     }
 
@@ -164,6 +165,17 @@ object ExpressionDumper {
             append("${BackticksPolitics.forIdentifier(expression.procedureCall.name)}(")
             if(expression.procedureCall.arguments.isNotEmpty()) {
                 val args = expression.procedureCall.arguments.map { dump(it) }
+                append(args.joinToString(separator = ", "))
+            }
+            append(")")
+        }
+    }
+
+    private fun dumpFunctionUsageExpression(expression: FunctionUsageExpression): String {
+        return buildString {
+            append("${BackticksPolitics.forIdentifier(expression.functionUsage.name)}(")
+            if(expression.functionUsage.arguments.isNotEmpty()) {
+                val args = expression.functionUsage.arguments.map { dump(it) }
                 append(args.joinToString(separator = ", "))
             }
             append(")")

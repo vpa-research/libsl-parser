@@ -413,6 +413,8 @@ class ExpressionVisitor(
             posGetter.getCtxPosition(fileName, ctx)
         )
 
+        println(context.getAllFunctions())
+
         return ProcExpression(
             procedureCall,
             posGetter.getCtxPosition(fileName, ctx)

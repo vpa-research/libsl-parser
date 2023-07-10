@@ -14,6 +14,17 @@ type Collection<Int> {
 type T<Int> {
 }
 
+type X {
+}
+
+type Smth<X> {
+    var qwerty: X;
+}
+
+automaton Auto: Smth<Y> {
+    fun hello(): Y;
+}
+
 automaton Foo(val y: Int): T<Int> {
 
    state S1;

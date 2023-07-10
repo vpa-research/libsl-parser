@@ -73,6 +73,21 @@ data class ProcedureCall(
     }
 }
 
+data class FunctionUsage(
+    val name: String,
+    val arguments: MutableList<Expression> = mutableListOf(),
+    val entityPosition: EntityPosition
+) : Statement() {
+    override fun dumpToString(): String = buildString {
+        append("${BackticksPolitics.forIdentifier(name)}(")
+        if(arguments.isNotEmpty()) {
+            val args = arguments.map { it.dumpToString() }
+            append(args.joinToString(separator = ", "))
+        }
+        append(");")
+    }
+}
+
 data class ExpressionStatement(
     val expression: Expression,
     val entityPosition: EntityPosition

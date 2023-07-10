@@ -99,6 +99,11 @@ data class ProcExpression(
     val entityPosition: EntityPosition
 ) : Expression()
 
+data class FunctionUsageExpression(
+    val functionUsage: FunctionUsage,
+    val entityPosition: EntityPosition
+) : Expression()
+
 data class HasAutomatonConcept(
     val variable: QualifiedAccess,
     val automatonReference: AutomatonReference,
