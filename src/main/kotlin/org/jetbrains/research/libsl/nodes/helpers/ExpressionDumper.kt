@@ -82,6 +82,15 @@ object ExpressionDumper {
                     add(arg.dumpToString())
                 }
             }
+
+            if(expression.generics.isNotEmpty()) {
+                append("<")
+                append(expression.generics.joinToString(separator = ", ") {
+                    it.dumpToString()
+                })
+                append(">")
+            }
+
             append(formattedArgs.joinToString(separator = ", ", prefix = "(", postfix = ")"))
         }
     }

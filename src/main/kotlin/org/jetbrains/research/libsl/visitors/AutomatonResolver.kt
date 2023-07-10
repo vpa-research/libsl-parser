@@ -23,8 +23,7 @@ class AutomatonResolver(
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.asPeriodSeparatedString()
-        val typeName = ctx.type.periodSeparatedFullName().asPeriodSeparatedString()
-        val typeReference = TypeReferenceBuilder.build(typeName, mutableListOf(), context = context)
+        val typeReference = processTypeIdentifier(ctx.typeIdentifier())
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
         if (ctx.CONCEPT() == null) {

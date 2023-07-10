@@ -361,11 +361,16 @@ class ExpressionVisitor(
         check(stateName != null)
 
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
+        val generics = mutableListOf<Generic>()
+        if(ctx.generic() != null) {
+            generics.addAll(processGenerics(ctx.generic()))
+        }
 
         return CallAutomatonConstructor(
             automatonRef,
             args,
             stateRef,
+            generics,
             posGetter.getCtxPosition(fileName, ctx)
         )
     }

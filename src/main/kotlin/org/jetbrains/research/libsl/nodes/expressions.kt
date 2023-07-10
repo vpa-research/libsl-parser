@@ -74,11 +74,10 @@ data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
     val args: List<NamedArgumentWithValue>,
     val stateRef: AutomatonStateReference,
+    val generics: MutableList<Generic>,
     val entityPosition: EntityPosition
 ) : Atomic() {
     override val value: Any? = null
-
-    override fun toString(): String = dumpToString()
 }
 
 data class ArrayLiteral(
