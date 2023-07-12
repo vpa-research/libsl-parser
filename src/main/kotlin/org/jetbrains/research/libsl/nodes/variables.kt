@@ -1,5 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.nodes.helpers.TypeDumper
 import org.jetbrains.research.libsl.nodes.references.AnnotationReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
@@ -87,7 +88,7 @@ class FunctionArgument(
         if (targetAutomaton != null) {
             append(targetAutomaton!!.name)
         } else {
-            append(typeReference.name)
+            append(TypeDumper.dumpResolvedType(typeReference.resolveOrError()))
         }
     }
 }

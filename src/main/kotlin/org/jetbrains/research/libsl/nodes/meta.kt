@@ -6,7 +6,7 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Library(
     val fileName: String,
-    val metadata: MetaNode,
+    val metadata: MetaNode?,
     val importNames: MutableList<String> = mutableListOf(),
     val importsMap: MutableMap<String, Library> = mutableMapOf(),
     val includes: MutableList<String> = mutableListOf(),
@@ -34,7 +34,9 @@ data class Library(
 
 
     override fun dumpToString(): String = buildString {
-        appendLine(metadata.dumpToString())
+        if(metadata != null) {
+            appendLine(metadata.dumpToString())
+        }
         append(formatImports())
         append(formatIncludes())
         append(formatTopLevelSemanticTypes())

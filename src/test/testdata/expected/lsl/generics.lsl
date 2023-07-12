@@ -1,5 +1,3 @@
-libsl "1.0.0";
-library simple;
 type List<in Int, out Collection<Int>> {
 }
 type Collection<Int> {

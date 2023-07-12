@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnresolvedState
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 import org.jetbrains.research.libsl.utils.PositionGetter
@@ -53,7 +54,12 @@ class AutomatonResolver(
 
     override fun visitImplementedConcepts(ctx: LibSLParser.ImplementedConceptsContext) {
         ctx.concept().forEach {
-            buildingAutomaton.implementedConcepts.add(ImplementedConcept(it.name.text, posGetter.getCtxPosition(fileName, ctx)))
+            buildingAutomaton.implementedConcepts.add(
+                ImplementedConcept(
+                    it.name.text,
+                    posGetter.getCtxPosition(fileName, ctx)
+                )
+            )
         }
     }
 
@@ -64,8 +70,9 @@ class AutomatonResolver(
         val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
-        val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()),
-        posGetter.getCtxPosition(fileName, ctx)
+        val argument = ConstructorArgument(
+            keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()),
+            posGetter.getCtxPosition(fileName, ctx)
         )
         context.storeVariable(argument)
         buildingAutomaton.constructorVariables.add(argument)
@@ -85,14 +92,19 @@ class AutomatonResolver(
         val toStateName = ctx.to.text
         val toState = getToState(toStateName, ctx)
         if (toState == null) {
-            errorManager(UnresolvedState("unresolved state: $toStateName", ctx.position()))
+            errorManager(UnresolvedState("unresolved state: $toStateName", posGetter.getCtxPosition(fileName, ctx)))
             return
         }
 
         for (fromStateName in ctx.fromStatesNames) {
             val fromState = getFromState(fromStateName, ctx)
             if (fromState == null) {
-                errorManager(UnresolvedState("unresolved state: $fromStateName", ctx.position()))
+                errorManager(
+                    UnresolvedState(
+                        "unresolved state: $fromStateName",
+                        posGetter.getCtxPosition(fileName, ctx)
+                    )
+                )
                 continue
             }
 
@@ -112,7 +124,12 @@ class AutomatonResolver(
 
     private fun getToState(name: String, ctx: LibSLParser.AutomatonShiftDeclContext): State? {
         if (name == "self") {
-            return State(name, StateKind.SIMPLE, isSelf = true, entityPosition = posGetter.getCtxPosition(fileName, ctx))
+            return State(
+                name,
+                StateKind.SIMPLE,
+                isSelf = true,
+                entityPosition = posGetter.getCtxPosition(fileName, ctx)
+            )
         }
 
         return buildingAutomaton.states.firstOrNull { s -> s.name == name }
@@ -133,24 +150,33 @@ class AutomatonResolver(
 
             val result = mutableListOf<FunctionReference>()
 
-            for (functionListPart in this.functionsList()?.functionsListPart() ?: listOf(functionsListPart())) {
-                val ids = functionListPart.Identifier().map { id -> id.asPeriodSeparatedString() }
-                val functionName = ids.first()
-
-                val argTypesNames = ids.drop(1)
-                val argTypesRefs = argTypesNames.map { name ->
-                    TypeReferenceBuilder.build(name, mutableListOf(), context = context)
+            if (functionsList() == null && functionsListPart() != null) {
+                val functionName = functionsListPart().name.asPeriodSeparatedString()
+                val argTypes = mutableListOf<TypeReference>()
+                functionsListPart().typeIdentifier()?.forEach { t ->
+                    argTypes.add(processTypeIdentifier(t))
                 }
-
                 val ref = FunctionReferenceBuilder.build(
                     name = functionName,
-                    argTypes = argTypesRefs,
+                    argTypes = argTypes,
                     context
                 )
-
                 result.add(ref)
+            } else {
+                functionsList()?.functionsListPart()?.forEach { f ->
+                    val functionName = f.name.asPeriodSeparatedString()
+                    val argTypes = mutableListOf<TypeReference>()
+                    f.typeIdentifier()?.forEach { t ->
+                        argTypes.add(processTypeIdentifier(t))
+                    }
+                    val ref = FunctionReferenceBuilder.build(
+                        name = functionName,
+                        argTypes = argTypes,
+                        context
+                    )
+                    result.add(ref)
+                }
             }
-
             return result
         }
 

@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.nodes
 
 import org.jetbrains.research.libsl.context.AutomatonContext
+import org.jetbrains.research.libsl.nodes.helpers.TypeDumper
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
@@ -188,7 +189,7 @@ data class Shift(
                     val functionName = function.name
                     if (function.argTypes.isNotEmpty()) {
                         val argTypeNames =
-                            function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.name }
+                            function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { TypeDumper.dumpResolvedType(it.resolveOrError()) }
                         "$functionName$argTypeNames"
                     } else {
                         functionName

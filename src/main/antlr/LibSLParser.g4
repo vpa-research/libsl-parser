@@ -10,7 +10,7 @@ options { tokenVocab = LibSLLexer; }
  * semantic types section and declarations (automata and extension functions)
  */
 file
-   :   header
+   :   header?
        globalStatement*
        EOF
    ;
@@ -196,7 +196,7 @@ automatonStateDecl
 automatonShiftDecl
    :   SHIFT from=Identifier MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
    |   SHIFT from=Identifier MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
-   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier  BY functionsListPart SEMICOLON
+   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
    |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
    ;
 
@@ -205,7 +205,7 @@ functionsList
    ;
 
 functionsListPart
-   :   name=Identifier (L_BRACKET Identifier? (COMMA Identifier)* R_BRACKET)?
+   :   name=Identifier (L_BRACKET typeIdentifier? (COMMA typeIdentifier)* R_BRACKET)?
    ;
 
 /* variable declaration with optional initializers

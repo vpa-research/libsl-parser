@@ -42,7 +42,7 @@ annotation implements;
 
 automaton concept IterableAutomaton : Int {
    var storage: any;
-   proc _getNext (index: int): any;
+   proc _getNext (index: Int): any;
    proc something(): any;
 }
 

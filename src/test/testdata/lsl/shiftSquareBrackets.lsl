@@ -5,6 +5,9 @@ types {
     int(int32);
 }
 
+type genType<int>{
+}
+
 automaton a: int {
 
     state S1;
@@ -12,7 +15,7 @@ automaton a: int {
     state S3;
 
     shift S1 -> S2 by foo;
-    shift S1 -> S2 by [fix, foo,];
+    shift S1 -> S2 by [fix(genType<int>), foo,];
     shift S1 -> S2 by [foo];
     shift S1 -> S2 by [foo,];
     shift S1 -> S3 by [sum(int, int), min(int), ];
@@ -25,5 +28,5 @@ automaton a: int {
     fun foo();
     fun sum(i: int, j: int);
     fun min(i: int);
-    fun fix();
+    fun fix(i: genType<int>);
 }

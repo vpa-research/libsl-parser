@@ -37,11 +37,11 @@ annotation Parametrized(
 annotation implements;
 automaton concept IterableAutomaton : Int {
     var storage: any;
-    proc _getNext(index: int): any;
+    proc _getNext(index: Int): any;
     proc something(): any;
 }
 automaton Foo : Int implements IterableAutomaton, CollectionAutomaton {
-    fun bar(img: BufferedImage): Object {
+    fun bar(img: BufferedImage<A, B, C>): Object {
         var b: bool = arg0 is List<Int>;
         var x: Collection<Int> = arg0 as List<Int>;
         result = iterator(this.offset + 2);

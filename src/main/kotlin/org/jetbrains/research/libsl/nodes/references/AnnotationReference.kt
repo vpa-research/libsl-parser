@@ -1,6 +1,7 @@
 package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
+import org.jetbrains.research.libsl.errors.UnresolvedReference
 import org.jetbrains.research.libsl.nodes.Annotation
 
 data class AnnotationReference(

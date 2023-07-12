@@ -7,7 +7,10 @@ data class EntityPosition(
     val fileName: String,
     val startPosition: PositionInfo,
     val endPosition: PositionInfo
-    )
+)
+
+val EntityPosition.string: String
+    get() = "$fileName.lsl, start position[${startPosition.line}:${startPosition.column}], end position[${endPosition.line}:${endPosition.column}]"
 
 class PositionGetter {
     fun getCtxPosition(fileName: String, ctx: ParserRuleContext): EntityPosition {
