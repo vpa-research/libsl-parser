@@ -21,20 +21,12 @@ types {
         variant2: 1;
     }
 }
-var field: Int;
-var height: Int;
-var width: Int;
-var tpe: StructureType;
-var content: array<array<Boolean>>;
-var field: Int;
-var height: Int;
-var width: Int;
-var tpe: StructureType;
-var content: array<array<Boolean>>;
+
 automaton Image : BlackAndWhiteImage {
     fun inversePixel(img: BlackAndWhiteImage, x: Int, y: Int) {
         requires size: x > 0 & y > 0;
         ensures img.content[y][x] != (img.content[y][x])';
+
         img.content[y][x] = !img.content[y][x];
         img.tpe.field = 1;
     }

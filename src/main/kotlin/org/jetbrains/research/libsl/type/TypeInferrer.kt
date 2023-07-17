@@ -3,10 +3,13 @@ package org.jetbrains.research.libsl.type
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class TypeInferrer(private val context: LslContextBase) {
     private val anyType by lazy { context.resolveType(AnyType.getAnyTypeReference(context))!! }
     private val nothingType by lazy { context.resolveType(NothingType.getNothingTypeReference(context))!! }
+    private val fileName = context.fileName
+    private val posGetter = PositionGetter()
 
     @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun getExpressionTypeOrNull(expression: Expression): Type? {
@@ -30,10 +33,14 @@ class TypeInferrer(private val context: LslContextBase) {
             is OldValue -> getExpressionType(expression.value)
             is HasAutomatonConcept -> BoolType(context)
             is NamedArgumentWithValue -> getExpressionType(expression.value)
-
-            // TODO("Action type")
-            is ActionExpression -> anyType
-            is ProcExpression -> anyType
+            is TypeOperationExpression -> getExpressionType(expression.expression)
+            is ActionExpression -> expression.actionUsage.actionReference.resolveOrError().returnType?.resolveOrError()
+                ?: VoidType(context)
+            // is ProcExpression -> expression.procedureCall.procReference.resolveOrError().returnType?.resolveOrError()
+            // ?: VoidType(context)
+            is ProcExpression -> VoidType(context)
+            is FunctionUsageExpression -> expression.functionUsage.functionReference.resolveOrError().returnType?.resolveOrError()
+                ?: VoidType(context)
         }
     }
 

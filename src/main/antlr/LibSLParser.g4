@@ -10,7 +10,7 @@ options { tokenVocab = LibSLLexer; }
  * semantic types section and declarations (automata and extension functions)
  */
 file
-   :   header
+   :   header?
        globalStatement*
        EOF
    ;
@@ -61,8 +61,9 @@ typeDefBlock
    ;
 
 targetType
-   :   (is=Identifier typeIdentifier)? for=Identifier typeList
+   :   (IS typeIdentifier)? for=Identifier typeList
    ;
+
 
 typeList
    :  typeIdentifier (COMMA typeIdentifier)*
@@ -121,11 +122,11 @@ enumSemanticTypeEntry
  *         );
  */
 annotationDecl
-   :   ANNOTATION name=Identifier (L_BRACKET (annotationDeclParams) (COMMA)? R_BRACKET)? SEMICOLON
+   :   ANNOTATION name=Identifier annotationDeclParams? SEMICOLON
    ;
 
 annotationDeclParams
-   :   (annotationDeclParamsPart (COMMA annotationDeclParamsPart)*)*
+   :   L_BRACKET annotationDeclParamsPart (COMMA annotationDeclParamsPart)* (COMMA)? R_BRACKET
    ;
 
 annotationDeclParamsPart
@@ -152,7 +153,7 @@ actionParameter
  */
 automatonDecl
    :   annotationUsage* AUTOMATON CONCEPT? name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
-   COLON type=periodSeparatedFullName implementedConcepts*
+   COLON type=typeIdentifier implementedConcepts*
    L_BRACE automatonStatement* R_BRACE
    ;
 
@@ -192,7 +193,7 @@ automatonStateDecl
 automatonShiftDecl
    :   SHIFT from=Identifier MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
    |   SHIFT from=Identifier MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
-   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier  BY functionsListPart SEMICOLON
+   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
    |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
    ;
 
@@ -201,7 +202,7 @@ functionsList
    ;
 
 functionsListPart
-   :   name=Identifier (L_BRACKET Identifier? (COMMA Identifier)* R_BRACKET)?
+   :   name=Identifier (L_BRACKET typeIdentifier? (COMMA typeIdentifier)* R_BRACKET)?
    ;
 
 /* variable declaration with optional initializers
@@ -209,7 +210,7 @@ functionsListPart
  */
 variableDecl
    :   annotationUsage* keyword=(VAR|VAL) nameWithType SEMICOLON
-   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP expression SEMICOLON
+   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight SEMICOLON
    ;
 
 nameWithType
@@ -224,10 +225,15 @@ typeIdentifier
    ;
 
 variableAssignment
-   :   qualifiedAccess op=ASSIGN_OP expression SEMICOLON
-   |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) expression SEMICOLON
-   |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) expression SEMICOLON
-   |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) expression SEMICOLON
+   :   qualifiedAccess op=ASSIGN_OP assignmentRight SEMICOLON
+   |   qualifiedAccess op=(PLUS_EQ | MINUS_EQ | ASTERISK_EQ | SLASH_EQ | PERCENT_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(AMPERSAND_EQ | OR_EQ | XOR_EQ) assignmentRight SEMICOLON
+   |   qualifiedAccess op=(R_SHIFT_EQ | L_SHIFT_EQ) assignmentRight SEMICOLON
+   ;
+
+assignmentRight
+   :   expression
+   |   callAutomatonConstructorWithNamedArgs
    ;
 
 callAutomatonConstructorWithNamedArgs
@@ -245,17 +251,17 @@ argPair
 
 constructorDecl
    :   annotationUsage* CONSTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
 destructorDecl
    :   annotationUsage* DESTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (SEMICOLON | L_BRACE functionBody R_BRACE)?
    ;
 
 procDecl
    :   annotationUsage* PROC functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | functionPreamble (L_BRACE functionBody R_BRACE)?)
+   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
 /*
@@ -264,7 +270,7 @@ procDecl
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   annotationUsage* FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   :   annotationUsage* STATIC? FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
    (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
    ;
@@ -284,24 +290,17 @@ annotationUsage
    :   AT Identifier (L_BRACKET annotationArgs* R_BRACKET)?
    ;
 
-/*
- * declarations between function's header and body-block
- */
-functionPreamble
-   :   preamblePart*
-   ;
-
-preamblePart
+functionContract
    :   requiresContract
    |   ensuresContract
    |   assignsContract
    ;
 
 functionBody
-   :   functionPreamble functionBodyStatements*
+   :   functionContract* functionBodyStatement*
    ;
 
-functionBodyStatements
+functionBodyStatement
    :   variableAssignment
    |   variableDecl
    |   ifStatement
@@ -309,11 +308,13 @@ functionBodyStatements
    ;
 
 ifStatement
-   :   IF expression L_BRACE functionBodyStatements* R_BRACE (elseStatement)?
+   :   IF expression L_BRACE functionBodyStatement* R_BRACE (elseStatement)?
+   |   IF expression functionBodyStatement (elseStatement)?
    ;
 
 elseStatement
-   :   ELSE L_BRACE functionBodyStatements* R_BRACE
+   :   ELSE L_BRACE functionBodyStatement* R_BRACE
+   |   ELSE functionBodyStatement
    ;
 
 /* semantic action
@@ -324,8 +325,11 @@ actionUsage
    ;
 
 procUsage
-   :   periodSeparatedFullName L_BRACKET expressionsList? R_BRACKET
-   |   simpleCall DOT Identifier L_BRACKET expressionsList? R_BRACKET
+   :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
+   ;
+
+funUsage
+   :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList
@@ -373,12 +377,14 @@ expression
    |   expression op=(AMPERSAND | BIT_OR | XOR) expression
    |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
    |   expression bitShiftOp expression
+   |   expression typeOp=(IS | AS) typeIdentifier
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
    |   unaryOp
    |   procUsage
    |   actionUsage
+   |   funUsage
    |   callAutomatonConstructorWithNamedArgs
    |   hasAutomatonConcept
    ;

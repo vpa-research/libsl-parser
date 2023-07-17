@@ -1,10 +1,8 @@
 package org.jetbrains.research.libsl.context
 
+import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Annotation
-import org.jetbrains.research.libsl.nodes.ActionDecl
-import org.jetbrains.research.libsl.nodes.Automaton
 import org.jetbrains.research.libsl.nodes.Function
-import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.*
 import org.jetbrains.research.libsl.type.*
 

@@ -1,14 +1,14 @@
 package org.jetbrains.research.libsl.type
 
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.AnnotationUsage
-import org.jetbrains.research.libsl.nodes.Atomic
+import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.IPrinter
 import org.jetbrains.research.libsl.nodes.Variable
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.EntityPosition
 
 sealed interface Type : IPrinter {
     val name: String
@@ -42,7 +42,8 @@ data class RealType(
     val nameParts: List<String>,
     override val isPointer: Boolean = false,
     override val generic: TypeReference? = null,
-    override val context: LslContextBase
+    override val context: LslContextBase,
+    val entityPosition: EntityPosition
 ) : Type {
     override val name: String
         get() = nameParts.joinToString(".")
@@ -57,7 +58,8 @@ data class SimpleType(
     val realType: Type,
     val annotationUsages: MutableList<AnnotationUsage>,
     override val isPointer: Boolean = false,
-    override val context: LslContextBase
+    override val context: LslContextBase,
+    val entityPosition: EntityPosition
 ) : LibslType {
     override val generic: TypeReference? = null
     override val isTypeBlockType: Boolean = true
@@ -76,7 +78,8 @@ data class TypeAlias(
     override val name: String,
     val originalType: TypeReference,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-    override val context: LslContextBase
+    override val context: LslContextBase,
+    val entityPosition: EntityPosition
 ) : LibslType {
     override val isPointer: Boolean = false
     override val generic: TypeReference? = null
@@ -102,7 +105,8 @@ data class EnumLikeSemanticType(
     val type: Type,
     val entries: Map<String, Atomic>,
     val annotationUsages: MutableList<AnnotationUsage>,
-    override val context: LslContextBase
+    override val context: LslContextBase,
+    val entityPosition: EntityPosition
 ) : LibslType {
     override val isPointer: Boolean = false
     override val generic: TypeReference? = null
@@ -126,7 +130,8 @@ data class StructuredType(
     val isTypeIdentifier: String?,
     val forTypeList: MutableList<String> = mutableListOf(),
     val annotationUsages: MutableList<AnnotationUsage>,
-    override val context: LslContextBase
+    override val context: LslContextBase,
+    val entityPosition: EntityPosition
 ) : Type {
     override val isPointer: Boolean = false
     override val isTopLevelType: Boolean = true
@@ -182,7 +187,8 @@ data class EnumType(
     override val name: String,
     val entries: Map<String, Atomic>,
     val annotationUsages: MutableList<AnnotationUsage>,
-    override val context: LslContextBase
+    override val context: LslContextBase,
+    val entityPosition: EntityPosition
 ) : Type {
     override val isPointer: Boolean = false
     override val generic: TypeReference? = null

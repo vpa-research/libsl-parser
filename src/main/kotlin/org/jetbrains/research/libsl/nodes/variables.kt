@@ -5,13 +5,16 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type.Companion.UNRESOLVED_TYPE_SYMBOL
 import org.jetbrains.research.libsl.utils.BackticksPolitics
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
 
 enum class ArithmeticUnaryOp(val string: String) {
     PLUS("+"), MINUS("-"), INVERSION("!"), TILDE("~");
 
     companion object {
-        fun fromString(str: String) = ArithmeticUnaryOp.values().first { op -> op.string == str }
+        fun fromString(str: String) = ArithmeticUnaryOp.values().firstOrNull { op ->
+            op.string == str }
+            ?: throw NoSuchElementException("Unknown operator: $str")
+
     }
 }
 
@@ -26,7 +29,7 @@ enum class VariableKind(val string: String) {
 open class Variable(
     open var name: String,
     open var typeReference: TypeReference,
-    open val position: Position
+    open val entityPosition: EntityPosition
 ) : Expression() {
     open val fullName: String
         get() = name
@@ -50,8 +53,8 @@ open class Variable(
 
 data class ResultVariable(
     override var typeReference: TypeReference,
-    override val position: Position
-) : Variable(name = "result", typeReference, position)
+    override val entityPosition: EntityPosition
+) : Variable(name = "result", typeReference, entityPosition)
 
 @Suppress("unused")
 class FunctionArgument(
@@ -60,8 +63,8 @@ class FunctionArgument(
     val index: Int,
     var annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
     var targetAutomaton: AutomatonReference? = null,
-    override val position: Position
-) : Variable(name, typeReference, position) {
+    override val entityPosition: EntityPosition
+) : Variable(name, typeReference, entityPosition) {
     lateinit var function: Function
 
     override val fullName: String
@@ -78,10 +81,14 @@ class FunctionArgument(
             )
             append(IPrinter.SPACE)
         }
+
         append(BackticksPolitics.forIdentifier(name))
         append(": ")
-
-        append(typeReference.name)
+        if (targetAutomaton != null) {
+            append(targetAutomaton!!.name)
+        } else {
+            append(typeReference.name)
+        }
     }
 }
 
@@ -91,32 +98,16 @@ class ActionParameter(
     typeReference: TypeReference,
     val index: Int,
     var annotation: AnnotationReference? = null,
-    override val position: Position
-) : Variable(name, typeReference, position)
-
-@Suppress("MemberVisibilityCanBePrivate")
-class DeclaredActionParameter(
-    name: String,
-    typeReference: TypeReference,
-    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-    override val position: Position
-) : Variable(name, typeReference, position) {
-    override fun dumpToString(): String = buildString {
-        if (annotationUsages.isNotEmpty()) {
-            append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
-            append(IPrinter.SPACE)
-        }
-        append("${BackticksPolitics.forIdentifier(name)}: ${typeReference.name}")
-    }
-}
+    override val entityPosition: EntityPosition
+) : Variable(name, typeReference, entityPosition)
 
 class ConstructorArgument(
     val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
-    override val position: Position
-) : Variable(name, typeReference, position) {
+    override val entityPosition: EntityPosition
+) : Variable(name, typeReference, entityPosition) {
     lateinit var automaton: Automaton
 
     override val fullName: String
@@ -139,8 +130,8 @@ class VariableWithInitialValue(
     typeReference: TypeReference,
     val annotationUsage: MutableList<AnnotationUsage> = mutableListOf(),
     val initialValue: Expression?,
-    override val position: Position
-) : Variable(name, typeReference, position) {
+    override val entityPosition: EntityPosition
+) : Variable(name, typeReference, entityPosition) {
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsage))
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")

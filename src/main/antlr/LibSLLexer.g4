@@ -230,6 +230,10 @@ DEFINE
    :   'define'
    ;
 
+STATIC
+   :   'static'
+   ;
+
 IF
    :   'if'
    ;
@@ -240,6 +244,14 @@ ELSE
 
 BY
    :   'by'
+   ;
+
+IS
+   :   'is'
+   ;
+
+AS
+   :   'as'
    ;
 
 Identifier

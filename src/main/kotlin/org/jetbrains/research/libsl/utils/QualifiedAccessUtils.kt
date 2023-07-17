@@ -11,7 +11,6 @@ object QualifiedAccessUtils {
             is EnumType -> IntType(parentType.context, IntType.IntCapacity.UNKNOWN)
             is EnumLikeSemanticType -> IntType(parentType.context, IntType.IntCapacity.UNKNOWN)
             is TypeAlias -> parentType.originalType.resolve()?.let { resolveFieldType(it, name) }
-
             is SimpleType -> null
             is PrimitiveType -> null
             is RealType -> null

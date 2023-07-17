@@ -3,7 +3,8 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.helpers.ExpressionDumper
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.AutomatonStateReference
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.nodes.references.TypeReference
+import org.jetbrains.research.libsl.utils.EntityPosition
 
 sealed class Expression : Node() {
     override fun dumpToString(): String = ExpressionDumper.dump(this)
@@ -13,7 +14,7 @@ data class BinaryOpExpression(
     val left: Expression,
     val right: Expression,
     val op: ArithmeticBinaryOps,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : Expression()
 
 // priorities from https://www.l3harrisgeospatial.com/docs/Operator_Precedence.html
@@ -48,7 +49,7 @@ enum class AssignOps(val string: String) {
     COMP_ADD("+="), COMP_SUB("-="), COMP_MUL("*="), COMP_DIV("/="), COMP_MOD("%="),
 
     //Bitwise
-    COMP_AND("&="),  COMP_OR("|="), COMP_XOR("^="),
+    COMP_AND("&="), COMP_OR("|="), COMP_XOR("^="),
 
     //Shift
     COMP_R_SHIFT(">>="), COMP_UN_R_SHIFT(">>>="), COMP_L_SHIFT("<<=");
@@ -61,19 +62,19 @@ enum class AssignOps(val string: String) {
 data class UnaryOpExpression(
     val op: ArithmeticUnaryOp,
     val value: Expression,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : Expression()
 
 data class OldValue(
     val value: QualifiedAccess,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : Expression()
 
 data class CallAutomatonConstructor(
     val automatonRef: AutomatonReference,
     val args: List<NamedArgumentWithValue>,
     val stateRef: AutomatonStateReference,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : Atomic() {
     override val value: Any? = null
 
@@ -82,7 +83,7 @@ data class CallAutomatonConstructor(
 
 data class ArrayLiteral(
     override val value: List<Expression>,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : Atomic()
 
 sealed class Atomic : Expression() {
@@ -90,23 +91,35 @@ sealed class Atomic : Expression() {
 }
 
 data class ActionExpression(
-    val action: Action,
-    val position: Position
+    val actionUsage: ActionUsage,
+    val entityPosition: EntityPosition
 ) : Expression()
 
 data class ProcExpression(
     val procedureCall: ProcedureCall,
-    val position: Position
+    val entityPosition: EntityPosition
+) : Expression()
+
+data class FunctionUsageExpression(
+    val functionUsage: FunctionUsage,
+    val entityPosition: EntityPosition
 ) : Expression()
 
 data class HasAutomatonConcept(
     val variable: QualifiedAccess,
     val automatonReference: AutomatonReference,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : Expression()
 
 data class NamedArgumentWithValue(
     val name: String?,
     val value: Expression,
-    val position: Position
+    val entityPosition: EntityPosition
+) : Expression()
+
+data class TypeOperationExpression(
+    val opName: String,
+    val expression: Expression,
+    val typeReference: TypeReference,
+    val entityPosition: EntityPosition
 ) : Expression()

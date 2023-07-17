@@ -15,6 +15,6 @@ object ActionDeclReferenceBuilder {
     }
 
     fun ActionDecl.getReference(context: LslContextBase): ActionDeclReference {
-        return build(this.name, this.values.map { value -> value.typeReference }, context)
+        return build(this.name, this.argumentDescriptors.map { descr -> descr.typeReference }, context)
     }
 }

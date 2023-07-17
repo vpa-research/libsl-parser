@@ -5,8 +5,8 @@ typealias Int=int32;
 
 
 automaton B: Int {
-    constructor B()
-    destructor B()
+    constructor B();
+    destructor B();
 }
 
 automaton A : Int {
@@ -15,7 +15,7 @@ automaton A : Int {
        x = 1;
        y = 1;
     }
-    destructor A()
-    fun f()
-    fun g(param: Int)
+    destructor A();
+    fun f();
+    fun g(param: Int);
 }

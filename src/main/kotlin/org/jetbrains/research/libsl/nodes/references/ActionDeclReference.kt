@@ -12,31 +12,17 @@ data class ActionDeclReference(
         return context.resolveDeclaredAction(this)
     }
 
-    override fun isReferenceMatchWithNode(node: ActionDecl): Boolean {
-        if (node.name != this.name) {
-            return false
-        }
-
-        if (!doParamsMatch(node.values.map { value -> value.typeReference })) {
-            return false
-        }
-
-        return true
-    }
-
+    // todo: Improve a support for overloading
     override fun isSameReference(other: ActionDeclReference): Boolean {
-        return this.name == other.name && doParamsMatch(other.paramTypes)
+        return other.name == this.name && other.paramTypes.size == this.paramTypes.size
     }
 
-    private fun doParamsMatch(params: List<TypeReference>): Boolean {
-        if (params.size != this.paramTypes.size) {
-            return false
-        }
-
-        return params.withIndex().all { (index, element) -> element.isSameReference(params[index]) }
+    // todo: Improve a support for overloading
+    override fun isReferenceMatchWithNode(node: ActionDecl): Boolean {
+        return this.name == node.name && this.paramTypes.size == node.argumentDescriptors.size
     }
 
     override fun toString(): String {
-        return "ActionReference(name: $name, paramTypes:$paramTypes)"
+        return "ActionReference($name)"
     }
 }

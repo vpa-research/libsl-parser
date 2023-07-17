@@ -5,7 +5,7 @@ fun main() {
     val lslDir = File("$testdataPath/lsl/")
     val lsls = lslDir.listFiles()
         .orEmpty()
-        .filter  { file -> file.isFile && file.extension == "lsl" }
+        .filter { file -> file.isFile && file.extension == "lsl" }
         .sorted()
         .map { it.nameWithoutExtension }
 

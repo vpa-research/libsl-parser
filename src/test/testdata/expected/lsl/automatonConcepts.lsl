@@ -5,7 +5,9 @@ library simple;
 type BufferedImage is java.awt.image.BufferedImage for Image, Object {
     var width: int;
     var content: array<array<int>>;
-    fun iterator(offset: int): Iterator;
+    static fun iterator(offset: int): Iterator;
+}
+type Collection {
 }
 types {
     @implements
@@ -15,11 +17,6 @@ types {
     Image(java.img.Image);
     Iterator(iterator);
 }
-var width: int;
-var content: array<array<int>>;
-result
-var width: int;
-var content: array<array<int>>;
 annotation StructureKind(
     str: string
 );
@@ -34,12 +31,13 @@ automaton concept IterableAutomaton : Int {
 }
 automaton Foo : Int implements IterableAutomaton, CollectionAutomaton {
     fun bar(img: BufferedImage): Object {
-        result = `img.iterator`(this.offset + 2);
+        var b: bool = arg0 is List;
+        var x: Collection = arg0 as List;
+        result = iterator(this.offset + 2);
     }
     fun foo(newValue: any) {
         val x: any;
-        if (this.newValue has IterableAutomaton) {
-            `IterableAutomaton(newValue).something`();
-        }
+        if (this.newValue has IterableAutomaton) 
+            something();
     }
 }

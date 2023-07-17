@@ -10,7 +10,7 @@ automaton A : Int {
     proc _noReturn() {
     }
     fun useProc(): Int {
-        `this._noReturn`();
-        result = `this._sum`(x, y) + 1;
+        _noReturn();
+        result = _sum(x, y) + 1;
     }
 }

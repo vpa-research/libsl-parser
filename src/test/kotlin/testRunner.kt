@@ -2,8 +2,6 @@ import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.jetbrains.research.libsl.LibSL
-import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Function
@@ -108,12 +106,12 @@ private fun checkFunctionIsResolved(function: Function) {
 }
 
 private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
-    for(s in statements) {
+    for (s in statements) {
         when (s) {
-            is Action -> {}
+            is ActionUsage -> {s.actionReference.resolveOrError()}
+            // is ProcedureCall -> {s.procReference.resolveOrError()}
             is ProcedureCall -> {}
-            // TODO(Variable statement)
-            is VariableDeclaration -> {}
+            is VariableDeclaration -> {s.variable.typeReference.resolveOrError()}
             is Assignment -> {
                 function.context.typeInferrer.getExpressionType(s.left)
                 function.context.typeInferrer.getExpressionType(s.value)
@@ -128,6 +126,7 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
             is ExpressionStatement -> {
                 function.context.typeInferrer.getExpressionType(s.expression)
             }
+            is FunctionUsage -> {}
         }
     }
 }

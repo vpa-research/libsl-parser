@@ -13,7 +13,7 @@ automaton B : Int {
 }
 automaton A : Int {
     @Static
-    fun f(@Anno(1, 12) @Target obj: Int);
+    fun f(@Anno(1, 12) @Target obj: B);
     @Void
     fun g(@Anno(554, 784) @Something param: Int);
 }

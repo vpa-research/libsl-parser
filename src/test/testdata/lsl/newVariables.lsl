@@ -12,8 +12,7 @@ automaton A (val x: Int) : Int {
         requires i == 0;
         val x: Int = 1;
         val v: Int;
-        if(y > 1) {
+        if(y > 1)
             val b: Int;
-        }
     }
 }

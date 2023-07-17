@@ -3,22 +3,31 @@ package org.jetbrains.research.libsl.nodes
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
-import org.jetbrains.research.libsl.utils.Position
+import org.jetbrains.research.libsl.utils.EntityPosition
 
 data class ActionDecl(
     val name: String,
-    val values: MutableList<DeclaredActionParameter> = mutableListOf(),
+    val argumentDescriptors: MutableList<ActionArgumentDescriptor> = mutableListOf(),
     val annotations: MutableList<AnnotationUsage> = mutableListOf(),
     val returnType: TypeReference?,
-    val position: Position
+    val entityPosition: EntityPosition
 ) : IPrinter {
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotations))
         append("define action ${BackticksPolitics.forIdentifier(name)}")
 
-        append(
-            values.joinToString(separator = ", ", prefix = "(", postfix = ")") { value -> value.dumpToString()}
-        )
+        if (argumentDescriptors.isNotEmpty()) {
+            appendLine("(")
+            appendLine(
+                withIndent(
+                    argumentDescriptors.joinToString(
+                        separator = ",\n",
+                        transform = ActionArgumentDescriptor::dumpToString
+                    )
+                )
+            )
+            append(")")
+        }
 
         if (returnType != null) {
             append(": ")
@@ -26,5 +35,18 @@ data class ActionDecl(
         }
 
         appendLine(";")
+    }
+}
+
+data class ActionArgumentDescriptor(
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
+    val name: String,
+    val typeReference: TypeReference,
+    val entityPosition: EntityPosition
+) : IPrinter {
+    override fun dumpToString(): String = buildString {
+        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
+        val type = BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: Type.UNRESOLVED_TYPE_SYMBOL)
+        append("${BackticksPolitics.forIdentifier(name)}: $type")
     }
 }

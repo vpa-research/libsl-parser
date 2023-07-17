@@ -1,8 +1,11 @@
 package org.jetbrains.research.libsl.errors
 
+import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.utils.string
+
 sealed interface LslError {
     val text: String
-    val position: Position
+    val entityPosition: EntityPosition
 }
 
 typealias Position = Pair<Int, Int>
@@ -12,41 +15,42 @@ val Position.string: String
 
 open class UnresolvedReference(
     override val text: String,
-    override val position: Position,
+    override val entityPosition: EntityPosition,
     val kind: ReferenceKind
 ) : LslError {
-    override fun toString(): String = "Unresolved reference of kind $kind with name $text on position ${position.string}"
+    override fun toString(): String =
+        "Unresolved reference of kind $kind with name $text in ${entityPosition.string}"
 }
 
 class UnresolvedVariable(
     text: String,
-    position: Position
+    position: EntityPosition
 ) : UnresolvedReference(text, position, ReferenceKind.Variable)
 
 
 class UnresolvedFunction(
     text: String,
-    position: Position
+    position: EntityPosition
 ) : UnresolvedReference(text, position, ReferenceKind.Function)
 
 class UnresolvedAutomaton(
     text: String,
-    position: Position
+    position: EntityPosition
 ) : UnresolvedReference(text, position, ReferenceKind.Automaton)
 
 class UnresolvedState(
     text: String,
-    position: Position
+    position: EntityPosition
 ) : UnresolvedReference(text, position, ReferenceKind.State)
 
 class UnresolvedType(
     text: String,
-    position: Position
+    position: EntityPosition
 ) : UnresolvedReference(text, position, ReferenceKind.Type)
 
 class SemanticTypeExpected(
     text: String,
-    position: Position
+    position: EntityPosition
 ) : UnresolvedReference("expected semantic type but got $text", position, ReferenceKind.Type)
 
 
@@ -56,29 +60,30 @@ enum class ReferenceKind {
 
 class UninitializedGlobalVariable(
     override val text: String,
-    override val position: Position
+    override val entityPosition: EntityPosition
 ) : LslError {
     override fun toString(): String =
-        "Uninitialized global variable $text on ${position.string}. Uninitialized variables aren't allowed"
+        "Uninitialized global variable $text in ${entityPosition.string}"
 }
 
 class UnspecifiedAutomaton(
     override val text: String,
-    override val position: Position
+    override val entityPosition: EntityPosition
 ) : LslError {
-    override fun toString(): String = "Unspecified automaton's name for function $text on ${position.string}"
+    override fun toString(): String = "Unspecified automaton's name for function $text in ${entityPosition.string}"
 }
 
 class MoreThanOneTypesSection(
-    override val position: Position
+    override val entityPosition: EntityPosition
 ) : LslError {
     override val text: String = ""
-    override fun toString(): String = "Only one `types` section must be provided. Another one provided at ${position.string}"
+    override fun toString(): String =
+        "Only one `types` section must be provided. Another one provided at ${entityPosition.string}"
 }
 
 class UnresolvedImportOrInclude(
     override val text: String,
-    override val position: Position
+    override val entityPosition: EntityPosition
 ) : LslError {
-    override fun toString(): String = "Unresolved import path $text on ${position.string}"
+    override fun toString(): String = "Unresolved import path $text on ${entityPosition.string}"
 }

@@ -3,7 +3,9 @@ library literalArrays;
 
 typealias Int = int32;
 typealias ArrayType = array<Int>;
-
+define action TEST_ACTION(
+    a: ArrayType
+);
 automaton A : Int {
     var arrayVariable: ArrayType;
 

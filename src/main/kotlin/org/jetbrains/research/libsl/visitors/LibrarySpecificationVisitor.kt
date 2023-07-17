@@ -16,6 +16,8 @@ import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceB
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.nodes.references.builders.VariableReferenceBuilder.getReference
 import org.jetbrains.research.libsl.type.RealType
+import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.utils.PositionGetter
 
 class LibrarySpecificationVisitor(
     val fileName: String,
@@ -24,9 +26,14 @@ class LibrarySpecificationVisitor(
     private val globalContext: LslGlobalContext
 ) : LibSLParserVisitor<Unit>(globalContext) {
     private lateinit var library: Library
+    private val posGetter = PositionGetter()
 
     fun processFile(file: FileContext): Library {
-        val header = processHeader(file.header())
+        val header = if(file.header() != null) {
+            processHeader(file.header())
+        } else {
+            null
+        }
 
         TypeResolver(basePath, errorManager, globalContext).visitFile(file)
         TopLevelDeclarationsResolver(basePath, errorManager, globalContext).visitFile(file)
@@ -68,32 +75,32 @@ class LibrarySpecificationVisitor(
 
     override fun visitGlobalStatement(ctx: LibSLParser.GlobalStatementContext) {
         when {
-            ctx.ImportStatement() != null -> processImport(ctx.ImportStatement().text, ctx.position())
-            ctx.IncludeStatement() != null -> processInclude(ctx.IncludeStatement().text, ctx.position())
+            ctx.ImportStatement() != null -> processImport(ctx.ImportStatement().text, posGetter.getCtxPosition(fileName, ctx))
+            ctx.IncludeStatement() != null -> processInclude(ctx.IncludeStatement().text, posGetter.getCtxPosition(fileName, ctx))
         }
 
         super.visitGlobalStatement(ctx)
     }
 
-    private fun processImport(str: String, position: Position) {
+    private fun processImport(str: String, entityPosition: EntityPosition) {
         val importRegex = Regex("^(import)\\s+(.+);")
         val importName = importRegex.find(str)?.groupValues?.get(2)
 
         if (importName == null) {
-            errorManager(UnresolvedImportOrInclude(str, position))
+            errorManager(UnresolvedImportOrInclude(str, entityPosition))
             return
         }
 
-        library.imports.add(importName)
+        library.importNames.add(importName)
 
     }
 
-    private fun processInclude(str: String, position: Position) {
+    private fun processInclude(str: String, entityPosition: EntityPosition) {
         val includeRegex = Regex("^(include)\\s+(.+);")
         val includeName = includeRegex.find(str)?.groupValues?.get(2)
 
         if (includeName == null) {
-            errorManager(UnresolvedImportOrInclude(str, position))
+            errorManager(UnresolvedImportOrInclude(str, entityPosition))
             return
         }
 

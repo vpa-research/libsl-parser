@@ -6,8 +6,9 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 
 data class Library(
     val fileName: String,
-    val metadata: MetaNode,
-    val imports: MutableList<String> = mutableListOf(),
+    val metadata: MetaNode?,
+    val importNames: MutableList<String> = mutableListOf(),
+    val importsMap: MutableMap<String, Library> = mutableMapOf(),
     val includes: MutableList<String> = mutableListOf(),
     val semanticTypesReferences: MutableList<TypeReference> = mutableListOf(),
     val automataReferences: MutableList<AutomatonReference> = mutableListOf(),
@@ -16,19 +17,26 @@ data class Library(
     val annotationReferences: MutableList<AnnotationReference> = mutableListOf(),
     val declaredActionReferences: MutableList<ActionDeclReference> = mutableListOf()
 ) : Node() {
-    private val resolvedTypes: List<Type>
+    val resolvedTypes: List<Type>
         get() = semanticTypesReferences.map { it.resolveOrError() }
-    private val automata: List<Automaton>
+    val automata: List<Automaton>
         get() = automataReferences.map { it.resolveOrError() }
-    private val annotations: List<Annotation>
+    val annotations: List<Annotation>
         get() = annotationReferences.map { it.resolveOrError() }
-    private val globalVariables: List<Variable>
+    val globalVariables: List<Variable>
         get() = globalVariableReferences.map { it.resolveOrError() }
-    private val declaredActions: List<ActionDecl>
+    val declaredActions: List<ActionDecl>
         get() = declaredActionReferences.map { it.resolveOrError() }
+    val importedAutomataMap: Map<String, List<Automaton>>
+        get() = importsMap.mapValues { (_, library) -> library.automata }
+    val importedSemanticTypesMap: Map<String, List<Type>>
+        get() = importsMap.mapValues { (_, library) -> library.resolvedTypes }
+
 
     override fun dumpToString(): String = buildString {
-        appendLine(metadata.dumpToString())
+        if(metadata != null) {
+            appendLine(metadata.dumpToString())
+        }
         append(formatImports())
         append(formatIncludes())
         append(formatTopLevelSemanticTypes())
@@ -42,7 +50,7 @@ data class Library(
 
     private fun formatImports(): String {
         return simpleCollectionFormatter(
-            imports,
+            importNames,
             prefix = "import${IPrinter.SPACE}",
             suffix = ";",
             addEmptyLastLine = true
