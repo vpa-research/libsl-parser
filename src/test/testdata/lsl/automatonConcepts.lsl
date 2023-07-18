@@ -14,7 +14,7 @@ types {
 @Parametrized("P extends java.img.PixelType")
 type BufferedImage is java.awt.image.BufferedImage for Image, Object {
    var width: int;
-   var content: array<array<int>>;
+   var content: array<array<int, string>>;
    static fun iterator(offset: int): Iterator;
 }
 

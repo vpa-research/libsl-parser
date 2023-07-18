@@ -7,14 +7,14 @@ import org.jetbrains.research.libsl.type.Type
 object TypeReferenceBuilder {
     fun build(
         name: String,
-        genericReference: TypeReference? = null,
+        genericReferences: MutableList<TypeReference>,
         isPointer: Boolean = false,
         context: LslContextBase
     ): TypeReference {
-        return TypeReference(name, isPointer, genericReference, context)
+        return TypeReference(name, isPointer, genericReferences, context)
     }
 
     fun Type.getReference(context: LslContextBase): TypeReference {
-        return build(this.name, this.generic, this.isPointer, context)
+        return build(this.name, this.generics, this.isPointer, context)
     }
 }

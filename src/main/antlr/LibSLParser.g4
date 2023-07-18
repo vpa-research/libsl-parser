@@ -57,7 +57,7 @@ typealiasStatement
  * syntax: type full.name { field1: Type; field2: Type; ... }
  */
 typeDefBlock
-   :   annotationUsage* TYPE name=periodSeparatedFullName targetType? (L_BRACE typeDefBlockStatement* R_BRACE)?
+   :   annotationUsage* TYPE name=periodSeparatedFullName generic? targetType? (L_BRACE typeDefBlockStatement* R_BRACE)?
    ;
 
 targetType
@@ -221,7 +221,11 @@ nameWithType
  * syntax: one.two.three<T>
  */
 typeIdentifier
-   :   (asterisk=ASTERISK)? name=periodSeparatedFullName (L_ARROW generic=typeIdentifier R_ARROW)?
+   :   (asterisk=ASTERISK)? name=periodSeparatedFullName generic?
+   ;
+
+generic
+   :   (L_ARROW typeIdentifier (COMMA typeIdentifier)* R_ARROW)
    ;
 
 variableAssignment

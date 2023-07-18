@@ -80,7 +80,7 @@ class TypeInferrer(private val context: LslContextBase) {
 
         return ArrayType(
             isPointer = false,
-            generic = typeOfElements.getReference(context),
+            generics = mutableListOf(typeOfElements.getReference(context)),
             context = context
         )
     }
