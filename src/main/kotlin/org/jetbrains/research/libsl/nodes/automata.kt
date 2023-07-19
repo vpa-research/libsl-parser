@@ -29,7 +29,7 @@ data class Automaton(
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
 
         if (constructorVariables.isNotEmpty()) {
-            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() }})")
+            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
         }
 
         appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)} {")
@@ -92,10 +92,11 @@ data class Shift(
             append(
                 functions.joinToString(separator = ", ", prefix = "[", postfix = "]") { function ->
                     val functionName = function.name
-                  
                     if (function.argTypes.isNotEmpty()) {
                         val argTypeNames =
-                            function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.name }
+                            function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") {
+                                it.name
+                            }
                         "$functionName$argTypeNames"
                     } else {
                         functionName

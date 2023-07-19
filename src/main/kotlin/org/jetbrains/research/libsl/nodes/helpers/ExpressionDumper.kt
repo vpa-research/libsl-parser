@@ -13,8 +13,8 @@ object ExpressionDumper {
             is ArrayLiteral -> dumpArrayLiteral(expression)
             is BoolLiteral -> dumpLiteral(expression)
             is CallAutomatonConstructor -> dumpCallAutomatonConstructor(expression)
-            is FloatLiteral -> dumpLiteral(expression)
-            is IntegerLiteral -> dumpLiteral(expression)
+            is FloatLiteral -> dumpFloatLiteral(expression)
+            is IntegerLiteral -> dumpIntegerLiteral(expression)
             is ArrayAccess -> dumpArrayAccess(expression)
             is AutomatonOfFunctionArgumentInvoke -> dumpAutomatonOfFunctionArgumentInvoke(expression)
             is ThisAccess -> dumpThisAccess(expression)
@@ -24,6 +24,8 @@ object ExpressionDumper {
             is ProcExpression -> dumpProcExpression(expression)
             is UnaryOpExpression -> dumpUnaryOpExpression(expression)
             is Variable -> dumpVariable(expression)
+            is HasAutomaton -> dumpHasAutomaton(expression)
+            is NamedArgumentWithValue -> dumpNamedArgumentWithValue(expression)
         }
     }
 
@@ -85,6 +87,14 @@ object ExpressionDumper {
 
     private fun dumpLiteral(expression: Atomic): String {
         return expression.value.toString()
+    }
+
+    private fun dumpIntegerLiteral(expression: IntegerLiteral): String {
+        return "${expression.value}${expression.suffix ?:""}"
+    }
+
+    private fun dumpFloatLiteral(expression: FloatLiteral): String {
+        return "${expression.value}${expression.suffix ?:""}"
     }
 
     private fun dumpStringLiteral(expression: StringLiteral): String {
@@ -160,5 +170,17 @@ object ExpressionDumper {
 
     private fun dumpVariable(expression: Variable): String {
         return expression.name
+    }
+
+    private fun dumpHasAutomaton(expression: HasAutomaton): String {
+        return "${expression.variable.dumpToString()} has ${expression.automatonReference.name}"
+    }
+
+    private fun dumpNamedArgumentWithValue(expression: NamedArgumentWithValue): String {
+        return if(expression.name != null) {
+            "${expression.name} = ${expression.value.dumpToString()}"
+        } else {
+            expression.value.dumpToString()
+        }
     }
 }

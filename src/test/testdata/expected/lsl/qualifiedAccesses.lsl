@@ -1,6 +1,5 @@
 libsl "1.0.0";
 library simple;
-
 type Type1 {
     field: Type2;
 }

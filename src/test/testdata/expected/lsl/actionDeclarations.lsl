@@ -5,12 +5,15 @@ annotation Something;
 annotation Ann;
 @Something
 define action SUM(
+    @Ann
     x: Int,
     y: Int
 ): Int;
 @Something
 define action NO_RETURN(
+    @Ann
     x: Int,
+    @Ann
     y: Int
 );
 define action NO_ARGS: Int;

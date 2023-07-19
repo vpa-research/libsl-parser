@@ -1,11 +1,18 @@
 package org.jetbrains.research.libsl.nodes
 
+import org.jetbrains.research.libsl.type.*
+
 data class IntegerLiteral(
-    override val value: Int
+
+    // "Any" set in order to pass both signed and unsigned integers
+
+    override val value: Any,
+    val suffix: String?
 ) : Atomic()
 
 data class FloatLiteral(
-    override val value: Float
+    override val value: Number,
+    val suffix: String?
 ) : Atomic()
 
 data class StringLiteral(

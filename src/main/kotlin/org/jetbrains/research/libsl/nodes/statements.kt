@@ -1,6 +1,6 @@
 package org.jetbrains.research.libsl.nodes
 
-import org.jetbrains.research.libsl.nodes.references.ActionReference
+import org.jetbrains.research.libsl.nodes.references.ActionDeclReference
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
@@ -20,11 +20,15 @@ data class IfStatement(
     val elseStatements: ElseStatement?
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        append("if (${value.dumpToString()}) ")
-        appendLine("{")
-        append(withIndent(formatListEmptyLineAtEndIfNeeded(ifStatements)))
-        appendLine("}")
-        if (elseStatements?.statements?.isNotEmpty() == true) {
+        if(ifStatements.size == 1) {
+            appendLine("if (${value.dumpToString()}) ")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(ifStatements)))
+        } else {
+            appendLine("if (${value.dumpToString()}) {")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(ifStatements)))
+            appendLine("}")
+        }
+        if(elseStatements?.statements?.isNotEmpty() == true) {
             append(elseStatements.dumpToString())
         }
     }
@@ -34,15 +38,19 @@ data class ElseStatement(
     val statements: MutableList<Statement> = mutableListOf()
 ) : Statement() {
     override fun dumpToString(): String = buildString {
-        append("else")
-        appendLine(" {")
-        append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
-        appendLine("}")
+        if(statements.size == 1) {
+            appendLine("else")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
+        } else {
+            appendLine("else {")
+            append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
+            appendLine("}")
+        }
     }
 }
 
 data class ActionUsage(
-    val actionReference: ActionReference,
+    val actionReference: ActionDeclReference,
     val arguments: List<Expression>
 ) : Statement() {
     override fun dumpToString(): String = buildString {

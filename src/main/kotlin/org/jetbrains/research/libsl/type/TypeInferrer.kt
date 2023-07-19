@@ -28,6 +28,8 @@ class TypeInferrer(private val context: LslContextBase) {
             is UnaryOpExpression -> getExpressionType(expression.value)
             is Variable -> expression.typeReference.resolveOrError()
             is OldValue -> getExpressionType(expression.value)
+            is HasAutomaton -> BoolType(context)
+            is NamedArgumentWithValue -> getExpressionType(expression.value)
             is ActionExpression -> expression.actionUsage.actionReference.resolveOrError().returnType?.resolveOrError()
                 ?: VoidType(context)
             is ProcExpression -> expression.procedureCall.procReference.resolveOrError().returnType?.resolveOrError()
@@ -38,8 +40,8 @@ class TypeInferrer(private val context: LslContextBase) {
     private fun getAtomicType(atomic: Atomic): Type {
         return when (atomic) {
             is BoolLiteral -> BoolType(context)
-            is FloatLiteral -> FloatType(context, FloatType.FloatCapacity.UNKNOWN)
-            is IntegerLiteral -> IntType(context, IntType.IntCapacity.UNKNOWN)
+            is FloatLiteral -> processFloatLiteralType(atomic, context)
+            is IntegerLiteral -> processIntegerLiteralType(atomic, context)
             is StringLiteral -> StringType(context)
             is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
             is QualifiedAccess -> getQualifiedAccessType(atomic)
@@ -47,12 +49,34 @@ class TypeInferrer(private val context: LslContextBase) {
         }
     }
 
+    private fun processIntegerLiteralType(integerLiteral: IntegerLiteral, context: LslContextBase): Type {
+        return when(integerLiteral.suffix) {
+            "b" -> Int8Type(context)
+            "ub" -> UnsignedInt8Type(context)
+            "s" -> Int16Type(context)
+            "us" -> UnsignedInt16Type(context)
+            null -> Int32Type(context)
+            "u" -> UnsignedInt32Type(context)
+            "L" -> Int64Type(context)
+            "uL" -> UnsignedInt64Type(context)
+            else -> error("Unknown integer literal, no such type")
+        }
+    }
+
+    private fun processFloatLiteralType(floatLiteral: FloatLiteral, context: LslContextBase): Type {
+        return when(floatLiteral.suffix) {
+            "f" -> Float32Type(context)
+            null -> Float64Type(context)
+            else -> throw IllegalArgumentException("Unknown float literal, no such type")
+        }
+    }
+
     private fun getQualifiedAccessType(access: QualifiedAccess): Type {
         return when (access) {
-            is ArrayAccess -> TODO()
+            is ArrayAccess -> anyType
             is AutomatonOfFunctionArgumentInvoke -> access.automatonReference.resolveOrError().typeReference.resolveOrError()
             is VariableAccess -> access.variable.resolveOrError().typeReference.resolveOrError()
-            is ThisAccess -> getQualifiedAccessType(access.lastChild)
+            is ThisAccess -> anyType
         }
     }
 
@@ -60,7 +84,6 @@ class TypeInferrer(private val context: LslContextBase) {
         val typeOfElements = arrayLiteral.value.fold(nothingType) { acc, expression ->
             mergeTypes(acc, getExpressionType(expression))
         }
-
         return ArrayType(
             isPointer = false,
             generic = typeOfElements.getReference(context),
@@ -78,20 +101,6 @@ class TypeInferrer(private val context: LslContextBase) {
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun mergeTypes(typeA: Type, typeB: Type): Type {
-        if (typeA is IntType) {
-            typeB as IntType
-            check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
-        }
-
-        if (typeA is FloatType) {
-            typeB as FloatType
-            check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
-        }
-
-        if (typeA is UnsignedType) {
-            typeB as UnsignedType
-            check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
-        }
 
         if (typeA::class == typeB::class) {
             return typeA

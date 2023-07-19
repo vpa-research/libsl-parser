@@ -8,6 +8,7 @@ import org.jetbrains.research.libsl.errors.ErrorManager
 import org.jetbrains.research.libsl.errors.UnresolvedState
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.FunctionReference
+import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.FunctionReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
 
@@ -20,8 +21,7 @@ class AutomatonResolver(
     private lateinit var buildingAutomaton: Automaton
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
         val name = ctx.name.asPeriodSeparatedString()
-        val typeName = ctx.type.asPeriodSeparatedString()
-        val typeReference = TypeReferenceBuilder.build(typeName, context = context)
+        val typeReference = processTypeIdentifier(ctx.type)
         val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
 
         buildingAutomaton = Automaton(
@@ -42,7 +42,12 @@ class AutomatonResolver(
         val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
-        val argument = ConstructorArgument(keyword, name, typeReference, getAnnotationUsages(ctx.annotationUsage()))
+        val argument = ConstructorArgument(
+            keyword,
+            name,
+            typeReference,
+            getAnnotationUsages(ctx.annotationUsage())
+        )
         context.storeVariable(argument)
         buildingAutomaton.constructorVariables.add(argument)
     }
@@ -59,14 +64,14 @@ class AutomatonResolver(
 
     override fun visitAutomatonShiftDecl(ctx: LibSLParser.AutomatonShiftDeclContext) {
         val toStateName = ctx.to.text
-        val toState = getToState(toStateName)
+        val toState = getToState(toStateName, ctx)
         if (toState == null) {
             errorManager(UnresolvedState("unresolved state: $toStateName", ctx.position()))
             return
         }
 
         for (fromStateName in ctx.fromStatesNames) {
-            val fromState = getFromState(fromStateName)
+            val fromState = getFromState(fromStateName, ctx)
             if (fromState == null) {
                 errorManager(UnresolvedState("unresolved state: $fromStateName", ctx.position()))
                 continue
@@ -78,7 +83,7 @@ class AutomatonResolver(
         }
     }
 
-    private fun getFromState(name: String): State? {
+    private fun getFromState(name: String, ctx: LibSLParser.AutomatonShiftDeclContext): State? {
         if (name == "any") {
             return State(name, StateKind.SIMPLE, isAny = true)
         }
@@ -86,7 +91,7 @@ class AutomatonResolver(
         return buildingAutomaton.states.firstOrNull { s -> s.name == name }
     }
 
-    private fun getToState(name: String): State? {
+    private fun getToState(name: String, ctx: LibSLParser.AutomatonShiftDeclContext): State? {
         if (name == "self") {
             return State(name, StateKind.SIMPLE, isSelf = true)
         }
@@ -109,24 +114,33 @@ class AutomatonResolver(
 
             val result = mutableListOf<FunctionReference>()
 
-            for (functionListPart in this.functionsList()?.functionsListPart() ?: listOf(functionsListPart())) {
-                val ids = functionListPart.Identifier().map { id -> id.asPeriodSeparatedString() }
-                val functionName = ids.first()
-
-                val argTypesNames = ids.drop(1)
-                val argTypesRefs = argTypesNames.map { name ->
-                    TypeReferenceBuilder.build(name, context = context)
+            if (functionsList() == null && functionsListPart() != null) {
+                val functionName = functionsListPart().name.asPeriodSeparatedString()
+                val argTypes = mutableListOf<TypeReference>()
+                functionsListPart().typeIdentifier()?.forEach { t ->
+                    argTypes.add(processTypeIdentifier(t))
                 }
-
                 val ref = FunctionReferenceBuilder.build(
                     name = functionName,
-                    argTypes = argTypesRefs,
+                    argTypes = argTypes,
                     context
                 )
-
                 result.add(ref)
+            } else {
+                functionsList()?.functionsListPart()?.forEach { f ->
+                    val functionName = f.name.asPeriodSeparatedString()
+                    val argTypes = mutableListOf<TypeReference>()
+                    f.typeIdentifier()?.forEach { t ->
+                        argTypes.add(processTypeIdentifier(t))
+                    }
+                    val ref = FunctionReferenceBuilder.build(
+                        name = functionName,
+                        argTypes = argTypes,
+                        context
+                    )
+                    result.add(ref)
+                }
             }
-
             return result
         }
 
@@ -137,7 +151,7 @@ class AutomatonResolver(
         val expressionVisitor = ExpressionVisitor(context)
         val initValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
 
-            val variable = VariableWithInitialValue(
+        val variable = VariableWithInitialValue(
             keyword,
             name,
             typeReference,

@@ -143,7 +143,7 @@ actionParameter
  */
 automatonDecl
    :   annotationUsage* AUTOMATON name=periodSeparatedFullName (L_BRACKET constructorVariables* R_BRACKET)?
-   COLON type=periodSeparatedFullName L_BRACE automatonStatement* R_BRACE
+   COLON type=typeIdentifier L_BRACE automatonStatement* R_BRACE
    ;
 
 constructorVariables
@@ -174,7 +174,7 @@ automatonStateDecl
 automatonShiftDecl
    :   SHIFT from=Identifier MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
    |   SHIFT from=Identifier MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
-   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier  BY functionsListPart SEMICOLON
+   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
    |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
    ;
 
@@ -183,7 +183,7 @@ functionsList
    ;
 
 functionsListPart
-   :   name=Identifier (L_BRACKET Identifier? (COMMA Identifier)* R_BRACKET)?
+   :   name=Identifier (L_BRACKET typeIdentifier? (COMMA typeIdentifier)* R_BRACKET)?
    ;
 
 /* variable declaration with optional initializers
@@ -195,7 +195,7 @@ variableDecl
    ;
 
 nameWithType
-   :   name=Identifier COLON type=typeIdentifier
+   :  name=Identifier COLON type=typeIdentifier
    ;
 
 /*
@@ -222,7 +222,7 @@ callAutomatonConstructorWithNamedArgs
    ;
 
 namedArgs
-   :   argPair (COMMA argPair)*
+   :   argPair (COMMA argPair)* (COMMA)?
    ;
 
 argPair
@@ -268,12 +268,8 @@ parameter
  * syntax: @annotationName(args)
  */
 annotationUsage
-   :   AT Identifier (L_BRACKET expressionsList R_BRACKET)?
+   :   AT Identifier (L_BRACKET annotationArgs* R_BRACKET)?
    ;
-
-/*
- * declarations between function's header and body-block
- */
 
 functionContract
    :   requiresContract
@@ -282,10 +278,10 @@ functionContract
    ;
 
 functionBody
-   :   functionContract* functionBodyStatements*
+   :   functionContract* functionBodyStatement*
    ;
 
-functionBodyStatements
+functionBodyStatement
    :   variableAssignment
    |   variableDecl
    |   ifStatement
@@ -293,26 +289,36 @@ functionBodyStatements
    ;
 
 ifStatement
-   :   IF expression L_BRACE functionBodyStatements* R_BRACE (elseStatement)?
+   :   IF expression L_BRACE functionBodyStatement* R_BRACE (elseStatement)?
+   |   IF expression functionBodyStatement (elseStatement)?
    ;
 
 elseStatement
-   :   ELSE L_BRACE functionBodyStatements* R_BRACE
+   :   ELSE L_BRACE functionBodyStatement* R_BRACE
+   |   ELSE functionBodyStatement
    ;
 
 /* semantic action
  * syntax: action ActionName(args)
  */
 actionUsage
-   :  ACTION Identifier L_BRACKET expressionsList? R_BRACKET
+   :   ACTION Identifier L_BRACKET expressionsList? R_BRACKET
    ;
 
 procUsage
-   :  qualifiedAccess L_BRACKET expressionsList? R_BRACKET
+   :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
    ;
 
 expressionsList
    :   expression (COMMA expression)* (COMMA)?
+   ;
+
+annotationArgs
+   :   argName? expression (COMMA)?
+   ;
+
+argName
+   :   name=Identifier ASSIGN_OP
    ;
 
 /* requires contract
@@ -354,6 +360,12 @@ expression
    |   unaryOp
    |   procUsage
    |   actionUsage
+   |   callAutomatonConstructorWithNamedArgs
+   |   hasAutomaton
+   ;
+
+hasAutomaton
+   :   qualifiedAccess HAS name=Identifier
    ;
 
 bitShiftOp
@@ -419,10 +431,14 @@ periodSeparatedFullName
    ;
 
 integerNumber
-   :   MINUS? Digit+
-   |   Digit
+   :   MINUS? Digit+ suffix?
+   |   Digit suffix?
    ;
 
 floatNumber
-   :  MINUS? Digit+ DOT Digit+
+   :   MINUS? Digit+ DOT Digit+ suffix?
+   ;
+
+suffix
+   :   Identifier
    ;

@@ -5,6 +5,7 @@ import org.jetbrains.research.libsl.LibSLParser.TypeIdentifierContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.AnnotationUsage
+import org.jetbrains.research.libsl.nodes.NamedArgumentWithValue
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
@@ -12,6 +13,7 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
+import org.jetbrains.research.libsl.type.TypeAlias
 
 abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
     protected fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
@@ -19,7 +21,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val isPointer = ctx.asterisk != null
         val genericTypeIdentifierContext = ctx.generic
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
-        val genericReference = generic?.getReference(context)
+        var genericReference = generic?.getReference(context)
 
         return TypeReferenceBuilder.build(typeName, genericReference, isPointer, context)
     }
@@ -67,13 +69,32 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
 
     private fun processAnnotationUsage(ctx: LibSLParser.AnnotationUsageContext): AnnotationUsage {
         val name = ctx.Identifier().asPeriodSeparatedString()
-        val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.orEmpty()
-        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+        val args = if(ctx.annotationArgs() != null) {
+            processAnnotationArgs(ctx)
+        } else {
+            emptyList()
+        }
+        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument.value).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)
 
-        return AnnotationUsage(annotationRef, args)
+        return AnnotationUsage(
+            annotationRef,
+            args
+        )
+    }
+
+    private fun processAnnotationArgs(ctx: LibSLParser.AnnotationUsageContext): List<NamedArgumentWithValue> {
+        val namedArgs = mutableListOf<NamedArgumentWithValue>()
+        ctx.annotationArgs().forEach { a ->
+            val name = a.argName()?.name?.text
+            val value = ExpressionVisitor(context).visitExpression(a.expression())
+            namedArgs.add(
+                NamedArgumentWithValue(
+                    name,
+                    value
+                )
+            )
+        }
+        return namedArgs
     }
 }

@@ -21,19 +21,11 @@ class FunctionVisitor(
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
-        if (automatonName == null && parentAutomaton == null) {
-            errorManager(UnspecifiedAutomaton("automaton must be specified for top-level functions", ctx.position()))
-            return
-        }
-
-        check((automatonName != null) xor (parentAutomaton != null))
-
         val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) }
             ?: parentAutomaton?.getReference(functionContext)
-        check(automatonReference != null)
 
         if (automatonName != null) {
-            parentAutomaton = automatonReference.resolveOrError()
+            parentAutomaton = automatonReference?.resolveOrError()
         }
 
         val functionName = ctx.functionName.text.extractIdentifier()
@@ -127,7 +119,7 @@ class FunctionVisitor(
         parentAutomaton?.procDeclarations?.add(buildingFunction)
     }
 
-    override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
+    override fun visitFunctionBodyStatement(ctx: FunctionBodyStatementContext) {
         val visitor = BlockStatementVisitor(functionContext)
         visitor.visit(ctx)
         val statements = visitor.statements
@@ -187,7 +179,11 @@ class FunctionVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val expression = expressionVisitor.visitExpression(expressionContext)
 
-        val contract = Contract(name, expression, kind)
+        val contract = Contract(
+            name,
+            expression,
+            kind
+        )
         buildingFunction.contracts.add(contract)
     }
 }

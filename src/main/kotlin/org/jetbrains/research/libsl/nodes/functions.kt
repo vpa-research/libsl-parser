@@ -20,7 +20,7 @@ open class Function(
     open val context: FunctionContext
 ) : Node() {
     val fullName: String
-        get() = if (automatonReference?.name?.isEmpty() == true) "${automatonReference!!.name}.$name" else name
+        get() = if(automatonReference?.name?.isEmpty() == true) "${automatonReference!!.name}.$name" else name
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
@@ -100,10 +100,3 @@ class Procedure(
     annotationUsages, contracts,
     statements, hasBody, null, context
 )
-
-data class ArgumentWithValue(
-    val name: String,
-    val value: Expression
-) : IPrinter {
-    override fun dumpToString(): String = "${BackticksPolitics.forIdentifier(name)} = ${value.dumpToString()}"
-}

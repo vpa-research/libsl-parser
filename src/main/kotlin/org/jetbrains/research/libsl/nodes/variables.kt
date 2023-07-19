@@ -97,10 +97,10 @@ class ActionParameter(
 ) : Variable(name, typeReference)
 
 class ConstructorArgument(
-    private val keyword: VariableKind,
+    val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
-    private val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
+    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf()
 ) : Variable(name, typeReference) {
     lateinit var automaton: Automaton
 
@@ -112,7 +112,6 @@ class ConstructorArgument(
             append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
             append(IPrinter.SPACE)
         }
-
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
     }
@@ -120,7 +119,7 @@ class ConstructorArgument(
 
 @Suppress("MemberVisibilityCanBePrivate")
 class VariableWithInitialValue(
-    private val keyword: VariableKind,
+    val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
     val annotationUsage: MutableList<AnnotationUsage> = mutableListOf(),
@@ -130,7 +129,6 @@ class VariableWithInitialValue(
         append(formatListEmptyLineAtEndIfNeeded(annotationUsage))
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
-
         if (initialValue != null) {
             append(" = ${initialValue.dumpToString()};")
         } else {

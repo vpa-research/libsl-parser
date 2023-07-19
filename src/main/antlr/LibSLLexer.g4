@@ -238,6 +238,10 @@ BY
    :   'by'
    ;
 
+HAS
+   :   'has'
+   ;
+
 Identifier
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
    |   '`' .*? '`'

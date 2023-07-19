@@ -31,7 +31,10 @@ class TopLevelDeclarationsResolver(
             params.add(param)
         }
 
-        val annotation = Annotation(annotationName, params)
+        val annotation = Annotation(
+            annotationName,
+            params
+        )
         globalContext.storeAnnotation(annotation)
     }
 
@@ -87,6 +90,7 @@ class TopLevelDeclarationsResolver(
 
         ctx.actionDeclParamList()?.actionParameter()?.forEach { parameterCtx ->
             val param = ActionArgumentDescriptor(
+                getAnnotationUsages(parameterCtx.annotationUsage()),
                 parameterCtx.name.text.extractIdentifier(),
                 processTypeIdentifier(parameterCtx.type)
             )
@@ -98,8 +102,12 @@ class TopLevelDeclarationsResolver(
         val actionAnnotations = getAnnotationUsages(ctx.annotationUsage())
 
         val declaredAction =
-            Action(actionName, actionParams, actionAnnotations, returnType)
-
+            ActionDecl(
+                actionName,
+                actionParams,
+                actionAnnotations,
+                returnType
+            )
         globalContext.storeDeclaredAction(declaredAction)
     }
 }

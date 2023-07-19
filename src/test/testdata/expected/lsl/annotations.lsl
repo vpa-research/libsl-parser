@@ -9,7 +9,7 @@ annotation Anno(
 );
 automaton A : Int {
     @Public
-    fun f(@Anno(1, 12) param: Int);
+    fun f(@Anno(x = 1, y = 12) param: Int);
     @Public
-    fun g(@Anno(1, 12) param: Int, @Something value: Int);
+    fun g(@Anno(x = 1, y = 12) param: Int, @Something value: Int);
 }
