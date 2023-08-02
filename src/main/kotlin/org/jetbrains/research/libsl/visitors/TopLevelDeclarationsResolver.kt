@@ -49,8 +49,8 @@ class TopLevelDeclarationsResolver(
     }
 
     override fun visitFunctionDecl(ctx: LibSLParser.FunctionDeclContext) {
-        val parentContext = if (ctx.automatonName != null) {
-            val automatonRef = AutomatonReferenceBuilder.build(ctx.automatonName.text.extractIdentifier(), context)
+        val parentContext = if (ctx.functionHeader().automatonName != null) {
+            val automatonRef = AutomatonReferenceBuilder.build(ctx.functionHeader().automatonName.text.extractIdentifier(), context)
             globalContext.resolveAutomaton(automatonRef)!!.context
         } else {
             globalContext

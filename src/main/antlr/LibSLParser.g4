@@ -253,30 +253,48 @@ argPair
    |   name=Identifier ASSIGN_OP expression
    ;
 
+headerWithAsterisk
+   :   ASTERISK DOT
+   ;
+
 constructorDecl
-   :   annotationUsage* CONSTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
+   :   constructorHeader (SEMICOLON | L_BRACE functionBody R_BRACE)
+   ;
+
+constructorHeader
+   :   annotationUsage* CONSTRUCTOR headerWithAsterisk? functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)?
    ;
 
 destructorDecl
-   :   annotationUsage* DESTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
-   (SEMICOLON | L_BRACE functionBody R_BRACE)?
+   :   destructorHeader (SEMICOLON | L_BRACE functionBody R_BRACE)?
+   ;
+
+destructorHeader
+   :   annotationUsage* DESTRUCTOR headerWithAsterisk? functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)?
    ;
 
 procDecl
-   :   annotationUsage* PROC functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
-   (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
+   :   procHeader (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
+procHeader
+   :   annotationUsage* PROC headerWithAsterisk? functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
+   (COLON functionType=typeIdentifier)?
+   ;
 /*
  * syntax: @Annotation
  *         fun name(@annotation arg1: type, arg2: type, ...) [: type] [preambule] { statement1; statement2; ... }
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   annotationUsage* STATIC? FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   :   functionHeader (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
+   ;
+
+functionHeader
+   :   annotationUsage* STATIC? FUN (automatonName=periodSeparatedFullName DOT)? headerWithAsterisk? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
-   (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
    ;
 
 functionDeclArgList

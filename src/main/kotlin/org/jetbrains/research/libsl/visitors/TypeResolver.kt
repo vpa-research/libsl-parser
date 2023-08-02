@@ -170,16 +170,17 @@ class TypeResolver(
     }
 
     private fun processFunctionDecl(ctx: FunctionDeclContext): org.jetbrains.research.libsl.nodes.Function {
+        val isMethod = ctx.functionHeader().headerWithAsterisk() != null
         val functionContext = FunctionContext(context)
-        val isStatic = ctx.STATIC() != null
-        val functionName = ctx.functionName.text.extractIdentifier()
+        val isStatic = ctx.functionHeader().STATIC() != null
+        val functionName = ctx.functionHeader().functionName.text.extractIdentifier()
 
-        val annotationReferences = getAnnotationUsages(ctx.annotationUsage())
+        val annotationReferences = getAnnotationUsages(ctx.functionHeader().annotationUsage())
 
         val args = ctx.args.toMutableList()
         args.forEach { arg -> functionContext.storeFunctionArgument(arg) }
 
-        val returnType = ctx.functionType?.let { processTypeIdentifier(it) }
+        val returnType = ctx.functionHeader().functionType?.let { processTypeIdentifier(it) }
 
         return Function(
             kind = FunctionKind.FUNCTION,
@@ -192,13 +193,14 @@ class TypeResolver(
             targetAutomatonRef = null,
             context = functionContext,
             isStatic = isStatic,
+            isMethod = isMethod,
             entityPosition = posGetter.getCtxPosition(fileName, ctx)
         )
     }
 
     private val FunctionDeclContext.args: List<FunctionArgument>
         get() = this
-            .functionDeclArgList()
+            .functionHeader().functionDeclArgList()
             ?.parameter()
             ?.mapIndexed { i, parameter ->
                 val typeRef = processTypeIdentifier(parameter.type)
