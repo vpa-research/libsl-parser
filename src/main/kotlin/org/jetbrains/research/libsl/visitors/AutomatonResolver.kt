@@ -55,7 +55,7 @@ class AutomatonResolver(
     override fun visitAutomatonStateDecl(ctx: LibSLParser.AutomatonStateDeclContext) {
         val stateKind = StateKind.fromString(ctx.keyword.text)
 
-        val names = ctx.identifierList().Identifier().map { it.text }
+        val names = ctx.identifierList().IDENTIFIER().map { it.text }
         for (name in names) {
             val state = State(name, stateKind)
             buildingAutomaton.states.add(state)
@@ -102,9 +102,9 @@ class AutomatonResolver(
     private val LibSLParser.AutomatonShiftDeclContext.fromStatesNames: List<String>
         get() {
             return if (this.identifierList() != null) {
-                identifierList().Identifier().map { id -> id.text }
+                identifierList().IDENTIFIER().map { id -> id.text }
             } else {
-                listOf(Identifier().first().text)
+                listOf(IDENTIFIER().first().text)
             }
         }
 

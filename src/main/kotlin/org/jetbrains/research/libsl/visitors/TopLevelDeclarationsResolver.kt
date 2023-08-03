@@ -16,7 +16,7 @@ class TopLevelDeclarationsResolver(
 ) : LibSLParserVisitor<Unit>(globalContext) {
 
     override fun visitAnnotationDecl(ctx: LibSLParser.AnnotationDeclContext) {
-        val annotationName = ctx.Identifier().asPeriodSeparatedString()
+        val annotationName = ctx.IDENTIFIER().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(context)
         val params = mutableListOf<AnnotationArgumentDescriptor>()
 

@@ -68,7 +68,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
     }
 
     private fun processAnnotationUsage(ctx: LibSLParser.AnnotationUsageContext): AnnotationUsage {
-        val name = ctx.Identifier().asPeriodSeparatedString()
+        val name = ctx.IDENTIFIER().asPeriodSeparatedString()
         val args = if(ctx.annotationArgs() != null) {
             processAnnotationArgs(ctx)
         } else {

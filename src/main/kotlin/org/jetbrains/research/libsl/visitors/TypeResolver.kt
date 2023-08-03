@@ -53,7 +53,7 @@ class TypeResolver(
     }
 
     private fun processBlockTypeStatement(statementContext: EnumSemanticTypeEntryContext): Pair<String, Atomic> {
-        val entryName = statementContext.Identifier().asPeriodSeparatedString()
+        val entryName = statementContext.IDENTIFIER().asPeriodSeparatedString()
         val expressionVisitor = ExpressionVisitor(context)
         val atomicValueContext = statementContext.expressionAtomic()
         val atomicValue = expressionVisitor.visitExpressionAtomic(atomicValueContext)
@@ -85,7 +85,7 @@ class TypeResolver(
     }
 
     private fun processEnumStatement(statement: LibSLParser.EnumBlockStatementContext): Pair<String, Atomic> {
-        val name = statement.Identifier().asPeriodSeparatedString()
+        val name = statement.IDENTIFIER().asPeriodSeparatedString()
 
         val expressionVisitor = ExpressionVisitor(context)
         val atomicContext = statement.integerNumber()

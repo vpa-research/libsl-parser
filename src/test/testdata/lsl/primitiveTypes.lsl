@@ -26,4 +26,16 @@ automaton A : Int {
     fun newSum(): Float {
         result = 0.0f + 0.1f;
     }
+
+    fun intSum(): Int {
+        result = 2 + 2;
+    }
+
+    fun int8Sum(): Byte {
+        result = 2b + 3b;
+    }
+
+    fun int64Sum(): Long {
+        result = 2L + 2L;
+    }
 }

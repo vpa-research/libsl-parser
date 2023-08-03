@@ -242,7 +242,7 @@ HAS
    :   'has'
    ;
 
-Identifier
+IDENTIFIER
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
    |   '`' .*? '`'
    ;
@@ -251,7 +251,7 @@ DoubleQuotedString
    :   '"' .*? '"'
    ;
 
-Digit: ('0'..'9');
+DIGIT: ('0'..'9');
 
 fragment
 NEWLINE

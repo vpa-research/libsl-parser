@@ -168,28 +168,28 @@ class ExpressionVisitor(
         } else {
             return when(ctx.suffix().text) {
                 "b" -> IntegerLiteral(
-                    ctx.text.toByte(), "b"
+                    ctx.text.dropLast(1).toByte(), "b"
                 )
                 "ub" -> IntegerLiteral(
-                    ctx.text.toUByte(), "ub"
+                    ctx.text.dropLast(2).toUByte(), "ub"
                 )
                 "s" -> IntegerLiteral(
-                    ctx.text.toShort(), "s"
+                    ctx.text.dropLast(1).toShort(), "s"
                 )
                 "us" -> IntegerLiteral(
-                    ctx.text.toUShort(), "us"
+                    ctx.text.dropLast(2).toUShort(), "us"
                 )
                 null -> IntegerLiteral(
                     ctx.text.toInt(), ""
                 )
                 "u" -> IntegerLiteral(
-                    ctx.text.toUInt(), "u"
+                    ctx.text.dropLast(1).toUInt(), "u"
                 )
                 "L" -> IntegerLiteral(
-                    ctx.text.toLong(), "L"
+                    ctx.text.dropLast(1).toLong(), "L"
                 )
                 "uL" -> IntegerLiteral(
-                    ctx.text.toULong(), "uL"
+                    ctx.text.dropLast(2).toULong(), "uL"
                 )
                 else -> throw IllegalArgumentException("Incorrect integer suffix")
             }
@@ -198,18 +198,20 @@ class ExpressionVisitor(
 
 
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
-        if(ctx.suffix() == null) {
-            return FloatLiteral(
+        return if(ctx.suffix() == null) {
+            FloatLiteral(
                 ctx.text.toDouble(), null
             )
         } else {
-            return when(ctx.suffix().text) {
+            when(ctx.suffix().text) {
                 "f" -> FloatLiteral(
                     ctx.text.toFloat(), "f"
                 )
+
                 null -> FloatLiteral(
                     ctx.text.toDouble(), ""
                 )
+
                 else -> throw IllegalArgumentException("Incorrect float suffix")
             }
         }
@@ -262,7 +264,7 @@ class ExpressionVisitor(
     private fun processPeriodSeparatedQualifiedAccess(
         periodSeparatedFullNameContext: PeriodSeparatedFullNameContext
     ): QualifiedAccess {
-        val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
+        val names = periodSeparatedFullNameContext.IDENTIFIER().map { it.text.extractIdentifier() }
 
         val lastAccess = when (val lastFieldName = names.last()) {
             "this" -> ThisAccess(childAccess = null)
@@ -294,10 +296,10 @@ class ExpressionVisitor(
     override fun visitSimpleCall(ctx: SimpleCallContext): AutomatonOfFunctionArgumentInvoke {
         check(context is FunctionContext) { "simple call is allowed only inside of function" }
 
-        val automatonName = ctx.Identifier(0).asPeriodSeparatedString()
+        val automatonName = ctx.IDENTIFIER(0).asPeriodSeparatedString()
         val automatonReference = AutomatonReferenceBuilder.build(automatonName, context)
 
-        val argName = ctx.Identifier(1).asPeriodSeparatedString()
+        val argName = ctx.IDENTIFIER(1).asPeriodSeparatedString()
         val arg = context.resolveFunctionArgumentByName(argName)
 
         check(arg != null) { "can't resolve argument $argName" }
@@ -356,7 +358,7 @@ class ExpressionVisitor(
     }
 
     override fun visitActionUsage(ctx: ActionUsageContext): Expression {
-        val name = ctx.Identifier().text.extractIdentifier()
+        val name = ctx.IDENTIFIER().text.extractIdentifier()
         for (c in name) {
             if(c.isLowerCase()) {
                 throw IllegalArgumentException("Action names must be in upper case")

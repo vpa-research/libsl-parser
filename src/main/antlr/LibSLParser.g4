@@ -40,7 +40,7 @@ topLevelDecl
  */
 header:
    (LIBSL lslver=DoubleQuotedString SEMICOLON)
-   (LIBRARY libraryName=Identifier)
+   (LIBRARY libraryName=IDENTIFIER)
    (VERSION ver = DoubleQuotedString)?
    (LANGUAGE lang=DoubleQuotedString)?
    (URL link=DoubleQuotedString)?
@@ -72,7 +72,7 @@ enumBlock
    ;
 
 enumBlockStatement
-   :   Identifier ASSIGN_OP integerNumber SEMICOLON
+   :   IDENTIFIER ASSIGN_OP integerNumber SEMICOLON
    ;
 
 /* semantic types section
@@ -98,11 +98,11 @@ simpleSemanticType
  * syntax: semanticTypeName (realTypeName) {variant1: 0; variant2: 1; ...};
  */
 enumSemanticType
-   :   semanticName=Identifier L_BRACKET realName=typeIdentifier R_BRACKET L_BRACE enumSemanticTypeEntry+ R_BRACE
+   :   semanticName=IDENTIFIER L_BRACKET realName=typeIdentifier R_BRACKET L_BRACE enumSemanticTypeEntry+ R_BRACE
    ;
 
 enumSemanticTypeEntry
-   :   Identifier COLON expressionAtomic SEMICOLON
+   :   IDENTIFIER COLON expressionAtomic SEMICOLON
    ;
 
 /* annotation declaration
@@ -112,7 +112,7 @@ enumSemanticTypeEntry
  *         );
  */
 annotationDecl
-   :   ANNOTATION name=Identifier annotationDeclParams? SEMICOLON
+   :   ANNOTATION name=IDENTIFIER annotationDeclParams? SEMICOLON
    ;
 
 annotationDeclParams
@@ -125,7 +125,7 @@ annotationDeclParamsPart
 
 actionDecl
    :   annotationUsage*
-   DEFINE ACTION actionName=Identifier L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
+   DEFINE ACTION actionName=IDENTIFIER L_BRACKET actionDeclParamList? R_BRACKET (COLON actionType=typeIdentifier)? SEMICOLON
    ;
 
 actionDeclParamList
@@ -133,7 +133,7 @@ actionDeclParamList
    ;
 
 actionParameter
-   :   annotationUsage* name=Identifier COLON type=typeIdentifier
+   :   annotationUsage* name=IDENTIFIER COLON type=typeIdentifier
    ;
 
 /* automaton declaration
@@ -172,10 +172,10 @@ automatonStateDecl
  * syntax: shift (from1, from2, ...) -> to(function1; function2(optional arg types); ...)
  */
 automatonShiftDecl
-   :   SHIFT from=Identifier MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
-   |   SHIFT from=Identifier MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
-   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY functionsListPart SEMICOLON
-   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=Identifier BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
+   :   SHIFT from=IDENTIFIER MINUS_ARROW to=IDENTIFIER BY functionsListPart SEMICOLON
+   |   SHIFT from=IDENTIFIER MINUS_ARROW to=IDENTIFIER BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
+   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=IDENTIFIER BY functionsListPart SEMICOLON
+   |   SHIFT from=L_BRACKET identifierList R_BRACKET MINUS_ARROW to=IDENTIFIER BY L_SQUARE_BRACKET functionsList? R_SQUARE_BRACKET SEMICOLON
    ;
 
 functionsList
@@ -183,7 +183,7 @@ functionsList
    ;
 
 functionsListPart
-   :   name=Identifier (L_BRACKET typeIdentifier? (COMMA typeIdentifier)* R_BRACKET)?
+   :   name=IDENTIFIER (L_BRACKET typeIdentifier? (COMMA typeIdentifier)* R_BRACKET)?
    ;
 
 /* variable declaration with optional initializers
@@ -195,7 +195,7 @@ variableDecl
    ;
 
 nameWithType
-   :  name=Identifier COLON type=typeIdentifier
+   :  name=IDENTIFIER COLON type=typeIdentifier
    ;
 
 /*
@@ -227,21 +227,21 @@ namedArgs
 
 argPair
    :   name=STATE ASSIGN_OP expressionAtomic
-   |   name=Identifier ASSIGN_OP expression
+   |   name=IDENTIFIER ASSIGN_OP expression
    ;
 
 constructorDecl
-   :   annotationUsage* CONSTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
+   :   annotationUsage* CONSTRUCTOR functionName=IDENTIFIER? L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
 destructorDecl
-   :   annotationUsage* DESTRUCTOR functionName=Identifier? L_BRACKET functionDeclArgList? R_BRACKET
+   :   annotationUsage* DESTRUCTOR functionName=IDENTIFIER? L_BRACKET functionDeclArgList? R_BRACKET
    (SEMICOLON | L_BRACE functionBody R_BRACE)?
    ;
 
 procDecl
-   :   annotationUsage* PROC functionName=Identifier L_BRACKET functionDeclArgList? R_BRACKET
+   :   annotationUsage* PROC functionName=IDENTIFIER L_BRACKET functionDeclArgList? R_BRACKET
    (COLON functionType=typeIdentifier)? (SEMICOLON | L_BRACE functionBody R_BRACE)
    ;
 
@@ -251,7 +251,7 @@ procDecl
  * In case of declaring extension-function, name must look like Automaton.functionName
  */
 functionDecl
-   :   annotationUsage* FUN (automatonName=periodSeparatedFullName DOT)? functionName=Identifier
+   :   annotationUsage* FUN (automatonName=periodSeparatedFullName DOT)? functionName=IDENTIFIER
    L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
    (SEMICOLON | (L_BRACE functionBody R_BRACE)?)
    ;
@@ -261,14 +261,14 @@ functionDeclArgList
    ;
 
 parameter
-   :   annotationUsage* name=Identifier COLON type=typeIdentifier
+   :   annotationUsage* name=IDENTIFIER COLON type=typeIdentifier
    ;
 
 /* annotation
  * syntax: @annotationName(args)
  */
 annotationUsage
-   :   AT Identifier (L_BRACKET annotationArgs* R_BRACKET)?
+   :   AT IDENTIFIER (L_BRACKET annotationArgs* R_BRACKET)?
    ;
 
 functionContract
@@ -302,7 +302,7 @@ elseStatement
  * syntax: action ActionName(args)
  */
 actionUsage
-   :   ACTION Identifier L_BRACKET expressionsList? R_BRACKET
+   :   ACTION IDENTIFIER L_BRACKET expressionsList? R_BRACKET
    ;
 
 procUsage
@@ -318,28 +318,28 @@ annotationArgs
    ;
 
 argName
-   :   name=Identifier ASSIGN_OP
+   :   name=IDENTIFIER ASSIGN_OP
    ;
 
 /* requires contract
  * syntax: requires [name:] condition
  */
 requiresContract
-   :   REQUIRES (name=Identifier COLON)? expression SEMICOLON
+   :   REQUIRES (name=IDENTIFIER COLON)? expression SEMICOLON
    ;
 
 /* ensures contract
  * syntax: ensures [name:] condition
  */
 ensuresContract
-   :   ENSURES (name=Identifier COLON)? expression SEMICOLON
+   :   ENSURES (name=IDENTIFIER COLON)? expression SEMICOLON
    ;
 
 /* assigns contract
  * syntax: assigns [name:] condition
  */
 assignsContract
-   :   ASSIGNS (name=Identifier COLON)? expression SEMICOLON
+   :   ASSIGNS (name=IDENTIFIER COLON)? expression SEMICOLON
    ;
 
 /*
@@ -365,7 +365,7 @@ expression
    ;
 
 hasAutomaton
-   :   qualifiedAccess HAS name=Identifier
+   :   qualifiedAccess HAS name=IDENTIFIER
    ;
 
 bitShiftOp
@@ -413,11 +413,11 @@ qualifiedAccess
    ;
 
 simpleCall
-   :   Identifier L_BRACKET Identifier R_BRACKET
+   :   IDENTIFIER L_BRACKET IDENTIFIER R_BRACKET
    ;
 
 identifierList
-   :   Identifier (COMMA Identifier)*
+   :   IDENTIFIER (COMMA IDENTIFIER)*
    ;
 
 arrayLiteral
@@ -425,20 +425,20 @@ arrayLiteral
    ;
 
 periodSeparatedFullName
-   :   Identifier
-   |   Identifier (DOT Identifier)*
-   |   BACK_QOUTE Identifier (DOT Identifier)* BACK_QOUTE
+   :   IDENTIFIER
+   |   IDENTIFIER (DOT IDENTIFIER)*
+   |   BACK_QOUTE IDENTIFIER (DOT IDENTIFIER)* BACK_QOUTE
    ;
 
 integerNumber
-   :   MINUS? Digit+ suffix?
-   |   Digit suffix?
+   :   MINUS? DIGIT+ suffix?
+   |   DIGIT suffix?
    ;
 
 floatNumber
-   :   MINUS? Digit+ DOT Digit+ suffix?
+   :   MINUS? DIGIT+ DOT DIGIT+ suffix?
    ;
 
 suffix
-   :   Identifier
+   :   IDENTIFIER
    ;
