@@ -101,6 +101,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testHasOperatorLsl() {
+        runLslTest("hasOperator")
+    }
+
+    @Test
     fun testIfElseLsl() {
         runLslTest("ifElse")
     }
@@ -201,3 +206,4 @@ class GeneratedTests {
     }
 
 }
+
