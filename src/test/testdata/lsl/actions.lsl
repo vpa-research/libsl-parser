@@ -4,7 +4,7 @@ library simple;
 typealias Int=int32;
 typealias String=string;
 
-define action TEST_ACTION(x: Int, s: string, p: Int, sum: Int): Int;
+define action TEST_ACTION(x: Int, s: String, p: Int, sum: Int): Int;
 define action TEST_ACTION(x: Int, p: Int, sum: Int): Int;
 // define action TEST_ACTION_TWO(s: String);
 define action LIST_GET(aList: array<any>, itemIndex: int32): any;

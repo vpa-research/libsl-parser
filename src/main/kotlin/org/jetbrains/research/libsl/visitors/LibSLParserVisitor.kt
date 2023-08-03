@@ -20,7 +20,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val isPointer = ctx.asterisk != null
         val genericTypeIdentifierContext = ctx.generic
         val generic = genericTypeIdentifierContext?.let { genericCtx -> getRealType(genericCtx) }
-        var genericReference = generic?.getReference(context)
+        val genericReference = generic?.getReference(context)
 
         return TypeReferenceBuilder.build(typeName, genericReference, isPointer, context)
     }

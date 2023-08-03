@@ -88,11 +88,10 @@ class ExpressionVisitor(
         val left = ctx.expression(0)
         val right = ctx.expression(1)
 
-        return processBinaryExpression(ctx, left, right, op)
+        return processBinaryExpression(left, right, op)
     }
 
     private fun processBinaryExpression(
-        ctx: ExpressionContext,
         left: ExpressionContext,
         right: ExpressionContext,
         op: ArithmeticBinaryOps

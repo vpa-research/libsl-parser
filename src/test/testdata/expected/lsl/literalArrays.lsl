@@ -11,7 +11,7 @@ define action TEST_ACTION(
     s: StringArray
 );
 define action TEST_ACTION_ANY(
-    any: any
+    anyParam: any
 );
 automaton A : Int {
     var arrayVariable: IntArray;

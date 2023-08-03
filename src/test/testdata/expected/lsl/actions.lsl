@@ -4,7 +4,7 @@ typealias Int = int32;
 typealias String = string;
 define action TEST_ACTION(
     x: Int,
-    s: string,
+    s: String,
     p: Int,
     sum: Int
 ): Int;

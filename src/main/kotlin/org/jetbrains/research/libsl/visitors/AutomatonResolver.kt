@@ -115,34 +115,31 @@ class AutomatonResolver(
             val result = mutableListOf<FunctionReference>()
 
             if (functionsList() == null && functionsListPart() != null) {
-                val functionName = functionsListPart().name.asPeriodSeparatedString()
-                val argTypes = mutableListOf<TypeReference>()
-                functionsListPart().typeIdentifier()?.forEach { t ->
-                    argTypes.add(processTypeIdentifier(t))
-                }
-                val ref = FunctionReferenceBuilder.build(
-                    name = functionName,
-                    argTypes = argTypes,
-                    context
-                )
-                result.add(ref)
+                buildFunctionReference(functionsListPart(), result)
             } else {
                 functionsList()?.functionsListPart()?.forEach { f ->
-                    val functionName = f.name.asPeriodSeparatedString()
-                    val argTypes = mutableListOf<TypeReference>()
-                    f.typeIdentifier()?.forEach { t ->
-                        argTypes.add(processTypeIdentifier(t))
-                    }
-                    val ref = FunctionReferenceBuilder.build(
-                        name = functionName,
-                        argTypes = argTypes,
-                        context
-                    )
-                    result.add(ref)
+                    buildFunctionReference(f, result)
                 }
             }
             return result
         }
+
+    private fun buildFunctionReference(
+        f: LibSLParser.FunctionsListPartContext,
+        result: MutableList<FunctionReference>
+    ) {
+        val functionName = f.name.asPeriodSeparatedString()
+        val argTypes = mutableListOf<TypeReference>()
+        f.typeIdentifier()?.forEach { t ->
+            argTypes.add(processTypeIdentifier(t))
+        }
+        val ref = FunctionReferenceBuilder.build(
+            name = functionName,
+            argTypes = argTypes,
+            context
+        )
+        result.add(ref)
+    }
 
     override fun visitVariableDecl(ctx: LibSLParser.VariableDeclContext) {
         val keyword = VariableKind.fromString(ctx.keyword.text)

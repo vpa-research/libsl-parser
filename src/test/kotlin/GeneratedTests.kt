@@ -21,11 +21,6 @@ class GeneratedTests {
     }
 
     @Test
-    fun testAnnotationsLsl() {
-        runLslTest("annotations")
-    }
-
-    @Test
     fun testAutomatonAnnotationsLsl() {
         runLslTest("automatonAnnotations")
     }
@@ -108,6 +103,11 @@ class GeneratedTests {
     @Test
     fun testIfElseLsl() {
         runLslTest("ifElse")
+    }
+
+    @Test
+    fun testInitValuesAnnotationsLsl() {
+        runLslTest("initValuesAnnotations")
     }
 
     @Test

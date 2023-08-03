@@ -8,7 +8,7 @@ typealias StringArray = array<String>;
 
 define action TEST_ACTION(a: IntArray);
 define action TEST_ACTION(s: StringArray);
-define action TEST_ACTION_ANY(any: any);
+define action TEST_ACTION_ANY(anyParam: any);
 
 automaton A : Int {
     var arrayVariable: IntArray;
