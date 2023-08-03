@@ -4,7 +4,7 @@ import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.TypeIdentifierContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.AnnotationUsage
+import org.jetbrains.research.libsl.nodes.AnnotatedWith
 import org.jetbrains.research.libsl.nodes.NamedArgumentWithValue
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder
@@ -13,7 +13,6 @@ import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuild
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.RealType
 import org.jetbrains.research.libsl.type.Type
-import org.jetbrains.research.libsl.type.TypeAlias
 
 abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserBaseVisitor<T>() {
     protected fun processTypeIdentifier(ctx: TypeIdentifierContext): TypeReference {
@@ -63,11 +62,11 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         }
     }
 
-    protected fun getAnnotationUsages(ctx: List<LibSLParser.AnnotationUsageContext>): MutableList<AnnotationUsage> {
+    protected fun getAnnotationUsages(ctx: List<LibSLParser.AnnotationUsageContext>): MutableList<AnnotatedWith> {
         return ctx.map { processAnnotationUsage(it) }.toMutableList()
     }
 
-    private fun processAnnotationUsage(ctx: LibSLParser.AnnotationUsageContext): AnnotationUsage {
+    private fun processAnnotationUsage(ctx: LibSLParser.AnnotationUsageContext): AnnotatedWith {
         val name = ctx.IDENTIFIER().asPeriodSeparatedString()
         val args = if(ctx.annotationArgs() != null) {
             processAnnotationArgs(ctx)
@@ -77,7 +76,7 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument.value).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)
 
-        return AnnotationUsage(
+        return AnnotatedWith(
             annotationRef,
             args
         )

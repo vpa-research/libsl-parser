@@ -43,7 +43,7 @@ data class AnnotationArgumentDescriptor(
     }
 }
 
-data class AnnotationUsage(
+data class AnnotatedWith(
     val annotationReference: AnnotationReference,
     val arguments: List<NamedArgumentWithValue>
 ) : IPrinter {

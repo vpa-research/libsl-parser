@@ -4,7 +4,6 @@ import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.errors.UnspecifiedAutomaton
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
@@ -157,7 +156,7 @@ class FunctionVisitor(
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
             val targetArg = firstOrNull { arg ->
-                arg.annotationUsages.any { it.annotationReference.name == "target" }
+                arg.annotatedWith.any { it.annotationReference.name == "target" }
             } ?: return null
             val automatonName = targetArg.typeReference.name
             return AutomatonReferenceBuilder.build(automatonName, functionContext)

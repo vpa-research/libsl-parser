@@ -58,7 +58,7 @@ class FunctionArgument(
     name: String,
     typeReference: TypeReference,
     val index: Int,
-    var annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
+    var annotatedWith: MutableList<AnnotatedWith> = mutableListOf(),
     var targetAutomaton: AutomatonReference? = null
 ) : Variable(name, typeReference) {
     lateinit var function: Function
@@ -67,10 +67,10 @@ class FunctionArgument(
         get() = "${function.name}.$name"
 
     override fun dumpToString(): String = buildString {
-        if (annotationUsages.isNotEmpty()) {
+        if (annotatedWith.isNotEmpty()) {
             append(
                 formatListEmptyLineAtEndIfNeeded(
-                    annotationUsages,
+                    annotatedWith,
                     appendEndLineAtTheEnd = false,
                     onSeparatedLines = false
                 )
@@ -100,7 +100,7 @@ class ConstructorArgument(
     val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
-    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf()
+    val annotatedWith: MutableList<AnnotatedWith> = mutableListOf()
 ) : Variable(name, typeReference) {
     lateinit var automaton: Automaton
 
@@ -108,8 +108,8 @@ class ConstructorArgument(
         get() = "${automaton.name}.$name"
 
     override fun dumpToString(): String = buildString {
-        if (annotationUsages.isNotEmpty()) {
-            append(formatListEmptyLineAtEndIfNeeded(annotationUsages, onSeparatedLines = false))
+        if (annotatedWith.isNotEmpty()) {
+            append(formatListEmptyLineAtEndIfNeeded(annotatedWith, onSeparatedLines = false))
             append(IPrinter.SPACE)
         }
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
@@ -122,11 +122,11 @@ class VariableWithInitialValue(
     val keyword: VariableKind,
     name: String,
     typeReference: TypeReference,
-    val annotationUsage: MutableList<AnnotationUsage> = mutableListOf(),
+    val annotatedWith: MutableList<AnnotatedWith> = mutableListOf(),
     val initialValue: Expression?,
 ) : Variable(name, typeReference) {
     override fun dumpToString(): String = buildString {
-        append(formatListEmptyLineAtEndIfNeeded(annotationUsage))
+        append(formatListEmptyLineAtEndIfNeeded(annotatedWith))
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
         if (initialValue != null) {
