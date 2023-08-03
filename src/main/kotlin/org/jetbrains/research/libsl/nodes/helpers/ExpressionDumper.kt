@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.nodes.helpers
 
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import kotlin.math.exp
 
 object ExpressionDumper {
     fun dump(expression: Expression): String = dump(expression, priority = Int.MAX_VALUE)
@@ -13,8 +14,7 @@ object ExpressionDumper {
             is ArrayLiteral -> dumpArrayLiteral(expression)
             is BoolLiteral -> dumpLiteral(expression)
             is CallAutomatonConstructor -> dumpCallAutomatonConstructor(expression)
-            is FloatLiteral -> dumpFloatLiteral(expression)
-            is IntegerLiteral -> dumpIntegerLiteral(expression)
+            is LiteralWithSuffix -> dumpLiteralWithSuffix(expression)
             is ArrayAccess -> dumpArrayAccess(expression)
             is AutomatonOfFunctionArgumentInvoke -> dumpAutomatonOfFunctionArgumentInvoke(expression)
             is ThisAccess -> dumpThisAccess(expression)
@@ -89,11 +89,7 @@ object ExpressionDumper {
         return expression.value.toString()
     }
 
-    private fun dumpIntegerLiteral(expression: IntegerLiteral): String {
-        return "${expression.value}${expression.suffix ?:""}"
-    }
-
-    private fun dumpFloatLiteral(expression: FloatLiteral): String {
+    private fun dumpLiteralWithSuffix(expression: LiteralWithSuffix): String {
         return "${expression.value}${expression.suffix ?:""}"
     }
 

@@ -42,6 +42,10 @@ class TypeInferrer(private val context: LslContextBase) {
             is BoolLiteral -> BoolType(context)
             is FloatLiteral -> processFloatLiteralType(atomic, context)
             is IntegerLiteral -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt16Literal -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt32Literal -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt64Literal -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt8Literal -> processIntegerLiteralType(atomic, context)
             is StringLiteral -> StringType(context)
             is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
             is QualifiedAccess -> getQualifiedAccessType(atomic)
@@ -49,8 +53,8 @@ class TypeInferrer(private val context: LslContextBase) {
         }
     }
 
-    private fun processIntegerLiteralType(integerLiteral: IntegerLiteral, context: LslContextBase): Type {
-        return when(integerLiteral.suffix) {
+    private fun processIntegerLiteralType(literalWithSuffix: LiteralWithSuffix, context: LslContextBase): Type {
+        return when(literalWithSuffix.suffix) {
             "b" -> Int8Type(context)
             "ub" -> UnsignedInt8Type(context)
             "s" -> Int16Type(context)

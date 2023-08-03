@@ -161,7 +161,7 @@ class ExpressionVisitor(
         }
     }
 
-    override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): IntegerLiteral {
+    override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
         if(ctx.suffix() == null) {
             return IntegerLiteral(
                 ctx.text.toInt(), null)
@@ -170,25 +170,25 @@ class ExpressionVisitor(
                 "b" -> IntegerLiteral(
                     ctx.text.dropLast(1).toByte(), "b"
                 )
-                "ub" -> IntegerLiteral(
+                "ub" -> UnsignedInt8Literal(
                     ctx.text.dropLast(2).toUByte(), "ub"
                 )
                 "s" -> IntegerLiteral(
                     ctx.text.dropLast(1).toShort(), "s"
                 )
-                "us" -> IntegerLiteral(
+                "us" -> UnsignedInt16Literal(
                     ctx.text.dropLast(2).toUShort(), "us"
                 )
                 null -> IntegerLiteral(
                     ctx.text.toInt(), ""
                 )
-                "u" -> IntegerLiteral(
+                "u" -> UnsignedInt32Literal(
                     ctx.text.dropLast(1).toUInt(), "u"
                 )
                 "L" -> IntegerLiteral(
                     ctx.text.dropLast(1).toLong(), "L"
                 )
-                "uL" -> IntegerLiteral(
+                "uL" -> UnsignedInt64Literal(
                     ctx.text.dropLast(2).toULong(), "uL"
                 )
                 else -> throw IllegalArgumentException("Incorrect integer suffix")
