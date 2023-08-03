@@ -63,7 +63,7 @@ class TypeInferrer(private val context: LslContextBase) {
             "u" -> UnsignedInt32Type(context)
             "L" -> Int64Type(context)
             "uL" -> UnsignedInt64Type(context)
-            else -> error("Unknown integer literal, no such type")
+            else -> throw IllegalArgumentException("Unknown integer literal, no such type")
         }
     }
 

@@ -27,10 +27,10 @@ data class ActionDeclReference(
             return false
         }
         return this.paramTypes.zip(node.argumentDescriptors).all { (refType, nodeType) ->
-            val refTypeName = getRealTypeName(refType)
-            val nodeTypeName = getRealTypeName(nodeType.typeReference)
             val resolvedRefType = checkIfTypeAliasAndResolve(refType)
+            val refTypeName = resolvedRefType.name
             val checkedNodeTypeRef = checkIfTypeAliasAndResolve(nodeType.typeReference)
+            val nodeTypeName = checkedNodeTypeRef.name
             val checkedTypeGeneric = checkedNodeTypeRef.generic
             val checkedRefTypeGeneric = resolvedRefType.generic?.let { checkIfTypeAliasAndResolve(it) }
             val resolvedNodeGeneric = checkedTypeGeneric?.let { checkIfTypeAliasAndResolve(it) }
@@ -71,17 +71,6 @@ data class ActionDeclReference(
         } else {
             resolvedT
         }
-    }
-
-    private fun getRealTypeName(refType: TypeReference): String {
-        val s = when (val resolvedRefType = refType.resolveOrError()) {
-            is TypeAlias ->
-                resolvedRefType.originalType.resolveOrError().name
-
-            else ->
-                resolvedRefType.name
-        }
-        return s
     }
 
     override fun toString(): String {

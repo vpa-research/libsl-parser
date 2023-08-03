@@ -24,6 +24,10 @@ abstract class ExpressionVisitor<T> {
             is ThisAccess -> visitThisAccess(node)
             is HasAutomaton -> visitHasAutomaton(node)
             is NamedArgumentWithValue -> visitNamedArgumentWithValue(node)
+            is UnsignedInt16Literal -> visitUInt16Number(node)
+            is UnsignedInt32Literal -> visitUInt32Number(node)
+            is UnsignedInt64Literal -> visitUInt64Number(node)
+            is UnsignedInt8Literal -> visitUInt8Number(node)
         }
     }
 
@@ -34,6 +38,10 @@ abstract class ExpressionVisitor<T> {
     abstract fun visitFloatNumber(node: FloatLiteral): T
 
     abstract fun visitIntegerNumber(node: IntegerLiteral): T
+    abstract fun visitUInt8Number(node: UnsignedInt8Literal): T
+    abstract fun visitUInt16Number(node: UnsignedInt16Literal): T
+    abstract fun visitUInt32Number(node: UnsignedInt32Literal): T
+    abstract fun visitUInt64Number(node: UnsignedInt64Literal): T
 
     abstract fun visitArrayAccess(node: ArrayAccess): T
 

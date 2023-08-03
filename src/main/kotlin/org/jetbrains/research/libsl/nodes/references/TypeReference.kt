@@ -4,7 +4,7 @@ import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.Type
 
-open class TypeReference(
+data class TypeReference(
     val name: String,
     val isPointer: Boolean,
     val genericReference: TypeReference?,
