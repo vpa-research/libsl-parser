@@ -4,10 +4,10 @@ import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.type.Type
 import org.jetbrains.research.libsl.utils.BackticksPolitics
 
-data class Action(
+data class ActionDecl(
     val name: String,
     val argumentDescriptors: MutableList<ActionArgumentDescriptor> = mutableListOf(),
-    val annotations: MutableList<AnnotationUsage> = mutableListOf(),
+    val annotations: MutableList<AnnotatedWith> = mutableListOf(),
     val returnType: TypeReference?
 ) : IPrinter {
     override fun dumpToString(): String = buildString {
@@ -37,10 +37,12 @@ data class Action(
 }
 
 data class ActionArgumentDescriptor(
+    val annotatedWith: MutableList<AnnotatedWith> = mutableListOf(),
     val name: String,
     val typeReference: TypeReference
 ) : IPrinter {
     override fun dumpToString(): String = buildString {
+        append(formatListEmptyLineAtEndIfNeeded(annotatedWith))
         val type = BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: Type.UNRESOLVED_TYPE_SYMBOL)
         append("${BackticksPolitics.forIdentifier(name)}: $type")
     }

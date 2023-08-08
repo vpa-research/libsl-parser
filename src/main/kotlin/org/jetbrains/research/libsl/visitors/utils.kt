@@ -18,9 +18,9 @@ fun Token.asPeriodSeparatedString(): String = this.text.extractIdentifier()
 fun String.extractIdentifier(): String = removeSurrounding("`", "`")
 
 fun PeriodSeparatedFullNameContext.asPeriodSeparatedString(): String =
-    Identifier().joinToString(separator = ".") { it.asPeriodSeparatedString() }
+    IDENTIFIER().joinToString(separator = ".") { it.asPeriodSeparatedString() }
 
-fun PeriodSeparatedFullNameContext.asPeriodSeparatedParts(): List<String> = this.Identifier().map { it.text }
+fun PeriodSeparatedFullNameContext.asPeriodSeparatedParts(): List<String> = this.IDENTIFIER().map { it.text }
 
 fun Token.position(): Position {
     return Position(this.line, this.charPositionInLine)

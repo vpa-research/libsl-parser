@@ -4,7 +4,7 @@ import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.type.ArrayType
 import org.jetbrains.research.libsl.type.Type
 
-open class TypeReference(
+data class TypeReference(
     val name: String,
     val isPointer: Boolean,
     val genericReference: TypeReference?,
@@ -57,25 +57,5 @@ open class TypeReference(
 
     override fun toString(): String {
         return "TypeReference(name=$name, isPointer=$isPointer, genericReference=$genericReference)"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TypeReference) return false
-
-        if (name != other.name) return false
-        if (isPointer != other.isPointer) return false
-        if (genericReference != other.genericReference) return false
-        if (context != other.context) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + isPointer.hashCode()
-        result = 31 * result + (genericReference?.hashCode() ?: 0)
-        result = 31 * result + context.hashCode()
-        return result
     }
 }

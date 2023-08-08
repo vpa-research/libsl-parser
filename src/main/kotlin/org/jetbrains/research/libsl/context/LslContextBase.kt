@@ -10,9 +10,8 @@ import org.jetbrains.research.libsl.type.TypeInferrer
 
 abstract class LslContextBase {
     abstract val parentContext: LslContextBase?
-
     private val annotations = mutableListOf<Annotation>()
-    private val actions = mutableListOf<Action>()
+    private val actions = mutableListOf<ActionDecl>()
     private val automata = mutableListOf<Automaton>()
     private val types = mutableListOf<Type>()
     private val functions = mutableListOf<Function>()
@@ -50,7 +49,7 @@ abstract class LslContextBase {
         annotations.add(annotation)
     }
 
-    fun storeDeclaredAction(action: Action) {
+    fun storeDeclaredAction(action: ActionDecl) {
         actions.add(action)
     }
 
@@ -79,9 +78,9 @@ abstract class LslContextBase {
             ?: parentContext?.resolveAnnotation(reference)
     }
 
-    open fun resolveAction(reference: ActionReference): Action? {
+    open fun resolveActionDecl(reference: ActionDeclReference): ActionDecl? {
         return actions.firstOrNull { action -> reference.isReferenceMatchWithNode(action) }
-            ?: parentContext?.resolveAction(reference)
+            ?: parentContext?.resolveActionDecl(reference)
     }
 
     internal fun getAllTypes() = types

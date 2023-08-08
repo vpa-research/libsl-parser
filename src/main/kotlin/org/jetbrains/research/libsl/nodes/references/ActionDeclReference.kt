@@ -1,32 +1,32 @@
 package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.Annotation
+import org.jetbrains.research.libsl.nodes.ActionDecl
 import org.jetbrains.research.libsl.type.*
 
-data class AnnotationReference(
+data class ActionDeclReference(
     val name: String,
-    val argTypes: List<TypeReference>,
+    val paramTypes: List<TypeReference>,
     override val context: LslContextBase
-) : LslReference<Annotation, AnnotationReference> {
-    override fun resolve(): Annotation? {
-        return context.resolveAnnotation(this)
+) : LslReference<ActionDecl, ActionDeclReference> {
+    override fun resolve(): ActionDecl? {
+        return context.resolveActionDecl(this)
     }
 
-    override fun isSameReference(other: AnnotationReference): Boolean {
-        if(other.name != this.name || other.argTypes.size != this.argTypes.size) {
+    override fun isSameReference(other: ActionDeclReference): Boolean {
+        if(other.name != this.name || other.paramTypes.size != this.paramTypes.size) {
             return false
         }
-        return other.argTypes.zip(this.argTypes).all { (otherType, thisType) ->
+        return other.paramTypes.zip(this.paramTypes).all { (otherType, thisType) ->
             otherType.resolveOrError().fullName == thisType.resolveOrError().fullName
         }
     }
 
-    override fun isReferenceMatchWithNode(node: Annotation): Boolean {
-        if(this.name != node.name || this.argTypes.size != node.argumentDescriptors.size) {
+    override fun isReferenceMatchWithNode(node: ActionDecl): Boolean {
+        if(this.name != node.name || this.paramTypes.size != node.argumentDescriptors.size) {
             return false
         }
-        return this.argTypes.zip(node.argumentDescriptors).all { (refType, nodeType) ->
+        return this.paramTypes.zip(node.argumentDescriptors).all { (refType, nodeType) ->
             val resolvedRefType = checkIfTypeAliasAndResolve(refType)
             val refTypeName = resolvedRefType.name
             val checkedNodeTypeRef = checkIfTypeAliasAndResolve(nodeType.typeReference)
@@ -74,6 +74,6 @@ data class AnnotationReference(
     }
 
     override fun toString(): String {
-        return "AnnotationReference($name)"
+        return "ActionReference($name)"
     }
 }

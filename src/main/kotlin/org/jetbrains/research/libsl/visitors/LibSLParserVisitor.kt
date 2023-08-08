@@ -4,7 +4,8 @@ import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.TypeIdentifierContext
 import org.jetbrains.research.libsl.LibSLParserBaseVisitor
 import org.jetbrains.research.libsl.context.LslContextBase
-import org.jetbrains.research.libsl.nodes.AnnotationUsage
+import org.jetbrains.research.libsl.nodes.AnnotatedWith
+import org.jetbrains.research.libsl.nodes.NamedArgumentWithValue
 import org.jetbrains.research.libsl.nodes.references.TypeReference
 import org.jetbrains.research.libsl.nodes.references.builders.AnnotationReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder
@@ -61,19 +62,38 @@ abstract class LibSLParserVisitor<T>(val context: LslContextBase) : LibSLParserB
         }
     }
 
-    protected fun getAnnotationUsages(ctx: List<LibSLParser.AnnotationUsageContext>): MutableList<AnnotationUsage> {
+    protected fun getAnnotationUsages(ctx: List<LibSLParser.AnnotationUsageContext>): MutableList<AnnotatedWith> {
         return ctx.map { processAnnotationUsage(it) }.toMutableList()
     }
 
-    private fun processAnnotationUsage(ctx: LibSLParser.AnnotationUsageContext): AnnotationUsage {
-        val name = ctx.Identifier().asPeriodSeparatedString()
-        val expressionVisitor = ExpressionVisitor(context)
-        val args = ctx.expressionsList()?.expression()?.map { expr ->
-            expressionVisitor.visitExpression(expr)
-        }.orEmpty()
-        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
+    private fun processAnnotationUsage(ctx: LibSLParser.AnnotationUsageContext): AnnotatedWith {
+        val name = ctx.IDENTIFIER().asPeriodSeparatedString()
+        val args = if(ctx.annotationArgs() != null) {
+            processAnnotationArgs(ctx)
+        } else {
+            emptyList()
+        }
+        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument.value).getReference(context) }
         val annotationRef = AnnotationReferenceBuilder.build(name, argTypes, context)
 
-        return AnnotationUsage(annotationRef, args)
+        return AnnotatedWith(
+            annotationRef,
+            args
+        )
+    }
+
+    private fun processAnnotationArgs(ctx: LibSLParser.AnnotationUsageContext): List<NamedArgumentWithValue> {
+        val namedArgs = mutableListOf<NamedArgumentWithValue>()
+        ctx.annotationArgs().forEach { a ->
+            val name = a.argName()?.name?.text
+            val value = ExpressionVisitor(context).visitExpression(a.expression())
+            namedArgs.add(
+                NamedArgumentWithValue(
+                    name,
+                    value
+                )
+            )
+        }
+        return namedArgs
     }
 }

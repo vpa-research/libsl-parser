@@ -21,11 +21,6 @@ class GeneratedTests {
     }
 
     @Test
-    fun testAnnotationsLsl() {
-        runLslTest("annotations")
-    }
-
-    @Test
     fun testAutomatonAnnotationsLsl() {
         runLslTest("automatonAnnotations")
     }
@@ -101,8 +96,18 @@ class GeneratedTests {
     }
 
     @Test
+    fun testHasOperatorLsl() {
+        runLslTest("hasOperator")
+    }
+
+    @Test
     fun testIfElseLsl() {
         runLslTest("ifElse")
+    }
+
+    @Test
+    fun testInitValuesAnnotationsLsl() {
+        runLslTest("initValuesAnnotations")
     }
 
     @Test
@@ -199,4 +204,6 @@ class GeneratedTests {
     fun testVoidAndAnyLsl() {
         runLslTest("voidAndAny")
     }
+
 }
+

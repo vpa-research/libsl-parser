@@ -8,13 +8,26 @@ define action TEST_ACTION(
     p: Int,
     sum: Int
 ): Int;
-define action TEST_ACTION_TWO(
-    s: String
-);
+define action TEST_ACTION(
+    x: Int,
+    p: Int,
+    sum: Int
+): Int;
+define action LIST_GET(
+    aList: array<any>,
+    itemIndex: int32
+): any;
+define action LIST_GET(
+    itemIndex: int32,
+    aList: array<any>
+): any;
 automaton A : Int {
     var i: Int;
     fun f(param: Int) {
-        action TEST_ACTION(1, "123", param, 1 + 123);
-        action TEST_ACTION_TWO("foo");
+        action TEST_ACTION(1, "123", 2, 1 + 2);
+        action TEST_ACTION(1, 2, 123);
+        var a: array<any>;
+        action LIST_GET(a, 1);
+        action LIST_GET(1, a);
     }
 }

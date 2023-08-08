@@ -8,9 +8,10 @@ automaton A : Int {
     var result: Int;
 
     fun f(x: Int, y: Int) {
-        if(x == y) {
+        if(x == y)
             result = x;
-        } else {
+        else {
+            y = x - y;
             result = y;
         }
     }

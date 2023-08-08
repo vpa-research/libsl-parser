@@ -4,7 +4,6 @@ import org.jetbrains.research.libsl.LibSLParser.*
 import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
-import org.jetbrains.research.libsl.errors.UnspecifiedAutomaton
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
@@ -21,19 +20,11 @@ class FunctionVisitor(
 
     override fun visitFunctionDecl(ctx: FunctionDeclContext) {
         val automatonName = ctx.automatonName?.text?.extractIdentifier()
-        if (automatonName == null && parentAutomaton == null) {
-            errorManager(UnspecifiedAutomaton("automaton must be specified for top-level functions", ctx.position()))
-            return
-        }
-
-        check((automatonName != null) xor (parentAutomaton != null))
-
         val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) }
             ?: parentAutomaton?.getReference(functionContext)
-        check(automatonReference != null)
 
         if (automatonName != null) {
-            parentAutomaton = automatonReference.resolveOrError()
+            parentAutomaton = automatonReference?.resolveOrError()
         }
 
         val functionName = ctx.functionName.text.extractIdentifier()
@@ -127,7 +118,7 @@ class FunctionVisitor(
         parentAutomaton?.procDeclarations?.add(buildingFunction)
     }
 
-    override fun visitFunctionBodyStatements(ctx: FunctionBodyStatementsContext) {
+    override fun visitFunctionBodyStatement(ctx: FunctionBodyStatementContext) {
         val visitor = BlockStatementVisitor(functionContext)
         visitor.visit(ctx)
         val statements = visitor.statements
@@ -165,7 +156,7 @@ class FunctionVisitor(
     private val List<FunctionArgument>.getFunctionTargetByAnnotation: AutomatonReference?
         get() {
             val targetArg = firstOrNull { arg ->
-                arg.annotationUsages.any { it.annotationReference.name == "target" }
+                arg.annotatedWith.any { it.annotationReference.name == "target" }
             } ?: return null
             val automatonName = targetArg.typeReference.name
             return AutomatonReferenceBuilder.build(automatonName, functionContext)
@@ -187,7 +178,11 @@ class FunctionVisitor(
         val expressionVisitor = ExpressionVisitor(functionContext)
         val expression = expressionVisitor.visitExpression(expressionContext)
 
-        val contract = Contract(name, expression, kind)
+        val contract = Contract(
+            name,
+            expression,
+            kind
+        )
         buildingFunction.contracts.add(contract)
     }
 }

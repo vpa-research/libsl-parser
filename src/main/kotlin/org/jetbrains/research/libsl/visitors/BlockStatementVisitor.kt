@@ -29,17 +29,22 @@ class BlockStatementVisitor(
         val value = expressionVisitor.visitExpression(ifCtx.expression())
 
         val ifStatementVisitor = BlockStatementVisitor(functionContext)
-        ifCtx.functionBodyStatements().forEach { ifStatementVisitor.visit(it) }
+        ifCtx.functionBodyStatement().forEach { ifStatementVisitor.visit(it) }
         val ifStatements = ifStatementVisitor.statements
 
         val elseStatement = ifCtx.elseStatement()?.let { elseStmt ->
+
             val elseStatementsVisitor = BlockStatementVisitor(functionContext)
-            elseStmt.functionBodyStatements().forEach { elseStatementsVisitor.visit(it) }
+            elseStmt.functionBodyStatement().forEach { elseStatementsVisitor.visit(it) }
             val elseStatements = elseStatementsVisitor.statements
             ElseStatement(elseStatements)
         }
 
-        val ifBlock = IfStatement(value, ifStatements, elseStatement)
+        val ifBlock = IfStatement(
+            value,
+            ifStatements,
+            elseStatement
+        )
 
         statements.add(ifBlock)
     }

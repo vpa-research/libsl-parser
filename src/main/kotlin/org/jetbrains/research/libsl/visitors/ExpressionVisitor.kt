@@ -53,6 +53,14 @@ class ExpressionVisitor(
                 visitActionUsage(ctx.actionUsage())
             }
 
+            ctx.callAutomatonConstructorWithNamedArgs() != null -> {
+                visitCallAutomatonConstructorWithNamedArgs(ctx.callAutomatonConstructorWithNamedArgs())
+            }
+
+            ctx.hasAutomaton() != null -> {
+                visitHasAutomaton(ctx.hasAutomaton())
+            }
+
             else -> error("unknown expression type")
         }
     }
@@ -91,7 +99,11 @@ class ExpressionVisitor(
         val leftExpression = visitExpression(left)
         val rightExpression = visitExpression(right)
 
-        return BinaryOpExpression(leftExpression, rightExpression, op)
+        return BinaryOpExpression(
+            leftExpression,
+            rightExpression,
+            op
+        )
     }
 
     private fun processUnaryExpression(ctx: ExpressionContext): UnaryOpExpression {
@@ -99,7 +111,10 @@ class ExpressionVisitor(
         val op = ArithmeticUnaryOp.fromString(opText)
         val expression = visitExpression(ctx.expression(0))
 
-        return UnaryOpExpression(op, expression)
+        return UnaryOpExpression(
+            op,
+            expression
+        )
     }
 
     private fun processOldValue(ctx: QualifiedAccessContext): OldValue {
@@ -145,12 +160,60 @@ class ExpressionVisitor(
         }
     }
 
-    override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): IntegerLiteral {
-        return IntegerLiteral(ctx.text.toInt())
+    override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
+        if(ctx.suffix() == null) {
+            return IntegerLiteral(
+                ctx.text.toInt(), null)
+        } else {
+            return when(ctx.suffix().text) {
+                "b" -> IntegerLiteral(
+                    ctx.text.dropLast(1).toByte(), "b"
+                )
+                "ub" -> UnsignedInt8Literal(
+                    ctx.text.dropLast(2).toUByte(), "ub"
+                )
+                "s" -> IntegerLiteral(
+                    ctx.text.dropLast(1).toShort(), "s"
+                )
+                "us" -> UnsignedInt16Literal(
+                    ctx.text.dropLast(2).toUShort(), "us"
+                )
+                null -> IntegerLiteral(
+                    ctx.text.toInt(), ""
+                )
+                "u" -> UnsignedInt32Literal(
+                    ctx.text.dropLast(1).toUInt(), "u"
+                )
+                "L" -> IntegerLiteral(
+                    ctx.text.dropLast(1).toLong(), "L"
+                )
+                "uL" -> UnsignedInt64Literal(
+                    ctx.text.dropLast(2).toULong(), "uL"
+                )
+                else -> throw IllegalArgumentException("Incorrect integer suffix")
+            }
+        }
     }
 
+
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
-        return FloatLiteral(ctx.text.toFloat())
+        return if(ctx.suffix() == null) {
+            FloatLiteral(
+                ctx.text.toDouble(), null
+            )
+        } else {
+            when(ctx.suffix().text) {
+                "f" -> FloatLiteral(
+                    ctx.text.toFloat(), "f"
+                )
+
+                null -> FloatLiteral(
+                    ctx.text.toDouble(), ""
+                )
+
+                else -> throw IllegalArgumentException("Incorrect float suffix")
+            }
+        }
     }
 
     override fun visitQualifiedAccess(ctx: QualifiedAccessContext): QualifiedAccess {
@@ -170,6 +233,7 @@ class ExpressionVisitor(
 
             ctx.expressionAtomic() != null -> {
                 val parentQualifiedAccess = visitQualifiedAccess(ctx.qualifiedAccess(0))
+
                 val arrayIndex = visitExpressionAtomic(ctx.expressionAtomic())
 
                 val qualifiedArrayAccess = ArrayAccess(arrayIndex)
@@ -199,7 +263,7 @@ class ExpressionVisitor(
     private fun processPeriodSeparatedQualifiedAccess(
         periodSeparatedFullNameContext: PeriodSeparatedFullNameContext
     ): QualifiedAccess {
-        val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
+        val names = periodSeparatedFullNameContext.IDENTIFIER().map { it.text.extractIdentifier() }
 
         val lastAccess = when (val lastFieldName = names.last()) {
             "this" -> ThisAccess(childAccess = null)
@@ -231,10 +295,10 @@ class ExpressionVisitor(
     override fun visitSimpleCall(ctx: SimpleCallContext): AutomatonOfFunctionArgumentInvoke {
         check(context is FunctionContext) { "simple call is allowed only inside of function" }
 
-        val automatonName = ctx.Identifier(0).asPeriodSeparatedString()
+        val automatonName = ctx.IDENTIFIER(0).asPeriodSeparatedString()
         val automatonReference = AutomatonReferenceBuilder.build(automatonName, context)
 
-        val argName = ctx.Identifier(1).asPeriodSeparatedString()
+        val argName = ctx.IDENTIFIER(1).asPeriodSeparatedString()
         val arg = context.resolveFunctionArgumentByName(argName)
 
         check(arg != null) { "can't resolve argument $argName" }
@@ -263,7 +327,10 @@ class ExpressionVisitor(
                 return@mapNotNull null
             }
 
-            ArgumentWithValue(name, value)
+            NamedArgumentWithValue(
+                name,
+                value
+            )
         }
 
         val stateName =
@@ -272,7 +339,11 @@ class ExpressionVisitor(
 
         val stateRef = AutomatonStateReferenceBuilder.build(stateName, automatonRef, context)
 
-        return CallAutomatonConstructor(automatonRef, args, stateRef)
+        return CallAutomatonConstructor(
+            automatonRef,
+            args,
+            stateRef
+        )
     }
 
     override fun visitAssignmentRight(ctx: AssignmentRightContext): Expression {
@@ -286,16 +357,25 @@ class ExpressionVisitor(
     }
 
     override fun visitActionUsage(ctx: ActionUsageContext): Expression {
-        val name = ctx.Identifier().text.extractIdentifier()
+        val name = ctx.IDENTIFIER().text.extractIdentifier()
+        for (c in name) {
+            if(c.isLowerCase()) {
+                throw IllegalArgumentException("Action names must be in upper case")
+            }
+        }
         val expressionVisitor = ExpressionVisitor(context)
         val args = ctx.expressionsList()?.expression()?.map { expr ->
             expressionVisitor.visitExpression(expr)
         }.orEmpty()
 
-        val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
-        val actionRef = ActionReferenceBuilder.build(name, argTypes, context)
+        val argTypes = args.map { argument ->
+            context.typeInferrer.getExpressionType(argument).getReference(context) }
+        val actionRef = ActionDeclReferenceBuilder.build(name, argTypes, context)
 
-        val actionUsage = ActionUsage(actionRef, args)
+        val actionUsage = ActionUsage(
+            actionRef,
+            args
+        )
 
         return ActionExpression(actionUsage)
     }
@@ -320,5 +400,16 @@ class ExpressionVisitor(
 
         val value = visitExpression(ctx.expression())
         return UnaryOpExpression(op, value)
+    }
+
+    override fun visitHasAutomaton(ctx: LibSLParser.HasAutomatonContext): Expression {
+        val variable = visitQualifiedAccess(ctx.qualifiedAccess())
+        val automatonConceptName = ctx.name.text
+        val automatonReference = AutomatonReferenceBuilder.build(automatonConceptName, context)
+
+        return HasAutomaton(
+            variable,
+            automatonReference
+        )
     }
 }

@@ -9,7 +9,7 @@ import org.jetbrains.research.libsl.utils.BackticksPolitics
 data class Automaton(
     val name: String,
     val typeReference: TypeReference,
-    val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
+    val annotatedWith: MutableList<AnnotatedWith> = mutableListOf(),
     val states: MutableList<State> = mutableListOf(),
     val shifts: MutableList<Shift> = mutableListOf(),
     val internalVariables: MutableList<VariableWithInitialValue> = mutableListOf(),
@@ -25,11 +25,11 @@ data class Automaton(
         get() = localFunctions + extensionFunctions
 
     override fun dumpToString(): String = buildString {
-        append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
+        append(formatListEmptyLineAtEndIfNeeded(annotatedWith))
         append("automaton ${BackticksPolitics.forPeriodSeparated(name)}")
 
         if (constructorVariables.isNotEmpty()) {
-            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() }})")
+            append(" (${constructorVariables.joinToString(", ") { v -> v.dumpToString() } })")
         }
 
         appendLine(" : ${BackticksPolitics.forPeriodSeparated(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)} {")
@@ -92,10 +92,11 @@ data class Shift(
             append(
                 functions.joinToString(separator = ", ", prefix = "[", postfix = "]") { function ->
                     val functionName = function.name
-                  
                     if (function.argTypes.isNotEmpty()) {
                         val argTypeNames =
-                            function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.name }
+                            function.argTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") {
+                                it.name
+                            }
                         "$functionName$argTypeNames"
                     } else {
                         functionName
