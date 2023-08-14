@@ -6,8 +6,13 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.jetbrains.research.libsl.LibSLParser.FileContext
 import org.jetbrains.research.libsl.context.LslGlobalContext
 import org.jetbrains.research.libsl.errors.ErrorManager
+import org.jetbrains.research.libsl.errors.UnresolvedImportOrInclude
 import org.jetbrains.research.libsl.nodes.Library
-import org.jetbrains.research.libsl.visitors.LibrarySpecificationVisitor
+import org.jetbrains.research.libsl.nodes.LslVersion
+import org.jetbrains.research.libsl.nodes.MetaNode
+import org.jetbrains.research.libsl.utils.EntityPosition
+import org.jetbrains.research.libsl.utils.PositionGetter
+import org.jetbrains.research.libsl.visitors.*
 import java.io.File
 import java.nio.file.Path
 
@@ -17,7 +22,6 @@ class LibSL(
     val context: LslGlobalContext = LslGlobalContext(File(basePath).name)
 ) {
     val errorManager = ErrorManager()
-    lateinit var library: Library
     private var isParsed = false
     private val processedFiles = mutableSetOf<String>()
 
@@ -55,20 +59,69 @@ class LibSL(
         }
 
         val file = parser.file()
-        val library = processFileRule(file, fileName)
 
-        for (importName in library.importNames) {
+        val invokedLibrary = invokeLibrary(file, fileName)
+
+        file.globalStatement().forEach { s ->
+            if (s.ImportStatement() != null) {
+                processImport(s.ImportStatement().text, invokedLibrary, PositionGetter().getCtxPosition(fileName, s))
+            }
+        }
+
+        for (importName in invokedLibrary.importNames) {
             if (importName in processedFiles)
                 continue
 
-            library.importsMap["$importName.lsl"] = loadFromFileName("$importName.lsl")
+            invokedLibrary.importsMap["$importName.lsl"] = loadFromFileName("$importName.lsl")
         }
 
-        return library
+
+        return processFileRule(file, fileName, invokedLibrary)
     }
 
-    private fun processFileRule(file: FileContext, fileName: String): Library {
-        val librarySpecificationVisitor = LibrarySpecificationVisitor(fileName, basePath, errorManager, context)
-        return librarySpecificationVisitor.processFile(file)
+    private fun processFileRule(file: FileContext, fileName: String, invokedLibrary: Library): Library {
+        val librarySpecificationVisitor = LibrarySpecificationVisitor(fileName, invokedLibrary, basePath, errorManager, context)
+        return librarySpecificationVisitor.processFile(file, invokedLibrary)
+    }
+
+    private fun invokeLibrary(file: FileContext, fileName: String): Library {
+
+        val header = if(file.header() != null) {
+            processHeader(file.header())
+        } else {
+            null
+        }
+
+        return Library(fileName, header)
+    }
+
+    private fun processHeader(ctx: LibSLParser.HeaderContext): MetaNode {
+        val libraryName = ctx.libraryName.text.extractIdentifier()
+        val libraryVersion = ctx.ver?.text?.removeDoubleQuotes()
+        val libraryLanguage = ctx.lang?.text?.removeDoubleQuotes()
+        val libraryUrl = ctx.link?.text?.removeDoubleQuotes()
+
+        val libslVersionString = ctx.lslver.text.removeDoubleQuotes()
+        val libslVersion = LslVersion.fromString(libslVersionString)
+
+        return MetaNode(
+            libslVersion,
+            libraryName,
+            libraryVersion,
+            libraryLanguage,
+            libraryUrl
+        )
+    }
+
+    private fun processImport(str: String, invokedLibrary: Library, entityPosition: EntityPosition) {
+        val importRegex = Regex("^(import)\\s+(.+);")
+        val importName = importRegex.find(str)?.groupValues?.get(2)
+
+        if (importName == null) {
+            errorManager(UnresolvedImportOrInclude(str, entityPosition))
+            return
+        }
+
+        invokedLibrary.importNames.add(importName)
     }
 }

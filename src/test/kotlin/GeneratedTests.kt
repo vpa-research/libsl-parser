@@ -6,6 +6,11 @@ import org.junit.jupiter.api.Test
 
 class GeneratedTests {
     @Test
+    fun test_interfacesLsl() {
+        runLslTest("_interfaces")
+    }
+
+    @Test
     fun testActionDeclarationsLsl() {
         runLslTest("actionDeclarations")
     }
@@ -23,6 +28,11 @@ class GeneratedTests {
     @Test
     fun testAnnotationsLsl() {
         runLslTest("annotations")
+    }
+
+    @Test
+    fun testArrayListLsl() {
+        runLslTest("ArrayList")
     }
 
     @Test
@@ -116,6 +126,11 @@ class GeneratedTests {
     }
 
     @Test
+    fun testJavaCommonLsl() {
+        runLslTest("javaCommon")
+    }
+
+    @Test
     fun testLiteralArraysLsl() {
         runLslTest("literalArrays")
     }
@@ -206,3 +221,4 @@ class GeneratedTests {
     }
 
 }
+

@@ -3,8 +3,6 @@ library simple;
 
 import specImportSecondary;
 
-typealias Int=int64;
-
 define action TEST_ACTION(i: Int, s: String, p: Int): Int;
 define action TEST_ACTION_TWO(s: String);
 

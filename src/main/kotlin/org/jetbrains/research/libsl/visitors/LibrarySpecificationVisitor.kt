@@ -21,27 +21,17 @@ import org.jetbrains.research.libsl.utils.PositionGetter
 
 class LibrarySpecificationVisitor(
     val fileName: String,
+    private val library: Library,
     private val basePath: String,
     private val errorManager: ErrorManager,
     private val globalContext: LslGlobalContext
 ) : LibSLParserVisitor<Unit>(globalContext) {
-    private lateinit var library: Library
     private val posGetter = PositionGetter()
 
-    fun processFile(file: FileContext): Library {
-        val header = if(file.header() != null) {
-            processHeader(file.header())
-        } else {
-            null
-        }
+    fun processFile(file: FileContext, library: Library): Library {
 
         TypeResolver(basePath, errorManager, globalContext).visitFile(file)
         TopLevelDeclarationsResolver(basePath, errorManager, globalContext).visitFile(file)
-
-        library = Library(
-            fileName,
-            header
-        )
 
         file.globalStatement().forEach { visitGlobalStatement(it) }
 
@@ -53,24 +43,6 @@ class LibrarySpecificationVisitor(
         representDeclaredActionsFromContextInLibrary()
 
         return library
-    }
-
-    private fun processHeader(ctx: LibSLParser.HeaderContext): MetaNode {
-        val libraryName = ctx.libraryName.text.extractIdentifier()
-        val libraryVersion = ctx.ver?.text?.removeDoubleQuotes()
-        val libraryLanguage = ctx.lang?.text?.removeDoubleQuotes()
-        val libraryUrl = ctx.link?.text?.removeDoubleQuotes()
-
-        val libslVersionString = ctx.lslver.text.removeDoubleQuotes()
-        val libslVersion = LslVersion.fromString(libslVersionString)
-
-        return MetaNode(
-            libslVersion,
-            libraryName,
-            libraryVersion,
-            libraryLanguage,
-            libraryUrl
-        )
     }
 
     override fun visitGlobalStatement(ctx: LibSLParser.GlobalStatementContext) {
