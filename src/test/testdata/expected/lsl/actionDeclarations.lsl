@@ -7,7 +7,8 @@ annotation Ann;
 define action SUM(
     @Ann
     x: Int,
-    y: Int
+    y: Int,
+    n: any
 ): Int;
 @Something
 define action NO_RETURN(
@@ -21,7 +22,7 @@ automaton A : Int {
     var x: Int = 1;
     var y: Int = 2;
     fun f(param: Int): Int {
-        result = action SUM(x, y);
+        result = action SUM(x, y, null);
     }
     fun v() {
         action NO_RETURN(1, 2);

@@ -451,6 +451,7 @@ primitiveLiteral
    |   floatNumber
    |   DoubleQuotedString
    |   bool=(TRUE | FALSE)
+   |   nullLiteral=NULL
    ;
 
 qualifiedAccess

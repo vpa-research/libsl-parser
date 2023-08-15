@@ -34,3 +34,8 @@ data class BoolLiteral(
     override val value: Boolean,
     val entityPosition: EntityPosition
 ) : Atomic()
+
+data class NullLiteral(
+    override val value: String = "null",
+    val entityPosition: EntityPosition
+) : Atomic()

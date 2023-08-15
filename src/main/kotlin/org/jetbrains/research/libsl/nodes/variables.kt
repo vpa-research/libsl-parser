@@ -56,6 +56,11 @@ data class ResultVariable(
     override val entityPosition: EntityPosition
 ) : Variable(name = "result", typeReference, entityPosition)
 
+data class NullVariable(
+    override var typeReference: TypeReference,
+    override val entityPosition: EntityPosition
+) : Variable(name = "null", typeReference, entityPosition)
+
 @Suppress("unused")
 class FunctionArgument(
     name: String,

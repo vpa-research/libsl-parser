@@ -28,6 +28,7 @@ object ExpressionDumper {
             is NamedArgumentWithValue -> dumpNamedArgumentWithValue(expression)
             is TypeOperationExpression -> dumpTypeOperationExpression(expression)
             is FunctionUsageExpression -> dumpFunctionUsageExpression(expression)
+            is NullLiteral -> dumpNullLiteral(expression)
         }
     }
 
@@ -97,6 +98,10 @@ object ExpressionDumper {
 
     private fun dumpStringLiteral(expression: StringLiteral): String {
         return "\"${expression.value}\""
+    }
+
+    private fun dumpNullLiteral(expression: NullLiteral): String {
+        return "null"
     }
 
     private fun dumpArrayAccess(expression: ArrayAccess): String {

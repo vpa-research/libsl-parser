@@ -47,6 +47,7 @@ class TypeInferrer(private val context: LslContextBase) {
     private fun getAtomicType(atomic: Atomic): Type {
         return when (atomic) {
             is BoolLiteral -> BoolType(context)
+            is NullLiteral -> NullType(false, mutableListOf(), context)
             is FloatLiteral -> processFloatLiteralType(atomic, context)
             is IntegerLiteral -> IntType(context, IntType.IntCapacity.UNKNOWN)
             is StringLiteral -> StringType(context)

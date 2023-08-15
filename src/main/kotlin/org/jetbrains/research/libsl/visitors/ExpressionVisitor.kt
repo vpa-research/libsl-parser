@@ -177,6 +177,13 @@ class ExpressionVisitor(
                 }
             }
 
+            primitiveLiteralContext.nullLiteral != null -> {
+                NullLiteral(
+                    "null",
+                    posGetter.getCtxPosition(fileName, primitiveLiteralContext)
+                )
+            }
+
             primitiveLiteralContext.DoubleQuotedString() != null -> {
                 val literal =
                     primitiveLiteralContext.DoubleQuotedString().asPeriodSeparatedString().removeDoubleQuotes()

@@ -4,6 +4,7 @@ abstract class ExpressionVisitor<T> {
     open fun visit(node: Expression): T {
         return when (node) {
             is BoolLiteral -> visitBool(node)
+            is NullLiteral -> visitNull(node)
             is CallAutomatonConstructor -> visitCallAutomatonConstructor(node)
             is FloatLiteral -> visitFloatNumber(node)
             is IntegerLiteral -> visitIntegerNumber(node)
@@ -74,4 +75,6 @@ abstract class ExpressionVisitor<T> {
     abstract fun visitTypeOperationExpression(node: TypeOperationExpression): T
 
     abstract fun visitFunctionUsageExpression(node: FunctionUsageExpression): T
+
+    abstract fun visitNull(node: NullLiteral): T
 }
