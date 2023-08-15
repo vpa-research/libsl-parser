@@ -139,6 +139,7 @@ private fun checkTypeIsResolved(type: Type) {
         is EnumLikeSemanticType -> {}
         is SimpleType -> {}
         is TypeAlias -> type.originalType.resolveOrError()
+        is NullType -> {}
         is PrimitiveType -> {}
         is RealType -> {}
         is StructuredType -> {
