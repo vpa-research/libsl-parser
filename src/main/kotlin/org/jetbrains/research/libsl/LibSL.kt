@@ -24,6 +24,7 @@ class LibSL(
     val errorManager = ErrorManager()
     private var isParsed = false
     private val processedFiles = mutableSetOf<String>()
+    private val thisFilesCanBeIgnored = mutableSetOf<String>()
 
     init {
         context.init()
@@ -68,10 +69,11 @@ class LibSL(
             }
         }
 
-        for (importName in invokedLibrary.importNames) {
-            if (importName in processedFiles)
-                continue
 
+        for (importName in invokedLibrary.importNames) {
+            if (importName in thisFilesCanBeIgnored)
+                continue
+            thisFilesCanBeIgnored.add(importName)
             invokedLibrary.importsMap["$importName.lsl"] = loadFromFileName("$importName.lsl")
         }
 
@@ -81,6 +83,7 @@ class LibSL(
 
     private fun processFileRule(file: FileContext, fileName: String, invokedLibrary: Library): Library {
         val librarySpecificationVisitor = LibrarySpecificationVisitor(fileName, invokedLibrary, basePath, errorManager, context)
+        thisFilesCanBeIgnored.add(fileName.replace(".lsl",""))
         return librarySpecificationVisitor.processFile(file, invokedLibrary)
     }
 

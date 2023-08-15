@@ -40,7 +40,9 @@ class TopLevelDeclarationsResolver(
             params,
             posGetter.getCtxPosition(fileName, ctx)
         )
-        globalContext.storeAnnotation(annotation)
+        if(annotation !in globalContext.getAllAnnotations()) {
+            globalContext.storeAnnotation(annotation)
+        }
     }
 
     override fun visitAutomatonDecl(ctx: LibSLParser.AutomatonDeclContext) {
@@ -91,7 +93,9 @@ class TopLevelDeclarationsResolver(
             initValue,
             posGetter.getCtxPosition(fileName, ctx)
         )
-        globalContext.storeVariable(variable)
+        if(variable !in globalContext.getAllVariables()) {
+            globalContext.storeVariable(variable)
+        }
     }
 
     override fun visitActionDecl(ctx: LibSLParser.ActionDeclContext) {
@@ -120,7 +124,8 @@ class TopLevelDeclarationsResolver(
                 returnType,
                 posGetter.getCtxPosition(fileName, ctx)
             )
-
-        globalContext.storeDeclaredAction(declaredAction)
+        if(declaredAction !in globalContext.getAllDeclaredActions()) {
+            globalContext.storeDeclaredAction(declaredAction)
+        }
     }
 }

@@ -33,6 +33,7 @@ automaton B : Int {
     shift S1 -> S2 by [func(SimpleTypeWithGeneric)];
     shift S2 -> S1 by [func(SimpleType)];
     var v: Int;
-    fun func(arg1: SimpleType): SimpleTypeWithGeneric;
+    var c: String = A.strVar;
+    static fun *.func(arg1: SimpleType): SimpleTypeWithGeneric;
     fun func(arg1: SimpleTypeWithGeneric): SimpleTypeWithGeneric;
 }

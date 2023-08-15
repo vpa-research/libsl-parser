@@ -81,7 +81,9 @@ abstract class LibSLParserVisitor<T>(open val context: LslContextBase) : LibSLPa
             val genericTypeIdentifierContext = ctx.generic().typeIdentifier()
             genericReferences = processGenerics(genericTypeIdentifierContext)
         }
-        return ArrayType(isPointer, genericReferences, context)
+        val arrayType = ArrayType(isPointer, genericReferences, context)
+        context.storeType(arrayType)
+        return arrayType
     }
 
     fun getRealTypeOrArray(ctx: TypeIdentifierContext): Type {

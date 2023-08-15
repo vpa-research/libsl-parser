@@ -32,9 +32,12 @@ class TypeResolver(
             context = context,
             entityPosition = posGetter.getCtxPosition(fileName, ctx)
         )
-
-        context.storeType(originType)
-        context.storeType(type)
+        if(originType !in context.getAllTypes()) {
+            context.storeType(originType)
+        }
+        if(type !in context.getAllTypes()) {
+            context.storeType(type)
+        }
     }
 
     override fun visitEnumSemanticType(ctx: LibSLParser.EnumSemanticTypeContext) {
@@ -54,8 +57,12 @@ class TypeResolver(
             posGetter.getCtxPosition(fileName, ctx)
         )
 
-        context.storeType(originType)
-        context.storeType(type)
+        if(originType !in context.getAllTypes()) {
+            context.storeType(originType)
+        }
+        if(type !in context.getAllTypes()) {
+            context.storeType(type)
+        }
     }
 
     private fun processBlockTypeStatements(statementsContexts: List<EnumSemanticTypeEntryContext>): Map<String, Atomic> {
@@ -148,7 +155,9 @@ class TypeResolver(
             context,
             posGetter.getCtxPosition(fileName, ctx)
         )
-        context.storeType(type)
+        if(type !in context.getAllTypes()) {
+            context.storeType(type)
+        }
     }
 
     private fun processVariableDecl(ctx: LibSLParser.VariableDeclContext): Variable {

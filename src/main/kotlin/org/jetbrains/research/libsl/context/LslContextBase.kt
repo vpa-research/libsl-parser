@@ -23,7 +23,9 @@ abstract class LslContextBase(var fileName: String) {
     val typeInferrer = TypeInferrer(this)
 
     fun storeAutomata(automaton: Automaton) {
-        automata.add(automaton)
+        if(automaton !in automata) {
+            automata.add(automaton)
+        }
     }
 
     fun storeAutomataConcepts(automatonConcept: AutomatonConcept) {
@@ -43,19 +45,27 @@ abstract class LslContextBase(var fileName: String) {
     }
 
     fun storeFunction(function: Function) {
-        functions.add(function)
+        if(function !in functions) {
+            functions.add(function)
+        }
     }
 
     fun storeVariable(variable: Variable) {
-        variables.add(variable)
+        if(variable !in variables) {
+            variables.add(variable)
+        }
     }
 
     fun storeAnnotation(annotation: Annotation) {
-        annotations.add(annotation)
+        if(annotation !in annotations) {
+            annotations.add(annotation)
+        }
     }
 
     fun storeDeclaredAction(action: ActionDecl) {
-        declaredActions.add(action)
+        if(action !in declaredActions) {
+            declaredActions.add(action)
+        }
     }
 
     open fun resolveAutomaton(reference: AutomatonReference): Automaton? {
