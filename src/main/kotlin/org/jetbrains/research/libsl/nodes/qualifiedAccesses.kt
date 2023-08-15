@@ -54,9 +54,9 @@ data class ArrayAccess(
     override var childAccess: QualifiedAccess? = null
 }
 
-data class AutomatonOfFunctionArgumentInvoke(
+data class AutomatonVariableInvoke(
     val automatonReference: AutomatonReference,
-    val arg: FunctionArgument,
+    val arg: QualifiedAccess,
     override var childAccess: QualifiedAccess?,
     val entityPosition: EntityPosition
 ) : QualifiedAccess()

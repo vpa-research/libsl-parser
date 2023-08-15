@@ -224,3 +224,17 @@ data class ArrayType(
 
     override fun toString() = dumpToString()
 }
+
+data class ListType(
+    override val isPointer: Boolean = false,
+    override val generics: MutableList<TypeReference>,
+    override val context: LslContextBase
+) : Type {
+    override val name: String = "list"
+
+    override fun dumpToString(): String {
+        return BackticksPolitics.forTypeIdentifier(fullName)
+    }
+
+    override fun toString() = dumpToString()
+}

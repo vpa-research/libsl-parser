@@ -62,9 +62,9 @@ class LibrarySpecificationVisitor(
             errorManager(UnresolvedImportOrInclude(str, entityPosition))
             return
         }
-
-        library.importNames.add(importName)
-
+        if(importName !in library.importNames) {
+            library.importNames.add(importName)
+        }
     }
 
     private fun processInclude(str: String, entityPosition: EntityPosition) {

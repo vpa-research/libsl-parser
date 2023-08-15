@@ -2,7 +2,6 @@ package org.jetbrains.research.libsl.visitors
 
 import org.jetbrains.research.libsl.LibSLParser
 import org.jetbrains.research.libsl.LibSLParser.*
-import org.jetbrains.research.libsl.context.FunctionContext
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.*
@@ -304,18 +303,18 @@ class ExpressionVisitor(
         }
     }
 
-    override fun visitSimpleCall(ctx: SimpleCallContext): AutomatonOfFunctionArgumentInvoke {
-        check(context is FunctionContext) { "simple call is allowed only inside of function" }
+    override fun visitSimpleCall(ctx: SimpleCallContext): AutomatonVariableInvoke {
+        // check(context is FunctionContext) { "simple call is allowed only inside of function" }
 
-        val automatonName = ctx.Identifier(0).asPeriodSeparatedString()
+        val automatonName = ctx.Identifier().asPeriodSeparatedString()
         val automatonReference = AutomatonReferenceBuilder.build(automatonName, context)
 
-        val argName = ctx.Identifier(1).asPeriodSeparatedString()
-        val arg = context.resolveFunctionArgumentByName(argName)
+        //val argName = ctx.Identifier(1).asPeriodSeparatedString()
+        val arg = visitQualifiedAccess(ctx.qualifiedAccess())
 
-        check(arg != null) { "can't resolve argument $argName" }
+        // check(arg != null) { "can't resolve argument $argName" }
 
-        return AutomatonOfFunctionArgumentInvoke(
+        return AutomatonVariableInvoke(
             automatonReference,
             arg,
             childAccess = null,

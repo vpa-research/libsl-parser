@@ -24,7 +24,7 @@ type Object is java.lang.Object for Object {}
 
 define action THROW_NEW(
         exceptionType: string,
-        params: array<any>
+        params: list<any>
     ): void;
 
 

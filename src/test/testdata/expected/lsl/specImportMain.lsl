@@ -1,7 +1,7 @@
 libsl "1.0.0";
 library simple;
 import specImportSecondary;
-typealias Int = int64;
+typealias Int = int32;
 define action TEST_ACTION(
     i: Int,
     s: `<UNRESOLVED_TYPE>`,

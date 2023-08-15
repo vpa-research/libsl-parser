@@ -6,5 +6,5 @@ type Object is java.lang.Object for Object {
 annotation public;
 define action THROW_NEW(
     exceptionType: string,
-    params: array<any>
+    params: list<any>
 ): void;

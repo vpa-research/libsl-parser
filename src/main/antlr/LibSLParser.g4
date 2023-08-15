@@ -460,7 +460,7 @@ qualifiedAccess
    ;
 
 simpleCall
-   :   Identifier L_BRACKET Identifier R_BRACKET
+   :   Identifier L_BRACKET qualifiedAccess R_BRACKET
    ;
 
 identifierList

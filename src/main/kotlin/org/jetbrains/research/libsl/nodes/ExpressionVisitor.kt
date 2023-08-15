@@ -8,7 +8,7 @@ abstract class ExpressionVisitor<T> {
             is FloatLiteral -> visitFloatNumber(node)
             is IntegerLiteral -> visitIntegerNumber(node)
             is ArrayAccess -> visitArrayAccess(node)
-            is AutomatonOfFunctionArgumentInvoke -> visitAutomatonGetter(node)
+            is AutomatonVariableInvoke -> visitAutomatonGetter(node)
             is VariableAccess -> visitVariableAccess(node)
             is StringLiteral -> visitStringValue(node)
             is BinaryOpExpression -> visitBinaryOpExpression(node)
@@ -39,7 +39,7 @@ abstract class ExpressionVisitor<T> {
 
     abstract fun visitArrayAccess(node: ArrayAccess): T
 
-    abstract fun visitAutomatonGetter(node: AutomatonOfFunctionArgumentInvoke): T
+    abstract fun visitAutomatonGetter(node: AutomatonVariableInvoke): T
 
     abstract fun visitVariableAccess(node: VariableAccess): T
 

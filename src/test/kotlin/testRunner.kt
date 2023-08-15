@@ -134,6 +134,7 @@ private fun checkStatementIsResolved(function: Function, statements: List<Statem
 private fun checkTypeIsResolved(type: Type) {
     when (type) {
         is ArrayType -> type.generics.mapNotNull { it.resolve() }
+        is ListType -> type.generics.mapNotNull { it.resolve() }
         is EnumType -> {}
         is EnumLikeSemanticType -> {}
         is SimpleType -> {}

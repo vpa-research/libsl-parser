@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.nodes.references
 
 import org.jetbrains.research.libsl.context.LslContextBase
 import org.jetbrains.research.libsl.type.ArrayType
+import org.jetbrains.research.libsl.type.ListType
 import org.jetbrains.research.libsl.type.Type
 
 open class TypeReference(
@@ -11,7 +12,7 @@ open class TypeReference(
     override val context: LslContextBase
 ) : LslReference<Type, TypeReference> {
     override fun resolve(): Type? {
-        return resolveArrayType() ?: context.resolveType(this)
+        return resolveArrayType() ?: resolveListType() ?: context.resolveType(this)
     }
 
     private fun resolveArrayType(): ArrayType? {
@@ -19,6 +20,13 @@ open class TypeReference(
             return null
         genericReferences.forEach { it.resolve() }
         return ArrayType(isPointer, genericReferences, context)
+    }
+
+    private fun resolveListType(): ListType? {
+        if (name != "list")
+            return null
+        genericReferences.forEach { it.resolve() }
+        return ListType(isPointer, genericReferences, context)
     }
 
     override fun isReferenceMatchWithNode(node: Type): Boolean {

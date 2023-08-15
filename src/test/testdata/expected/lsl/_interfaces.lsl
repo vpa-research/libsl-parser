@@ -14,5 +14,5 @@ type String is java.lang.String for CharSequence, string {
 annotation public;
 define action THROW_NEW(
     exceptionType: string,
-    params: array<any>
+    params: list<any>
 ): void;
