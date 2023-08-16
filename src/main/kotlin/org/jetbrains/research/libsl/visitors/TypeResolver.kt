@@ -181,7 +181,14 @@ class TypeResolver(
     private fun processFunctionDecl(ctx: FunctionDeclContext): org.jetbrains.research.libsl.nodes.Function {
         val isMethod = ctx.functionHeader().headerWithAsterisk() != null
         val functionContext = FunctionContext(context)
-        val isStatic = ctx.functionHeader().STATIC() != null
+        var isStatic = false
+        if(ctx.functionHeader().modifier != null) {
+            if(ctx.functionHeader().modifier.text == "static") {
+                isStatic = true
+            } else {
+                throw IllegalStateException("Unknown modifier, only static allowed")
+            }
+        }
         val functionName = ctx.functionHeader().functionName.text.extractIdentifier()
 
         val annotationReferences = getAnnotationUsages(ctx.functionHeader().annotationUsage())

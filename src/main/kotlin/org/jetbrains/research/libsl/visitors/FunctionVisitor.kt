@@ -10,6 +10,7 @@ import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
+import kotlin.IllegalStateException
 
 class FunctionVisitor(
     private val functionContext: FunctionContext,
@@ -38,7 +39,14 @@ class FunctionVisitor(
             parentAutomaton = automatonReference?.resolveOrError()
         }
 
-        val isStatic = ctx.functionHeader().STATIC() != null
+        var isStatic = false
+        if(ctx.functionHeader().modifier != null) {
+            if(ctx.functionHeader().modifier.text == "static") {
+                isStatic = true
+            } else {
+                throw IllegalStateException("Unknown modifier, only static allowed")
+            }
+        }
 
         val functionName = ctx.functionHeader().functionName.text.extractIdentifier()
 
@@ -175,7 +183,7 @@ class FunctionVisitor(
                 posGetter.getCtxPosition(fileName, parameter)
             )
 
-            if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
+            if (annotationsReferences.any { it.annotationReference.name == "target" }) {
                 val targetAutomatonName = typeRef.name
                 val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                 arg.targetAutomaton = targetAutomatonReference

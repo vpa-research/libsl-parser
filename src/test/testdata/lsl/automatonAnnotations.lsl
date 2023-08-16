@@ -3,8 +3,8 @@ library simple;
 
 typealias Int=int32;
 
-annotation Public;
-annotation Something;
+annotation Public();
+annotation Something();
 
 @Public
 @Something

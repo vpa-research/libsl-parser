@@ -3,18 +3,18 @@ library simple;
 typealias Int = int32;
 annotation Something;
 annotation Ann;
-@Something
+@Something()
 define action SUM(
-    @Ann
+    @Ann()
     x: Int,
     y: Int,
     n: any
 ): Int;
-@Something
+@Something()
 define action NO_RETURN(
-    @Ann
+    @Ann()
     x: Int,
-    @Ann
+    @Ann()
     y: Int
 );
 define action NO_ARGS: Int;

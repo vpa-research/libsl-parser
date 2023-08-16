@@ -10,7 +10,7 @@ library std
 
 // === ANNOTATIONS ===
 
-annotation public;
+annotation public();
 
 
 

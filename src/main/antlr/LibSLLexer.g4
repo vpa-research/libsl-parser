@@ -230,10 +230,6 @@ DEFINE
    :   'define'
    ;
 
-STATIC
-   :   'static'
-   ;
-
 IF
    :   'if'
    ;

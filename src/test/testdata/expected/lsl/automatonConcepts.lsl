@@ -10,7 +10,7 @@ type BufferedImage is java.awt.image.BufferedImage for Image, Object {
 type Collection {
 }
 types {
-    @implements
+    @implements()
     Int(int32);
     String(string);
     Object(java.lang.Object);

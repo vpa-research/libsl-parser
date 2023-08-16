@@ -23,7 +23,7 @@ type Collection{
 
 annotation StructureKind(str: string);
 annotation Parametrized(str: string);
-annotation implements;
+annotation implements();
 
 automaton concept IterableAutomaton : Int {
    var storage: any;

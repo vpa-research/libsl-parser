@@ -122,11 +122,11 @@ enumSemanticTypeEntry
  *         );
  */
 annotationDecl
-   :   ANNOTATION name=Identifier annotationDeclParams? SEMICOLON
+   :   ANNOTATION name=Identifier L_BRACKET annotationDeclParams? R_BRACKET SEMICOLON
    ;
 
 annotationDeclParams
-   :   L_BRACKET annotationDeclParamsPart (COMMA annotationDeclParamsPart)* (COMMA)? R_BRACKET
+   :   annotationDeclParamsPart (COMMA annotationDeclParamsPart)* (COMMA)?
    ;
 
 annotationDeclParamsPart
@@ -293,7 +293,7 @@ functionDecl
    ;
 
 functionHeader
-   :   annotationUsage* STATIC? FUN (automatonName=periodSeparatedFullName DOT)? headerWithAsterisk? functionName=Identifier
+   :   annotationUsage* modifier=Identifier? FUN (automatonName=periodSeparatedFullName DOT)? headerWithAsterisk? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
    ;
 

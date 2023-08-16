@@ -6,7 +6,7 @@ typealias Int=int32;
 annotation Throws (
     exceptionTypes: Int = 0
 );
-annotation Public;
+annotation Public();
 annotation Something (
     variable1: Int = 2,
     variable2: Int = 5,

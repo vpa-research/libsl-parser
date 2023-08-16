@@ -3,22 +3,22 @@ library simple;
 
 typealias Int=int32;
 
-annotation Static;
-annotation Void;
-annotation Anno(
+annotation static();
+annotation void();
+annotation anno(
     x: Int,
     y: Int,
 );
-annotation Target;
-annotation Something;
+annotation target();
+annotation something();
 
 automaton B: Int {
 }
 
 automaton A : Int {
-    @Static
-    fun f(@Anno(1, 12) @Target obj: B);
+    @static
+    fun f(@anno(1, 12) @target obj: B);
 
-    @Void
-    fun g(@Anno(554, 784) @Something param: Int)
+    @void
+    fun g(@anno(554, 784) @something param: Int)
 }

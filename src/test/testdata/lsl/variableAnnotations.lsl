@@ -5,8 +5,8 @@ types {
     Int(int32);
 }
 
-annotation Const;
-annotation Something;
+annotation Const();
+annotation Something();
 
 @Const
 var x: Int = 1;

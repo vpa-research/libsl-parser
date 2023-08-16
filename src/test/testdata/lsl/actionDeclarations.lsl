@@ -3,8 +3,8 @@ library simple;
 
 typealias Int=int32;
 
-annotation Something;
-annotation Ann;
+annotation Something();
+annotation Ann();
 
 @Something
 define action SUM(@Ann x: Int, y: Int, n: any): Int;
