@@ -159,6 +159,7 @@ automatonDecl
 
 constructorVariables
    :   annotationUsage* keyword=(VAR|VAL) nameWithType (COMMA)?
+   |   annotationUsage* keyword=(VAR|VAL) nameWithType ASSIGN_OP assignmentRight (COMMA)?
    ;
 
 automatonStatement

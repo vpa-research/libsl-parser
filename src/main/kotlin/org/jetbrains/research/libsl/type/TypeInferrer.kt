@@ -96,10 +96,10 @@ class TypeInferrer(private val context: LslContextBase) {
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun mergeTypes(typeA: Type, typeB: Type): Type {
-        if (typeA is IntType) {
+        /* if (typeA is IntType) {
             typeB as IntType
             check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
-        }
+        } */
 
         /* if (typeA is Float32Type) {
             typeB as Float32Type

@@ -111,6 +111,7 @@ class ConstructorArgument(
     name: String,
     typeReference: TypeReference,
     val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
+    val initialValue: Expression?,
     override val entityPosition: EntityPosition
 ) : Variable(name, typeReference, entityPosition) {
     lateinit var automaton: Automaton
@@ -125,6 +126,9 @@ class ConstructorArgument(
         }
         append("${keyword.string} ${BackticksPolitics.forIdentifier(name)}: ")
         append(BackticksPolitics.forTypeIdentifier(typeReference.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL))
+        if (initialValue != null) {
+            append(" = ${initialValue.dumpToString()};")
+        }
     }
 }
 

@@ -70,15 +70,19 @@ class AutomatonResolver(
         val keyword = VariableKind.fromString(ctx.keyword.text)
         val name = ctx.nameWithType().name.asPeriodSeparatedString()
         val typeReference = processTypeIdentifier(ctx.nameWithType().type)
-        val argument = ConstructorArgument(
+        val expressionVisitor = ExpressionVisitor(context)
+        val initValue = ctx.assignmentRight()?.let { expressionVisitor.visitAssignmentRight(it) }
+
+        val variable = ConstructorArgument(
             keyword,
             name,
             typeReference,
             getAnnotationUsages(ctx.annotationUsage()),
+            initValue,
             posGetter.getCtxPosition(fileName, ctx)
         )
-        context.storeVariable(argument)
-        buildingAutomaton.constructorVariables.add(argument)
+        context.storeVariable(variable)
+        buildingAutomaton.constructorVariables.add(variable)
     }
 
     override fun visitAutomatonStateDecl(ctx: LibSLParser.AutomatonStateDeclContext) {
