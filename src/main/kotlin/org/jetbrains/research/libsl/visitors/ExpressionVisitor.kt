@@ -94,6 +94,9 @@ class ExpressionVisitor(
             ctx.bitShiftOp().uRShift() != null -> let {
                 ">>>"
             }
+            ctx.bitShiftOp().uLShift() != null -> let {
+                "<<<"
+            }
 
             else -> error("unknown binary expression")
         }

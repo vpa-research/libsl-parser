@@ -17,6 +17,7 @@ automaton A : Int {
         res = x >> y;
         res = x << y;
         res = x >>> y;
+        res = x <<< y;
 
         x = x && y;
         x = x || y;

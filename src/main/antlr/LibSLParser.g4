@@ -420,6 +420,7 @@ bitShiftOp
    :   lShift
    |   rShift
    |   uRShift
+   |   uLShift
    ;
 
 lShift
@@ -432,6 +433,10 @@ rShift
 
 uRShift
    :   R_ARROW R_ARROW R_ARROW
+   ;
+
+uLShift
+   :   L_ARROW L_ARROW L_ARROW
    ;
 
 unaryOp

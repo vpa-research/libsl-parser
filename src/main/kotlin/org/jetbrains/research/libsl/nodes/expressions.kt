@@ -35,7 +35,8 @@ enum class ArithmeticBinaryOps(val string: String, val priority: Int) {
     GT(">", 6), LT("<", 6),
 
     //Shift
-    R_SHIFT(">>", 7), UNSIGNED_R_SHIFT(">>>", 7), L_SHIFT("<<", 7);
+    R_SHIFT(">>", 7), UNSIGNED_R_SHIFT(">>>", 7), L_SHIFT("<<", 7),
+    UNSIGNED_L_SHIFT("<<<", 7);
 
     companion object {
         fun fromString(str: String) = ArithmeticBinaryOps.values().first { op -> op.string == str }
