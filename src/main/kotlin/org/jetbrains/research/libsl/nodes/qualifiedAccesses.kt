@@ -60,3 +60,11 @@ data class AutomatonVariableInvoke(
     override var childAccess: QualifiedAccess?,
     val entityPosition: EntityPosition
 ) : QualifiedAccess()
+
+data class AutomatonProcedureCall(
+    val automatonReference: AutomatonReference,
+    val arg: QualifiedAccess,
+    override var childAccess: QualifiedAccess?,
+    val procExpression: ProcExpression,
+    val entityPosition: EntityPosition
+) : QualifiedAccess()

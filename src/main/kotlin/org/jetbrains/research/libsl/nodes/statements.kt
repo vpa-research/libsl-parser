@@ -74,8 +74,6 @@ data class ActionUsage(
 }
 
 data class ProcedureCall(
-    // TODO()
-    //val procReference: FunctionReference,
     val name: String,
     val arguments: List<Expression>,
     val entityPosition: EntityPosition

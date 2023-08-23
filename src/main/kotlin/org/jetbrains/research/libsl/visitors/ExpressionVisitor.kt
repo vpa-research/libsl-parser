@@ -227,11 +227,20 @@ class ExpressionVisitor(
                 processPeriodSeparatedQualifiedAccess(ctx.periodSeparatedFullName())
             }
 
-            ctx.simpleCall() != null -> {
+            ctx.simpleCall()!= null && ctx.procUsage() == null -> {
                 val automatonByFunctionArgumentCreation = visitSimpleCall(ctx.simpleCall())
                 val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it) }
 
                 automatonByFunctionArgumentCreation.also {
+                    it.childAccess = childQualifiedAccess
+                }
+            }
+
+            ctx.simpleCall()!= null && ctx.procUsage() != null -> {
+                val automatonProcedureCall = visitSimpleCallWithProcedure(ctx)
+                val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it)}
+
+                automatonProcedureCall.also {
                     it.childAccess = childQualifiedAccess
                 }
             }
@@ -328,6 +337,26 @@ class ExpressionVisitor(
             automatonReference,
             arg,
             childAccess = null,
+            entityPosition = posGetter.getCtxPosition(fileName, ctx)
+        )
+    }
+
+    fun visitSimpleCallWithProcedure(ctx: QualifiedAccessContext): AutomatonProcedureCall {
+        // check(context is FunctionContext) { "simple call is allowed only inside of function" }
+
+        val automatonName = ctx.simpleCall().Identifier().asPeriodSeparatedString()
+        val automatonReference = AutomatonReferenceBuilder.build(automatonName, context)
+
+        //val argName = ctx.Identifier(1).asPeriodSeparatedString()
+        val arg = visitQualifiedAccess(ctx.simpleCall().qualifiedAccess())
+
+        // check(arg != null) { "can't resolve argument $argName" }
+
+        return AutomatonProcedureCall(
+            automatonReference,
+            arg,
+            childAccess = null,
+            procExpression = visitProcUsage(ctx.procUsage()) as ProcExpression,
             entityPosition = posGetter.getCtxPosition(fileName, ctx)
         )
     }

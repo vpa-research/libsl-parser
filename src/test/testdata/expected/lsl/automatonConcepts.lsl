@@ -38,6 +38,6 @@ automaton Foo : Int implements IterableAutomaton, CollectionAutomaton {
     fun foo(newValue: any) {
         val x: any;
         if (this.newValue has IterableAutomaton) 
-            something();
+            IterableAutomaton(newValue).something();
     }
 }

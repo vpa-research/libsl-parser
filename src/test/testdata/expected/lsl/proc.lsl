@@ -11,6 +11,10 @@ automaton A : Int {
     }
     fun useProc(): Int {
         _noReturn();
-        result = _sum(x, y) + 1;
+        result = B(self)._something();
+    }
+}
+automaton B : Int {
+    proc _something() {
     }
 }

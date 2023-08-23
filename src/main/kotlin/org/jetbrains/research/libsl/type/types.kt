@@ -239,6 +239,20 @@ data class ListType(
     override fun toString() = dumpToString()
 }
 
+data class MapType(
+    override val isPointer: Boolean = false,
+    override val generics: MutableList<TypeReference>,
+    override val context: LslContextBase
+) : Type {
+    override val name: String = "map"
+
+    override fun dumpToString(): String {
+        return BackticksPolitics.forTypeIdentifier(fullName)
+    }
+
+    override fun toString() = dumpToString()
+}
+
 data class NullType(
     override val isPointer: Boolean = false,
     override val generics: MutableList<TypeReference> = mutableListOf(),

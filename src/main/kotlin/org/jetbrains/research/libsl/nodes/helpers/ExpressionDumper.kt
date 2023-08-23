@@ -17,6 +17,7 @@ object ExpressionDumper {
             is IntegerLiteral -> dumpLiteral(expression)
             is ArrayAccess -> dumpArrayAccess(expression)
             is AutomatonVariableInvoke -> dumpAutomatonOfFunctionArgumentInvoke(expression)
+            is AutomatonProcedureCall -> dumpAutomatonProcedureCall(expression)
             is ThisAccess -> dumpThisAccess(expression)
             is VariableAccess -> dumpVariableAccess(expression)
             is StringLiteral -> dumpStringLiteral(expression)
@@ -128,6 +129,16 @@ object ExpressionDumper {
                 append(".")
                 append(dump(expression.childAccess!!))
             }
+        }
+    }
+
+    private fun dumpAutomatonProcedureCall(expression: AutomatonProcedureCall): String {
+        return buildString {
+            append(BackticksPolitics.forPeriodSeparated(expression.automatonReference.name))
+            append("(")
+            append(dump(expression.arg))
+            append(").")
+            append(dumpProcExpression(expression.procExpression))
         }
     }
 
