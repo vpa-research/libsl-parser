@@ -4,9 +4,8 @@ types {
     Int(int32);
     A(int16);
 }
-annotation Target;
 automaton B : Int {
 }
 automaton A : Int {
-    fun foo(@Target() self: Int);
+    fun foo(@target() self: Int);
 }

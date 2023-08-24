@@ -52,7 +52,11 @@ data class AnnotationUsage(
     val entityPosition: EntityPosition
 ) : IPrinter {
     override fun dumpToString() = buildString {
-        append("@${BackticksPolitics.forIdentifier(annotationReference.name)}(")
+        if(annotationReference.name == "target") {
+            append("@${BackticksPolitics.forIdentifier(annotationReference.name)}(")
+        } else {
+            append("@${BackticksPolitics.forIdentifier(annotationReference.resolveOrError().name)}(")
+        }
         if (arguments.isNotEmpty()) {
             append(
                 arguments.joinToString(

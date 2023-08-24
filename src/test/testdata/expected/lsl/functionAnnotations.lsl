@@ -4,16 +4,15 @@ typealias Int = int32;
 annotation static;
 annotation void;
 annotation anno(
-    x: Int,
+    x: Int = 1,
     y: Int
 );
-annotation Target;
 annotation something;
 automaton B : Int {
 }
 automaton A : Int {
     @static()
-    fun f(@anno(1, 12) @Target() obj: Int);
+    fun f(@anno(1, 12) @target() obj: Int);
     @void()
     fun g(@anno(554, 784) @something() param: Int);
 }
