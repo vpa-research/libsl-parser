@@ -9,6 +9,7 @@ import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
+import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
 import kotlin.IllegalStateException
 
@@ -183,12 +184,12 @@ class FunctionVisitor(
                 posGetter.getCtxPosition(fileName, parameter)
             )
 
-                // TODO ()
-                if (annotationsReferences.any { it.annotationReference.name == "Target" }) {
+                if (annotationsReferences.any { it.annotationReference.name == "target" }) {
                 val targetAutomatonName = typeRef.name
                 val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                 arg.targetAutomaton = targetAutomatonReference
-                arg.typeReference = targetAutomatonReference.resolveOrError().typeReference
+                arg.typeReference = globalContext.getAllTypes().filter {
+                    it.name.equals(targetAutomatonName) }.first().getReference(context)
             }
 
             arg

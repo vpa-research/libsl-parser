@@ -8,5 +8,5 @@ annotation Target;
 automaton B : Int {
 }
 automaton A : Int {
-    fun foo(@Target() self: B);
+    fun foo(@Target() self: Int);
 }
