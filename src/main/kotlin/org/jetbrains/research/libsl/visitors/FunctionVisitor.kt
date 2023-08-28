@@ -184,13 +184,15 @@ class FunctionVisitor(
                 posGetter.getCtxPosition(fileName, parameter)
             )
 
-                if (annotationsReferences.any { it.annotationReference.name == "target" }) {
+                /* if (annotationsReferences.any { it.annotationReference.name == "target" }) {
                 val targetAutomatonName = typeRef.name
                 val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
                 arg.targetAutomaton = targetAutomatonReference
                 arg.typeReference = globalContext.getAllTypes().filter {
                     it.name.equals(targetAutomatonName) }.first().getReference(context)
-            }
+
+                }
+                 */
 
             arg
         }.orEmpty()
