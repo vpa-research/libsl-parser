@@ -13,8 +13,7 @@ object ExpressionDumper {
             is ArrayLiteral -> dumpArrayLiteral(expression)
             is BoolLiteral -> dumpLiteral(expression)
             is CallAutomatonConstructor -> dumpCallAutomatonConstructor(expression)
-            is FloatLiteral -> dumpFloatLiteral(expression)
-            is IntegerLiteral -> dumpLiteral(expression)
+            is LiteralWithSuffix -> dumpLiteralWithSuffix(expression)
             is ArrayAccess -> dumpArrayAccess(expression)
             is AutomatonVariableInvoke -> dumpAutomatonOfFunctionArgumentInvoke(expression)
             is AutomatonProcedureCall -> dumpAutomatonProcedureCall(expression)
@@ -93,8 +92,8 @@ object ExpressionDumper {
         return expression.value.toString()
     }
 
-    private fun dumpFloatLiteral(expression: FloatLiteral): String {
-        return "${expression.value}${expression.suffix}"
+    private fun dumpLiteralWithSuffix(expression: LiteralWithSuffix): String {
+        return "${expression.value}${expression.suffix ?:""}"
     }
 
     private fun dumpStringLiteral(expression: StringLiteral): String {

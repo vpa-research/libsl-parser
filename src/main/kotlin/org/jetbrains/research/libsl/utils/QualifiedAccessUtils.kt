@@ -10,8 +10,8 @@ object QualifiedAccessUtils {
             is ArrayType -> parentType.generics.firstOrNull()?.resolve()?.let { resolveFieldType(it, name) }
             is ListType -> parentType.generics.firstOrNull()?.resolve()?.let { resolveFieldType(it, name) }
             is MapType -> parentType.generics.firstOrNull()?.resolve()?.let { resolveFieldType(it, name) }
-            is EnumType -> IntType(parentType.context, IntType.IntCapacity.UNKNOWN)
-            is EnumLikeSemanticType -> IntType(parentType.context, IntType.IntCapacity.UNKNOWN)
+            is EnumType -> Int32Type(parentType.context)
+            is EnumLikeSemanticType -> Int32Type(parentType.context)
             is TypeAlias -> parentType.originalType.resolve()?.let { resolveFieldType(it, name) }
 
             is NullType -> null

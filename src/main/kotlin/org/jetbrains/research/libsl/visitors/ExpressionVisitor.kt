@@ -200,24 +200,83 @@ class ExpressionVisitor(
         }
     }
 
-    override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): IntegerLiteral {
-        return IntegerLiteral(
-            ctx.text.toInt(),
-            posGetter.getCtxPosition(fileName, ctx)
-        )
+    override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
+        if(ctx.suffix() == null) {
+            return IntegerLiteral(
+                ctx.text.toInt(),
+                null,
+                posGetter.getCtxPosition(context.fileName, ctx))
+        } else {
+            return when(ctx.suffix().text) {
+                "b" -> IntegerLiteral(
+                    ctx.text.dropLast(1).toByte(),
+                    "b",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                "ub" -> UnsignedInt8Literal(
+                    ctx.text.dropLast(2).toUByte(),
+                    "ub",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                "s" -> IntegerLiteral(
+                    ctx.text.dropLast(1).toShort(),
+                    "s",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                "us" -> UnsignedInt16Literal(
+                    ctx.text.dropLast(2).toUShort(),
+                    "us",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                null -> IntegerLiteral(
+                    ctx.text.toInt(),
+                    "",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                "u" -> UnsignedInt32Literal(
+                    ctx.text.dropLast(1).toUInt(),
+                    "u",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                "L" -> IntegerLiteral(
+                    ctx.text.dropLast(1).toLong(),
+                    "L",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                "uL" -> UnsignedInt64Literal(
+                    ctx.text.dropLast(2).toULong(),
+                    "uL",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+                else -> throw IllegalArgumentException("Incorrect integer suffix")
+            }
+        }
     }
 
+
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
-        return when(ctx.suffix.text) {
-            "f" -> Float32Literal(
-                ctx.text.toFloat(),
-                entityPosition = posGetter.getCtxPosition(fileName, ctx)
-            )
-            "d" -> Float64Literal(
+        return if(ctx.suffix() == null) {
+            FloatLiteral(
                 ctx.text.toDouble(),
-                entityPosition = posGetter.getCtxPosition(fileName, ctx)
+                null,
+                posGetter.getCtxPosition(context.fileName, ctx)
             )
-            else -> throw IllegalArgumentException("Incorrect float suffix")
+        } else {
+            when(ctx.suffix().text) {
+                "f" -> FloatLiteral(
+                    ctx.text.toFloat(),
+                    "f",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+
+                null -> FloatLiteral(
+                    ctx.text.toDouble(),
+                    "",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+
+                else -> throw IllegalArgumentException("Incorrect float suffix")
+            }
         }
     }
 

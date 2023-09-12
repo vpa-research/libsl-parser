@@ -10,34 +10,68 @@ interface PrimitiveType : Type {
     }
 }
 
-data class IntType(
+data class Int8Type(
     override val context: LslContextBase,
-    val capacity: IntCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
     override val generics: MutableList<TypeReference> = mutableListOf()
-    override val name: String = if (capacity == IntCapacity.UNKNOWN) {
-        ""
-    } else {
-        capacity.name.lowercase()
-    }
-
-    enum class IntCapacity {
-        INT8, INT16, INT32, INT64, UNKNOWN
-    }
+    override val name: String = "int8"
 }
 
-data class UnsignedType(
+data class Int16Type(
     override val context: LslContextBase,
-    val capacity: UnsignedCapacity,
     override val isPointer: Boolean = false
 ) : PrimitiveType {
     override val generics: MutableList<TypeReference> = mutableListOf()
-    override val name: String = capacity.name.lowercase()
+    override val name: String = "int16"
+}
 
-    enum class UnsignedCapacity {
-        UNSIGNED8, UNSIGNED16, UNSIGNED32, UNSIGNED64, UNKNOWN
-    }
+data class Int32Type(
+    override val context: LslContextBase,
+    override val isPointer: Boolean = false
+) : PrimitiveType {
+    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val name: String = "int32"
+}
+
+data class Int64Type(
+    override val context: LslContextBase,
+    override val isPointer: Boolean = false
+) : PrimitiveType {
+    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val name: String = "int64"
+}
+
+data class UnsignedInt8Type(
+    override val context: LslContextBase,
+    override val isPointer: Boolean = false
+) : PrimitiveType {
+    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val name: String = "unsigned8"
+}
+
+data class UnsignedInt16Type(
+    override val context: LslContextBase,
+    override val isPointer: Boolean = false
+) : PrimitiveType {
+    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val name: String = "unsigned16"
+}
+
+data class UnsignedInt32Type(
+    override val context: LslContextBase,
+    override val isPointer: Boolean = false
+) : PrimitiveType {
+    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val name: String = "unsigned32"
+}
+
+data class UnsignedInt64Type(
+    override val context: LslContextBase,
+    override val isPointer: Boolean = false
+) : PrimitiveType {
+    override val generics: MutableList<TypeReference> = mutableListOf()
+    override val name: String = "unsigned64"
 }
 
 data class Float32Type(

@@ -486,10 +486,14 @@ periodSeparatedFullName
    ;
 
 integerNumber
-   :   MINUS? Digit+
-   |   Digit
+   :   MINUS? Digit+ suffix?
+   |   Digit suffix?
    ;
 
 floatNumber
-   :  MINUS? Digit+ DOT Digit+ suffix=Identifier
+   :   MINUS? Digit+ DOT Digit+ suffix?
+   ;
+
+suffix
+   :   Identifier
    ;

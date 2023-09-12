@@ -18,15 +18,16 @@ class LslGlobalContext(fileName: String) : LslContextBase(fileName) {
             return
         val types = buildList<Type> {
             for (pointer in listOf(true, false)) {
-                add(IntType(this@LslGlobalContext, IntType.IntCapacity.INT8, pointer))
-                add(IntType(this@LslGlobalContext, IntType.IntCapacity.INT16, pointer))
-                add(IntType(this@LslGlobalContext, IntType.IntCapacity.INT32, pointer))
-                add(IntType(this@LslGlobalContext, IntType.IntCapacity.INT64, pointer))
+                add(Int8Type(this@LslGlobalContext, pointer))
+                add(Int16Type(this@LslGlobalContext, pointer))
+                add(Int32Type(this@LslGlobalContext, pointer))
+                add(Int64Type(this@LslGlobalContext, pointer))
 
-                add(UnsignedType(this@LslGlobalContext, UnsignedType.UnsignedCapacity.UNSIGNED8, pointer))
-                add(UnsignedType(this@LslGlobalContext, UnsignedType.UnsignedCapacity.UNSIGNED16, pointer))
-                add(UnsignedType(this@LslGlobalContext, UnsignedType.UnsignedCapacity.UNSIGNED32, pointer))
-                add(UnsignedType(this@LslGlobalContext, UnsignedType.UnsignedCapacity.UNSIGNED64, pointer))
+                add(UnsignedInt8Type(this@LslGlobalContext, pointer))
+                add(UnsignedInt16Type(this@LslGlobalContext, pointer))
+                add(UnsignedInt32Type(this@LslGlobalContext, pointer))
+                add(UnsignedInt64Type(this@LslGlobalContext, pointer))
+
 
                 add(Float32Type(this@LslGlobalContext, pointer))
                 add(Float64Type(this@LslGlobalContext, pointer))

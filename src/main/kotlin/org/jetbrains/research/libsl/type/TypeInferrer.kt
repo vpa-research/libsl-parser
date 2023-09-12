@@ -49,7 +49,11 @@ class TypeInferrer(private val context: LslContextBase) {
             is BoolLiteral -> BoolType(context)
             is NullLiteral -> NullType(false, mutableListOf(), context)
             is FloatLiteral -> processFloatLiteralType(atomic, context)
-            is IntegerLiteral -> IntType(context, IntType.IntCapacity.UNKNOWN)
+            is IntegerLiteral -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt16Literal -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt32Literal -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt64Literal -> processIntegerLiteralType(atomic, context)
+            is UnsignedInt8Literal -> processIntegerLiteralType(atomic, context)
             is StringLiteral -> StringType(context)
             is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
             is QualifiedAccess -> getQualifiedAccessType(atomic)
@@ -57,11 +61,25 @@ class TypeInferrer(private val context: LslContextBase) {
         }
     }
 
+    private fun processIntegerLiteralType(literalWithSuffix: LiteralWithSuffix, context: LslContextBase): Type {
+        return when(literalWithSuffix.suffix) {
+            "b" -> Int8Type(context)
+            "ub" -> UnsignedInt8Type(context)
+            "s" -> Int16Type(context)
+            "us" -> UnsignedInt16Type(context)
+            null -> Int32Type(context)
+            "u" -> UnsignedInt32Type(context)
+            "L" -> Int64Type(context)
+            "uL" -> UnsignedInt64Type(context)
+            else -> throw IllegalArgumentException("Unknown integer literal, no such type")
+        }
+    }
+
     private fun processFloatLiteralType(floatLiteral: FloatLiteral, context: LslContextBase): Type {
         return when(floatLiteral.suffix) {
             "f" -> Float32Type(context)
-            "d" -> Float64Type(context)
-            else -> throw IllegalArgumentException("Unknown float")
+            null -> Float64Type(context)
+            else -> throw IllegalArgumentException("Unknown float literal, no such type")
         }
     }
 
@@ -97,21 +115,6 @@ class TypeInferrer(private val context: LslContextBase) {
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun mergeTypes(typeA: Type, typeB: Type): Type {
-        /* if (typeA is IntType) {
-            typeB as IntType
-            check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
-        } */
-
-        /* if (typeA is Float32Type) {
-            typeB as Float32Type
-            check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
-        }
-         */
-
-        if (typeA is UnsignedType) {
-            typeB as UnsignedType
-            check(typeA.capacity == typeB.capacity) { "Capacities not mach: ${typeA.capacity} & ${typeB.capacity}" }
-        }
 
         if (typeA::class == typeB::class) {
             return typeA
