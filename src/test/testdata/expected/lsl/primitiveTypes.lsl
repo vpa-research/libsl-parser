@@ -4,8 +4,10 @@ typealias Int = int32;
 typealias Float = float32;
 typealias Double = float64;
 typealias V = *void;
+typealias Char = char;
 automaton A : Int {
     var i: V;
+    var c: Char = 'x';
     fun f(param: Int): V {
     }
     fun sum(): Float {

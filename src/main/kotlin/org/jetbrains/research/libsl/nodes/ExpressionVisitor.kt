@@ -13,6 +13,7 @@ abstract class ExpressionVisitor<T> {
             is AutomatonProcedureCall -> visitAutomatonProcedureCall(node)
             is VariableAccess -> visitVariableAccess(node)
             is StringLiteral -> visitStringValue(node)
+            is CharacterLiteral -> visitCharacterValue(node)
             is BinaryOpExpression -> visitBinaryOpExpression(node)
             is OldValue -> visitOldValue(node)
             is UnaryOpExpression -> visitUnaryOpExpression(node)
@@ -56,6 +57,8 @@ abstract class ExpressionVisitor<T> {
     abstract fun visitVariableAccess(node: VariableAccess): T
 
     abstract fun visitStringValue(node: StringLiteral): T
+
+    abstract fun visitCharacterValue(node: CharacterLiteral): T
 
     abstract fun visitBinaryOpExpression(node: BinaryOpExpression): T
 

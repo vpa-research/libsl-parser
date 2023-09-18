@@ -196,6 +196,14 @@ class ExpressionVisitor(
                 )
             }
 
+            primitiveLiteralContext.CHARACTER() != null -> {
+                val literal = primitiveLiteralContext.CHARACTER().asPeriodSeparatedString().removeQuotes().single()
+                CharacterLiteral(
+                    literal,
+                    posGetter.getCtxPosition(fileName, primitiveLiteralContext)
+                )
+            }
+
             else -> super.visitPrimitiveLiteral(primitiveLiteralContext) as Atomic
         }
     }

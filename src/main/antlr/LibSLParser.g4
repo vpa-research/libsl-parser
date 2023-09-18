@@ -456,6 +456,7 @@ primitiveLiteral
    :   integerNumber
    |   floatNumber
    |   DoubleQuotedString
+   |   CHARACTER
    |   bool=(TRUE | FALSE)
    |   nullLiteral=NULL
    ;

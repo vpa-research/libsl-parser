@@ -263,6 +263,10 @@ DoubleQuotedString
    :   '"' .*? '"'
    ;
 
+CHARACTER
+   :   '\'' . '\''
+   ;
+
 Digit: ('0'..'9');
 
 fragment

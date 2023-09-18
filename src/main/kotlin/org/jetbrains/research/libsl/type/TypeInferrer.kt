@@ -55,6 +55,7 @@ class TypeInferrer(private val context: LslContextBase) {
             is UnsignedInt64Literal -> processIntegerLiteralType(atomic, context)
             is UnsignedInt8Literal -> processIntegerLiteralType(atomic, context)
             is StringLiteral -> StringType(context)
+            is CharacterLiteral -> CharType(context)
             is CallAutomatonConstructor -> atomic.automatonRef.resolveOrError().typeReference.resolveOrError()
             is QualifiedAccess -> getQualifiedAccessType(atomic)
             is ArrayLiteral -> getArrayLiteralType(atomic)

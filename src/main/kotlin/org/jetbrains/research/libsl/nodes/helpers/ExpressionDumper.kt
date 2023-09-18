@@ -20,6 +20,7 @@ object ExpressionDumper {
             is ThisAccess -> dumpThisAccess(expression)
             is VariableAccess -> dumpVariableAccess(expression)
             is StringLiteral -> dumpStringLiteral(expression)
+            is CharacterLiteral -> dumpCharacterLiteral(expression)
             is OldValue -> dumpOldValue(expression)
             is ProcExpression -> dumpProcExpression(expression)
             is UnaryOpExpression -> dumpUnaryOpExpression(expression)
@@ -98,6 +99,10 @@ object ExpressionDumper {
 
     private fun dumpStringLiteral(expression: StringLiteral): String {
         return "\"${expression.value}\""
+    }
+
+    private fun dumpCharacterLiteral(expression: CharacterLiteral): String {
+        return "\'${expression.value}\'"
     }
 
     private fun dumpNullLiteral(expression: NullLiteral): String {

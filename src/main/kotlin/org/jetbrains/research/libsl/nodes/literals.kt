@@ -51,6 +51,11 @@ data class StringLiteral(
     val entityPosition: EntityPosition
 ) : Atomic()
 
+data class CharacterLiteral(
+    override val value: Char,
+    val entityPosition: EntityPosition
+) : Atomic()
+
 data class BoolLiteral(
     override val value: Boolean,
     val entityPosition: EntityPosition
