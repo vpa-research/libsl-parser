@@ -528,7 +528,6 @@ class ExpressionVisitor(
     }
 
     private fun processUnaryOp(ctx: ExpressionContext): Expression {
-        println(ctx.unaryOp.text)
         val op = ArithmeticUnaryOp.fromString(ctx.unaryOp.text)
 
         val value = visitExpression(ctx.expression(0))
