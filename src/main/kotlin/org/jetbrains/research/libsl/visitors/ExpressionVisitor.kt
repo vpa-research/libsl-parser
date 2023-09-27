@@ -16,6 +16,10 @@ class ExpressionVisitor(
 
     override fun visitExpression(ctx: ExpressionContext): Expression {
         return when {
+            ctx.unaryOp != null -> {
+                processUnaryOp(ctx)
+            }
+
             ctx.typeOp != null -> {
                 processTypeOperationExpression(ctx)
             }
@@ -45,10 +49,6 @@ class ExpressionVisitor(
 
             ctx.qualifiedAccess() != null -> {
                 visitQualifiedAccess(ctx.qualifiedAccess())
-            }
-
-            ctx.unaryOp() != null -> {
-                visitUnaryOp(ctx.unaryOp())
             }
 
             ctx.procUsage() != null -> {
@@ -527,10 +527,11 @@ class ExpressionVisitor(
         )
     }
 
-    override fun visitUnaryOp(ctx: UnaryOpContext): Expression {
-        val op = ArithmeticUnaryOp.fromString(ctx.op.text)
+    private fun processUnaryOp(ctx: ExpressionContext): Expression {
+        println(ctx.unaryOp.text)
+        val op = ArithmeticUnaryOp.fromString(ctx.unaryOp.text)
 
-        val value = visitExpression(ctx.expression())
+        val value = visitExpression(ctx.expression(0))
         return UnaryOpExpression(
             op,
             value,

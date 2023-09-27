@@ -392,7 +392,8 @@ assignsContract
  * expression
  */
 expression
-   :   lbracket=L_BRACKET expression rbracket=R_BRACKET
+   :   unaryOp=(EXCLAMATION | TILDE | PLUS | MINUS) expression
+   |   lbracket=L_BRACKET expression rbracket=R_BRACKET
    |   expression op=(ASTERISK | SLASH) expression
    |   expression op=PERCENT expression
    |   expression op=(PLUS | MINUS) expression
@@ -404,7 +405,6 @@ expression
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   expressionAtomic
    |   qualifiedAccess
-   |   unaryOp
    |   procUsage
    |   actionUsage
    |   funUsage
@@ -437,13 +437,6 @@ uRShift
 
 uLShift
    :   L_ARROW L_ARROW L_ARROW
-   ;
-
-unaryOp
-   :   op=PLUS expression
-   |   op=MINUS expression
-   |   op=EXCLAMATION expression
-   |   op=TILDE expression
    ;
 
 expressionAtomic
