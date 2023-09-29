@@ -351,10 +351,6 @@ procUsage
    :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
    ;
 
-funUsage
-   :   qualifiedAccess L_BRACKET expressionsList? R_BRACKET
-   ;
-
 expressionsList
    :   expression (COMMA expression)* (COMMA)?
    ;
@@ -392,8 +388,8 @@ assignsContract
  * expression
  */
 expression
-   :   unaryOp=(EXCLAMATION | TILDE | PLUS | MINUS) expression
-   |   lbracket=L_BRACKET expression rbracket=R_BRACKET
+   :   expressionAtomic
+   |   unaryOp=(EXCLAMATION | TILDE | PLUS | MINUS) expression
    |   expression op=(ASTERISK | SLASH) expression
    |   expression op=PERCENT expression
    |   expression op=(PLUS | MINUS) expression
@@ -403,13 +399,12 @@ expression
    |   expression bitShiftOp expression
    |   expression typeOp=(IS | AS) typeIdentifier
    |   qualifiedAccess apostrophe=APOSTROPHE
-   |   expressionAtomic
    |   qualifiedAccess
    |   procUsage
    |   actionUsage
-   |   funUsage
    |   callAutomatonConstructorWithNamedArgs
    |   hasAutomatonConcept
+   |   lbracket=L_BRACKET expression rbracket=R_BRACKET
    ;
 
 hasAutomatonConcept
@@ -440,9 +435,9 @@ uLShift
    ;
 
 expressionAtomic
-   :   qualifiedAccess
-   |   primitiveLiteral
+   :   primitiveLiteral
    |   arrayLiteral
+   |   qualifiedAccess
    ;
 
 primitiveLiteral
