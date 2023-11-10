@@ -259,8 +259,12 @@ Identifier
    |   '`' .*? '`'
    ;
 
+fragment ESCAPED_QUOTE
+   : '\\"'
+   ;
+
 DoubleQuotedString
-   :   '"' .*? '"'
+   :   '"' ( ESCAPED_QUOTE | ~('\n'|'\r') )*? '"'
    ;
 
 CHARACTER
