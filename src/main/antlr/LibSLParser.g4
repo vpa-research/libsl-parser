@@ -389,22 +389,48 @@ assignsContract
  */
 expression
    :   expressionAtomic
-   |   unaryOp=(EXCLAMATION | TILDE | PLUS | MINUS) expression
-   |   expression op=(ASTERISK | SLASH) expression
-   |   expression op=PERCENT expression
-   |   expression op=(PLUS | MINUS) expression
-   |   expression op=(EQ | EXCLAMATION_EQ | L_ARROW_EQ | L_ARROW | R_ARROW_EQ | R_ARROW) expression
-   |   expression op=(AMPERSAND | BIT_OR | XOR) expression
-   |   expression op=(DOUBLE_AMPERSAND | LOGIC_OR) expression
-   |   expression bitShiftOp expression
-   |   expression typeOp=(IS | AS) typeIdentifier
+   // primaryNoNewArray
    |   qualifiedAccess apostrophe=APOSTROPHE
    |   qualifiedAccess
    |   procUsage
    |   actionUsage
    |   callAutomatonConstructorWithNamedArgs
-   |   hasAutomatonConcept
    |   lbracket=L_BRACKET expression rbracket=R_BRACKET
+   |   hasAutomatonConcept
+
+   // unaryExpression + unaryExpressionNotPlusMinus
+   |   unaryOp=(PLUS | MINUS | TILDE | EXCLAMATION) expression
+
+   // castExpression
+   |   expression typeOp=AS typeIdentifier
+
+   // multiplicativeExpression
+   |   expression op=(ASTERISK | SLASH | PERCENT) expression
+
+   // additiveExpression
+   |   expression op=(PLUS | MINUS) expression
+
+   // shiftExpression
+   |   expression bitShiftOp expression
+
+   // relationalExpression
+   |   expression op=(L_ARROW | R_ARROW | L_ARROW_EQ | R_ARROW_EQ) expression
+   |   expression typeOp=IS typeIdentifier
+
+   // equalityExpression
+   |   expression op=(EQ | EXCLAMATION_EQ) expression
+
+   // inclusiveOrExpression
+   |   expression op=BIT_OR expression
+   // exclusiveOrExpression
+   |   expression op=XOR expression
+   // andExpression
+   |   expression op=AMPERSAND expression
+
+   // conditionalOrExpression
+   |   expression op=LOGIC_OR expression
+   // conditionalAndExpression
+   |   expression op=DOUBLE_AMPERSAND expression
    ;
 
 hasAutomatonConcept
