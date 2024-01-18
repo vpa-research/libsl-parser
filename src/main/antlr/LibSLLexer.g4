@@ -268,8 +268,19 @@ DoubleQuotedString
    ;
 
 CHARACTER
-   :   '\'' . '\''
+   :   '\'' SingleCharacter '\''
+   |   '\'' EscapeSequence '\''
    ;
+
+fragment
+SingleCharacter
+    :   ~['\\\r\n]
+    ;
+
+fragment
+EscapeSequence
+    :   '\\' .
+    ;
 
 Digit: ('0'..'9');
 
