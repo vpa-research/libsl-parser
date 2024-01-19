@@ -477,7 +477,7 @@ primitiveLiteral
 
 qualifiedAccess
    :   periodSeparatedFullName
-   |   qualifiedAccess L_SQUARE_BRACKET expressionAtomic R_SQUARE_BRACKET (DOT qualifiedAccess)?
+   |   qualifiedAccess L_SQUARE_BRACKET expression R_SQUARE_BRACKET (DOT qualifiedAccess)?
    |   simpleCall DOT qualifiedAccess
    |   simpleCall DOT procUsage
    ;

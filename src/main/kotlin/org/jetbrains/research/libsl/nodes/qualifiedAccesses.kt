@@ -48,7 +48,7 @@ data class ThisAccess(
 }
 
 data class ArrayAccess(
-    var index: Atomic,
+    var index: Expression,
     val entityPosition: EntityPosition
 ) : QualifiedAccess() {
     override var childAccess: QualifiedAccess? = null

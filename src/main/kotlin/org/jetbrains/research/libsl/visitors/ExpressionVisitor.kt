@@ -312,9 +312,9 @@ class ExpressionVisitor(
                 }
             }
 
-            ctx.expressionAtomic() != null -> {
+            ctx.expression() != null -> {
                 val parentQualifiedAccess = visitQualifiedAccess(ctx.qualifiedAccess(0))
-                val arrayIndex = visitExpressionAtomic(ctx.expressionAtomic())
+                val arrayIndex = visitExpression(ctx.expression())
 
                 val qualifiedArrayAccess = ArrayAccess(
                     arrayIndex,
