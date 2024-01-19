@@ -279,10 +279,12 @@ SingleCharacter
 
 fragment
 EscapeSequence
-    :   '\\' .
+    :   '\\u' Hex Hex Hex Hex Hex Hex Hex Hex
     ;
 
 Digit: ('0'..'9');
+
+Hex: Digit | ('A'..'F');
 
 fragment
 NEWLINE

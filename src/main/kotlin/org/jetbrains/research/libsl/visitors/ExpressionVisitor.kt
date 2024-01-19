@@ -7,6 +7,7 @@ import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
+import java.nio.charset.StandardCharsets
 
 class ExpressionVisitor(
     override val context: LslContextBase
@@ -197,7 +198,8 @@ class ExpressionVisitor(
             }
 
             primitiveLiteralContext.CHARACTER() != null -> {
-                val literal = primitiveLiteralContext.CHARACTER().asPeriodSeparatedString().removeQuotes().single()
+                val literalString = primitiveLiteralContext.CHARACTER().asPeriodSeparatedString().removeQuotes()
+                val literal = String(literalString.toByteArray(Charsets.ISO_8859_1)).single();
                 CharacterLiteral(
                     literal,
                     posGetter.getCtxPosition(fileName, primitiveLiteralContext)

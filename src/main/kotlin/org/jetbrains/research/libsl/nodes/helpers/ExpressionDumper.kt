@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.nodes.helpers
 
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import java.nio.charset.Charset
 
 object ExpressionDumper {
     fun dump(expression: Expression): String = dump(expression, priority = Int.MAX_VALUE)
@@ -102,7 +103,9 @@ object ExpressionDumper {
     }
 
     private fun dumpCharacterLiteral(expression: CharacterLiteral): String {
-        return "\'${expression.value}\'"
+        val value = expression.value
+        val str = String(value.toString().toByteArray(Charsets.UTF_8))
+        return "\'${str}\'"
     }
 
     private fun dumpNullLiteral(expression: NullLiteral): String {
