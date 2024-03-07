@@ -506,9 +506,13 @@ integerNumber
    ;
 
 floatNumber
-   :   MINUS? Digit+ DOT Digit+ suffix?
+   :   MINUS? Digit+ DOT Digit+ exp? suffix?
    ;
 
 suffix
    :   Identifier
+   ;
+
+exp
+   :   Identifier MINUS? Digit+
    ;
