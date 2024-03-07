@@ -211,83 +211,111 @@ class ExpressionVisitor(
     }
 
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
-        if(ctx.suffix() == null) {
+        val num = ctx.text.lowercase()
+        if (num.endsWith("l")) {
             return IntegerLiteral(
-                ctx.text.toInt(),
-                null,
-                posGetter.getCtxPosition(context.fileName, ctx))
-        } else {
-            return when(ctx.suffix().text) {
-                "b" -> IntegerLiteral(
-                    ctx.text.dropLast(1).toByte(),
-                    "b",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "ub" -> UnsignedInt8Literal(
-                    ctx.text.dropLast(2).toUByte(),
-                    "ub",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "s" -> IntegerLiteral(
-                    ctx.text.dropLast(1).toShort(),
-                    "s",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "us" -> UnsignedInt16Literal(
-                    ctx.text.dropLast(2).toUShort(),
-                    "us",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                null -> IntegerLiteral(
-                    ctx.text.toInt(),
-                    "",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "u" -> UnsignedInt32Literal(
-                    ctx.text.dropLast(1).toUInt(),
-                    "u",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "L" -> IntegerLiteral(
-                    ctx.text.dropLast(1).toLong(),
-                    "L",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "uL" -> UnsignedInt64Literal(
-                    ctx.text.dropLast(2).toULong(),
-                    "uL",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                else -> throw IllegalArgumentException("Incorrect integer suffix")
-            }
+                ctx.text.dropLast(1).toLong(),
+                "L",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
         }
+        return IntegerLiteral(
+            ctx.text.toInt(),
+            null,
+            posGetter.getCtxPosition(context.fileName, ctx)
+        )
+//        if (ctx.suffix() == null) {
+//            return IntegerLiteral(
+//                ctx.text.toInt(),
+//                null,
+//                posGetter.getCtxPosition(context.fileName, ctx)
+//            )
+//        } else {
+//            return when (ctx.suffix().text) {
+//                "b" -> IntegerLiteral(
+//                    ctx.text.dropLast(1).toByte(),
+//                    "b",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                "ub" -> UnsignedInt8Literal(
+//                    ctx.text.dropLast(2).toUByte(),
+//                    "ub",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                "s" -> IntegerLiteral(
+//                    ctx.text.dropLast(1).toShort(),
+//                    "s",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                "us" -> UnsignedInt16Literal(
+//                    ctx.text.dropLast(2).toUShort(),
+//                    "us",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                null -> IntegerLiteral(
+//                    ctx.text.toInt(),
+//                    "",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                "u" -> UnsignedInt32Literal(
+//                    ctx.text.dropLast(1).toUInt(),
+//                    "u",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                "L" -> IntegerLiteral(
+//                    ctx.text.dropLast(1).toLong(),
+//                    "L",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                "uL" -> UnsignedInt64Literal(
+//                    ctx.text.dropLast(2).toULong(),
+//                    "uL",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//                else -> throw IllegalArgumentException("Incorrect integer suffix")
+//            }
+//        }
     }
 
 
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
-        return if(ctx.suffix() == null) {
-            FloatLiteral(
-                ctx.text.toDouble(),
-                null,
+//        return if(ctx.FLOAT_TYPED_SUFFIX() == null) {
+//            FloatLiteral(
+//                ctx.text.toDouble(),
+//                null,
+//                posGetter.getCtxPosition(context.fileName, ctx)
+//            )
+//        } else {
+//            when(ctx.FLOAT_TYPED_SUFFIX().text) {
+//                "f" -> FloatLiteral(
+//                    ctx.text.toFloat(),
+//                    "f",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//
+//                null -> FloatLiteral(
+//                    ctx.text.toDouble(),
+//                    "",
+//                    posGetter.getCtxPosition(context.fileName, ctx)
+//                )
+//
+//                else -> throw IllegalArgumentException("Incorrect float suffix")
+//            }
+//        }
+        val num = ctx.text.lowercase()
+        if (num.endsWith("f")) {
+            return FloatLiteral(
+                ctx.text.toFloat(),
+                "f",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else {
-            when(ctx.suffix().text) {
-                "f" -> FloatLiteral(
-                    ctx.text.toFloat(),
-                    "f",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-
-                null -> FloatLiteral(
-                    ctx.text.toDouble(),
-                    "",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-
-                else -> throw IllegalArgumentException("Incorrect float suffix")
-            }
         }
+        return FloatLiteral(
+            ctx.text.toDouble(),
+            null,
+            posGetter.getCtxPosition(context.fileName, ctx)
+        )
+
     }
 
     override fun visitQualifiedAccess(ctx: QualifiedAccessContext): QualifiedAccess {
@@ -296,7 +324,7 @@ class ExpressionVisitor(
                 processPeriodSeparatedQualifiedAccess(ctx.periodSeparatedFullName())
             }
 
-            ctx.simpleCall()!= null && ctx.procUsage() == null -> {
+            ctx.simpleCall() != null && ctx.procUsage() == null -> {
                 val automatonByFunctionArgumentCreation = visitSimpleCall(ctx.simpleCall())
                 val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it) }
 
@@ -305,9 +333,9 @@ class ExpressionVisitor(
                 }
             }
 
-            ctx.simpleCall()!= null && ctx.procUsage() != null -> {
+            ctx.simpleCall() != null && ctx.procUsage() != null -> {
                 val automatonProcedureCall = visitSimpleCallWithProcedure(ctx)
-                val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it)}
+                val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it) }
 
                 automatonProcedureCall.also {
                     it.childAccess = childQualifiedAccess
@@ -351,7 +379,7 @@ class ExpressionVisitor(
     ): QualifiedAccess {
         val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
 
-        val lastAccess = when(val lastFieldName = names.last()) {
+        val lastAccess = when (val lastFieldName = names.last()) {
 
             "this" ->
                 ThisAccess(
@@ -481,14 +509,14 @@ class ExpressionVisitor(
     override fun visitActionUsage(ctx: ActionUsageContext): Expression {
         val name = ctx.Identifier().text.extractIdentifier()
         for (c in name) {
-            if(c.isLowerCase()) {
+            if (c.isLowerCase()) {
                 throw IllegalArgumentException("Action names must be in upper case")
             }
         }
         val expressionVisitor = ExpressionVisitor(context)
         val args = mutableListOf<Expression>()
-        if(ctx.expressionsList() != null) {
-            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
+        if (ctx.expressionsList() != null) {
+            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr)) }
         }
 
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
@@ -510,8 +538,8 @@ class ExpressionVisitor(
         val name = visitQualifiedAccess(ctx.qualifiedAccess()).lastChild.toString()
         val expressionVisitor = ExpressionVisitor(context)
         val args = mutableListOf<Expression>()
-        if(ctx.expressionsList() != null) {
-            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
+        if (ctx.expressionsList() != null) {
+            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr)) }
         }
         //val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
         //val procRef = FunctionReferenceBuilder.build(name, argTypes, context)

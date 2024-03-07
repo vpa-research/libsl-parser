@@ -254,6 +254,34 @@ NULL
    :   'null'
    ;
 
+IntegerLiteral:
+    DecimalIntegerLiteral
+;
+
+fragment DecimalIntegerLiteral: DecimalNumeral IntegerTypeSuffix?;
+
+fragment DecimalNumeral: '0' | NonZeroDigit (Digits?);
+
+fragment IntegerTypeSuffix: [lL];
+
+FloatingPointLiteral: DecimalFloatingPointLiteral;
+
+fragment DecimalFloatingPointLiteral:
+    Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+    | Digits ExponentPart FloatTypeSuffix?
+    | Digits FloatTypeSuffix
+;
+
+fragment ExponentPart: ExponentIndicator SignedInteger;
+
+fragment ExponentIndicator: [eE];
+
+fragment SignedInteger: Sign? Digits;
+
+fragment Sign: [+-];
+
+fragment FloatTypeSuffix: [fFdD];
+
 Identifier
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
    |   '`' .*? '`'
@@ -282,7 +310,11 @@ EscapeSequence
     :   '\\u' Hex Hex Hex Hex Hex Hex Hex Hex
     ;
 
+fragment Digits: Digit (Digit)?;
+
 Digit: ('0'..'9');
+
+fragment NonZeroDigit: [1-9];
 
 Hex: Digit | ('A'..'F');
 
