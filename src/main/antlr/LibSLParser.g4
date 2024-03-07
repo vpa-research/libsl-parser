@@ -184,7 +184,7 @@ concept
  * syntax: one of {initstate; state; finishstate} name;
  */
 automatonStateDecl
-   :   keyword=(INITSTATE | STATE | FINISHSTATE) identifierList SEMICOLON
+   :   keyword=(INITSTATE | 'state' | FINISHSTATE) identifierList SEMICOLON
    ;
 
 /* shift declaration
@@ -250,7 +250,7 @@ namedArgs
    ;
 
 argPair
-   :   name=STATE ASSIGN_OP expressionAtomic
+   :   name='state' ASSIGN_OP expressionAtomic
    |   name=Identifier ASSIGN_OP expression
    ;
 
