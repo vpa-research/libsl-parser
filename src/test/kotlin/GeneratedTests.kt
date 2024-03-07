@@ -220,5 +220,10 @@ class GeneratedTests {
         runLslTest("voidAndAny")
     }
 
+    @Test
+    fun testScientificNotationLsl() {
+        runLslTest("scientificNotation")
+    }
+
 }
 
