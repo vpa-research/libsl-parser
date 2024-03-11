@@ -198,7 +198,17 @@ class ExpressionVisitor(
 
             primitiveLiteralContext.CHARACTER() != null -> {
                 val literalString = primitiveLiteralContext.CHARACTER().asPeriodSeparatedString().removeQuotes()
-                val literal = String(literalString.toByteArray(Charsets.ISO_8859_1)).single();
+                // I'm nor sure in this conversion !!!
+                // https://stackoverflow.com/questions/2126378/java-convert-string-uffff-into-char
+                var literal = '?'
+                if (literalString.startsWith("\\u")) {
+                    literal = Character.toChars(Integer.parseInt(literalString.substring(2), 16))[0]
+                } else if (literalString.startsWith("\\")) {
+                    literal = Character.toChars(Integer.parseInt(literalString.substring(1), 8))[0]
+                } else {
+                    // I must think about this line !!!
+                    literal = String(literalString.toByteArray(Charsets.ISO_8859_1)).single();
+                }
                 CharacterLiteral(
                     literal,
                     posGetter.getCtxPosition(fileName, primitiveLiteralContext)

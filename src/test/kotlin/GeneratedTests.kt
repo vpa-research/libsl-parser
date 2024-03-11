@@ -229,5 +229,11 @@ class GeneratedTests {
     fun testHexBinAndOctLiteralsLsl() {
         runLslTest("hexBinAndOctLiterals")
     }
+
+    @Test
+    fun testCharLiteralsLsl() {
+        runLslTest("charLiterals")
+    }
+
 }
 

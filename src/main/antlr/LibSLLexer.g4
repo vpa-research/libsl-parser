@@ -309,15 +309,24 @@ CHARACTER
    |   '\'' EscapeSequence '\''
    ;
 
-fragment
-SingleCharacter
+fragment SingleCharacter
     :   ~['\\\r\n]
     ;
 
-fragment
-EscapeSequence
-    :   '\\u' Hex Hex Hex Hex Hex Hex Hex Hex
+fragment EscapeSequence
+    :   UnicodeEscape
+        | OctalEscape
     ;
+
+fragment UnicodeEscape: '\\' 'u'+ Hex Hex Hex Hex;
+
+fragment OctalEscape:
+    '\\' OctalDigit
+    | '\\' OctalDigit OctalDigit
+    | '\\' ZeroToThree OctalDigit OctalDigit
+;
+
+fragment ZeroToThree: [0-3];
 
 fragment Digits: Digit+;
 
