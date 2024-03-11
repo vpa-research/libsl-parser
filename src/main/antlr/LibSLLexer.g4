@@ -256,9 +256,18 @@ NULL
 
 IntegerLiteral:
     DecimalIntegerLiteral
+    | HexIntegerLiteral
+    | OctalIntegerLiteral
+    | BinaryIntegerLiteral
 ;
 
 fragment DecimalIntegerLiteral: DecimalNumeral IntegerTypeSuffix?;
+
+fragment HexIntegerLiteral: HexNumeral IntegerTypeSuffix?;
+
+fragment OctalIntegerLiteral: OctalNumeral IntegerTypeSuffix?;
+
+fragment BinaryIntegerLiteral: BinaryNumeral IntegerTypeSuffix?;
 
 fragment DecimalNumeral: '0' | NonZeroDigit (Digits?);
 
@@ -316,7 +325,17 @@ Digit: ('0'..'9');
 
 fragment NonZeroDigit: [1-9];
 
-Hex: Digit | ('A'..'F');
+fragment Hex: Digit | ('A'..'F');
+
+fragment HexNumeral: '0' [xX] Hex+;
+
+fragment OctalNumeral: '0' OctalDigit+;
+
+fragment OctalDigit: [0-7];
+
+fragment BinaryNumeral: '0' [bB] BinaryDigit+;
+
+fragment BinaryDigit: [01];
 
 fragment
 NEWLINE

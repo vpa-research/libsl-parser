@@ -225,5 +225,9 @@ class GeneratedTests {
         runLslTest("scientificNotation")
     }
 
+    @Test
+    fun testHexBinAndOctLiteralsLsl() {
+        runLslTest("hexBinAndOctLiterals")
+    }
 }
 

@@ -213,14 +213,27 @@ class ExpressionVisitor(
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
         val num = ctx.text.lowercase()
         if (num.endsWith("l")) {
+            if (num.startsWith("0x")) {
+
+            }
             return IntegerLiteral(
                 ctx.text.dropLast(1).toLong(),
                 "L",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
         }
+        var number = -1
+        if (num.startsWith("0x")) {
+            number = Integer.parseInt(num.drop(2), 16)
+        } else if (num.startsWith("0b")) {
+            number = Integer.parseInt(num.drop(2), 2)
+        } else if (num.startsWith("0") && num.length > 1) {
+            number = Integer.parseInt(num.drop(1), 8)
+        } else {
+            number = ctx.text.toInt()
+        }
         return IntegerLiteral(
-            ctx.text.toInt(),
+            number,
             null,
             posGetter.getCtxPosition(context.fileName, ctx)
         )

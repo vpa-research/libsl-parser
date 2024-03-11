@@ -6,4 +6,5 @@ typealias double = float64;
 automaton A : Int {
     var d1: double = 4.05E-13;
     var d2: double = 4.05E13;
+    var d3: double = 4.05E+13;
 }
