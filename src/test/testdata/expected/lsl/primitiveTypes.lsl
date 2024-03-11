@@ -19,4 +19,9 @@ automaton A : Int {
     fun newSum(): Float {
         result = 0.0f + 0.1f;
     }
+    fun compareInt(param: Int): Int {
+        if (param > 1073)
+            result = 1;
+        result = 0;
+    }
 }

@@ -310,7 +310,7 @@ EscapeSequence
     :   '\\u' Hex Hex Hex Hex Hex Hex Hex Hex
     ;
 
-fragment Digits: Digit (Digit)?;
+fragment Digits: Digit+;
 
 Digit: ('0'..'9');
 

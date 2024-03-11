@@ -501,7 +501,7 @@ periodSeparatedFullName
    ;
 
 integerNumber
-   :   MINUS? IntegerLiteral
+   :   (MINUS | PLUS)? IntegerLiteral
    ;
 
 floatNumber
