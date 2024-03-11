@@ -7,7 +7,6 @@ import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
-import java.nio.charset.StandardCharsets
 
 class ExpressionVisitor(
     override val context: LslContextBase
@@ -211,29 +210,36 @@ class ExpressionVisitor(
     }
 
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
-        val num = ctx.text.lowercase()
+        var result = ""
+        var num = ctx.text.lowercase()
         if (num.endsWith("l")) {
+            num = num.dropLast(1)
             if (num.startsWith("0x")) {
-
+                result = java.lang.Long.parseLong(num.drop(2), 16).toString()
+            } else if (num.startsWith("0b")) {
+                result = java.lang.Long.parseLong(num.drop(2), 2).toString()
+            } else if (num.startsWith("0") && num.length > 1) {
+                result = java.lang.Long.parseLong(num.drop(1), 8).toString()
+            } else {
+                result = num
             }
             return IntegerLiteral(
-                ctx.text.dropLast(1).toLong(),
+                java.lang.Long.parseLong(result),
                 "L",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
         }
-        var number = -1
         if (num.startsWith("0x")) {
-            number = Integer.parseInt(num.drop(2), 16)
+            result = Integer.parseInt(num.drop(2), 16).toString()
         } else if (num.startsWith("0b")) {
-            number = Integer.parseInt(num.drop(2), 2)
+            result = Integer.parseInt(num.drop(2), 2).toString()
         } else if (num.startsWith("0") && num.length > 1) {
-            number = Integer.parseInt(num.drop(1), 8)
+            result = Integer.parseInt(num.drop(1), 8).toString()
         } else {
-            number = ctx.text.toInt()
+            result = ctx.text
         }
         return IntegerLiteral(
-            number,
+            Integer.parseInt(result),
             null,
             posGetter.getCtxPosition(context.fileName, ctx)
         )
