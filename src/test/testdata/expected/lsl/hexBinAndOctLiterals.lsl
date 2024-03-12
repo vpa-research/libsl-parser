@@ -13,4 +13,5 @@ automaton A : int {
     var d9: int = 10L;
     var d10: int = 495L;
     var d11: int = 495L;
+    var plainZero: int = 0;
 }
