@@ -26,9 +26,7 @@ automaton A : Int {
         result = 0.0f + 0.1f;
     }
 
-    fun compareInt(param: Int): Int {
-        if (param > 1073)
-            result = 1;
-        result = 0;
+    fun compareInt(): Int {
+        result = 1073;
     }
 }

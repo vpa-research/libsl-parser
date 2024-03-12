@@ -505,7 +505,7 @@ integerNumber
    ;
 
 floatNumber
-   :   FloatingPointLiteral
+   :   (MINUS | PLUS)? FloatingPointLiteral
    ;
 
 suffix

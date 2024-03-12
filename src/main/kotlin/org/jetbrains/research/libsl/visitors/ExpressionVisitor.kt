@@ -7,12 +7,17 @@ import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
+import java.lang.Integer.parseInt
+import java.lang.Long.parseLong
 
 class ExpressionVisitor(
     override val context: LslContextBase
 ) : LibSLParserVisitor<Expression>(context) {
     private val fileName = context.fileName
     private val posGetter = PositionGetter()
+    private val HEX_PREFIX = "0x"
+    private val OCT_PREFIX = "0"
+    private val BIN_PREFIX = "0b"
 
     override fun visitExpression(ctx: ExpressionContext): Expression {
         return when {
@@ -200,14 +205,13 @@ class ExpressionVisitor(
                 val literalString = primitiveLiteralContext.CHARACTER().asPeriodSeparatedString().removeQuotes()
                 // I'm nor sure in this conversion !!!
                 // https://stackoverflow.com/questions/2126378/java-convert-string-uffff-into-char
-                var literal = '?'
-                if (literalString.startsWith("\\u")) {
-                    literal = Character.toChars(Integer.parseInt(literalString.substring(2), 16))[0]
+                val literal: Char = if (literalString.startsWith("\\u")) {
+                    Character.toChars(parseInt(literalString.substring(2), 16))[0]
                 } else if (literalString.startsWith("\\")) {
-                    literal = Character.toChars(Integer.parseInt(literalString.substring(1), 8))[0]
+                    Character.toChars(parseInt(literalString.substring(1), 8))[0]
                 } else {
                     // I must think about this line !!!
-                    literal = String(literalString.toByteArray(Charsets.ISO_8859_1)).single();
+                    String(literalString.toByteArray(Charsets.ISO_8859_1)).single();
                 }
                 CharacterLiteral(
                     literal,
@@ -220,131 +224,49 @@ class ExpressionVisitor(
     }
 
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
-        var result = ""
         var num = ctx.text.lowercase()
         if (num.endsWith("l")) {
             num = num.dropLast(1)
-            if (num.startsWith("0x")) {
-                result = java.lang.Long.parseLong(num.drop(2), 16).toString()
-            } else if (num.startsWith("0b")) {
-                result = java.lang.Long.parseLong(num.drop(2), 2).toString()
-            } else if (num.startsWith("0") && num.length > 1) {
-                result = java.lang.Long.parseLong(num.drop(1), 8).toString()
-            } else {
-                result = num
-            }
             return IntegerLiteral(
-                java.lang.Long.parseLong(result),
+                convertBinHexOctToPrimitives(num, "l"),
                 "L",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
         }
-        if (num.startsWith("0x")) {
-            result = Integer.parseInt(num.drop(2), 16).toString()
-        } else if (num.startsWith("0b")) {
-            result = Integer.parseInt(num.drop(2), 2).toString()
-        } else if (num.startsWith("0") && num.length > 1) {
-            result = Integer.parseInt(num.drop(1), 8).toString()
-        } else {
-            result = ctx.text
-        }
         return IntegerLiteral(
-            Integer.parseInt(result),
+            convertBinHexOctToPrimitives(num, "i"),
             null,
             posGetter.getCtxPosition(context.fileName, ctx)
         )
-//        if (ctx.suffix() == null) {
-//            return IntegerLiteral(
-//                ctx.text.toInt(),
-//                null,
-//                posGetter.getCtxPosition(context.fileName, ctx)
-//            )
-//        } else {
-//            return when (ctx.suffix().text) {
-//                "b" -> IntegerLiteral(
-//                    ctx.text.dropLast(1).toByte(),
-//                    "b",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                "ub" -> UnsignedInt8Literal(
-//                    ctx.text.dropLast(2).toUByte(),
-//                    "ub",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                "s" -> IntegerLiteral(
-//                    ctx.text.dropLast(1).toShort(),
-//                    "s",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                "us" -> UnsignedInt16Literal(
-//                    ctx.text.dropLast(2).toUShort(),
-//                    "us",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                null -> IntegerLiteral(
-//                    ctx.text.toInt(),
-//                    "",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                "u" -> UnsignedInt32Literal(
-//                    ctx.text.dropLast(1).toUInt(),
-//                    "u",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                "L" -> IntegerLiteral(
-//                    ctx.text.dropLast(1).toLong(),
-//                    "L",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                "uL" -> UnsignedInt64Literal(
-//                    ctx.text.dropLast(2).toULong(),
-//                    "uL",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//                else -> throw IllegalArgumentException("Incorrect integer suffix")
-//            }
-//        }
     }
 
+    fun convertBinHexOctToPrimitives(num: String, type: String): Number {
+        val result: Number = if (num.startsWith(HEX_PREFIX)) {
+            if ("i".equals(type)) parseInt(num.drop(2), 16) else parseLong(num.drop(2), 16)
+        } else if (num.startsWith(BIN_PREFIX)) {
+            if ("i".equals(type)) parseInt(num.drop(2), 2) else parseLong(num.drop(2), 2)
+        } else if (num.startsWith(OCT_PREFIX) && num.length > 1) {
+            if ("i".equals(type)) parseInt(num.drop(1), 8) else parseLong(num.drop(1), 8)
+        } else {
+            if ("i".equals(type)) num.toInt() else num.toLong()
+        }
+        return result;
+    }
 
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
-//        return if(ctx.FLOAT_TYPED_SUFFIX() == null) {
-//            FloatLiteral(
-//                ctx.text.toDouble(),
-//                null,
-//                posGetter.getCtxPosition(context.fileName, ctx)
-//            )
-//        } else {
-//            when(ctx.FLOAT_TYPED_SUFFIX().text) {
-//                "f" -> FloatLiteral(
-//                    ctx.text.toFloat(),
-//                    "f",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//
-//                null -> FloatLiteral(
-//                    ctx.text.toDouble(),
-//                    "",
-//                    posGetter.getCtxPosition(context.fileName, ctx)
-//                )
-//
-//                else -> throw IllegalArgumentException("Incorrect float suffix")
-//            }
-//        }
         val num = ctx.text.lowercase()
         if (num.endsWith("f")) {
             return FloatLiteral(
-                ctx.text.toFloat(),
+                num.toFloat(),
                 "f",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
         }
         return FloatLiteral(
-            ctx.text.toDouble(),
+            num.toDouble(),
             null,
             posGetter.getCtxPosition(context.fileName, ctx)
         )
-
     }
 
     override fun visitQualifiedAccess(ctx: QualifiedAccessContext): QualifiedAccess {
