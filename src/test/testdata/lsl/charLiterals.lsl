@@ -9,4 +9,5 @@ automaton A : Int {
     var ch3: Char = '\u72D0';
     var ch4: Char = '\52';
     var ch5: Char = '\123';
+    var ch6: Char = '狐';
 }

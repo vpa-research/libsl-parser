@@ -211,7 +211,7 @@ class ExpressionVisitor(
                     Character.toChars(parseInt(literalString.substring(1), 8))[0]
                 } else {
                     // I must think about this line !!!
-                    String(literalString.toByteArray(Charsets.ISO_8859_1)).single();
+                    literalString.toCharArray()[0]
                 }
                 CharacterLiteral(
                     literal,
