@@ -225,85 +225,81 @@ class ExpressionVisitor(
 
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
         var num = ctx.text.lowercase()
-        if (num.endsWith("ub")) {
-            return UnsignedInt8Literal(
+        return when {
+            num.endsWith("ub") -> UnsignedInt8Literal(
                 ctx.text.dropLast(2).toUByte(),
                 "ub",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else if (num.endsWith("b")) {
-            return IntegerLiteral(
+            num.endsWith("b") -> IntegerLiteral(
                 ctx.text.dropLast(1).toByte(),
                 "b",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else if (num.endsWith("us")) {
-            return UnsignedInt16Literal(
+            num.endsWith("us") -> UnsignedInt16Literal(
                 ctx.text.dropLast(2).toUShort(),
                 "us",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else if (num.endsWith("s")) {
-            return IntegerLiteral(
+            num.endsWith("s") -> IntegerLiteral(
                 ctx.text.dropLast(1).toShort(),
                 "s",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else if (num.endsWith("u")) {
-            return UnsignedInt32Literal(
+            num.endsWith("u") -> UnsignedInt32Literal(
                 ctx.text.dropLast(1).toUInt(),
                 "u",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else if (num.endsWith("ul")) {
-            return UnsignedInt64Literal(
+            num.endsWith("ul") -> UnsignedInt64Literal(
                 ctx.text.dropLast(2).toULong(),
                 "uL",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else if (num.endsWith("l")) {
-            num = num.dropLast(1)
-            return IntegerLiteral(
-                convertBinHexOctToPrimitives(num, "l"),
-                "L",
+            num.endsWith("l") -> {
+                num = num.dropLast(1)
+                IntegerLiteral(
+                    convertBinHexOctToPrimitives(num, "l"),
+                    "L",
+                    posGetter.getCtxPosition(context.fileName, ctx)
+                )
+            }
+            else -> IntegerLiteral(
+                convertBinHexOctToPrimitives(num, "i"),
+                null,
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
         }
-        return IntegerLiteral(
-            convertBinHexOctToPrimitives(num, "i"),
-            null,
-            posGetter.getCtxPosition(context.fileName, ctx)
-        )
     }
 
-    fun convertBinHexOctToPrimitives(num: String, type: String): Number {
+    private fun convertBinHexOctToPrimitives(num: String, type: String): Number {
         val isInt = "i".equals(type)
-        val result: Number = if (num.startsWith(HEX_PREFIX)) {
-            if (isInt) parseInt(num.drop(2), 16) else parseLong(num.drop(2), 16)
-        } else if (num.startsWith(BIN_PREFIX)) {
-            if (isInt) parseInt(num.drop(2), 2) else parseLong(num.drop(2), 2)
-        } else if (num.startsWith(OCT_PREFIX) && num.length > 1) {
-            if (isInt) parseInt(num.drop(1), 8) else parseLong(num.drop(1), 8)
-        } else {
-            if (isInt) num.toInt() else num.toLong()
+        return when {
+            num.startsWith(HEX_PREFIX) -> if (isInt) parseInt(num.drop(2), 16) else parseLong(num.drop(2), 16)
+            num.startsWith(BIN_PREFIX) -> if (isInt) parseInt(num.drop(2), 2) else parseLong(num.drop(2), 2)
+            num.startsWith(OCT_PREFIX) && num.length > 1 -> if (isInt) parseInt(num.drop(1), 8) else parseLong(
+                num.drop(
+                    1
+                ), 8
+            )
+            else -> if (isInt) num.toInt() else num.toLong()
         }
-        return result;
     }
 
     override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
         val num = ctx.text.lowercase()
-        if (num.endsWith("f")) {
-            return FloatLiteral(
+        return when {
+            num.endsWith("f") -> FloatLiteral(
                 num.toFloat(),
                 "f",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
+            else -> FloatLiteral(
+                num.toDouble(),
+                null,
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
         }
-        return FloatLiteral(
-            num.toDouble(),
-            null,
-            posGetter.getCtxPosition(context.fileName, ctx)
-        )
     }
 
     override fun visitQualifiedAccess(ctx: QualifiedAccessContext): QualifiedAccess {
