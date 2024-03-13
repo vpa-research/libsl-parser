@@ -271,7 +271,7 @@ fragment BinaryIntegerLiteral: BinaryNumeral IntegerTypeSuffix?;
 
 fragment DecimalNumeral: '0' | NonZeroDigit (Digits?);
 
-fragment IntegerTypeSuffix: [lL];
+fragment IntegerTypeSuffix: [lLbsu] | 'ub' | 'us' | 'uL';
 
 FloatingPointLiteral: DecimalFloatingPointLiteral;
 

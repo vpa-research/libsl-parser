@@ -225,7 +225,43 @@ class ExpressionVisitor(
 
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
         var num = ctx.text.lowercase()
-        if (num.endsWith("l")) {
+        if (num.endsWith("ub")) {
+            return UnsignedInt8Literal(
+                ctx.text.dropLast(2).toUByte(),
+                "ub",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+        } else if (num.endsWith("b")) {
+            return IntegerLiteral(
+                ctx.text.dropLast(1).toByte(),
+                "b",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+        } else if (num.endsWith("us")) {
+            return UnsignedInt16Literal(
+                ctx.text.dropLast(2).toUShort(),
+                "us",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+        } else if (num.endsWith("s")) {
+            return IntegerLiteral(
+                ctx.text.dropLast(1).toShort(),
+                "s",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+        } else if (num.endsWith("u")) {
+            return UnsignedInt32Literal(
+                ctx.text.dropLast(1).toUInt(),
+                "u",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+        } else if (num.endsWith("ul")) {
+            return UnsignedInt64Literal(
+                ctx.text.dropLast(2).toULong(),
+                "uL",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+        } else if (num.endsWith("l")) {
             num = num.dropLast(1)
             return IntegerLiteral(
                 convertBinHexOctToPrimitives(num, "l"),

@@ -235,5 +235,10 @@ class GeneratedTests {
         runLslTest("charLiterals")
     }
 
+    @Test
+    fun testIntegerLiteralsLsl() {
+        runLslTest("integerLiterals")
+    }
+
 }
 
