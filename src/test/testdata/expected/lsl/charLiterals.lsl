@@ -6,8 +6,7 @@ typealias Char = char;
 automaton A : Int {
     var ch1: Char = 'A';
     var ch2: Char = 'a';
-    var ch3: Char = 52;
+    var ch3: Char = '狐';
     var ch4: Char = '*';
-    var ch5: Char = '';
-    var ch6: Char = 'S';
+    var ch5: Char = 'S';
 }

@@ -277,14 +277,15 @@ class ExpressionVisitor(
     }
 
     fun convertBinHexOctToPrimitives(num: String, type: String): Number {
+        val isInt = "i".equals(type)
         val result: Number = if (num.startsWith(HEX_PREFIX)) {
-            if ("i".equals(type)) parseInt(num.drop(2), 16) else parseLong(num.drop(2), 16)
+            if (isInt) parseInt(num.drop(2), 16) else parseLong(num.drop(2), 16)
         } else if (num.startsWith(BIN_PREFIX)) {
-            if ("i".equals(type)) parseInt(num.drop(2), 2) else parseLong(num.drop(2), 2)
+            if (isInt) parseInt(num.drop(2), 2) else parseLong(num.drop(2), 2)
         } else if (num.startsWith(OCT_PREFIX) && num.length > 1) {
-            if ("i".equals(type)) parseInt(num.drop(1), 8) else parseLong(num.drop(1), 8)
+            if (isInt) parseInt(num.drop(1), 8) else parseLong(num.drop(1), 8)
         } else {
-            if ("i".equals(type)) num.toInt() else num.toLong()
+            if (isInt) num.toInt() else num.toLong()
         }
         return result;
     }
