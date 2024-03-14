@@ -10,4 +10,5 @@ automaton A : Int {
     var d4: double = -1.5E+2;
     var d5: double = -2.1E-5;
     var d6: float = 3.4e+38f;
+    var d7: double = 0.0e+0;
 }

@@ -205,14 +205,7 @@ class ExpressionVisitor(
                 val literalString = primitiveLiteralContext.CHARACTER().asPeriodSeparatedString().removeQuotes()
                 // I'm nor sure in this conversion !!!
                 // https://stackoverflow.com/questions/2126378/java-convert-string-uffff-into-char
-                val literal: Char = if (literalString.startsWith("\\u")) {
-                    Character.toChars(parseInt(literalString.substring(2), 16))[0]
-                } else if (literalString.startsWith("\\")) {
-                    Character.toChars(parseInt(literalString.substring(1), 8))[0]
-                } else {
-                    // I must think about this line !!!
-                    literalString.toCharArray()[0]
-                }
+                val literal = getCharRepresentation(literalString)
                 CharacterLiteral(
                     literal,
                     posGetter.getCtxPosition(fileName, primitiveLiteralContext)
@@ -220,6 +213,21 @@ class ExpressionVisitor(
             }
 
             else -> super.visitPrimitiveLiteral(primitiveLiteralContext) as Atomic
+        }
+    }
+
+    private fun getCharRepresentation(literal: String): Char {
+        return when {
+            literal == "\\n" -> '\n'
+            literal == "\\r" -> '\r'
+            literal == "\\t" -> '\t'
+            literal == "\\b" -> '\b'
+            literal == "\\'" -> '\''
+            literal == "\\\"" -> '\"'
+            literal == "\\\\" -> '\\'
+            literal.startsWith("\\u") -> Character.toChars(parseInt(literal.substring(2), 16))[0]
+            literal.startsWith("\\") -> Character.toChars(parseInt(literal.substring(1), 8))[0]
+            else -> literal.toCharArray()[0]
         }
     }
 

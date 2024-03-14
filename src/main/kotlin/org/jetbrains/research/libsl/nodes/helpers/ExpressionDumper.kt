@@ -104,8 +104,21 @@ object ExpressionDumper {
 
     private fun dumpCharacterLiteral(expression: CharacterLiteral): String {
         val value = expression.value
-        val str = String(value.toString().toByteArray(Charsets.UTF_8))
+        val str = escapeCharStringRepresentation(value)
         return "\'${str}\'"
+    }
+
+    private fun escapeCharStringRepresentation(value: Char): String {
+        return when (value) {
+            '\n' -> "\\n"
+            '\r' -> "\\r"
+            '\t' -> "\\t"
+            '\b' -> "\\b"
+            '\'' -> "\\'"
+            '\"' -> "\\\""
+            '\\' -> "\\\\"
+            else -> String(value.toString().toByteArray(Charsets.UTF_8))
+        }
     }
 
     private fun dumpNullLiteral(expression: NullLiteral): String {
@@ -189,7 +202,7 @@ object ExpressionDumper {
     private fun dumpFunctionUsageExpression(expression: FunctionUsageExpression): String {
         return buildString {
             append("${BackticksPolitics.forIdentifier(expression.functionUsage.functionReference.resolveOrError().name)}(")
-            if(expression.functionUsage.arguments.isNotEmpty()) {
+            if (expression.functionUsage.arguments.isNotEmpty()) {
                 val args = expression.functionUsage.arguments.map { dump(it) }
                 append(args.joinToString(separator = ", "))
             }
@@ -210,7 +223,7 @@ object ExpressionDumper {
     }
 
     private fun dumpNamedArgumentWithValue(expression: NamedArgumentWithValue): String {
-        return if(expression.name != null) {
+        return if (expression.name != null) {
             "${expression.name} = ${expression.value.dumpToString()}"
         } else {
             expression.value.dumpToString()

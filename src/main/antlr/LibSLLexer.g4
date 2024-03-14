@@ -314,7 +314,8 @@ fragment SingleCharacter
     ;
 
 fragment EscapeSequence
-    :   UnicodeEscape
+    :   '\\' 'u005c'? [btnfr"'\\]
+        | UnicodeEscape
         | OctalEscape
     ;
 
