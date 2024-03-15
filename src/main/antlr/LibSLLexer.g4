@@ -335,7 +335,7 @@ Digit: ('0'..'9');
 
 fragment NonZeroDigit: [1-9];
 
-fragment Hex: Digit | ('A'..'F');
+fragment Hex: Digit | [a-fA-F];
 
 fragment HexNumeral: '0' [xX] Hex+;
 

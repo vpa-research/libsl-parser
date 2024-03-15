@@ -8,7 +8,11 @@ import org.jetbrains.research.libsl.nodes.references.builders.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
 import java.lang.Integer.parseInt
+import java.lang.Integer.parseUnsignedInt
 import java.lang.Long.parseLong
+import java.lang.Long.parseUnsignedLong
+import java.lang.Byte.parseByte
+import java.lang.Short.parseShort
 
 class ExpressionVisitor(
     override val context: LslContextBase
@@ -232,42 +236,41 @@ class ExpressionVisitor(
     }
 
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
-        var num = ctx.text.lowercase()
+        val num = ctx.text.lowercase()
         return when {
             num.endsWith("ub") -> UnsignedInt8Literal(
-                ctx.text.dropLast(2).toUByte(),
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ub").toString().toUByte(),
                 "ub",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
             num.endsWith("b") -> IntegerLiteral(
-                ctx.text.dropLast(1).toByte(),
+                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "b"),
                 "b",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
             num.endsWith("us") -> UnsignedInt16Literal(
-                ctx.text.dropLast(2).toUShort(),
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ub").toString().toUShort(),
                 "us",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
             num.endsWith("s") -> IntegerLiteral(
-                ctx.text.dropLast(1).toShort(),
+                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "s"),
                 "s",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
             num.endsWith("u") -> UnsignedInt32Literal(
-                ctx.text.dropLast(1).toUInt(),
+                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "u").toString().toUInt(),
                 "u",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
             num.endsWith("ul") -> UnsignedInt64Literal(
-                ctx.text.dropLast(2).toULong(),
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ul").toString().toULong(),
                 "uL",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
             num.endsWith("l") -> {
-                num = num.dropLast(1)
                 IntegerLiteral(
-                    convertBinHexOctToPrimitives(num, "l"),
+                    convertBinHexOctToPrimitives(num.dropLast(1), "l"),
                     "L",
                     posGetter.getCtxPosition(context.fileName, ctx)
                 )
@@ -281,16 +284,65 @@ class ExpressionVisitor(
     }
 
     private fun convertBinHexOctToPrimitives(num: String, type: String): Number {
-        val isInt = "i".equals(type)
+        val isByte = "b" == type
+        val isUByte = "ub" == type
+        val isShort = "s" == type
+        val isUShort = "us" == type
+        val isInt = "i" == type
+        val isUInt = "u" == type
+        val isLong = "l" == type
+        val isULong = "ul" == type
         return when {
-            num.startsWith(HEX_PREFIX) -> if (isInt) parseInt(num.drop(2), 16) else parseLong(num.drop(2), 16)
-            num.startsWith(BIN_PREFIX) -> if (isInt) parseInt(num.drop(2), 2) else parseLong(num.drop(2), 2)
-            num.startsWith(OCT_PREFIX) && num.length > 1 -> if (isInt) parseInt(num.drop(1), 8) else parseLong(
-                num.drop(
-                    1
-                ), 8
-            )
-            else -> if (isInt) num.toInt() else num.toLong()
+            num.startsWith(HEX_PREFIX) -> return when {
+                isByte -> parseByte(num.drop(2), 16)
+                // This is right idea of conversions ? return Uint and the call toUbyte
+                isUByte -> parseUnsignedInt(num.drop(2), 16)
+                isShort -> parseShort(num.drop(2), 16)
+                // This is right idea of conversions ? return Uint and the call toUshort
+                isUShort -> parseUnsignedInt(num.drop(2), 16)
+                isInt -> parseInt(num.drop(2), 16)
+                isUInt -> parseUnsignedInt(num.drop(2), 16)
+                isLong -> parseLong(num.drop(2), 16)
+                isULong -> parseUnsignedLong(num.drop(2), 16)
+                else -> error("unsupported type of hex integer")
+            }
+            num.startsWith(BIN_PREFIX) -> return when {
+                isByte -> parseByte(num.drop(2), 2)
+                // This is right idea of conversions ? return Uint and the call toUbyte
+                isUByte -> parseUnsignedInt(num.drop(2), 2)
+                isShort -> parseShort(num.drop(2), 2)
+                // This is right idea of conversions ? return Uint and the call toUshort
+                isUShort -> parseUnsignedInt(num.drop(2), 2)
+                isInt -> parseInt(num.drop(2), 2)
+                isUInt -> parseUnsignedInt(num.drop(2), 2)
+                isLong -> parseLong(num.drop(2), 2)
+                isULong -> parseUnsignedLong(num.drop(2), 2)
+                else -> error("unsupported type of binary integer")
+            }
+            num.startsWith(OCT_PREFIX) && num.length > 1 -> return when {
+                isByte -> parseByte(num.drop(1), 8)
+                // This is right idea of conversions ? return Uint and the call toUbyte
+                isUByte -> parseUnsignedInt(num.drop(1), 8)
+                isShort -> parseShort(num.drop(1), 8)
+                // This is right idea of conversions ? return Uint and the call toUshort
+                isUShort -> parseUnsignedInt(num.drop(1), 8)
+                isInt -> parseInt(num.drop(1), 8)
+                isUInt -> parseUnsignedInt(num.drop(1), 8)
+                isLong -> parseLong(num.drop(1), 8)
+                isULong -> parseUnsignedLong(num.drop(1), 8)
+                else -> error("unsupported type of octal integer")
+            }
+            else -> return when {
+                isByte -> num.toByte()
+                isUByte -> num.toInt()
+                isShort -> num.toShort()
+                isUShort -> num.toInt()
+                isInt -> num.toInt()
+                isUInt -> num.toLong()
+                isLong -> num.toLong()
+                isULong -> num.toBigDecimal()
+                else -> error("unsupported type of octal integer")
+            }
         }
     }
 
