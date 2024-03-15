@@ -27,30 +27,31 @@ automaton A : Int {
     var d12: UInt = 0xFFu;
     var d13: ULong = 0x17uL;
     var d14: UShort = 0x17us;
-    var d15: UByte = 0x17ub;
-    var d16: Byte = 0x17b;
+    var d15: UByte = 0x17ux;
+    var d16: Byte = 0x17x;
     var d17: Short = 0x17s;
 
     var d18: UInt = 0b111111u;
     var d19: ULong = 0b111111uL;
     var d20: UShort = 0b111111us;
-    var d21: UByte = 0b111111ub;
-    var d22: Byte = 0b111111b;
+    var d21: UByte = 0b111111ux;
+    var d22: Byte = 0b111111x;
     var d23: Short = 0b111111s;
 
     var d24: UInt = 0133u;
     var d25: ULong = 0133uL;
     var d26: UShort = 0133us;
-    var d27: UByte = 0133ub;
-    var d28: Byte = 0133b;
+    var d27: UByte = 0133ux;
+    var d28: Byte = 0133x;
     var d29: Short = 0133s;
 
     var d30: UInt = 4294967295u;
     var d31: ULong = 18446744073709551615uL;
     var d32: UShort = 65535us;
-    var d33: UByte = 255ub;
-    var d34: Byte = -128b;
-    var d35: Byte = 127b;
+    var d33: UByte = 255ux;
+    var d34: Byte = -128x;
+    var d35: Byte = 127x;
     var d36: Short = -32768s;
     var d37: Short = 32767s;
+    var d38: Byte = 0xbx;
 }

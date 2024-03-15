@@ -11,8 +11,8 @@ typealias ULong = unsigned64;
 automaton A : Int {
     var i1: Int = 50;
     var i2: UInt = 50u;
-    var i3: Byte = 50b;
-    var i4: UByte = 50ub;
+    var i3: Byte = 50x;
+    var i4: UByte = 50ux;
     var i5: Short = 50s;
     var i6: UShort = 50us;
     var i7: Long = 50L;

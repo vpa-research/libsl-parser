@@ -238,18 +238,18 @@ class ExpressionVisitor(
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
         val num = ctx.text.lowercase()
         return when {
-            num.endsWith("ub") -> UnsignedInt8Literal(
-                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ub").toString().toUByte(),
-                "ub",
+            num.endsWith("ux") -> UnsignedInt8Literal(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ux").toString().toUByte(),
+                "ux",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-            num.endsWith("b") -> IntegerLiteral(
-                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "b"),
-                "b",
+            num.endsWith("x") -> IntegerLiteral(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "x"),
+                "x",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
             num.endsWith("us") -> UnsignedInt16Literal(
-                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ub").toString().toUShort(),
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "us").toString().toUShort(),
                 "us",
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
@@ -308,8 +308,8 @@ class ExpressionVisitor(
             )
             else ->
                 return when (type) {
-                    "b" -> num.toByte()
-                    "ub" -> num.toInt()
+                    "x" -> num.toByte()
+                    "ux" -> num.toInt()
                     "s" -> num.toShort()
                     "us" -> num.toInt()
                     "i" -> num.toInt()
@@ -329,9 +329,9 @@ class ExpressionVisitor(
         exceptionMessage: String
     ): Number {
         return when (type) {
-            "b" -> parseByte(num.drop(dropsCount), numeralSystem)
+            "x" -> parseByte(num.drop(dropsCount), numeralSystem)
             // This is right idea of conversions ? return Uint and the call toUbyte
-            "ub" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
+            "ux" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
             "s" -> parseShort(num.drop(dropsCount), numeralSystem)
             // This is right idea of conversions ? return Uint and the call toUshort
             "us" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
