@@ -117,6 +117,7 @@ object ExpressionDumper {
             '\'' -> "\\'"
             '\"' -> "\\\""
             '\\' -> "\\\\"
+            '\u0000' -> "\\0"
             else -> String(value.toString().toByteArray(Charsets.UTF_8))
         }
     }

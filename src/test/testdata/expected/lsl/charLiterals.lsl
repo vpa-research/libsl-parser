@@ -17,4 +17,5 @@ automaton A : Int {
     var ch11: Char = '\'';
     var ch12: Char = '\"';
     var ch13: Char = '\\';
+    var ch14: Char = '\0';
 }

@@ -229,6 +229,7 @@ class ExpressionVisitor(
             literal == "\\'" -> '\''
             literal == "\\\"" -> '\"'
             literal == "\\\\" -> '\\'
+            literal == "\\0" -> '\u0000'
             literal.startsWith("\\u") -> Character.toChars(parseInt(literal.substring(2), 16))[0]
             literal.startsWith("\\") -> Character.toChars(parseInt(literal.substring(1), 8))[0]
             else -> literal.toCharArray()[0]
