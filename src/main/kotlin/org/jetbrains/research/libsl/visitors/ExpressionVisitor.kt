@@ -284,65 +284,62 @@ class ExpressionVisitor(
     }
 
     private fun convertBinHexOctToPrimitives(num: String, type: String): Number {
-        val isByte = "b" == type
-        val isUByte = "ub" == type
-        val isShort = "s" == type
-        val isUShort = "us" == type
-        val isInt = "i" == type
-        val isUInt = "u" == type
-        val isLong = "l" == type
-        val isULong = "ul" == type
         return when {
-            num.startsWith(HEX_PREFIX) -> return when {
-                isByte -> parseByte(num.drop(2), 16)
-                // This is right idea of conversions ? return Uint and the call toUbyte
-                isUByte -> parseUnsignedInt(num.drop(2), 16)
-                isShort -> parseShort(num.drop(2), 16)
-                // This is right idea of conversions ? return Uint and the call toUshort
-                isUShort -> parseUnsignedInt(num.drop(2), 16)
-                isInt -> parseInt(num.drop(2), 16)
-                isUInt -> parseUnsignedInt(num.drop(2), 16)
-                isLong -> parseLong(num.drop(2), 16)
-                isULong -> parseUnsignedLong(num.drop(2), 16)
-                else -> error("unsupported type of hex integer")
-            }
-            num.startsWith(BIN_PREFIX) -> return when {
-                isByte -> parseByte(num.drop(2), 2)
-                // This is right idea of conversions ? return Uint and the call toUbyte
-                isUByte -> parseUnsignedInt(num.drop(2), 2)
-                isShort -> parseShort(num.drop(2), 2)
-                // This is right idea of conversions ? return Uint and the call toUshort
-                isUShort -> parseUnsignedInt(num.drop(2), 2)
-                isInt -> parseInt(num.drop(2), 2)
-                isUInt -> parseUnsignedInt(num.drop(2), 2)
-                isLong -> parseLong(num.drop(2), 2)
-                isULong -> parseUnsignedLong(num.drop(2), 2)
-                else -> error("unsupported type of binary integer")
-            }
-            num.startsWith(OCT_PREFIX) && num.length > 1 -> return when {
-                isByte -> parseByte(num.drop(1), 8)
-                // This is right idea of conversions ? return Uint and the call toUbyte
-                isUByte -> parseUnsignedInt(num.drop(1), 8)
-                isShort -> parseShort(num.drop(1), 8)
-                // This is right idea of conversions ? return Uint and the call toUshort
-                isUShort -> parseUnsignedInt(num.drop(1), 8)
-                isInt -> parseInt(num.drop(1), 8)
-                isUInt -> parseUnsignedInt(num.drop(1), 8)
-                isLong -> parseLong(num.drop(1), 8)
-                isULong -> parseUnsignedLong(num.drop(1), 8)
-                else -> error("unsupported type of octal integer")
-            }
-            else -> return when {
-                isByte -> num.toByte()
-                isUByte -> num.toInt()
-                isShort -> num.toShort()
-                isUShort -> num.toInt()
-                isInt -> num.toInt()
-                isUInt -> num.toLong()
-                isLong -> num.toLong()
-                isULong -> num.toBigDecimal()
-                else -> error("unsupported type of octal integer")
-            }
+            num.startsWith(HEX_PREFIX) -> return getNumInDecimalFormat(
+                num,
+                type,
+                16,
+                2,
+                "unsupported type of hex integer"
+            )
+            num.startsWith(BIN_PREFIX) -> return getNumInDecimalFormat(
+                num,
+                type,
+                2,
+                2,
+                "unsupported type of binary integer"
+            )
+            num.startsWith(OCT_PREFIX) && num.length > 1 -> return getNumInDecimalFormat(
+                num,
+                type,
+                8,
+                1,
+                "unsupported type of octal integer"
+            )
+            else ->
+                return when (type) {
+                    "b" -> num.toByte()
+                    "ub" -> num.toInt()
+                    "s" -> num.toShort()
+                    "us" -> num.toInt()
+                    "i" -> num.toInt()
+                    "u" -> num.toLong()
+                    "l" -> num.toLong()
+                    "ul" -> num.toBigDecimal()
+                    else -> error("unsupported type of octal integer")
+                }
+        }
+    }
+
+    private fun getNumInDecimalFormat(
+        num: String,
+        type: String,
+        numeralSystem: Int,
+        dropsCount: Int,
+        exceptionMessage: String
+    ): Number {
+        return when (type) {
+            "b" -> parseByte(num.drop(dropsCount), numeralSystem)
+            // This is right idea of conversions ? return Uint and the call toUbyte
+            "ub" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
+            "s" -> parseShort(num.drop(dropsCount), numeralSystem)
+            // This is right idea of conversions ? return Uint and the call toUshort
+            "us" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
+            "i" -> parseInt(num.drop(dropsCount), numeralSystem)
+            "u" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
+            "l" -> parseLong(num.drop(dropsCount), numeralSystem)
+            "ul" -> parseUnsignedLong(num.drop(dropsCount), numeralSystem)
+            else -> error(exceptionMessage)
         }
     }
 
