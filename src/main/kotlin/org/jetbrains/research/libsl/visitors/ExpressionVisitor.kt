@@ -226,6 +226,7 @@ class ExpressionVisitor(
             literal == "\\r" -> '\r'
             literal == "\\t" -> '\t'
             literal == "\\b" -> '\b'
+            literal == "\\f" -> '\u000C'
             literal == "\\'" -> '\''
             literal == "\\\"" -> '\"'
             literal == "\\\\" -> '\\'
