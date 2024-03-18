@@ -2,6 +2,7 @@ package org.jetbrains.research.libsl.nodes.helpers
 
 import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.utils.BackticksPolitics
+import org.jetbrains.research.libsl.utils.escapeCharStringRepresentation
 import java.nio.charset.Charset
 
 object ExpressionDumper {
@@ -106,21 +107,6 @@ object ExpressionDumper {
         val value = expression.value
         val str = escapeCharStringRepresentation(value)
         return "\'${str}\'"
-    }
-
-    private fun escapeCharStringRepresentation(value: Char): String {
-        return when (value) {
-            '\n' -> "\\n"
-            '\r' -> "\\r"
-            '\t' -> "\\t"
-            '\b' -> "\\b"
-            '\u000C' -> "\\f"
-            '\'' -> "\\'"
-            '\"' -> "\\\""
-            '\\' -> "\\\\"
-            '\u0000' -> "\\0"
-            else -> String(value.toString().toByteArray(Charsets.UTF_8))
-        }
     }
 
     private fun dumpNullLiteral(expression: NullLiteral): String {

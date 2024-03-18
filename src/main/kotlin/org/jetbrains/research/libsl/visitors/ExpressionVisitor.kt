@@ -7,6 +7,7 @@ import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
+import org.jetbrains.research.libsl.utils.getCharRepresentation
 import java.lang.Integer.parseInt
 import java.lang.Integer.parseUnsignedInt
 import java.lang.Long.parseLong
@@ -217,23 +218,6 @@ class ExpressionVisitor(
             }
 
             else -> super.visitPrimitiveLiteral(primitiveLiteralContext) as Atomic
-        }
-    }
-
-    private fun getCharRepresentation(literal: String): Char {
-        return when {
-            literal == "\\n" -> '\n'
-            literal == "\\r" -> '\r'
-            literal == "\\t" -> '\t'
-            literal == "\\b" -> '\b'
-            literal == "\\f" -> '\u000C'
-            literal == "\\'" -> '\''
-            literal == "\\\"" -> '\"'
-            literal == "\\\\" -> '\\'
-            literal == "\\0" -> '\u0000'
-            literal.startsWith("\\u") -> Character.toChars(parseInt(literal.substring(2), 16))[0]
-            literal.startsWith("\\") -> Character.toChars(parseInt(literal.substring(1), 8))[0]
-            else -> literal.toCharArray()[0]
         }
     }
 
