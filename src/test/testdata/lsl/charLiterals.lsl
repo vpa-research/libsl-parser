@@ -19,4 +19,7 @@ automaton A : Int {
     var ch13: Char = '\\';
     var ch14: Char = '\0';
     var ch15: Char = '\f';
+    var ch16: Char = '\001';
+    var ch17: Char = 'ሴ';
+    var ch18: Char = '\u1234';
 }
