@@ -6,10 +6,10 @@ typealias Char = char;
 automaton A : Int {
     var ch1: Char = 'A';
     var ch2: Char = 'a';
-    var ch3: Char = '\u72d0';
+    var ch3: Char = '\u72D0';
     var ch4: Char = '*';
     var ch5: Char = 'S';
-    var ch6: Char = '\u72d0';
+    var ch6: Char = '\u72D0';
     var ch7: Char = '\n';
     var ch8: Char = '\r';
     var ch9: Char = '\t';

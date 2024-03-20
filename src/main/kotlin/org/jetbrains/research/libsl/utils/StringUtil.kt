@@ -63,10 +63,10 @@ fun escapeSymbol(c: Char, buff: CharArray, pos: Int): Int {
     if (Character.isISOControl(c) || c > CHAR_BASIC_LATIN_END) {
         buff[pos++] = '\\'
         buff[pos++] = 'u'
-        buff[pos++] = (c.code shr (4 * 3) and 0xF).toString(16).toCharArray()[0]
-        buff[pos++] = (c.code shr (4 * 2) and 0xF).toString(16).toCharArray()[0]
-        buff[pos++] = (c.code shr (4 * 1) and 0xF).toString(16).toCharArray()[0]
-        buff[pos++] = (c.code shr (4 * 0) and 0xF).toString(16).toCharArray()[0]
+        buff[pos++] = DIGITS[(c.code shr (4 * 3) and 0xF)]
+        buff[pos++] = DIGITS[(c.code shr (4 * 2) and 0xF)]
+        buff[pos++] = DIGITS[(c.code shr (4 * 1) and 0xF)]
+        buff[pos++] = DIGITS[(c.code shr (4 * 0) and 0xF)]
         return pos
     }
     buff[pos++] = c
