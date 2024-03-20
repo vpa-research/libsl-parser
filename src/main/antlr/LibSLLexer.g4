@@ -254,6 +254,43 @@ NULL
    :   'null'
    ;
 
+IntegerLiteral:
+    DecimalIntegerLiteral
+    | HexIntegerLiteral
+    | OctalIntegerLiteral
+    | BinaryIntegerLiteral
+;
+
+fragment DecimalIntegerLiteral: DecimalNumeral IntegerTypeSuffix?;
+
+fragment HexIntegerLiteral: HexNumeral IntegerTypeSuffix?;
+
+fragment OctalIntegerLiteral: OctalNumeral IntegerTypeSuffix?;
+
+fragment BinaryIntegerLiteral: BinaryNumeral IntegerTypeSuffix?;
+
+fragment DecimalNumeral: '0' | NonZeroDigit (Digits?);
+
+fragment IntegerTypeSuffix: [lLxsu] | 'ux' | 'us' | 'uL';
+
+FloatingPointLiteral: DecimalFloatingPointLiteral;
+
+fragment DecimalFloatingPointLiteral:
+    Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+    | Digits ExponentPart FloatTypeSuffix?
+    | Digits FloatTypeSuffix
+;
+
+fragment ExponentPart: ExponentIndicator SignedInteger;
+
+fragment ExponentIndicator: [eE];
+
+fragment SignedInteger: Sign? Digits;
+
+fragment Sign: [+-];
+
+fragment FloatTypeSuffix: [fFdD];
+
 Identifier
    :   [a-zA-Z_$][a-zA-Z0-9_$]*
    |   '`' .*? '`'
@@ -272,19 +309,43 @@ CHARACTER
    |   '\'' EscapeSequence '\''
    ;
 
-fragment
-SingleCharacter
+fragment SingleCharacter
     :   ~['\\\r\n]
     ;
 
-fragment
-EscapeSequence
-    :   '\\u' Hex Hex Hex Hex Hex Hex Hex Hex
+fragment EscapeSequence
+    :   '\\' [btnfr"'\\]
+        | UnicodeEscape
+        | OctalEscape
     ;
+
+fragment UnicodeEscape: '\\' 'u'+ Hex Hex Hex Hex;
+
+fragment OctalEscape:
+    '\\' OctalDigit
+    | '\\' OctalDigit OctalDigit
+    | '\\' ZeroToThree OctalDigit OctalDigit
+;
+
+fragment ZeroToThree: [0-3];
+
+fragment Digits: Digit+;
 
 Digit: ('0'..'9');
 
-Hex: Digit | ('A'..'F');
+fragment NonZeroDigit: [1-9];
+
+fragment Hex: Digit | [a-fA-F];
+
+fragment HexNumeral: '0' [xX] Hex+;
+
+fragment OctalNumeral: '0' OctalDigit+;
+
+fragment OctalDigit: [0-7];
+
+fragment BinaryNumeral: '0' [bB] BinaryDigit+;
+
+fragment BinaryDigit: [01];
 
 fragment
 NEWLINE

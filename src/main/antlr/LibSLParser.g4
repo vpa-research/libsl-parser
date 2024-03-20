@@ -501,12 +501,11 @@ periodSeparatedFullName
    ;
 
 integerNumber
-   :   MINUS? Digit+ suffix?
-   |   Digit suffix?
+   :   (MINUS | PLUS)? IntegerLiteral
    ;
 
 floatNumber
-   :   MINUS? Digit+ DOT Digit+ suffix?
+   :   (MINUS | PLUS)? FloatingPointLiteral
    ;
 
 suffix

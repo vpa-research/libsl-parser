@@ -7,13 +7,22 @@ import org.jetbrains.research.libsl.nodes.*
 import org.jetbrains.research.libsl.nodes.references.builders.*
 import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
-import java.nio.charset.StandardCharsets
+import org.jetbrains.research.libsl.utils.getCharRepresentation
+import java.lang.Integer.parseInt
+import java.lang.Integer.parseUnsignedInt
+import java.lang.Long.parseLong
+import java.lang.Long.parseUnsignedLong
+import java.lang.Byte.parseByte
+import java.lang.Short.parseShort
 
 class ExpressionVisitor(
     override val context: LslContextBase
 ) : LibSLParserVisitor<Expression>(context) {
     private val fileName = context.fileName
     private val posGetter = PositionGetter()
+    private val HEX_PREFIX = "0x"
+    private val OCT_PREFIX = "0"
+    private val BIN_PREFIX = "0b"
 
     override fun visitExpression(ctx: ExpressionContext): Expression {
         return when {
@@ -199,7 +208,9 @@ class ExpressionVisitor(
 
             primitiveLiteralContext.CHARACTER() != null -> {
                 val literalString = primitiveLiteralContext.CHARACTER().asPeriodSeparatedString().removeQuotes()
-                val literal = String(literalString.toByteArray(Charsets.ISO_8859_1)).single();
+                // I'm nor sure in this conversion !!!
+                // https://stackoverflow.com/questions/2126378/java-convert-string-uffff-into-char
+                val literal = getCharRepresentation(literalString)
                 CharacterLiteral(
                     literal,
                     posGetter.getCtxPosition(fileName, primitiveLiteralContext)
@@ -211,82 +222,126 @@ class ExpressionVisitor(
     }
 
     override fun visitIntegerNumber(ctx: LibSLParser.IntegerNumberContext): Atomic {
-        if(ctx.suffix() == null) {
-            return IntegerLiteral(
-                ctx.text.toInt(),
-                null,
-                posGetter.getCtxPosition(context.fileName, ctx))
-        } else {
-            return when(ctx.suffix().text) {
-                "b" -> IntegerLiteral(
-                    ctx.text.dropLast(1).toByte(),
-                    "b",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "ub" -> UnsignedInt8Literal(
-                    ctx.text.dropLast(2).toUByte(),
-                    "ub",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "s" -> IntegerLiteral(
-                    ctx.text.dropLast(1).toShort(),
-                    "s",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "us" -> UnsignedInt16Literal(
-                    ctx.text.dropLast(2).toUShort(),
-                    "us",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                null -> IntegerLiteral(
-                    ctx.text.toInt(),
-                    "",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "u" -> UnsignedInt32Literal(
-                    ctx.text.dropLast(1).toUInt(),
-                    "u",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                "L" -> IntegerLiteral(
-                    ctx.text.dropLast(1).toLong(),
+        val num = ctx.text.lowercase()
+        return when {
+            num.endsWith("ux") -> UnsignedInt8Literal(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ux").toString().toUByte(),
+                "ux",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+            num.endsWith("x") -> IntegerLiteral(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "x"),
+                "x",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+            num.endsWith("us") -> UnsignedInt16Literal(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "us").toString().toUShort(),
+                "us",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+            num.endsWith("s") -> IntegerLiteral(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "s"),
+                "s",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+            num.endsWith("u") -> UnsignedInt32Literal(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(1), "u").toString().toUInt(),
+                "u",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+            num.endsWith("ul") -> UnsignedInt64Literal(
+                convertBinHexOctToPrimitives(ctx.text.dropLast(2), "ul").toString().toULong(),
+                "uL",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+            num.endsWith("l") -> {
+                IntegerLiteral(
+                    convertBinHexOctToPrimitives(num.dropLast(1), "l"),
                     "L",
                     posGetter.getCtxPosition(context.fileName, ctx)
                 )
-                "uL" -> UnsignedInt64Literal(
-                    ctx.text.dropLast(2).toULong(),
-                    "uL",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
-                else -> throw IllegalArgumentException("Incorrect integer suffix")
             }
-        }
-    }
-
-
-    override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
-        return if(ctx.suffix() == null) {
-            FloatLiteral(
-                ctx.text.toDouble(),
+            else -> IntegerLiteral(
+                convertBinHexOctToPrimitives(num, "i"),
                 null,
                 posGetter.getCtxPosition(context.fileName, ctx)
             )
-        } else {
-            when(ctx.suffix().text) {
-                "f" -> FloatLiteral(
-                    ctx.text.toFloat(),
-                    "f",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
+        }
+    }
 
-                null -> FloatLiteral(
-                    ctx.text.toDouble(),
-                    "",
-                    posGetter.getCtxPosition(context.fileName, ctx)
-                )
+    private fun convertBinHexOctToPrimitives(num: String, type: String): Number {
+        return when {
+            num.startsWith(HEX_PREFIX) -> return getNumInDecimalFormat(
+                num,
+                type,
+                16,
+                2,
+                "unsupported type of hex integer"
+            )
+            num.startsWith(BIN_PREFIX) -> return getNumInDecimalFormat(
+                num,
+                type,
+                2,
+                2,
+                "unsupported type of binary integer"
+            )
+            num.startsWith(OCT_PREFIX) && num.length > 1 -> return getNumInDecimalFormat(
+                num,
+                type,
+                8,
+                1,
+                "unsupported type of octal integer"
+            )
+            else ->
+                return when (type) {
+                    "x" -> num.toByte()
+                    "ux" -> num.toInt()
+                    "s" -> num.toShort()
+                    "us" -> num.toInt()
+                    "i" -> num.toInt()
+                    "u" -> num.toLong()
+                    "l" -> num.toLong()
+                    "ul" -> num.toBigDecimal()
+                    else -> error("unsupported type of octal integer")
+                }
+        }
+    }
 
-                else -> throw IllegalArgumentException("Incorrect float suffix")
-            }
+    private fun getNumInDecimalFormat(
+        num: String,
+        type: String,
+        numeralSystem: Int,
+        dropsCount: Int,
+        exceptionMessage: String
+    ): Number {
+        return when (type) {
+            "x" -> parseByte(num.drop(dropsCount), numeralSystem)
+            // This is right idea of conversions ? return Uint and the call toUbyte
+            "ux" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
+            "s" -> parseShort(num.drop(dropsCount), numeralSystem)
+            // This is right idea of conversions ? return Uint and the call toUshort
+            "us" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
+            "i" -> parseInt(num.drop(dropsCount), numeralSystem)
+            "u" -> parseUnsignedInt(num.drop(dropsCount), numeralSystem)
+            "l" -> parseLong(num.drop(dropsCount), numeralSystem)
+            "ul" -> parseUnsignedLong(num.drop(dropsCount), numeralSystem)
+            else -> error(exceptionMessage)
+        }
+    }
+
+    override fun visitFloatNumber(ctx: LibSLParser.FloatNumberContext): FloatLiteral {
+        val num = ctx.text.lowercase()
+        return when {
+            num.endsWith("f") -> FloatLiteral(
+                num.toFloat(),
+                "f",
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
+            else -> FloatLiteral(
+                num.toDouble(),
+                null,
+                posGetter.getCtxPosition(context.fileName, ctx)
+            )
         }
     }
 
@@ -296,7 +351,7 @@ class ExpressionVisitor(
                 processPeriodSeparatedQualifiedAccess(ctx.periodSeparatedFullName())
             }
 
-            ctx.simpleCall()!= null && ctx.procUsage() == null -> {
+            ctx.simpleCall() != null && ctx.procUsage() == null -> {
                 val automatonByFunctionArgumentCreation = visitSimpleCall(ctx.simpleCall())
                 val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it) }
 
@@ -305,9 +360,9 @@ class ExpressionVisitor(
                 }
             }
 
-            ctx.simpleCall()!= null && ctx.procUsage() != null -> {
+            ctx.simpleCall() != null && ctx.procUsage() != null -> {
                 val automatonProcedureCall = visitSimpleCallWithProcedure(ctx)
-                val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it)}
+                val childQualifiedAccess = ctx.qualifiedAccess(0)?.let { visitQualifiedAccess(it) }
 
                 automatonProcedureCall.also {
                     it.childAccess = childQualifiedAccess
@@ -351,7 +406,7 @@ class ExpressionVisitor(
     ): QualifiedAccess {
         val names = periodSeparatedFullNameContext.Identifier().map { it.text.extractIdentifier() }
 
-        val lastAccess = when(val lastFieldName = names.last()) {
+        val lastAccess = when (val lastFieldName = names.last()) {
 
             "this" ->
                 ThisAccess(
@@ -481,14 +536,14 @@ class ExpressionVisitor(
     override fun visitActionUsage(ctx: ActionUsageContext): Expression {
         val name = ctx.Identifier().text.extractIdentifier()
         for (c in name) {
-            if(c.isLowerCase()) {
+            if (c.isLowerCase()) {
                 throw IllegalArgumentException("Action names must be in upper case")
             }
         }
         val expressionVisitor = ExpressionVisitor(context)
         val args = mutableListOf<Expression>()
-        if(ctx.expressionsList() != null) {
-            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
+        if (ctx.expressionsList() != null) {
+            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr)) }
         }
 
         val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
@@ -510,8 +565,8 @@ class ExpressionVisitor(
         val name = visitQualifiedAccess(ctx.qualifiedAccess()).lastChild.toString()
         val expressionVisitor = ExpressionVisitor(context)
         val args = mutableListOf<Expression>()
-        if(ctx.expressionsList() != null) {
-            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr))}
+        if (ctx.expressionsList() != null) {
+            ctx.expressionsList().expression().forEach { expr -> args.add(expressionVisitor.visitExpression(expr)) }
         }
         //val argTypes = args.map { argument -> context.typeInferrer.getExpressionType(argument).getReference(context) }
         //val procRef = FunctionReferenceBuilder.build(name, argTypes, context)

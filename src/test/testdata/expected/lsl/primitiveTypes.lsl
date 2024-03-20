@@ -19,4 +19,7 @@ automaton A : Int {
     fun newSum(): Float {
         result = 0.0f + 0.1f;
     }
+    fun compareInt(): Int {
+        result = 1073;
+    }
 }

@@ -6,6 +6,11 @@ import org.junit.jupiter.api.Test
 
 class GeneratedTests {
     @Test
+    fun testArrayListLsl() {
+        runLslTest("ArrayList")
+    }
+
+    @Test
     fun test_interfacesLsl() {
         runLslTest("_interfaces")
     }
@@ -28,11 +33,6 @@ class GeneratedTests {
     @Test
     fun testAnnotationsLsl() {
         runLslTest("annotations")
-    }
-
-    @Test
-    fun testArrayListLsl() {
-        runLslTest("ArrayList")
     }
 
     @Test
@@ -218,6 +218,26 @@ class GeneratedTests {
     @Test
     fun testVoidAndAnyLsl() {
         runLslTest("voidAndAny")
+    }
+
+    @Test
+    fun testScientificNotationLsl() {
+        runLslTest("scientificNotation")
+    }
+
+    @Test
+    fun testHexBinAndOctLiteralsLsl() {
+        runLslTest("hexBinAndOctLiterals")
+    }
+
+    @Test
+    fun testCharLiteralsLsl() {
+        runLslTest("charLiterals")
+    }
+
+    @Test
+    fun testIntegerLiteralsLsl() {
+        runLslTest("integerLiterals")
     }
 
 }
