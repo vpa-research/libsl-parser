@@ -11,6 +11,7 @@ open class Function(
     open val kind: FunctionKind,
     open val name: String,
     open val automatonReference: AutomatonReference?,
+    open val funGenerics: MutableList<String>,
     open var args: MutableList<FunctionArgument> = mutableListOf(),
     open val returnType: TypeReference?,
     open val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
@@ -24,15 +25,23 @@ open class Function(
     open val entityPosition: EntityPosition
 ) : Node() {
     val fullName: String
-        get() = if(automatonReference?.name?.isEmpty() == true) "${automatonReference!!.name}.$name" else name
+        get() = if (automatonReference?.name?.isEmpty() == true) "${automatonReference!!.name}.$name" else name
 
     override fun dumpToString(): String = buildString {
         append(formatListEmptyLineAtEndIfNeeded(annotationUsages))
-        if(isStatic) {
+        if (isStatic) {
             append("static ")
         }
+        if (funGenerics.isNotEmpty()) {
+            append("<")
+            for (i in 0 until funGenerics.size - 1) {
+                append(funGenerics[i] + ", ")
+            }
+            append(funGenerics[funGenerics.size - 1])
+            append("> ")
+        }
         append("${kind.value} ")
-        if(isMethod) {
+        if (isMethod) {
             append("*.")
         }
         append(BackticksPolitics.forIdentifier(name))
@@ -42,7 +51,10 @@ open class Function(
 
         if (returnType != null) {
             append(": ")
-            append(returnType!!.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
+            if (funGenerics.contains(returnType!!.name))
+                append(returnType!!.name)
+            else
+                append(returnType!!.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
         }
 
         if (!hasBody && contracts.isEmpty()) {
@@ -80,7 +92,7 @@ data class Constructor(
     override val isMethod: Boolean,
     override val entityPosition: EntityPosition
 ) : Function(
-    kind = FunctionKind.CONSTRUCTOR, name, automatonReference = null, args, returnType = null,
+    kind = FunctionKind.CONSTRUCTOR, name, automatonReference = null, mutableListOf(), args, returnType = null,
     annotationUsages, contracts,
     statements, hasBody, null, context, false, isMethod, entityPosition
 )
@@ -96,7 +108,7 @@ class Destructor(
     override val isMethod: Boolean,
     override val entityPosition: EntityPosition
 ) : Function(
-    kind = FunctionKind.DESTRUCTOR, name, null, args, null,
+    kind = FunctionKind.DESTRUCTOR, name, null, mutableListOf(), args, null,
     annotationUsages, contracts,
     statements, hasBody, null, context, false, isMethod, entityPosition
 )
@@ -113,7 +125,7 @@ class Procedure(
     override val isMethod: Boolean,
     override val entityPosition: EntityPosition
 ) : Function(
-    kind = FunctionKind.PROC, name, null, args, returnType,
+    kind = FunctionKind.PROC, name, null, mutableListOf(), args, returnType,
     annotationUsages, contracts,
     statements, hasBody, null, context, false, isMethod, entityPosition
 )

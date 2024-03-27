@@ -9,7 +9,6 @@ import org.jetbrains.research.libsl.nodes.Function
 import org.jetbrains.research.libsl.nodes.references.AutomatonReference
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder
 import org.jetbrains.research.libsl.nodes.references.builders.AutomatonReferenceBuilder.getReference
-import org.jetbrains.research.libsl.nodes.references.builders.TypeReferenceBuilder.getReference
 import org.jetbrains.research.libsl.utils.PositionGetter
 import kotlin.IllegalStateException
 
@@ -33,7 +32,8 @@ class FunctionVisitor(
         } */
         // check((automatonName != null) xor (parentAutomaton != null))
 
-        val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) } ?: parentAutomaton?.getReference(functionContext)
+        val automatonReference = automatonName?.let { AutomatonReferenceBuilder.build(it, functionContext) }
+            ?: parentAutomaton?.getReference(functionContext)
         // check(automatonReference != null)
 
         if (automatonName != null) {
@@ -41,8 +41,8 @@ class FunctionVisitor(
         }
 
         var isStatic = false
-        if(ctx.functionHeader().modifier != null) {
-            if(ctx.functionHeader().modifier.text == "static") {
+        if (ctx.functionHeader().modifier != null) {
+            if (ctx.functionHeader().modifier.text == "static") {
                 isStatic = true
             } else {
                 throw IllegalStateException("Unknown modifier, only static allowed")
@@ -59,6 +59,11 @@ class FunctionVisitor(
         val targetAutomatonRef = args.getFunctionTargetByAnnotation ?: automatonReference
         val returnType = ctx.functionHeader().functionType?.let { processTypeIdentifier(it) }
 
+        val funGenerics: MutableList<String> = if (ctx.functionHeader().typeParameters() != null)
+            ctx.funGenerics
+        else
+            mutableListOf()
+
         if (returnType != null) {
             val resultVariable = ResultVariable(
                 returnType,
@@ -71,6 +76,7 @@ class FunctionVisitor(
             kind = FunctionKind.FUNCTION,
             functionName,
             automatonReference,
+            funGenerics,
             args,
             returnType,
             annotationReferences,
@@ -161,7 +167,7 @@ class FunctionVisitor(
     }
 
     override fun visitFunctionBodyStatement(ctx: FunctionBodyStatementContext) {
-        if(parentAutomaton is AutomatonConcept) {
+        if (parentAutomaton is AutomatonConcept) {
             error("Function realisation inside automaton concept")
         } else {
             val visitor = BlockStatementVisitor(functionContext)
@@ -184,15 +190,15 @@ class FunctionVisitor(
                 posGetter.getCtxPosition(fileName, parameter)
             )
 
-                /* if (annotationsReferences.any { it.annotationReference.name == "target" }) {
-                val targetAutomatonName = typeRef.name
-                val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
-                arg.targetAutomaton = targetAutomatonReference
-                arg.typeReference = globalContext.getAllTypes().filter {
-                    it.name.equals(targetAutomatonName) }.first().getReference(context)
+            /* if (annotationsReferences.any { it.annotationReference.name == "target" }) {
+            val targetAutomatonName = typeRef.name
+            val targetAutomatonReference = AutomatonReferenceBuilder.build(targetAutomatonName, context)
+            arg.targetAutomaton = targetAutomatonReference
+            arg.typeReference = globalContext.getAllTypes().filter {
+                it.name.equals(targetAutomatonName) }.first().getReference(context)
 
-                }
-                 */
+            }
+             */
 
             arg
         }.orEmpty()
@@ -242,5 +248,15 @@ class FunctionVisitor(
             posGetter.getCtxPosition(fileName, expressionContext)
         )
         buildingFunction.contracts.add(contract)
+    }
+
+    private val FunctionDeclContext.funGenerics: MutableList<String>
+        get() = getFunGenerics(this.functionHeader().typeParameters())
+
+    private fun getFunGenerics(typeParameters: TypeParametersContext): MutableList<String> {
+        val funGenerics: MutableList<String> = mutableListOf()
+        for (typeParam in typeParameters.typeParameterList().typeParameter())
+            funGenerics.add(typeParam.text)
+        return funGenerics
     }
 }

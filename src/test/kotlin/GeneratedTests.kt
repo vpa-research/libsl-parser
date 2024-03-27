@@ -240,5 +240,9 @@ class GeneratedTests {
         runLslTest("integerLiterals")
     }
 
+    @Test
+    fun testGnericsLsl() {
+        runLslTest("generics")
+    }
 }
 

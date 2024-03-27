@@ -101,17 +101,21 @@ private fun checkAutomatonIsResolved(automaton: Automaton) {
 private fun checkFunctionIsResolved(function: Function) {
     checkStatementIsResolved(function, function.statements)
 
-    function.returnType?.resolveOrError()
-    function.args.forEach { arg -> arg.typeReference.resolveOrError() }
+    if (!function.funGenerics.contains(function.returnType?.name)) function.returnType?.resolveOrError()
+    function.args.forEach { arg -> if (!function.funGenerics.contains(arg.typeReference.name)) arg.typeReference.resolveOrError() }
 }
 
 private fun checkStatementIsResolved(function: Function, statements: List<Statement>) {
     for (s in statements) {
         when (s) {
-            is ActionUsage -> {s.actionReference.resolveOrError()}
+            is ActionUsage -> {
+                s.actionReference.resolveOrError()
+            }
             // is ProcedureCall -> {s.procReference.resolveOrError()}
             is ProcedureCall -> {}
-            is VariableDeclaration -> {s.variable.typeReference.resolveOrError()}
+            is VariableDeclaration -> {
+                s.variable.typeReference.resolveOrError()
+            }
             is Assignment -> {
                 function.context.typeInferrer.getExpressionType(s.left)
                 function.context.typeInferrer.getExpressionType(s.value)
@@ -144,7 +148,7 @@ private fun checkTypeIsResolved(type: Type) {
         is PrimitiveType -> {}
         is RealType -> {}
         is StructuredType -> {
-            type.variables.forEach { v -> v.typeReference.resolveOrError()}
+            type.variables.forEach { v -> v.typeReference.resolveOrError() }
         }
     }
 }

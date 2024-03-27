@@ -294,7 +294,7 @@ functionDecl
    ;
 
 functionHeader
-   :   annotationUsage* modifier=Identifier? FUN (automatonName=periodSeparatedFullName DOT)? headerWithAsterisk? functionName=Identifier
+   :   annotationUsage* modifier=Identifier? typeParameters? FUN (automatonName=periodSeparatedFullName DOT)? headerWithAsterisk? functionName=Identifier
    L_BRACKET functionDeclArgList? R_BRACKET (COLON functionType=typeIdentifier)?
    ;
 
@@ -511,3 +511,15 @@ floatNumber
 suffix
    :   Identifier
    ;
+
+typeParameter
+    : paramType=Identifier
+    ;
+
+typeParameters
+    : L_ARROW typeParameterList R_ARROW
+    ;
+
+typeParameterList
+    : typeParameter (',' typeParameter)*
+    ;
