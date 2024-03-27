@@ -513,7 +513,7 @@ suffix
    ;
 
 typeParameter
-    : paramType=Identifier
+    : (bound=(IN | OUT))? paramType=Identifier
     ;
 
 typeParameters

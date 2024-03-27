@@ -254,6 +254,14 @@ NULL
    :   'null'
    ;
 
+IN
+   :   'in'
+   ;
+
+OUT
+   :   'out'
+   ;
+
 IntegerLiteral:
     DecimalIntegerLiteral
     | HexIntegerLiteral

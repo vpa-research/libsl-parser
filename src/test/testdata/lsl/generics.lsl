@@ -28,4 +28,7 @@ automaton A
 
     <T, R, Q> fun *.genericFunWithParametrizedArray(a: T, b: Q): array<R> {
     }
+
+    <in T, out R> fun *.copy(from: R, to: T): void {
+    }
 }

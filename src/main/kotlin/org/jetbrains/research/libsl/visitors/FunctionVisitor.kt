@@ -59,7 +59,7 @@ class FunctionVisitor(
         val targetAutomatonRef = args.getFunctionTargetByAnnotation ?: automatonReference
         val returnType = ctx.functionHeader().functionType?.let { processTypeIdentifier(it) }
 
-        val funGenerics: MutableList<String> = if (ctx.functionHeader().typeParameters() != null)
+        val funGenerics: MutableList<Generic> = if (ctx.functionHeader().typeParameters() != null)
             ctx.funGenerics
         else
             mutableListOf()
@@ -250,13 +250,16 @@ class FunctionVisitor(
         buildingFunction.contracts.add(contract)
     }
 
-    private val FunctionDeclContext.funGenerics: MutableList<String>
+    private val FunctionDeclContext.funGenerics: MutableList<Generic>
         get() = getFunGenerics(this.functionHeader().typeParameters())
 
-    private fun getFunGenerics(typeParameters: TypeParametersContext): MutableList<String> {
-        val funGenerics: MutableList<String> = mutableListOf()
-        for (typeParam in typeParameters.typeParameterList().typeParameter())
-            funGenerics.add(typeParam.text)
+    private fun getFunGenerics(typeParameters: TypeParametersContext): MutableList<Generic> {
+        val funGenerics: MutableList<Generic> = mutableListOf()
+        for (typeParam in typeParameters.typeParameterList().typeParameter()) {
+            val type =
+                if (typeParam.bound == null) GenericTypeKind.PLAIN else GenericTypeKind.fromString(typeParam.bound.text)
+            funGenerics.add(Generic(typeParam.paramType.text, type))
+        }
         return funGenerics
     }
 }

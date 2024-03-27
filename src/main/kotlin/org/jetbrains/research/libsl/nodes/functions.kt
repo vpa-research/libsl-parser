@@ -11,7 +11,7 @@ open class Function(
     open val kind: FunctionKind,
     open val name: String,
     open val automatonReference: AutomatonReference?,
-    open val funGenerics: MutableList<String>,
+    open val funGenerics: MutableList<Generic>,
     open var args: MutableList<FunctionArgument> = mutableListOf(),
     open val returnType: TypeReference?,
     open val annotationUsages: MutableList<AnnotationUsage> = mutableListOf(),
@@ -35,9 +35,9 @@ open class Function(
         if (funGenerics.isNotEmpty()) {
             append("<")
             for (i in 0 until funGenerics.size - 1) {
-                append(funGenerics[i] + ", ")
+                appendGeneric(this, i, true)
             }
-            append(funGenerics[funGenerics.size - 1])
+            appendGeneric(this, funGenerics.size - 1, false)
             append("> ")
         }
         append("${kind.value} ")
@@ -51,7 +51,7 @@ open class Function(
 
         if (returnType != null) {
             append(": ")
-            if (funGenerics.contains(returnType!!.name))
+            if (funGenerics.contains(Generic(returnType!!.name, GenericTypeKind.PLAIN)))
                 append(returnType!!.name)
             else
                 append(returnType!!.resolve()?.fullName ?: UNRESOLVED_TYPE_SYMBOL)
@@ -70,6 +70,12 @@ open class Function(
             append(withIndent(formatListEmptyLineAtEndIfNeeded(statements)))
             appendLine("}")
         }
+    }
+
+    private fun appendGeneric(t: StringBuilder, i: Int, addComma: Boolean) {
+        val type =
+            if (!funGenerics[i].type.equals(GenericTypeKind.PLAIN)) funGenerics[i].type.string + " " else ""
+        t.append(type + funGenerics[i].name + if (addComma) ", " else "")
     }
 }
 

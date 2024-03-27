@@ -12,7 +12,8 @@ enum class ArithmeticUnaryOp(val string: String) {
 
     companion object {
         fun fromString(str: String) = ArithmeticUnaryOp.values().firstOrNull { op ->
-            op.string == str }
+            op.string == str
+        }
             ?: throw NoSuchElementException("Unknown operator: $str")
 
     }
