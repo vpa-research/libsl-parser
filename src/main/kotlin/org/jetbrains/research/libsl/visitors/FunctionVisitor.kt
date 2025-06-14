@@ -97,6 +97,7 @@ class FunctionVisitor(
 
         super.visitFunctionDecl(ctx)
         parentAutomaton?.localFunctions?.add(buildingFunction)
+        context.parentContext?.storeFunction(buildingFunction)
     }
 
     override fun visitConstructorDecl(ctx: ConstructorDeclContext) {
